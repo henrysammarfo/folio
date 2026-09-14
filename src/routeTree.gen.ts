@@ -10,33 +10,187 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as CreditRouteImport } from './routes/credit'
+import { Route as DeskRouteImport } from './routes/desk'
+import { Route as ExecutionRouteImport } from './routes/execution'
+import { Route as NetworkRouteImport } from './routes/network'
+import { Route as TruthRouteImport } from './routes/truth'
+import { Route as DeskAcquireRouteImport } from './routes/desk.acquire'
+import { Route as DeskActivityRouteImport } from './routes/desk.activity'
+import { Route as DeskCreditRouteImport } from './routes/desk.credit'
+import { Route as DeskPositionsRouteImport } from './routes/desk.positions'
+import { Route as DeskSettingsRouteImport } from './routes/desk.settings'
+import { Route as DeskPositionsSymbolRouteImport } from './routes/desk.positions.$symbol'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreditRoute = CreditRouteImport.update({
+  id: '/credit',
+  path: '/credit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeskRoute = DeskRouteImport.update({
+  id: '/desk',
+  path: '/desk',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExecutionRoute = ExecutionRouteImport.update({
+  id: '/execution',
+  path: '/execution',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NetworkRoute = NetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TruthRoute = TruthRouteImport.update({
+  id: '/truth',
+  path: '/truth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeskAcquireRoute = DeskAcquireRouteImport.update({
+  id: '/acquire',
+  path: '/acquire',
+  getParentRoute: () => DeskRoute,
+} as any)
+const DeskActivityRoute = DeskActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => DeskRoute,
+} as any)
+const DeskCreditRoute = DeskCreditRouteImport.update({
+  id: '/credit',
+  path: '/credit',
+  getParentRoute: () => DeskRoute,
+} as any)
+const DeskPositionsRoute = DeskPositionsRouteImport.update({
+  id: '/positions',
+  path: '/positions',
+  getParentRoute: () => DeskRoute,
+} as any)
+const DeskSettingsRoute = DeskSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DeskRoute,
+} as any)
+const DeskPositionsSymbolRoute = DeskPositionsSymbolRouteImport.update({
+  id: '/$symbol',
+  path: '/$symbol',
+  getParentRoute: () => DeskPositionsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/credit': typeof CreditRoute
+  '/desk': typeof DeskRouteWithChildren
+  '/execution': typeof ExecutionRoute
+  '/network': typeof NetworkRoute
+  '/truth': typeof TruthRoute
+  '/desk/acquire': typeof DeskAcquireRoute
+  '/desk/activity': typeof DeskActivityRoute
+  '/desk/credit': typeof DeskCreditRoute
+  '/desk/positions': typeof DeskPositionsRouteWithChildren
+  '/desk/settings': typeof DeskSettingsRoute
+  '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/credit': typeof CreditRoute
+  '/desk': typeof DeskRouteWithChildren
+  '/execution': typeof ExecutionRoute
+  '/network': typeof NetworkRoute
+  '/truth': typeof TruthRoute
+  '/desk/acquire': typeof DeskAcquireRoute
+  '/desk/activity': typeof DeskActivityRoute
+  '/desk/credit': typeof DeskCreditRoute
+  '/desk/positions': typeof DeskPositionsRouteWithChildren
+  '/desk/settings': typeof DeskSettingsRoute
+  '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/credit': typeof CreditRoute
+  '/desk': typeof DeskRouteWithChildren
+  '/execution': typeof ExecutionRoute
+  '/network': typeof NetworkRoute
+  '/truth': typeof TruthRoute
+  '/desk/acquire': typeof DeskAcquireRoute
+  '/desk/activity': typeof DeskActivityRoute
+  '/desk/credit': typeof DeskCreditRoute
+  '/desk/positions': typeof DeskPositionsRouteWithChildren
+  '/desk/settings': typeof DeskSettingsRoute
+  '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/credit'
+    | '/desk'
+    | '/execution'
+    | '/network'
+    | '/truth'
+    | '/desk/acquire'
+    | '/desk/activity'
+    | '/desk/credit'
+    | '/desk/positions'
+    | '/desk/settings'
+    | '/desk/positions/$symbol'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/credit'
+    | '/desk'
+    | '/execution'
+    | '/network'
+    | '/truth'
+    | '/desk/acquire'
+    | '/desk/activity'
+    | '/desk/credit'
+    | '/desk/positions'
+    | '/desk/settings'
+    | '/desk/positions/$symbol'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/credit'
+    | '/desk'
+    | '/execution'
+    | '/network'
+    | '/truth'
+    | '/desk/acquire'
+    | '/desk/activity'
+    | '/desk/credit'
+    | '/desk/positions'
+    | '/desk/settings'
+    | '/desk/positions/$symbol'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  CreditRoute: typeof CreditRoute
+  DeskRoute: typeof DeskRouteWithChildren
+  ExecutionRoute: typeof ExecutionRoute
+  NetworkRoute: typeof NetworkRoute
+  TruthRoute: typeof TruthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +202,131 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/credit': {
+      id: '/credit'
+      path: '/credit'
+      fullPath: '/credit'
+      preLoaderRoute: typeof CreditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desk': {
+      id: '/desk'
+      path: '/desk'
+      fullPath: '/desk'
+      preLoaderRoute: typeof DeskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/execution': {
+      id: '/execution'
+      path: '/execution'
+      fullPath: '/execution'
+      preLoaderRoute: typeof ExecutionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/network': {
+      id: '/network'
+      path: '/network'
+      fullPath: '/network'
+      preLoaderRoute: typeof NetworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/truth': {
+      id: '/truth'
+      path: '/truth'
+      fullPath: '/truth'
+      preLoaderRoute: typeof TruthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desk/acquire': {
+      id: '/desk/acquire'
+      path: '/acquire'
+      fullPath: '/desk/acquire'
+      preLoaderRoute: typeof DeskAcquireRouteImport
+      parentRoute: typeof DeskRoute
+    }
+    '/desk/activity': {
+      id: '/desk/activity'
+      path: '/activity'
+      fullPath: '/desk/activity'
+      preLoaderRoute: typeof DeskActivityRouteImport
+      parentRoute: typeof DeskRoute
+    }
+    '/desk/credit': {
+      id: '/desk/credit'
+      path: '/credit'
+      fullPath: '/desk/credit'
+      preLoaderRoute: typeof DeskCreditRouteImport
+      parentRoute: typeof DeskRoute
+    }
+    '/desk/positions': {
+      id: '/desk/positions'
+      path: '/positions'
+      fullPath: '/desk/positions'
+      preLoaderRoute: typeof DeskPositionsRouteImport
+      parentRoute: typeof DeskRoute
+    }
+    '/desk/settings': {
+      id: '/desk/settings'
+      path: '/settings'
+      fullPath: '/desk/settings'
+      preLoaderRoute: typeof DeskSettingsRouteImport
+      parentRoute: typeof DeskRoute
+    }
+    '/desk/positions/$symbol': {
+      id: '/desk/positions/$symbol'
+      path: '/$symbol'
+      fullPath: '/desk/positions/$symbol'
+      preLoaderRoute: typeof DeskPositionsSymbolRouteImport
+      parentRoute: typeof DeskPositionsRoute
+    }
   }
 }
 
+interface DeskPositionsRouteChildren {
+  DeskPositionsSymbolRoute: typeof DeskPositionsSymbolRoute
+}
+
+const DeskPositionsRouteChildren: DeskPositionsRouteChildren = {
+  DeskPositionsSymbolRoute: DeskPositionsSymbolRoute,
+}
+
+const DeskPositionsRouteWithChildren = DeskPositionsRoute._addFileChildren(
+  DeskPositionsRouteChildren,
+)
+
+interface DeskRouteChildren {
+  DeskAcquireRoute: typeof DeskAcquireRoute
+  DeskActivityRoute: typeof DeskActivityRoute
+  DeskCreditRoute: typeof DeskCreditRoute
+  DeskPositionsRoute: typeof DeskPositionsRouteWithChildren
+  DeskSettingsRoute: typeof DeskSettingsRoute
+}
+
+const DeskRouteChildren: DeskRouteChildren = {
+  DeskAcquireRoute: DeskAcquireRoute,
+  DeskActivityRoute: DeskActivityRoute,
+  DeskCreditRoute: DeskCreditRoute,
+  DeskPositionsRoute: DeskPositionsRouteWithChildren,
+  DeskSettingsRoute: DeskSettingsRoute,
+}
+
+const DeskRouteWithChildren = DeskRoute._addFileChildren(DeskRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  CreditRoute: CreditRoute,
+  DeskRoute: DeskRouteWithChildren,
+  ExecutionRoute: ExecutionRoute,
+  NetworkRoute: NetworkRoute,
+  TruthRoute: TruthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
