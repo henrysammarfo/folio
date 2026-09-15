@@ -10,6 +10,17 @@ Deadline: **2026-09-18 20:00 UTC** · Network: mainnet-read + quote-only · Budg
 4. **Credit** — “Kamino xStocks LTV is live (AAPLx 40%). Borrow CPI stays fork/unavailable until funded. Bind a watch wallet for mainnet-read qty — still not Privy multi-tenant auth.”
 5. **Agent** — “Paper by default, metered, caps on. No mentor spam until this URL works.”
 
+
+## Live demo URL
+
+https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app
+
+Verified on this preview (SSO off): `/truth` ~1.003269× · `/network` NestUSD/wash/broadcast fail-closed · `/desk/credit` NestUSD unverified (not Ready).
+
+Set `FOLIO_SESSION_SECRET` (+ `BROADCAST_PAUSED=true`) in Vercel before demos that need watch-wallet bind.
+
+Stocklana live (2026-09-15, re-check at submit): **534** registered · **67** submissions · **$121k** hero · deadline conflict SEP 25 hero vs **18 Sep 20:00 UTC** timeline.
+
 ## Click path
 
 1. `/truth?symbol=AAPLx` — multiplier + economic shares

@@ -126,3 +126,7 @@
 
 - `/desk/` SSR-prefetches positions+credit bundles.
 - Settings ModeBadges reflect broadcast hard-false + auth fail-closed from session bundle.
+
+## 2026-09-15 — DEMO_SCRIPT live URL
+
+- Added verified Vercel preview URL + honesty beats + Stocklana 534/67/$121k note.
