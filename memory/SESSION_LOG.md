@@ -252,3 +252,9 @@
 - Paper agent never drops live spine when AgentRouter returns WAF HTML / bad JSON.
 - Settings readiness + structured agent output include nlExpansion.
 - Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Post-key smoke harness
+- Shipped `src/lib/keys-smoke.ts` + `scripts/smoke-keys.mts` + unit tests; `npm run smoke:keys`.
+- Live run (no Bitquery/Pyth/Privy/Supabase): SKIP probes · FC multi_tenant · OK broadcast/session/agentrouter.
+- Tenant migration user_id indexes; KEYS_LANDING / STOCKLANA_SUBMIT updated.
+- Vitest 76 green. Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.

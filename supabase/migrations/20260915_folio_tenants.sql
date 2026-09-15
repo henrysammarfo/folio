@@ -28,6 +28,12 @@ create table if not exists public.desk_preferences (
   primary key (tenant_id, user_id)
 );
 
+create index if not exists tenant_members_user_id_idx
+  on public.tenant_members (user_id);
+
+create index if not exists desk_preferences_user_id_idx
+  on public.desk_preferences (user_id);
+
 alter table public.tenants enable row level security;
 alter table public.tenant_members enable row level security;
 alter table public.desk_preferences enable row level security;

@@ -281,3 +281,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - AgentRouter WAF/HTML/errors no longer fail the whole turn — live Block 0 spine reply returns with `nlExpansion=failed`.
 - Settings readiness surfaces AGENTROUTER_API_KEY; paper agent UI prints spine + nl status.
 - B002 mitigated. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Post-key smoke harness
+- `npm run smoke:keys` — baseline honesty + live probes (wash/Pyth/Privy empty-token/Supabase REST) when keys present; exit 0 on missing keys (honesty report); exit 1 only on present-key probe errors.
+- Migration indexes: `tenant_members_user_id_idx` · `desk_preferences_user_id_idx`.
+- Docs: KEYS_LANDING + STOCKLANA_SUBMIT reference smoke:keys; optional AGENTROUTER noted.
+- Vitest **76** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

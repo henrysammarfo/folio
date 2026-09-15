@@ -7,9 +7,10 @@
 | B002 | Med | AgentRouter may return Aliyun WAF HTML from some cloud IPs — paper agent now keeps live Block 0 spine and labels NL skipped (no whole-turn fail). |
 | B003 | Med | TinyFish Agent automation needs credits; Search path preferred. |
 | B004 | Med | Public Solana RPC may rate-limit — prefer dedicated `SOLANA_RPC_URL` when provided. |
-| B006 | Med | Privy/Supabase/Bitquery/Pyth keys still empty — wash + Hermes diverge + multi-tenant sessions stay fail-closed until Henry lands keys. Watch-wallet mainnet-read qty path works with FOLIO_SESSION_SECRET alone (not multi-tenant auth); secret is set on Vercel. |
+| B006 | Med | Privy/Supabase/Bitquery/Pyth keys still empty — wash + Hermes diverge + multi-tenant sessions stay fail-closed until Henry lands keys. Watch-wallet mainnet-read qty path works with FOLIO_SESSION_SECRET alone (not multi-tenant auth); secret is set on Vercel. Run `npm run smoke:keys` the moment keys land. |
 | B007 | Low | Premium UI candidates remain on `/lab/*` until Henry approves an id. |
-| B013 | Med | Fixed: Privy session mint no longer treats tenant lookup errors as empty memberships — fail-closed instead.\n| B011 | Med | Hermes `/v2/updates/price/latest` requires `PYTH_API_KEY` since Aug 2026 — adapter fail-closes without it. |
+| B013 | Med | Fixed: Privy session mint no longer treats tenant lookup errors as empty memberships — fail-closed instead. |
+| B011 | Med | Hermes `/v2/updates/price/latest` requires `PYTH_API_KEY` since Aug 2026 — adapter fail-closes without it. |
 
 ## Closed
 

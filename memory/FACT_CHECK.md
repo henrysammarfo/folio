@@ -127,3 +127,5 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Corporate-action pending invents a calendar event | REJECTED | Truth/activity only surface live xStocks pendingMultiplier / none | 2026-09-15 |
 | Paper agent invents pending CA or fill | REJECTED | Truth spine labels pending/none from live multiplier; quote never a fill; wash gates shared | 2026-09-15 |
 | AgentRouter WAF fails whole paper agent turn | REJECTED (fixed) | Live spine reply returns with nlExpansion=failed; NL skipped and labeled | 2026-09-15 |
+| `smoke:keys` invents wash clear / multi-tenant ok without keys | REJECTED | Baseline skips missing; multi_tenant fail-closed; empty Privy token must fail-closed | 2026-09-15 |
+| Blocking keys present in local smoke env | MISSING | smoke:keys → still need bitquery, pyth, privy, supabase | 2026-09-15 |

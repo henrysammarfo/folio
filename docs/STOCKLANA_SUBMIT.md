@@ -41,7 +41,7 @@ npm run replay
 
 ## Keys to land (Henry)
 
-See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readiness (no values).
+See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readiness (no values) · `npm run smoke:keys` live-probes when keys present.
 
 | Key | Unlocks |
 |---|---|
@@ -50,6 +50,7 @@ See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readines
 | `PRIVY_APP_ID` + `PRIVY_APP_SECRET` | Wallet identity |
 | `SUPABASE_URL` + `SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` + migration | Tenant memberships / prefs |
 | `FOLIO_SESSION_SECRET` (≥16) — **set on Vercel** | httpOnly `folio_session` + watch-wallet cookie |
+| Optional `AGENTROUTER_API_KEY` | Paper agent NL (WAF → spine-only; live spine always) |
 | Optional `JUPITER_API_KEY` | If quote/price becomes gated |
 | `SOLANA_RPC_URL` — **set on Vercel** (public mainnet) | Scaled UI + wallet reads (fallback still labeled) |
 

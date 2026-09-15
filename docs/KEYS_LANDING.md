@@ -66,7 +66,15 @@ Verify: Settings → paste Privy access token → mint httpOnly `folio_session` 
 2. Hard-refresh `/desk/settings` — readiness rows green only for keys that actually landed.
 3. `/network` matrix matches readiness (no false mainnet-read).
 4. Keep `BROADCAST_PAUSED=true` until ≤~$1 funded demo is intentional.
-5. Run `npm run replay` locally with the same keys.
+5. Run locally with the same keys:
+
+```bash
+npm run keys        # presence only (no secret values)
+npm run smoke:keys  # live probes when keys present; fail-closed skips when missing
+npm run replay      # unit + e2e + empire smoke + build
+```
+
+`smoke:keys` never invents a wash clear or multi-tenant session. Empty Privy token must fail-closed. Supabase probe checks REST `tenants` via service-role (apply migration first).
 
 ## Honesty rules (do not regress)
 
@@ -75,3 +83,4 @@ Verify: Settings → paste Privy access token → mint httpOnly `folio_session` 
 - No Pyth price without `PYTH_API_KEY`
 - No “Ready” NestUSD until endpoint verified
 - Never claim unhackable / nation-state proof
+- Paper agent: AgentRouter WAF/HTML → keep live spine, label NL skipped
