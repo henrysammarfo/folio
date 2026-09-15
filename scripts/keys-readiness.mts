@@ -51,6 +51,11 @@ const rows: Array<{ name: string; ok: boolean; note: string; required?: boolean 
     ),
     note: "tenant_members + desk_preferences",
   },
+  {
+    name: "SUPABASE_JWT_SECRET",
+    ok: (process.env["SUPABASE_JWT_SECRET"]?.trim().length ?? 0) >= 16,
+    note: "user-JWT RLS path (sub=Privy DID); service-role labeled fallback when missing",
+  },
 ];
 
 let missing = 0;

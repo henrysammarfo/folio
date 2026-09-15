@@ -1,5 +1,6 @@
 import { errResult, okResult, type AdapterResult } from "../adapters/types";
 import { getAuthProviderStatus, type TenantMembership } from "./session";
+import { resolveSupabaseRestAuth } from "./supabase-user-jwt";
 
 export type TenantResolveInput = {
   userId: string;
@@ -27,9 +28,9 @@ function tenantEmbed(
 }
 
 /**
- * Resolve tenant memberships for a Privy subject via Supabase service role.
+ * Resolve tenant memberships for a Privy subject via Supabase.
+ * Prefers user-JWT (sub = Privy DID) so RLS authorizes; service-role is labeled fallback.
  * Fail-closed when keys missing or the query errors — never invent tenants.
- * Embeds tenants.slug / display_name when the FK join is available.
  */
 export async function resolveTenantMemberships(
   input: TenantResolveInput,
@@ -43,14 +44,13 @@ export async function resolveTenantMemberships(
     return errResult(source, "tenants_user_missing", "Privy subject required.");
   }
 
-  const url = process.env["SUPABASE_URL"]?.trim();
-  const serviceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim();
-  if (!url || !serviceKey) {
-    return errResult(source, "supabase_keys_missing", "SUPABASE_URL / SERVICE_ROLE_KEY required.");
+  const rest = resolveSupabaseRestAuth(input.userId.trim());
+  if (!rest.ok) {
+    return errResult(source, rest.reason, rest.detail);
   }
 
   try {
-    const endpoint = new URL("/rest/v1/tenant_members", url);
+    const endpoint = new URL("/rest/v1/tenant_members", rest.data.url);
     endpoint.searchParams.set("user_id", `eq.${input.userId.trim()}`);
     endpoint.searchParams.set(
       "select",
@@ -60,8 +60,8 @@ export async function resolveTenantMemberships(
     const res = await fetch(endpoint, {
       method: "GET",
       headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
+        apikey: rest.data.apikey,
+        Authorization: rest.data.authorization,
         Accept: "application/json",
       },
       signal: AbortSignal.timeout(15_000),
@@ -72,7 +72,7 @@ export async function resolveTenantMemberships(
       return errResult(
         source,
         "supabase_tenants_http_error",
-        `HTTP ${res.status} ${body.slice(0, 180)} — fail-closed.`,
+        `HTTP ${res.status} ${body.slice(0, 180)} — fail-closed (${rest.data.path}).`,
       );
     }
 

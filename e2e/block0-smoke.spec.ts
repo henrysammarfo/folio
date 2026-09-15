@@ -114,6 +114,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/agentrouter|live spine only|nl optional/);
     expect(body).toMatch(/privy|multi-tenant fail-closed/);
     expect(body).toMatch(/supabase|tenants fail-closed/);
+    expect(body).toMatch(/supabase_jwt_secret|user-jwt|service-role labeled|rls/);
     expect(body).toMatch(/smoke:keys|keys_landing|npm run keys/);
     expect(body).toMatch(/active tenant/);
     expect(body).toMatch(/rls|service-role|jwt sub/);

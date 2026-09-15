@@ -38,8 +38,10 @@ alter table public.tenants enable row level security;
 alter table public.tenant_members enable row level security;
 alter table public.desk_preferences enable row level security;
 
--- Placeholder policies: replace auth.uid()/JWT claim mapping once Privy→Supabase is wired.
--- Until then, service-role server only — anon client must not read memberships.
+-- RLS: auth.jwt() ->> 'sub' must equal Privy DID (user_id).
+-- FOLIO mints short-lived HS256 user JWTs when SUPABASE_JWT_SECRET is set
+-- (see src/lib/auth/supabase-user-jwt.ts). Without the JWT secret, server uses
+-- labeled service-role fallback — anon client still must not bypass these policies.
 create policy tenants_member_select on public.tenants
   for select using (
     exists (

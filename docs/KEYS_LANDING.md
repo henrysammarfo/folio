@@ -46,7 +46,10 @@ Verify: Settings auth badge still fail-closed until Supabase lands (both require
 |------|--------|
 | `SUPABASE_URL` | Project settings → API |
 | `SUPABASE_ANON_KEY` | Project settings → API |
-| `SUPABASE_SERVICE_ROLE_KEY` | Project settings → API (**server only**) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Project settings → API (**server only** · labeled fallback) |
+| `SUPABASE_JWT_SECRET` | Project settings → API → **JWT Secret** (≥16) |
+
+`SUPABASE_JWT_SECRET` arms the **user-JWT RLS path**: server mints short-lived HS256 JWTs with `sub` = Privy DID so PostgREST policies (`auth.jwt() ->> 'sub'`) authorize tenants/prefs. Without it, FOLIO keeps a labeled **service-role** fallback (not end-user authz).
 
 Then:
 
@@ -56,8 +59,7 @@ Then:
 # Optional seed: supabase/seed/demo_tenant.sql
 ```
 
-Verify: Settings → paste Privy access token → mint httpOnly `folio_session` → tenant list non-empty only when `tenant_members` rows exist for that Privy subject. Empty memberships stay fail-closed (no invented tenants).
-
+Verify: Settings → paste Privy access token → mint httpOnly `folio_session` → tenant list non-empty only when `tenant_members` rows exist for that Privy subject. Empty memberships stay fail-closed (no invented tenants). Settings RLS note should say **user-JWT path armed** when JWT secret is set.
 ---
 
 ## E — After keys: redeploy + checklist

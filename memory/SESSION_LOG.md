@@ -275,3 +275,7 @@
 ## 2026-09-15 — Desk false-greens + Raydium matrix
 - Verified≠paper; desk chrome quote-only; Raydium awareness on matrix/smoke/docs.
 - Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Supabase user-JWT RLS path
+- Prefs/tenants prefer user-JWT (sub=Privy DID) when SUPABASE_JWT_SECRET set; service-role labeled fallback.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase(+JWT secret); broadcast paused.

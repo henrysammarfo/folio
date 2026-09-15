@@ -1,5 +1,9 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { errResult, okResult, type AdapterResult } from "../adapters/types";
+import {
+  isSupabaseUserJwtConfigured,
+  resolveSupabaseRestAuth,
+} from "./supabase-user-jwt";
 
 export type AuthProviderStatus = {
   privyConfigured: boolean;
@@ -132,7 +136,14 @@ function prefsAuthGate(
   source: string,
   tenantId: string | null,
   userId?: string | null,
-): AdapterResult<{ url: string; serviceKey: string; tenantId: string; userId: string }> {
+): AdapterResult<{
+  url: string;
+  apikey: string;
+  authorization: string;
+  path: "user-jwt" | "service-role";
+  tenantId: string;
+  userId: string;
+}> {
   const auth = getAuthProviderStatus();
   if (!auth.ok) {
     return errResult(source, "prefs_require_auth", auth.detail ?? auth.reason);
@@ -151,17 +162,28 @@ function prefsAuthGate(
       "No verified user on session — refusing localStorage fallback.",
     );
   }
-  const url = process.env["SUPABASE_URL"]?.trim();
-  const serviceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim();
-  if (!url || !serviceKey) {
-    return errResult(source, "supabase_keys_missing", "SUPABASE_URL / SERVICE_ROLE_KEY required.");
+  const rest = resolveSupabaseRestAuth(userId.trim());
+  if (!rest.ok) {
+    return errResult(source, rest.reason, rest.detail);
   }
   return okResult("mainnet-read", source, {
-    url,
-    serviceKey,
+    url: rest.data.url,
+    apikey: rest.data.apikey,
+    authorization: rest.data.authorization,
+    path: rest.data.path,
     tenantId,
     userId: userId.trim(),
   });
+}
+
+/** Honesty label for settings — user-JWT RLS path vs service-role fallback. */
+export function deskRlsHonestyNote(
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  if (isSupabaseUserJwtConfigured(env)) {
+    return "User-JWT path armed (SUPABASE_JWT_SECRET) — prefs/tenants authorize via auth.jwt() sub = Privy DID. Service-role not used when JWT mint succeeds.";
+  }
+  return "Service-role server path only until SUPABASE_JWT_SECRET lands. Anon RLS policies await user JWT sub = Privy DID — not end-user authz yet.";
 }
 
 /** Server-persisted prefs — fail-closed without Supabase + session. */
@@ -186,8 +208,8 @@ export async function loadDeskPreferences(
     const res = await fetch(endpoint, {
       method: "GET",
       headers: {
-        apikey: gate.data.serviceKey,
-        Authorization: `Bearer ${gate.data.serviceKey}`,
+        apikey: gate.data.apikey,
+        Authorization: gate.data.authorization,
         Accept: "application/json",
       },
       signal: AbortSignal.timeout(15_000),
@@ -226,8 +248,8 @@ export async function loadDeskPreferences(
 }
 
 /**
- * Upsert server prefs via service role. Fail-closed without auth/tenant/user.
- * Never writes to localStorage.
+ * Upsert server prefs via user-JWT (preferred) or service-role fallback.
+ * Fail-closed without auth/tenant/user. Never writes to localStorage.
  */
 export async function saveDeskPreferences(
   tenantId: string | null,
@@ -244,8 +266,8 @@ export async function saveDeskPreferences(
     const res = await fetch(endpoint, {
       method: "POST",
       headers: {
-        apikey: gate.data.serviceKey,
-        Authorization: `Bearer ${gate.data.serviceKey}`,
+        apikey: gate.data.apikey,
+        Authorization: gate.data.authorization,
         Accept: "application/json",
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates,return=representation",

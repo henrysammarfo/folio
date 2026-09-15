@@ -194,6 +194,14 @@ function Page() {
             </b>
           </p>
           <p>
+            <span>SUPABASE_JWT_SECRET (RLS user path)</span>
+            <b>
+              {data?.readiness.supabaseJwtConfigured
+                ? "Set · user-JWT RLS armed (sub=Privy DID)"
+                : "Missing · service-role labeled fallback"}
+            </b>
+          </p>
+          <p>
             <span>Broadcast</span>
             <b>
               {data?.readiness.broadcastPaused

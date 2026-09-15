@@ -7,6 +7,7 @@ const KEYS = [
   "SUPABASE_URL",
   "SUPABASE_ANON_KEY",
   "SUPABASE_SERVICE_ROLE_KEY",
+  "SUPABASE_JWT_SECRET",
   "FOLIO_SESSION_SECRET",
 ] as const;
 
@@ -76,5 +77,35 @@ describe("saveDeskPreferences", () => {
     expect(String(init.headers && (init.headers as Record<string, string>)["Prefer"])).toMatch(
       /merge-duplicates/,
     );
+    // Without JWT secret → labeled service-role Bearer
+    expect(
+      String(init.headers && (init.headers as Record<string, string>)["Authorization"]),
+    ).toBe("Bearer service");
+  });
+
+  it("uses user-JWT Authorization when SUPABASE_JWT_SECRET is set", async () => {
+    setAuthKeys();
+    process.env["SUPABASE_JWT_SECRET"] = "test-supabase-jwt-secret-32b!!";
+    const fetchMock = vi.fn(async () =>
+      new Response(
+        JSON.stringify([
+          { corporate_action_alerts: true, strict_fail_closed: false },
+        ]),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const res = await saveDeskPreferences(
+      "11111111-1111-1111-1111-111111111111",
+      "did:privy:alice",
+      { corporateActionAlerts: true, strictFailClosed: false },
+    );
+    expect(res.ok).toBe(true);
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    const headers = init.headers as Record<string, string>;
+    expect(headers["apikey"]).toBe("anon");
+    expect(headers["Authorization"]).toMatch(/^Bearer ey/);
+    expect(headers["Authorization"]).not.toBe("Bearer service");
   });
 });

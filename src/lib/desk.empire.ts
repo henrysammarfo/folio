@@ -24,9 +24,11 @@ import {
   parseFolioSessionCookie,
   resolveActiveTenantId,
   saveDeskPreferences,
+  deskRlsHonestyNote,
   verifyFolioSessionCookieValue,
   type FolioSession,
 } from "./auth/session";
+import { isSupabaseUserJwtConfigured } from "./auth/supabase-user-jwt";
 import { buildSessionFromPrivyToken } from "./auth/session-from-privy";
 import {
   FOLIO_WATCH_WALLET_COOKIE,
@@ -177,8 +179,8 @@ export type SessionBundle = {
   /** AGENTROUTER_API_KEY present — NL expansion optional; live spine always runs. */
   agentRouterKeyPresent: boolean;
   /**
-   * RLS honesty: until Privy DID maps into Supabase JWT `sub`, desk prefs/tenants
-   * are service-role server only — anon RLS policies are placeholders.
+   * RLS honesty: user-JWT (sub=Privy DID) when SUPABASE_JWT_SECRET set;
+   * otherwise labeled service-role fallback (anon policies not live authz).
    */
   rlsNote: string;
   /** Production readiness flags — fail-closed honesty for Henry / Stocklana ops. */
@@ -189,6 +191,8 @@ export type SessionBundle = {
     sessionSecretPresent: boolean;
     pythApiKeyPresent: boolean;
     agentRouterKeyPresent: boolean;
+    /** SUPABASE_JWT_SECRET + anon + URL — user-JWT RLS path armed. */
+    supabaseJwtConfigured: boolean;
     broadcastPaused: boolean;
   };
 };
@@ -647,8 +651,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
       watchWallet: watch.ok ? watch.data.wallet : null,
       sessionSecretPresent,
       agentRouterKeyPresent,
-      rlsNote:
-        "Service-role server path only until Privy DID → Supabase JWT sub mapping lands. Anon RLS policies are placeholders — not end-user authz yet.",
+      rlsNote: deskRlsHonestyNote(),
       readiness: {
         bitqueryKeyPresent,
         privyConfigured,
@@ -656,6 +659,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         sessionSecretPresent,
         pythApiKeyPresent,
         agentRouterKeyPresent,
+        supabaseJwtConfigured: isSupabaseUserJwtConfigured(),
         broadcastPaused: isBroadcastPaused(),
       },
     };

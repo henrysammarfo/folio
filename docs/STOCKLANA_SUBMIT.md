@@ -49,6 +49,7 @@ See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readines
 | `PYTH_API_KEY` | Hermes equity diverge (fail-closed until set; Aug 2026 auth) |
 | `PRIVY_APP_ID` + `PRIVY_APP_SECRET` | Wallet identity |
 | `SUPABASE_URL` + `SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` + migration | Tenant memberships / prefs |
+| `SUPABASE_JWT_SECRET` (≥16) | User-JWT RLS path (`sub` = Privy DID); without it service-role is labeled fallback |
 | `FOLIO_SESSION_SECRET` (≥16) — **set on Vercel** | httpOnly `folio_session` + watch-wallet cookie |
 | Optional `AGENTROUTER_API_KEY` | Paper agent NL (WAF → spine-only; live spine always) |
 | Optional `JUPITER_API_KEY` | If quote/price becomes gated |

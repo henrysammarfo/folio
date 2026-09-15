@@ -10,6 +10,7 @@ const allMissing: KeySmokeEnv = {
   pyth: false,
   privy: false,
   supabase: false,
+  supabaseJwt: false,
   sessionSecret: true,
   agentRouter: true,
   broadcastPaused: true,
@@ -25,6 +26,7 @@ describe("keys smoke baseline honesty", () => {
     expect(byId.pyth?.status).toBe("skipped");
     expect(byId.privy?.status).toBe("skipped");
     expect(byId.supabase?.status).toBe("skipped");
+    expect(byId.supabase_jwt?.status).toBe("skipped");
     expect(byId.multi_tenant?.status).toBe("fail-closed");
     expect(byId.agentrouter?.status).toBe("ok");
 

@@ -15,6 +15,7 @@ export type KeySmokeEnv = {
   pyth: boolean;
   privy: boolean;
   supabase: boolean;
+  supabaseJwt: boolean;
   sessionSecret: boolean;
   agentRouter: boolean;
   broadcastPaused: boolean;
@@ -32,6 +33,10 @@ export function readKeySmokeEnv(
         env["SUPABASE_ANON_KEY"]?.trim() &&
         env["SUPABASE_SERVICE_ROLE_KEY"]?.trim(),
     ),
+    supabaseJwt:
+      Boolean(env["SUPABASE_URL"]?.trim()) &&
+      Boolean(env["SUPABASE_ANON_KEY"]?.trim()) &&
+      (env["SUPABASE_JWT_SECRET"]?.trim().length ?? 0) >= 16,
     sessionSecret: (env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16,
     agentRouter: Boolean(env["AGENTROUTER_API_KEY"]?.trim()),
     broadcastPaused: (env["BROADCAST_PAUSED"] ?? "true").toLowerCase() !== "false",
@@ -90,13 +95,23 @@ export function classifyKeySmokeBaseline(env: KeySmokeEnv): KeySmokeRow[] {
         : "Supabase keys missing — tenants/prefs fail-closed",
     },
     {
+      id: "supabase_jwt",
+      present: env.supabaseJwt,
+      status: env.supabaseJwt ? "ok" : "skipped",
+      detail: env.supabaseJwt
+        ? "SUPABASE_JWT_SECRET present — user-JWT RLS path armed (sub=Privy DID)"
+        : "SUPABASE_JWT_SECRET missing — service-role labeled fallback until set",
+    },
+    {
       id: "multi_tenant",
       present: env.privy && env.supabase && env.sessionSecret,
       status:
         env.privy && env.supabase && env.sessionSecret ? "ok" : "fail-closed",
       detail:
         env.privy && env.supabase && env.sessionSecret
-          ? "Privy + Supabase + session secret — multi-tenant mint path ready"
+          ? env.supabaseJwt
+            ? "Privy + Supabase + session secret + JWT secret — multi-tenant mint + RLS path ready"
+            : "Privy + Supabase + session secret — mint ready; add SUPABASE_JWT_SECRET for RLS user path"
           : "Multi-tenant FAIL-CLOSED until Privy + Supabase + FOLIO_SESSION_SECRET",
     },
     {
