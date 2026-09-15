@@ -268,6 +268,7 @@ export {
   getActivityBundle,
   getSessionBundle,
   runDeskAgent,
+  createSessionFromPrivyToken,
 } from "./desk.empire";
 export type {
   PositionsBundle,

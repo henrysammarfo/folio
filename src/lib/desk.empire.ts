@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { errResult, type AdapterResult } from "./adapters/types";
+import { errResult, okResult, type AdapterResult } from "./adapters/types";
 import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
 import {
   fetchJupiterQuote,
@@ -17,9 +17,11 @@ import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import {
   getAuthProviderStatus,
   loadDeskPreferences,
+  mintFolioSession,
   parseFolioSessionCookie,
   type FolioSession,
 } from "./auth/session";
+import { verifyPrivyAccessToken } from "./auth/privy";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 
@@ -316,3 +318,35 @@ const AgentInput = z.object({
 export const runDeskAgent = createServerFn({ method: "POST" })
   .validator(AgentInput)
   .handler(async ({ data }) => runPaperAgent(data.prompt));
+
+const PrivySessionInput = z.object({
+  accessToken: z.string().min(1).max(8_192),
+  walletAddress: z.string().max(128).optional(),
+});
+
+/**
+ * Exchange a Privy access token for an httpOnly folio_session cookie value.
+ * Fail-closed when keys missing or Privy rejects the token.
+ * Caller must Set-Cookie from setCookie; this does not touch localStorage.
+ */
+export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
+  .validator(PrivySessionInput)
+  .handler(async ({ data }) => {
+    const identity = await verifyPrivyAccessToken(data.accessToken);
+    if (!identity.ok) {
+      return errResult("folio.session.privy", identity.reason, identity.detail);
+    }
+    const minted = mintFolioSession({
+      userId: identity.data.userId,
+      walletAddress: data.walletAddress ?? identity.data.walletAddress,
+      tenants: [],
+    });
+    if (!minted.ok) {
+      return errResult("folio.session.privy", minted.reason, minted.detail);
+    }
+    return okResult("mainnet-read", "folio.session.privy", {
+      session: minted.data.session,
+      setCookie: minted.data.setCookie,
+      note: "httpOnly folio_session minted after Privy verify — resolve Supabase tenants next.",
+    });
+  });

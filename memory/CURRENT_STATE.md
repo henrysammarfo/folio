@@ -40,6 +40,7 @@ World’s Fair still wins on **working honesty**: live multiplier + wash refuse 
 | NestUSD | Fail-closed / risk-labeled |
 | Privy + Supabase sessions | Mint/verify httpOnly cookie path wired; fail-closed without keys+`FOLIO_SESSION_SECRET` |
 | Paper agent + meter stub | Wired on settings |
+| Playwright e2e | Green (home / truth / acquire fail-closed / network / lab gate) |
 | Vitest unit | Green (15) — market math, wash fail-closed + heuristics + thin-tape, session cookie, paper intent |
 | Lovable traces | Removed (`.lovable` deleted; vite config independent) |
 

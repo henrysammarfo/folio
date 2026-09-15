@@ -37,3 +37,9 @@ dist-ssr
 !.env.example
 .dev.vars
 memory/SESSION_LOG.local.md
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

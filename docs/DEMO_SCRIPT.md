@@ -22,6 +22,7 @@ Deadline: **2026-09-18 20:00 UTC** · Network: mainnet-read + quote-only · Budg
 
 ```bash
 npm test
+npm run test:e2e
 npx tsx scripts/smoke-empire.mts
 npm run build
 ```

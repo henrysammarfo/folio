@@ -49,6 +49,7 @@ All secrets live in gitignored `.env`. Rotate anything pasted into chat after th
 
 ```bash
 npm test
+npm run test:e2e
 npx tsx scripts/smoke-empire.mts
 ```
 
