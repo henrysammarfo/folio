@@ -88,6 +88,25 @@ function Page() {
           value={economic != null ? economic.toFixed(4) : isLoading ? "…" : "—"}
           detail="raw × live multiplier"
         />
+        <Metric
+          label="Pending corporate action"
+          value={
+            mult?.ok && mult.data.pendingMultiplier != null
+              ? `${mult.data.pendingMultiplier.toFixed(6)}×`
+              : mult?.ok
+                ? "None"
+                : isLoading
+                  ? "…"
+                  : "—"
+          }
+          detail={
+            mult?.ok && mult.data.pendingMultiplier != null
+              ? `xStocks pending · reason ${mult.data.reason ?? "n/a"}`
+              : mult?.ok
+                ? "No pending newMultiplier on live feed"
+                : "Awaiting live multiplier"
+          }
+        />
       </div>
 
       {(isError || (data && !mult?.ok)) && (
@@ -145,12 +164,25 @@ function Page() {
             </span>
           </li>
           <li>
+            <FileClock />
+            <span>
+              <b>Corporate-action pending</b>
+              {mult?.ok && mult.data.pendingMultiplier != null
+                ? ` newMultiplier ${mult.data.pendingMultiplier.toFixed(6)}× · reason ${mult.data.reason ?? "n/a"}`
+                : mult?.ok
+                  ? " none on live feed (no invented calendar)"
+                  : " unavailable"}
+            </span>
+          </li>
+          <li>
             <Database />
             <span>
               <b>Venue check</b>
               {data?.jupiterPrice.ok
-                ? " Jupiter Price v3 mainnet"
-                : " Jupiter price unavailable"}
+                ? ` Jupiter Price v3 · ${data.jupiterPrice.source.includes("cached") ? "cached/stale-aware" : "live"}`
+                : data?.jupiterPrice && !data.jupiterPrice.ok
+                  ? ` ${data.jupiterPrice.reason}`
+                  : " Jupiter price unavailable"}
             </span>
           </li>
           <li>

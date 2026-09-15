@@ -469,13 +469,34 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
       },
       {
         at: now,
+        title:
+          multiplier.ok && multiplier.data.pendingMultiplier != null
+            ? `Corporate action pending · ${multiplier.data.pendingMultiplier.toFixed(6)}×`
+            : multiplier.ok
+              ? "Corporate action · no pending multiplier"
+              : "Corporate action · multiplier unavailable",
+        detail: multiplier.ok
+          ? multiplier.data.pendingMultiplier != null
+            ? `Live xStocks pending · activation ${
+                multiplier.data.activationDateTime
+                  ? new Date(multiplier.data.activationDateTime * 1000).toISOString()
+                  : "n/a"
+              } · reason ${multiplier.data.reason ?? "none"}`
+            : `Current ${multiplier.data.currentMultiplier.toFixed(6)}× · reason ${multiplier.data.reason ?? "none"} · no separate CA calendar feed`
+          : "Cannot label CA pending without live multiplier",
+        tone:
+          multiplier.ok && multiplier.data.pendingMultiplier != null ? "amber" : "neutral",
+        mode: multiplier.ok ? multiplier.mode : "unavailable",
+      },
+      {
+        at: now,
         title: prefsFromSession
           ? corporateActionAlerts
             ? "Corporate-action alerts · on"
             : "Corporate-action alerts · off"
           : "Corporate-action alerts · no session prefs",
         detail: prefsFromSession
-          ? "Live CA signal today = xStocks multiplier / Scaled UI — no separate CA calendar feed yet (honest label)."
+          ? "Preference only — live CA signal = xStocks multiplier pending/current (above)."
           : "Mint httpOnly session (Privy + Supabase) to persist CA alert preference per active tenant.",
         tone: prefsFromSession && corporateActionAlerts ? "blue" : "neutral",
         mode: prefsFromSession ? "mainnet-read" : "unavailable",

@@ -16,6 +16,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = await page.locator("body").innerText();
     expect(body).not.toMatch(/\b4\.0000\s*×/);
     expect(body).not.toMatch(/\b4\.0\s*x\b/i);
+    expect(body).toMatch(/pending corporate action|corporate-action pending|no pending|none/i);
   });
 
   test("acquire stays fail-closed on wash without Bitquery", async ({ page }) => {
@@ -122,7 +123,9 @@ test.describe("FOLIO Block 0 smoke", () => {
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/corporate-action alerts/);
-    expect(body).toMatch(/no session prefs|multiplier|scaled ui|calendar feed/);
+    expect(body).toMatch(
+      /corporate action|pending multiplier|no pending|no session prefs|multiplier/,
+    );
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 

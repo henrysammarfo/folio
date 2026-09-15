@@ -228,3 +228,9 @@
 ## 2026-09-15 — Desk wallet honesty + Nest.credit live read
 - Killed fake `7vF…2ka` desk chip; Nest.credit vault TVL live as separate capability; NestUSD borrow remains fail-closed.
 - Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Jupiter short TTL + CA pending honesty
+- Shipping short TTL cache with honest labels, plus live CA surface from xStocks.
+- Quote 20s / price 30s; 429 → stale ≤120s or fail-closed `jupiter_rate_limited`.
+- Truth metric + activity event for pendingMultiplier; preference row no longer pretends a calendar feed.
+- Goal open: Henry lab Pick reply + Bitquery/Pyth/Privy/Supabase; broadcast paused.

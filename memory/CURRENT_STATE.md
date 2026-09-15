@@ -258,3 +258,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Removed invented desk pubkey `7vF…2ka` → **Bind wallet** / session / watch-wallet chip.
 - Live `api.nest.credit/v1/vaults` wired as Nest.credit vault awareness (mainnet-read); NestUSD borrow capacity stays fail-closed with explicit product split.
 - Empire smoke + matrix/e2e assert Nest.credit live and NestUSD unavailable. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Jupiter TTL cache + live CA pending
+- Jupiter quote/price: 20s/30s fresh TTL; on HTTP 429 serve last-good ≤120s labeled `stale-cache … after 429`, else `jupiter_rate_limited` fail-closed (no invented prices).
+- Truth + activity surface live xStocks `pendingMultiplier` (or honest “none”) — CA signal still not a separate calendar feed.
+- Vitest **71** green (incl. jupiter-cache). Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
