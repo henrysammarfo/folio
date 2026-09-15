@@ -47,7 +47,7 @@ World’s Fair still wins on **working honesty**: live multiplier + wash refuse 
 ## Keys
 
 Present in `.env`: Tavily, TinyFish, AgentRouter, 21st, Shaders, Solana RPC.
-Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated).
+Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESSION_SECRET` set locally for watch-wallet + session signing readiness.
 **Rotate all chat-pasted keys after hackathon.**
 
 ## Live deltas (do not regress)
@@ -73,4 +73,162 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated).
 - Session UX: tenant list + clear httpOnly cookie; prefs service-role fetch when keyed.
 - Yahoo leftovers removed; `/execution` copy softened (no false Pass theater).
 - Premium UI still approve-gated on `/lab/*` — awaiting Henry candidate id.
-- Keys still empty: Privy / Supabase / Bitquery / FOLIO_SESSION_SECRET.
+- Keys still empty: Privy / Supabase / Bitquery. `FOLIO_SESSION_SECRET` set locally for watch-wallet + session signing.
+
+
+## Latest progress (2026-09-15)
+
+- Watch-wallet httpOnly cookie + mainnet SPL/Token-2022 balance reads wired into Positions (qtySource wallet-read | paper).
+- Settings: bind/clear watch wallet (requires FOLIO_SESSION_SECRET; **not** Privy multi-tenant auth).
+- Stocklana live counts refreshed: **528 registered / 67 submissions / $115k hero pool**; deadline hero SEP 25 (re-check timeline vs hero at submit).
+- Broadcast still paused; Privy/Supabase/Bitquery still empty → wash + multi-tenant sessions remain fail-closed.
+- Premium UI still approve-gated on `/lab/*`.
+
+
+## 2026-09-15 wallet-read credit + demo
+
+- Credit collateral math prefers wallet-read qty when watch-wallet/Privy wallet bound; falls back to paper with honest labels.
+- `npm run replay` one-command verify (unit + e2e + empire smoke + build).
+- Vercel project `folio` linked to GitHub (`prj_pzvYDMnYiSDcJNsv5NCdy5UVeExq`); feature work on `cursor/folio-wallet-read-f1ec`.
+- Nitro preset: `vercel` when `VERCEL=1`, else `node-server` for local preview/e2e; `vercel.json` framework `tanstack-start`.
+- Verified locally: **31** unit + 7 e2e green; empire smoke live (wash/auth fail-closed; scaled-ui/pools/kamino ok).
+- Broadcast still paused; wash/multi-tenant still fail-closed without Bitquery/Privy/Supabase.
+- Demo env still needed on Vercel: `SOLANA_RPC_URL`, `FOLIO_SESSION_SECRET`, `BROADCAST_PAUSED=true` (+ keys when landed).
+
+## 2026-09-15 Vercel public demo + RPC fallback
+
+- Preview deploy **READY**: https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app (SSO protection disabled for public demo).
+- Nitro `vercel` preset fix shipped; home/`/truth`/`/desk`/`/desk/settings` return 200 publicly.
+- `resolveSolanaRpcUrl()` prefers `SOLANA_RPC_URL`, else labeled public mainnet RPC fallback for Scaled UI + wallet-read (still fail-closed on RPC errors).
+- Watch-wallet bind on Vercel still needs `FOLIO_SESSION_SECRET` in project env (CLI not authenticated here — set in Vercel dashboard).
+- Broadcast remains paused; wash/multi-tenant still fail-closed without Bitquery/Privy/Supabase.
+- Premium UI still approve-gated on `/lab/*` until Henry names a candidate id.
+
+## 2026-09-15 Truth SSR
+
+- `/truth` server loader prefetches live bundle; local SSR shows ~1.003269× (not fixture 4.0×).
+
+## 2026-09-15 network honesty + Stocklana refresh
+
+- Network matrix splits Kamino / Jupiter Lend / NestUSD; NestUSD + wash-without-Bitquery + broadcast stay **unavailable/fail-closed** (no false mainnet-read).
+- Matrix also surfaces multi-tenant keys, watch-wallet secret, Scaled UI RPC fallback.
+- `/network` SSR-prefetches live matrix.
+- Stocklana live: **536 registered / 67 submissions / $121k** hero; deadline hero SEP 25 vs timeline 18 Sep 20:00 UTC — re-check at submit.
+- Wash matrix row forced `unavailable` when Bitquery key missing (not just detail text).
+- Keys still empty: Privy / Supabase / Bitquery. Set `FOLIO_SESSION_SECRET` on Vercel for watch-wallet.
+- Premium UI still approve-gated (`ink-ledger` / `ledger-mist` / `aurora-grid` · `desk-density-a` / `desk-density-b` / `gate-chip`).
+
+## 2026-09-15 desk SSR honesty
+
+- `/desk/credit|settings|acquire` SSR-prefetch live bundles.
+- NestUSD UI never paints Ready; broadcast policy hard-false until funded.
+- Still blocked on Bitquery/Privy/Supabase keys + Henry lab approve + Vercel `FOLIO_SESSION_SECRET`.
+
+## 2026-09-15 positions SSR
+
+- `/desk/positions` SSR-prefetches live bundle.
+- Vercel preview READY on honesty push; `/network` live shows NestUSD/wash/broadcast/auth fail-closed; `/truth` ~1.003269×.
+- Still need: Bitquery/Privy/Supabase keys, Henry lab approve, Vercel `FOLIO_SESSION_SECRET`.
+
+## 2026-09-15 desk overview SSR
+
+- `/desk/` first paint uses SSR positions+credit.
+- Settings shows Auth fail-closed / Broadcast off from live session policy.
+
+## 2026-09-15 activity SSR + smoke honesty
+
+- Desk activity + position detail SSR.
+- Empire smoke fails closed if matrix lies about NestUSD/wash/broadcast/auth.
+- Still blocked: Bitquery/Privy/Supabase keys, Henry lab approve, Vercel FOLIO_SESSION_SECRET.
+
+## 2026-09-15 lab polish + Stocklana 68 + submit paste pack
+
+- `/lab/ui` candidates differentiated: dense ledger (`desk-density-a`), quiet metric strip (`desk-density-b`), ModeBadge chip row (`gate-chip`) with motion (respects prefers-reduced-motion).
+- `/lab/shaders` reply chip lists `ink-ledger` · `ledger-mist` · `aurora-grid`; hero still locked.
+- Stocklana live WebFetch: **536** registered / **69** submissions / **$121k** hero; deadline conflict unchanged — re-check at submit.
+- Added `docs/STOCKLANA_SUBMISSION.md` paste pack; submit checklist ticks verified honesty items; Vercel `FOLIO_SESSION_SECRET` still Henry-owned.
+- Still blocked for full objective: Bitquery / Privy / Supabase keys + lab approve + Vercel session secret.
+
+## 2026-09-15 settings watch-wallet secret honesty
+
+- SessionBundle exposes `sessionSecretPresent` (FOLIO_SESSION_SECRET ≥16).
+- `/desk/settings` ModeBadge + Watch wallet panel show secret set/missing; bind disabled when missing (Vercel Henry action still required).
+
+## 2026-09-15 public /credit + /execution live SSR
+
+- Public `/credit` SSR-prefetches `getCreditBundle` — live Kamino LTV, NestUSD fail-closed (never Ready), borrow fork/off.
+- Public `/execution` SSR-prefetches `getNetworkBundle` — wash/quote/broadcast honesty badges on first paint.
+- Block 0 e2e now 10 tests (added public credit + execution honesty).
+
+## 2026-09-15 ephemeral wallet inspect
+
+- `/desk/positions?inspect=<pubkey>` mainnet-reads balances without `FOLIO_SESSION_SECRET` / watch-wallet cookie.
+- Priority: Privy session → watch-wallet cookie → ephemeral inspect. Inspect labeled not-auth / not multi-tenant.
+- Stocklana live: **536** registered / **69** submissions / **$121k** hero; deadline conflict unchanged — re-check at submit.
+- Still blocked for full objective: Bitquery / Privy / Supabase keys + Henry lab approve + Vercel `FOLIO_SESSION_SECRET`.
+
+## 2026-09-15 credit ephemeral inspect
+
+- `/desk/credit?inspect=` + public `/credit?inspect=` pass through to credit bundle.
+- Network matrix lists ephemeral inspect as always-on mainnet-read (not auth).
+- Still blocked: Bitquery/Privy/Supabase keys + Henry lab approve + Vercel FOLIO_SESSION_SECRET for watch-wallet bind.
+
+## 2026-09-15 — Visible lab approve path (Henry feedback)
+
+- Home hero now shows **Approve desk UI** + **Approve shaders** CTAs (premium still gated).
+- Desk sidebar foot + settings readiness link to `/lab/ui` and `/lab/shaders`.
+- Desk overview `?inspect=` + settings production readiness checklist in flight on this branch.
+- Stocklana live (jina): **538** registered / **69** submissions / **$121k**; deadline conflict SEP 25 hero vs timeline/stocklana.fun 18 Sep — re-check at submit.
+- Vision stub: `docs/COLOSSEUM_VISION.md` (Ghana / why / sustainability — expand after UI approve + keys).
+- Still blocked for full objective: Bitquery/Privy/Supabase keys + Henry lab id + Vercel `FOLIO_SESSION_SECRET`.
+
+## 2026-09-15 — Home approve CTAs verified live
+- Vercel READY `419ff65`: home shows **Approve desk UI** + **Approve shaders**; hint that hero won’t change without Henry.
+- `/lab/ui` candidates: `desk-density-a` · `desk-density-b` · `gate-chip`.
+- Docs: `docs/HENRY_STEPS.md` (one-step keys), expanded `docs/COLOSSEUM_VISION.md` (AMA / interview / Ghana).
+- Still waiting on Henry: lab id, Vercel FOLIO_SESSION_SECRET, Bitquery/Privy/Supabase.
+
+## 2026-09-15 — Vercel session secret LIVE + lab approve UX
+- `FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED=true` set on Vercel (all targets) via API; redeploy READY.
+- Live `/desk/settings` shows **Watch-wallet secret set** / readiness **Set · watch-wallet bind ready** (`sessionSecretPresent: true`).
+- Lab: shared `LabApprovePanel` with copyable ids + how-to; `/about` Accra grit + fail-closed vision for judges.
+- **Henry rotate** any chat-pasted Vercel token.
+- Still blocked for full objective: lab candidate id · Bitquery · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Watch-wallet bind verified live + Stocklana refresh
+- Playwright against preview: bind `Tokenkeg…` succeeded → “Watch-wallet bound for mainnet-read qty. Not a Privy session.” Settings shows Currently: Toke…Q5DA.
+- Artifact: `/opt/cursor/artifacts/screenshots/watch-wallet-bind-live.png`
+- Stocklana live (jina): **538** registered / **69** submissions / **$121k** / deadline hero **SEP 25** (timeline still mentions 18 Sep — re-check at submit).
+- Next Henry gate: Step 0 lab id. Then Bitquery → Privy → Supabase. Goal not complete.
+
+## 2026-09-15 — Hermes PYTH_API_KEY fail-closed + Vercel SOLANA_RPC_URL
+- Hermes price updates require auth since Pyth Core Aug 2026; adapter fail-closes without `PYTH_API_KEY` (Bearer on upgraded + legacy hosts).
+- Settings readiness + network matrix label the missing key honestly; unit tests cover no-fetch fail-closed + Bearer parse.
+- Vercel now has `SOLANA_RPC_URL=https://api.mainnet-beta.solana.com` (encrypted) alongside `FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED`.
+- Still blocked for full objective: Henry lab id · Bitquery · Privy · Supabase · funded broadcast · `PYTH_API_KEY`.
+
+## 2026-09-15 — Keys landing runbook + Stocklana pack refresh
+- Added `docs/KEYS_LANDING.md` + `supabase/seed/demo_tenant.sql` + `npm run keys` readiness printer (no secret values).
+- Refreshed Stocklana submission/demo packs: session secret ✅ on Vercel; counts **538/69/$121k**; blockers = lab id · Bitquery · Pyth · Privy · Supabase.
+- E2E settings asserts PYTH_API_KEY honesty row.
+- Goal still open — multi-tenant + wash + premium merge need Henry.
+
+## 2026-09-15 — Multi-tenant session fail-closed on tenant lookup + lab copy ids
+- `buildSessionFromPrivyToken` refuses to mint when tenant lookup errors (no invented empty memberships); empty after successful lookup still OK.
+- Unit coverage: happy path + tenant 503 fail-closed + empty memberships (46 tests green).
+- Lab approve panel: one-click copy candidate ids; settings points at `docs/KEYS_LANDING.md` / `npm run keys`.
+- Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Acquire gate honesty split + Stocklana 539/71
+- Pure `buildAcquireGateMessages`: Bitquery missing → blockedReasons names `BITQUERY_API_KEY`; Pyth missing → honestyNotes names `PYTH_API_KEY` (does not alone block review).
+- `/desk/acquire` shows Fail-closed reasons vs Honesty labels + Settings/`KEYS_LANDING` next step.
+- E2E asserts `bitquery_api_key` on acquire checks; unit 50 green; block0 e2e 14 green.
+- Stocklana live WebFetch: **539** registered / **71** submissions / **$121k**; deadline conflict SEP 25 hero vs timeline 18 Sep 16:00 ET / stocklana.fun 18 Sep 23:59 UTC.
+- Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Lab Pick + opt-in desk preview (no production merge)
+- `/lab/ui` + `/lab/shaders`: **Pick** stores local candidate + copies chat reply (`Approve lab UI: …`).
+- **Preview on desk** is session-only opt-in (`data-lab-ui` / `data-lab-shader` + banner); Exit preview clears it — production chrome unchanged until Henry replies in chat.
+- Settings readiness shows picked ids when present; HENRY_STEPS Step 0 updated.
+- Unit 53 green; block0 e2e 14 green (includes pick → preview → exit).
+- Still blocked for full objective: Henry chat lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

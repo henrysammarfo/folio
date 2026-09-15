@@ -13,7 +13,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:install": "playwright install chromium"
+    "test:e2e:install": "playwright install chromium",
+    "replay": "npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build",
+    "smoke": "npx tsx scripts/smoke-empire.mts",
+    "keys": "npx tsx scripts/keys-readiness.mts"
   },
   "overrides": {
     "rolldown": "1.2.1"

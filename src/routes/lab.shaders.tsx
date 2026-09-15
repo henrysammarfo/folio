@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/public-page";
 import { StatusBadge } from "@/components/folio-brand";
+import { LabApprovePanel } from "@/components/lab-approve-panel";
 
 export const Route = createFileRoute("/lab/shaders")({
   head: () => ({
@@ -36,6 +37,8 @@ const CANDIDATES = [
   },
 ] as const;
 
+const SHADER_IDS = CANDIDATES.map((c) => c.id);
+
 function Page() {
   return (
     <PublicShell
@@ -43,10 +46,8 @@ function Page() {
       title="Shaders candidates stay here until you say yes."
       intro="Production home hero media is locked. These are backdrop candidates for later marketing/desk chrome only. Reply with a candidate id to approve a merge."
     >
-      <div className="mb-4 flex flex-wrap gap-2">
-        <StatusBadge tone="blue">Awaiting approval</StatusBadge>
-        <StatusBadge tone="neutral">Hero media untouched</StatusBadge>
-      </div>
+      <LabApprovePanel kind="shaders" ids={SHADER_IDS} />
+
       <div className="lab-grid">
         {CANDIDATES.map((c) => (
           <article key={c.id} className="lab-card">

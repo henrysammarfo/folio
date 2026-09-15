@@ -52,3 +52,61 @@ Source: https://hackathons.solana.com/hackathons/stocklana (Tavily)
 | Judging | through 2 Oct 2026 | Confirmed |
 
 Do **not** quote older ~500/57 registration counts.
+
+
+## Live Stocklana re-check (2026-09-15 16:45 UTC)
+
+Sources: https://hackathons.solana.com/hackathons/stocklana (jina/WebFetch live page) + Tavily index (may lag)
+
+| Claim | Live value | Status |
+|---|---|---|
+| Prize pool (hero total) | **$115,000** | Confirmed on live page (main track still lists $100,000 + bounty tracks) |
+| Registered | **528** | Confirmed live page (Tavily index still showed 145 — do not invent; prefer live page) |
+| Submissions | **67** | Confirmed live page (Tavily index still showed 12) |
+| Deadline (hero) | **SEP 25, 2026** | Confirmed on live hero; timeline text may still mention Fri 18 Sep 4pm ET — **re-check at submit** |
+| AAPLx multiplier | ≈ **1.00327** | Confirmed via api.xstocks.fi |
+| Token program IDs | Tokenkeg… / TokenzQd… | Confirmed executable on mainnet RPC |
+
+Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
+
+| Stocklana registered **536** / submissions **67** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana | 2026-09-15 |
+| Stocklana deadline conflict: hero SEP 25 vs timeline Fri 18 Sep 20:00 UTC | CONFIRMED conflict — re-check at submit | same page hero + timeline | 2026-09-15 |
+| Network matrix NestUSD labeled unavailable (not mainnet-read) | CONFIRMED in-repo | buildNetworkMatrix NestUSD row | 2026-09-15 |
+| AAPLx currentMultiplier ≈ 1.0032690125398187 | CONFIRMED live | api.xstocks.fi AAPLx multiplier | 2026-09-15 |
+| Stocklana registered **536** / submissions **69** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana (WebFetch) | 2026-09-15 |
+
+## Live Stocklana re-check (2026-09-15 ~18:05 UTC)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Stocklana registered **536** / submissions **69** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana (WebFetch) | 2026-09-15 |
+| Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)**; stocklana.fun shows **18 SEP 2026 · 23:59 UTC** | CONFIRMED conflict — re-check at submit | official + stocklana.fun | 2026-09-15 |
+| Ephemeral wallet inspect (no FOLIO_SESSION_SECRET) on `/desk/positions?inspect=` | SHIPPED | mainnet-read only; labeled not auth | 2026-09-15 |
+
+| Ephemeral inspect on `/desk/credit?inspect=` | SHIPPED | same binding priority as positions; labeled not auth | 2026-09-15 |
+
+## Live Vercel session secret (2026-09-15 ~18:48 UTC)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| `FOLIO_SESSION_SECRET` present on Vercel folio project (all targets) | CONFIRMED | Vercel env API lists encrypted key; settings SSR `sessionSecretPresent:true` | 2026-09-15 |
+| `BROADCAST_PAUSED=true` on Vercel | CONFIRMED | env API + settings readiness `broadcastPaused:true` | 2026-09-15 |
+| Settings badge **Watch-wallet secret set** | CONFIRMED live | https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app/desk/settings | 2026-09-15 |
+| Bitquery / Privy / Supabase on Vercel | MISSING | env API lists only session secret + broadcast; wash + multi-tenant fail-closed | 2026-09-15 |
+
+## Live watch-wallet bind + Stocklana (2026-09-15 ~18:53 UTC)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Watch-wallet bind works on Vercel preview with session secret | CONFIRMED | Playwright bind Tokenkeg… → success note + Currently Toke…Q5DA | 2026-09-15 |
+| Stocklana registered **538** / submissions **69** / prize **$121,000** / deadline hero **SEP 25, 2026** | SUPERSEDED by 539/71 | prior jina snapshot | 2026-09-15 |
+| Stocklana registered **539** / submissions **71** / prize **$121,000** / deadline hero **SEP 25, 2026** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana WebFetch (Registered 539 · Submissions 71 · Prize Pool $121,000) | 2026-09-15 |
+| Timeline Fri 18 Sep 2026 16:00 ET; stocklana.fun HACKATHON CLOSE 18 Sep 2026 23:59 UTC | CONFLICT vs hero SEP 25 — re-check at submit | hackathons page timeline + stocklana.fun | 2026-09-15 |
+
+## Hermes auth (2026-09-15)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Hermes `/v2/updates/price/latest` returns 401 without API key from this egress | CONFIRMED | curl 401 unauthorized; price_feeds still 200 | 2026-09-15 |
+| FOLIO fail-closes Pyth without `PYTH_API_KEY` (no invented price) | CONFIRMED | unit test + adapter early return `pyth_api_key_missing` | 2026-09-15 |
+| `SOLANA_RPC_URL` set on Vercel folio project | CONFIRMED | Vercel env API create encrypted all targets | 2026-09-15 |

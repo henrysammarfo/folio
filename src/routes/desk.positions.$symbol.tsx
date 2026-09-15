@@ -13,15 +13,20 @@ export const Route = createFileRoute("/desk/positions/$symbol")({
       { name: "description", content: `Live multiplier and paper economics for ${params.symbol}.` },
     ],
   }),
+  /** Prefetch so wallet-read vs paper qty label is honest on first paint. */
+  loader: async () => getPositionsBundle({ data: {} }),
   component: Page,
 });
 
 function Page() {
   const { symbol } = Route.useParams();
+  const initial = Route.useLoaderData();
   const fetchPositions = useServerFn(getPositionsBundle);
   const { data, isFetching } = useQuery({
     queryKey: ["positions-bundle"],
-    queryFn: () => fetchPositions(),
+    queryFn: () => fetchPositions({ data: {} }),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
   const row = data?.rows.find((r) => r.symbol.toLowerCase() === symbol.toLowerCase());
@@ -38,7 +43,9 @@ function Page() {
     >
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Mainnet read</ModeBadge>
-        <ModeBadge mode="paper">Paper qty</ModeBadge>
+        <ModeBadge mode={row?.qtySource === "wallet-read" ? "mainnet-read" : "paper"}>
+          {row?.qtySource === "wallet-read" ? "Wallet-read qty" : "Paper qty"}
+        </ModeBadge>
       </div>
       <Panel
         title={row?.name ?? symbol}
@@ -49,7 +56,14 @@ function Page() {
         ) : (
           <div className="policy-list">
             <p>
-              <span>Paper raw</span>
+              <span>Display qty</span>
+              <b>
+                {row.qty.toFixed(4)}{" "}
+                <small>({row.qtySource === "wallet-read" ? "wallet-read" : "paper"})</small>
+              </b>
+            </p>
+            <p>
+              <span>Paper raw (fallback)</span>
               <b>{row.paperRaw.toFixed(4)}</b>
             </p>
             <p>

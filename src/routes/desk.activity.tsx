@@ -13,14 +13,19 @@ export const Route = createFileRoute("/desk/activity")({
       { name: "description", content: "Live-derived desk events — not a fabricated ledger." },
     ],
   }),
+  /** Prefetch so event stream honesty paints on first load (not empty flash). */
+  loader: async () => getActivityBundle(),
   component: Page,
 });
 
 function Page() {
+  const initial = Route.useLoaderData();
   const fetchActivity = useServerFn(getActivityBundle);
   const { data, isFetching } = useQuery({
     queryKey: ["activity-bundle"],
     queryFn: () => fetchActivity(),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
 
