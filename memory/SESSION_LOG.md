@@ -287,3 +287,7 @@
 ## 2026-09-15 — Role-gated prefs + membership wallet
 - Viewer cannot save desk prefs (server + settings UI); membership wallet preferred for qty binding.
 - Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase(+JWT); broadcast paused.
+
+## 2026-09-15 — Network matrix membership + role-gate honesty
+- Matrix rows for membership wallet priority + role-gated prefs.
+- Goal open: Henry lab Pick + keys.

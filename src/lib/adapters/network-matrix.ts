@@ -138,6 +138,18 @@ export function buildNetworkMatrix(input: {
         : "PRIVY_* / SUPABASE_* missing · fail-closed (desk prefs non-authoritative)",
     },
     {
+      capability: "Membership wallet qty binding",
+      mode: "mainnet-read",
+      detail:
+        "Priority: active-tenant membership wallet → session → watch-wallet → ?inspect= · never invent a foreign pubkey",
+    },
+    {
+      capability: "Role-gated desk prefs",
+      mode: "mainnet-read",
+      detail:
+        "owner/trader may write · viewer fail-closed (prefs_role_denied) · settings switches disabled",
+    },
+    {
       capability: "Watch-wallet mainnet-read qty",
       mode: input.sessionSecretPresent ? "mainnet-read" : "unavailable",
       detail: input.sessionSecretPresent

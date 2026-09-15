@@ -14,6 +14,8 @@
 | Nest.credit vault awareness | mainnet-read | Indexed vault TVL/OFT — **not** NestUSD borrow |
 | NestUSD | unavailable | Unverified endpoint · fail-closed |
 | Multi-tenant sessions | unavailable | PRIVY_* / SUPABASE_* missing · fail-closed |
+| Membership wallet qty binding | mainnet-read | membership → session → watch → inspect |
+| Role-gated desk prefs | mainnet-read | owner/trader write · viewer fail-closed |
 | Watch-wallet mainnet-read qty | mainnet-read / unavailable | Requires `FOLIO_SESSION_SECRET` ≥16 (≠ Privy auth) |
 | Ephemeral wallet inspect | mainnet-read | `?inspect=` on desk/positions/credit · not auth |
 | Broadcast swap/borrow | unavailable | ≤~$1 budget · `BROADCAST_PAUSED` |

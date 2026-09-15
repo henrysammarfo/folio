@@ -321,3 +321,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Wallet binding priority: membership → session → watch-wallet → inspect; desk qty notes/badges label membership.
 - Settings switches disabled for viewer; DeskWalletPill prefers tenant membership wallet.
 - Vitest **95** green (role-gates + membership priority). Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase (+ JWT) · funded broadcast.
+
+## 2026-09-15 — Network matrix membership + role-gate rows
+- Matrix documents membership→session→watch→inspect qty priority and owner/trader prefs write (viewer fail-closed).
+- Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase (+ JWT) · funded broadcast.

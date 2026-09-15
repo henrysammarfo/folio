@@ -48,6 +48,15 @@ describe("buildNetworkMatrix honesty", () => {
 
     expect(byCap["Multi-tenant sessions (Privy + Supabase)"]?.mode).toBe("unavailable");
 
+    expect(byCap["Membership wallet qty binding"]?.mode).toBe("mainnet-read");
+    expect(byCap["Membership wallet qty binding"]?.detail).toMatch(
+      /membership wallet → session → watch-wallet/i,
+    );
+    expect(byCap["Role-gated desk prefs"]?.mode).toBe("mainnet-read");
+    expect(byCap["Role-gated desk prefs"]?.detail).toMatch(
+      /viewer fail-closed|prefs_role_denied/i,
+    );
+
     expect(byCap["Kamino xStocks market (read)"]?.mode).toBe("mainnet-read");
     expect(byCap["Kamino xStocks market (read)"]?.detail).toMatch(
       /no fork harness|unavailable until funded/i,
