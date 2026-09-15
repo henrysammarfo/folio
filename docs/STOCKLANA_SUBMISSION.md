@@ -27,7 +27,13 @@ FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after
 
 ## Henry blockers before “production complete”
 
-- [ ] Set Vercel env: `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true`
+- [ ] Set Vercel env: `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true` — preview `/desk/settings` already shows **Watch-wallet secret missing** and disables Bind until set
 - [ ] Land `BITQUERY_API_KEY` for live wash (still heuristic)
 - [ ] Land Privy + Supabase keys for multi-tenant sessions
 - [ ] Reply with one lab id to approve premium chrome: `ink-ledger` · `ledger-mist` · `aurora-grid` · `desk-density-a` · `desk-density-b` · `gate-chip`
+
+## Walkthrough artifacts (preview)
+
+- Settings secret honesty: `/opt/cursor/artifacts/settings_watch_wallet_secret.png`
+- Lab UI candidates: `/opt/cursor/artifacts/lab_ui_density_candidates.png`
+- Lab shaders candidates: `/opt/cursor/artifacts/lab_shaders_candidates.png`
