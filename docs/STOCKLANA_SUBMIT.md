@@ -5,7 +5,7 @@ Deadline: **2026-09-18 20:00 UTC** · Budget: ≤~$1 · Broadcast: paused
 ## Before submit
 
 - [ ] Re-check Stocklana registration counts live (do not invent) — last check 2026-09-15: **528 registered**, **67 submissions**, **$115k** hero pool (main track $100k + bounties), deadline **re-check live** (hero SEP 25 / timeline may still say 18 Sep 20:00 UTC)
-- [ ] Demo URL reachable (Block 0 spine) — Vercel project `folio` linked: https://folio-teamtitanlink.vercel.app (confirm deploy green; set env keys in Vercel)
+- [ ] Demo URL reachable (Block 0 spine) — Vercel project `folio` (`prj_pzvYDMnYiSDcJNsv5NCdy5UVeExq`); preview alias `folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app` after green build; set `SOLANA_RPC_URL`, `FOLIO_SESSION_SECRET`, `BROADCAST_PAUSED=true` in Vercel env (do not commit secrets)
 - [ ] Replay green locally:
 
 ```bash

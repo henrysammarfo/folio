@@ -33,23 +33,27 @@ function Page() {
   const rows = positions.data?.rows ?? [];
   const verified = rows.filter((r) => r.health === "Verified").length;
   const paperValue = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
+  const walletRead = rows.some((r) => r.qtySource === "wallet-read");
+  const creditLabel = credit.data?.paper.label === "wallet-read" ? "wallet-read" : "paper";
 
   return (
     <DeskShell eyebrow="Portfolio command" title="Prime desk">
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Live marks</ModeBadge>
-        <ModeBadge mode="paper">Paper qty</ModeBadge>
+        <ModeBadge mode={walletRead ? "mainnet-read" : "paper"}>
+          {walletRead ? "Wallet-read qty" : "Paper qty"}
+        </ModeBadge>
         <ModeBadge mode="quote-only">Broadcast off</ModeBadge>
       </div>
       <div className="desk-metrics">
         <div>
-          <span>Paper economic value</span>
+          <span>{walletRead ? "Wallet-read economic value" : "Paper economic value"}</span>
           <b>
             {paperValue > 0
               ? paperValue.toLocaleString("en-US", { style: "currency", currency: "USD" })
               : "—"}
           </b>
-          <small>Mainnet marks · paper qty</small>
+          <small>Mainnet marks · {walletRead ? "wallet-read qty" : "paper qty"}</small>
         </div>
         <div>
           <span>Verified rows</span>
@@ -69,7 +73,9 @@ function Page() {
                 })
               : "—"}
           </b>
-          <small>Paper × live Kamino LTV</small>
+          <small>
+            {creditLabel === "wallet-read" ? "Wallet-read × live Kamino LTV" : "Paper × live Kamino LTV"}
+          </small>
         </div>
       </div>
       <div className="desk-grid">

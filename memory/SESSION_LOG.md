@@ -80,3 +80,10 @@
 - Added `npm run replay` / `npm run smoke`.
 - Created Vercel git project `folio` (team teamtitanlink) for demo URL path.
 - Still blocked on Bitquery/Privy/Supabase keys + Henry lab approve for premium chrome merge.
+
+## 2026-09-15 — Vercel Nitro preset + verify
+
+- Fixed preview deploy `STATIC_BUILD_NO_OUT_DIR`: Nitro uses `vercel` preset under `VERCEL=1` (writes `.vercel/output`); local keeps `node-server`.
+- Added `vercel.json` framework `tanstack-start` (project was `tanstack-start-lovable`).
+- Desk home labels wallet-read vs paper; demo script mentions watch-wallet + `npm run replay`.
+- Verified: vitest 28, playwright 7, smoke-empire live adapters, VERCEL=1 build emits Build Output API.

@@ -7,7 +7,7 @@ Deadline: **2026-09-18 20:00 UTC** · Network: mainnet-read + quote-only · Budg
 1. **Truth** — “Token balances lie after splits. FOLIO reads the live xStocks Scaled UI multiplier — AAPLx ≈ 1.003× today, not a demo 4×.”
 2. **Wash** — “If the tape is missing or linked-flow looks dirty, we fail closed. No silent green.”
 3. **Buy** — “Jupiter quote-only on mainnet. Review the route — we do not broadcast on a dollar budget.”
-4. **Credit** — “Kamino xStocks LTV is live (AAPLx 40%). Borrow CPI stays fork/unavailable until funded.”
+4. **Credit** — “Kamino xStocks LTV is live (AAPLx 40%). Borrow CPI stays fork/unavailable until funded. Bind a watch wallet for mainnet-read qty — still not Privy multi-tenant auth.”
 5. **Agent** — “Paper by default, metered, caps on. No mentor spam until this URL works.”
 
 ## Click path
@@ -15,16 +15,14 @@ Deadline: **2026-09-18 20:00 UTC** · Network: mainnet-read + quote-only · Budg
 1. `/truth?symbol=AAPLx` — multiplier + economic shares
 2. `/desk/acquire` — run checks; wash blocked without Bitquery (honest)
 3. `/network` — capability matrix badges
-4. `/desk/credit` — Kamino reserves live
+4. `/desk/settings` — bind watch wallet (optional) → `/desk/positions` + `/desk/credit`
 5. `/lab/shaders` + `/lab/ui` — approve gate (not production)
 
 ## Replay
 
 ```bash
-npm test
-npm run test:e2e
-npx tsx scripts/smoke-empire.mts
-npm run build
+npm run replay
+# = npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build
 ```
 
 ## Do not say
