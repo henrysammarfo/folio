@@ -68,3 +68,7 @@ Expect: AAPLx multiplier ≈1.003…, Kamino AAPLx maxLtv 0.40, Jupiter Lend ear
 - Stocklana first (deadline 2026-09-18 20:00 UTC)
 - Colosseum World’s Fair next — same mainnet-read honesty posture
 - Do not claim unhackable / nation-state proof
+
+## Stocklana submit
+
+See [`docs/STOCKLANA_SUBMIT.md`](docs/STOCKLANA_SUBMIT.md).

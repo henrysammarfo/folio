@@ -25,6 +25,7 @@ import {
   type FolioSession,
 } from "./auth/session";
 import { verifyPrivyAccessToken } from "./auth/privy";
+import { resolveTenantMemberships } from "./auth/tenants";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 
@@ -340,10 +341,12 @@ export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
     if (!identity.ok) {
       return errResult("folio.session.privy", identity.reason, identity.detail);
     }
-    const minted = mintFolioSession({
+    const tenantsRes = await resolveTenantMemberships({ userId: identity.data.userId });
+    const tenants = tenantsRes.ok ? tenantsRes.data : [];
+const minted = mintFolioSession({
       userId: identity.data.userId,
       walletAddress: data.walletAddress ?? identity.data.walletAddress,
-      tenants: [],
+      tenants,
     });
     if (!minted.ok) {
       return errResult("folio.session.privy", minted.reason, minted.detail);

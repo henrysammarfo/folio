@@ -49,3 +49,10 @@
 - Playwright Block 0 smoke: home, truth (no 4.0×), acquire wash fail-closed (Continue disabled), network badges, lab approve gate — 5/5 green.
 - Vitest 17/17; `tsc --noEmit` clean; build green.
 - Still waiting on Bitquery / Privy / Supabase live keys and Henry lab UI approval before production visual merge / broadcast.
+
+## 2026-09-15 — Tenant resolve + submit checklist
+
+- `resolveTenantMemberships` fail-closed Supabase service-role lookup; wired into Privy→folio_session mint (empty tenants if unresolved).
+- Settings binds Privy token → httpOnly Set-Cookie.
+- `docs/STOCKLANA_SUBMIT.md` checklist.
+- Tests: 19 unit + 5 e2e green.
