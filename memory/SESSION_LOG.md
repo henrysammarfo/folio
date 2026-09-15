@@ -100,3 +100,12 @@
 
 - `/truth` loader prefetches `getTruthBundle` so first paint shows live xStocks multiplier (verified locally ~1.003269×), not empty placeholders.
 - Public Vercel demo remains up; set `FOLIO_SESSION_SECRET` in Vercel for watch-wallet.
+
+## 2026-09-15 — Network matrix honesty + Stocklana fact refresh
+
+- Reworked `buildNetworkMatrix` so NestUSD / multi-tenant auth / broadcast are not painted live when keys/endpoints are missing.
+- `getNetworkBundle` probes Kamino, Jupiter Lend, NestUSD, Scaled UI + key presence flags.
+- `/network` loader SSR-prefetches matrix; e2e asserts NestUSD fail-closed + broadcast paused + Bitquery missing.
+- Wash row mode forced `unavailable` without Bitquery (not just detail string).
+- Live Stocklana (official page): **534** registered, 67 submissions, $121k hero pool; deadline conflict SEP 25 hero vs 18 Sep 20:00 UTC timeline.
+- Submit pack lists lab candidate ids for Henry approve gate.

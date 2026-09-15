@@ -54,6 +54,10 @@ test.describe("FOLIO Block 0 smoke", () => {
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/mainnet|quote|read|unavailable|wash|broadcast/);
+    expect(body).toMatch(/broadcast paused|broadcast_paused|quote-only/);
+    expect(body).toMatch(/nestusd|fail-closed|unverified/);
+    expect(body).toMatch(/bitquery.*missing|wash.*fail-closed|fail-closed.*bitquery/);
+    expect(body).not.toMatch(/unhackable|nation-state/);
   });
 
   test("lab routes stay approve-gated", async ({ page }) => {

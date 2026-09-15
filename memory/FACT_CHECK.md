@@ -68,3 +68,8 @@ Sources: https://hackathons.solana.com/hackathons/stocklana (jina/WebFetch live 
 | Token program IDs | Tokenkeg… / TokenzQd… | Confirmed executable on mainnet RPC |
 
 Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
+
+| Stocklana registered **534** / submissions **67** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana | 2026-09-15 |
+| Stocklana deadline conflict: hero SEP 25 vs timeline Fri 18 Sep 20:00 UTC | CONFIRMED conflict — re-check at submit | same page hero + timeline | 2026-09-15 |
+| Network matrix NestUSD labeled unavailable (not mainnet-read) | CONFIRMED in-repo | buildNetworkMatrix NestUSD row | 2026-09-15 |
+| AAPLx currentMultiplier ≈ 1.0032690125398187 | CONFIRMED live | api.xstocks.fi AAPLx multiplier | 2026-09-15 |

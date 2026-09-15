@@ -24,6 +24,8 @@ export const Route = createFileRoute("/network")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  /** Prefetch live matrix so NestUSD / wash / broadcast honesty is visible on first paint. */
+  loader: async () => getNetworkBundle(),
   component: Page,
 });
 
@@ -35,11 +37,15 @@ function toneFor(mode: IntegrationMode): "green" | "amber" | "blue" | "neutral" 
 }
 
 function Page() {
+  const initial = Route.useLoaderData();
   const fetchNetwork = useServerFn(getNetworkBundle);
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["network-matrix"],
     queryFn: () => fetchNetwork(),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     refetchInterval: 60_000,
+    staleTime: 30_000,
   });
 
   return (

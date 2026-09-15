@@ -107,3 +107,13 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 ## 2026-09-15 Truth SSR
 
 - `/truth` server loader prefetches live bundle; local SSR shows ~1.003269× (not fixture 4.0×).
+
+## 2026-09-15 network honesty + Stocklana refresh
+
+- Network matrix splits Kamino / Jupiter Lend / NestUSD; NestUSD + wash-without-Bitquery + broadcast stay **unavailable/fail-closed** (no false mainnet-read).
+- Matrix also surfaces multi-tenant keys, watch-wallet secret, Scaled UI RPC fallback.
+- `/network` SSR-prefetches live matrix.
+- Stocklana live: **534 registered / 67 submissions / $121k** hero; deadline hero SEP 25 vs timeline 18 Sep 20:00 UTC — re-check at submit.
+- Wash matrix row forced `unavailable` when Bitquery key missing (not just detail text).
+- Keys still empty: Privy / Supabase / Bitquery. Set `FOLIO_SESSION_SECRET` on Vercel for watch-wallet.
+- Premium UI still approve-gated (`ink-ledger` / `ledger-mist` / `aurora-grid` · `desk-density-a` / `desk-density-b` / `gate-chip`).

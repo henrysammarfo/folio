@@ -1,20 +1,33 @@
 # FOLIO — Stocklana submit checklist
 
-Deadline: **2026-09-18 20:00 UTC** · Budget: ≤~$1 · Broadcast: paused
+Deadline conflict — **re-check live at submit**:
+- Hero / stats strip: **SEP 25, 2026**
+- Timeline copy: **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)**
+Budget: ≤~$1 · Broadcast: paused
+
+## Live counts (2026-09-15, official page)
+
+Source: https://hackathons.solana.com/hackathons/stocklana
+
+- Registered: **534**
+- Submissions: **67**
+- Prize pool hero: **$121,000** (Foundation main track $100k + bounty tracks)
+
+Do not invent newer counts — refresh the page before the submission form.
 
 ## Before submit
 
-- [ ] Re-check Stocklana registration counts live (do not invent) — last check 2026-09-15: **528 registered**, **67 submissions**, **$115k** hero pool (main track $100k + bounties), deadline **re-check live** (hero SEP 25 / timeline may still say 18 Sep 20:00 UTC)
-- [x] Demo URL reachable (Block 0 spine) — https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app (SSO off; Nitro preset fixed). Set `FOLIO_SESSION_SECRET` (+ optional `SOLANA_RPC_URL`) in Vercel env for watch-wallet; public RPC fallback covers Scaled UI reads when RPC unset.
+- [x] Demo URL reachable (Block 0 spine) — https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app (SSO off). Set `FOLIO_SESSION_SECRET` (+ optional `SOLANA_RPC_URL`) in Vercel env for watch-wallet; public RPC fallback covers Scaled UI reads when RPC unset. `BROADCAST_PAUSED=true` recommended in Vercel.
 - [ ] Replay green locally:
 
 ```bash
 npm run replay
-# equivalent: npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build
+# = npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build
 ```
 
 - [ ] Pitch order locked (truth → wash → buy → credit → agent) — see `docs/DEMO_SCRIPT.md`
 - [ ] Mode badges visible on `/truth`, `/desk/acquire`, `/network`, `/desk/credit`
+- [ ] `/network` shows NestUSD unavailable, wash fail-closed without Bitquery, broadcast paused
 - [ ] Wash fail-closed without Bitquery (Continue disabled)
 - [ ] No “unhackable” / nation-state claims anywhere
 - [ ] No claim of mainnet fill / mint / borrow unless actually funded + confirmed
@@ -26,15 +39,24 @@ npm run replay
 |---|---|
 | `BITQUERY_API_KEY` | Live wash tape (still heuristic) |
 | `PRIVY_APP_ID` + `PRIVY_APP_SECRET` | Wallet identity |
-| `SUPABASE_*` + migration applied | Tenant memberships / prefs |
-| `FOLIO_SESSION_SECRET` (≥16) | httpOnly `folio_session` mint/verify + watch-wallet cookie |
+| `SUPABASE_URL` + `SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` + migration | Tenant memberships / prefs |
+| `FOLIO_SESSION_SECRET` (≥16) — **also set on Vercel** | httpOnly `folio_session` + watch-wallet cookie |
 | Optional `JUPITER_API_KEY` | If quote/price becomes gated |
+| Optional `SOLANA_RPC_URL` | Private RPC (public mainnet fallback works for reads) |
 
-## UI approve gate
+## UI approve gate (reply with one id)
 
-- Candidates only on `/lab/shaders` and `/lab/ui`
-- Reply with a candidate id to merge into production chrome
-- Production hero media stays locked until then
+Shaders (`/lab/shaders`):
+- `ink-ledger`
+- `ledger-mist`
+- `aurora-grid`
+
+UI (`/lab/ui`):
+- `desk-density-a`
+- `desk-density-b`
+- `gate-chip`
+
+Production hero + desk chrome stay frozen until Henry names an id in chat.
 
 ## After Stocklana
 

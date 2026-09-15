@@ -5,12 +5,19 @@ import { divergeBps, fetchPythEquityPrice } from "./adapters/pyth";
 import { fetchJupiterQuote, fetchJupiterTokenPrice } from "./adapters/jupiter";
 import { evaluateWashGate, washAllowsSize } from "./adapters/wash";
 import { buildNetworkMatrix, type MatrixRow } from "./adapters/network-matrix";
+import { fetchKaminoXStocksMarket } from "./adapters/kamino";
+import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
+import { fetchNestUsdStatus } from "./adapters/nestusd";
+import { fetchScaledUiOnchain } from "./adapters/scaled-ui";
+import { resolveSolanaRpcUrl } from "./adapters/solana-rpc";
 import type { AdapterResult } from "./adapters/types";
 import type { XStockAsset, XStockMultiplier } from "./adapters/xstocks";
 import type { PythPrice } from "./adapters/pyth";
 import type { JupiterQuote, JupiterTokenPrice } from "./adapters/jupiter";
 import type { WashVerdict } from "./adapters/wash";
 import { paperRawFor } from "./market";
+import { isBroadcastPaused } from "./broadcast";
+export { isBroadcastPaused } from "./broadcast";
 
 const SymbolInput = z.object({
   symbol: z.string().min(2).max(16).default("AAPLx"),
@@ -57,8 +64,6 @@ export type AcquireBundle = {
   };
 };
 
-import { isBroadcastPaused } from "./broadcast";
-export { isBroadcastPaused } from "./broadcast";
 export type NetworkBundle = {
   rows: MatrixRow[];
   broadcastPaused: boolean;
@@ -237,12 +242,28 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     const underlying = asset.ok ? asset.data.underlyingSymbol : "AAPL";
     const mint = asset.ok ? asset.data.solanaMint : null;
     const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
+    const rpc = resolveSolanaRpcUrl();
 
-    const [pyth, jupiterPrice, wash] = await Promise.all([
-      fetchPythEquityPrice(underlying),
-      mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
-      evaluateWashGate({ symbol, mint, notionalUsd: 100 }),
-    ]);
+    const [pyth, jupiterPrice, wash, kamino, jupiterLend, nestusd, scaledUi] =
+      await Promise.all([
+        fetchPythEquityPrice(underlying),
+        mint
+          ? fetchJupiterTokenPrice(mint)
+          : Promise.resolve(unavailablePrice("xstock_mint_missing")),
+        evaluateWashGate({ symbol, mint, notionalUsd: 100 }),
+        fetchKaminoXStocksMarket(),
+        fetchJupiterLendEarn(),
+        fetchNestUsdStatus(),
+        mint
+          ? fetchScaledUiOnchain(mint)
+          : Promise.resolve({
+              ok: false as const,
+              mode: "unavailable" as const,
+              asOf: new Date().toISOString(),
+              source: "solana-rpc.scaled-ui",
+              reason: "xstock_mint_missing",
+            }),
+      ]);
 
     const jupiter = mint
       ? await fetchJupiterQuote({
@@ -258,6 +279,17 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
           reason: "xstock_mint_missing",
         } as const);
 
+    const multiTenantKeysPresent = Boolean(
+      process.env["PRIVY_APP_ID"]?.trim() &&
+        process.env["PRIVY_APP_SECRET"]?.trim() &&
+        process.env["SUPABASE_URL"]?.trim() &&
+        process.env["SUPABASE_ANON_KEY"]?.trim() &&
+        process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim() &&
+        (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16,
+    );
+    const sessionSecretPresent =
+      (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
+
     return {
       rows: buildNetworkMatrix({
         multiplier,
@@ -265,7 +297,14 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         jupiter,
         jupiterPrice,
         wash,
-        bitqueryKeyPresent: Boolean(process.env["BITQUERY_API_KEY"]),
+        kamino,
+        jupiterLend,
+        nestusd,
+        scaledUi,
+        bitqueryKeyPresent: Boolean(process.env["BITQUERY_API_KEY"]?.trim()),
+        multiTenantKeysPresent,
+        sessionSecretPresent,
+        solanaRpcPublicFallback: rpc.publicFallback,
         broadcastFunded: false,
       }),
       broadcastPaused: isBroadcastPaused(),
