@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { fetchJupiterQuote, fetchJupiterTokenPrice } from "../adapters/jupiter";
 import { cacheClearForTests } from "../adapters/ttl-cache";
 
+/** Low-entropy fixtures — not secrets; avoid GG high-entropy false positives on real mints. */
+const FIXTURE_USDC = "USDCtestMint111111111111111111111111111111";
+const FIXTURE_XSTOCK = "AAPLxTestMint111111111111111111111111111111";
+
 describe("Jupiter TTL cache + rate-limit honesty", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -12,8 +16,8 @@ describe("Jupiter TTL cache + rate-limit honesty", () => {
     const fetchMock = vi.fn(async () =>
       new Response(
         JSON.stringify({
-          inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-          outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+          inputMint: FIXTURE_USDC,
+          outputMint: FIXTURE_XSTOCK,
           inAmount: "1000000",
           outAmount: "400000000",
           otherAmountThreshold: "398000000",
@@ -27,12 +31,12 @@ describe("Jupiter TTL cache + rate-limit honesty", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const first = await fetchJupiterQuote({
-      outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+      outputMint: FIXTURE_XSTOCK,
       amountRaw: 1_000_000,
       outputDecimals: 8,
     });
     const second = await fetchJupiterQuote({
-      outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+      outputMint: FIXTURE_XSTOCK,
       amountRaw: 1_000_000,
       outputDecimals: 8,
     });
@@ -51,7 +55,7 @@ describe("Jupiter TTL cache + rate-limit honesty", () => {
       vi.fn(async () => new Response("Too many requests", { status: 429 })),
     );
     const res = await fetchJupiterQuote({
-      outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+      outputMint: FIXTURE_XSTOCK,
       amountRaw: 1_000_000,
     });
     expect(res.ok).toBe(false);
@@ -66,8 +70,8 @@ describe("Jupiter TTL cache + rate-limit honesty", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
-            inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-            outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            inputMint: FIXTURE_USDC,
+            outputMint: FIXTURE_XSTOCK,
             inAmount: "1000000",
             outAmount: "400000000",
             otherAmountThreshold: "398000000",
@@ -81,7 +85,7 @@ describe("Jupiter TTL cache + rate-limit honesty", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const warm = await fetchJupiterQuote({
-      outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+      outputMint: FIXTURE_XSTOCK,
       amountRaw: 1_000_000,
       outputDecimals: 8,
     });
@@ -92,7 +96,7 @@ describe("Jupiter TTL cache + rate-limit honesty", () => {
     vi.useFakeTimers({ shouldAdvanceTime: false });
     vi.setSystemTime(Date.now() + 25_000);
     const stale = await fetchJupiterQuote({
-      outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+      outputMint: FIXTURE_XSTOCK,
       amountRaw: 1_000_000,
       outputDecimals: 8,
     });
@@ -109,9 +113,7 @@ describe("Jupiter TTL cache + rate-limit honesty", () => {
       "fetch",
       vi.fn(async () => new Response("rate", { status: 429 })),
     );
-    const res = await fetchJupiterTokenPrice(
-      "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
-    );
+    const res = await fetchJupiterTokenPrice(FIXTURE_XSTOCK);
     expect(res.ok).toBe(false);
     if (res.ok) return;
     expect(res.reason).toBe("jupiter_rate_limited");

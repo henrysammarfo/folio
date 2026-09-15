@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { parsePaperIntent, runPaperAgent } from "../agent/paper-agent";
 
+/** Low-entropy fixtures — not secrets (GitGuardian high-entropy false positives). */
+const FIXTURE_USDC = "USDCtestMint111111111111111111111111111111";
+const FIXTURE_XSTOCK = "AAPLxTestMint111111111111111111111111111111";
+
 describe("parsePaperIntent", () => {
   it("parses quote intents with spend cap semantics left to runner", () => {
     const intent = parsePaperIntent("quote 25 USDC AAPLx");
@@ -95,7 +99,7 @@ describe("runPaperAgent live spine", () => {
             deployments: [
               {
                 network: "Solana",
-                address: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+                address: FIXTURE_XSTOCK,
                 decimals: 8,
               },
             ],
@@ -106,8 +110,8 @@ describe("runPaperAgent live spine", () => {
       if (url.includes("api.jup.ag/swap/v1/quote")) {
         return new Response(
           JSON.stringify({
-            inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-            outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            inputMint: FIXTURE_USDC,
+            outputMint: FIXTURE_XSTOCK,
             inAmount: "1000000",
             outAmount: "400000000",
             otherAmountThreshold: "398000000",
@@ -180,7 +184,7 @@ describe("runPaperAgent live spine", () => {
             deployments: [
               {
                 network: "Solana",
-                address: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+                address: FIXTURE_XSTOCK,
                 decimals: 8,
               },
             ],
@@ -191,8 +195,8 @@ describe("runPaperAgent live spine", () => {
       if (url.includes("api.jup.ag/swap/v1/quote")) {
         return new Response(
           JSON.stringify({
-            inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-            outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            inputMint: FIXTURE_USDC,
+            outputMint: FIXTURE_XSTOCK,
             inAmount: "1000000",
             outAmount: "400000000",
             otherAmountThreshold: "398000000",
