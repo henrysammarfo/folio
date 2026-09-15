@@ -225,3 +225,10 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - E2E asserts `bitquery_api_key` on acquire checks; unit 50 green; block0 e2e 14 green.
 - Stocklana live WebFetch: **539** registered / **71** submissions / **$121k**; deadline conflict SEP 25 hero vs timeline 18 Sep 16:00 ET / stocklana.fun 18 Sep 23:59 UTC.
 - Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Lab Pick + opt-in desk preview (no production merge)
+- `/lab/ui` + `/lab/shaders`: **Pick** stores local candidate + copies chat reply (`Approve lab UI: …`).
+- **Preview on desk** is session-only opt-in (`data-lab-ui` / `data-lab-shader` + banner); Exit preview clears it — production chrome unchanged until Henry replies in chat.
+- Settings readiness shows picked ids when present; HENRY_STEPS Step 0 updated.
+- Unit 53 green; block0 e2e 14 green (includes pick → preview → exit).
+- Still blocked for full objective: Henry chat lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

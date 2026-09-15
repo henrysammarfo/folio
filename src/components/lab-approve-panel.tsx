@@ -1,6 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { StatusBadge } from "@/components/folio-brand";
+import {
+  chatReplyForPick,
+  isLabShaderId,
+  isLabUiId,
+  readLabShaderPick,
+  readLabUiPick,
+  startLabPreview,
+  writeLabShaderPick,
+  writeLabUiPick,
+  type LabShaderId,
+  type LabUiId,
+} from "@/lib/lab-pick";
 
 /** Shared approve-gate instructions — premium chrome stays off until Henry replies with an id. */
 export function LabApprovePanel({
@@ -15,14 +27,46 @@ export function LabApprovePanel({
       ? { to: "/lab/shaders" as const, label: "Shader lab" }
       : { to: "/lab/ui" as const, label: "UI lab" };
   const [copied, setCopied] = useState<string | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
+  const [replyCopied, setReplyCopied] = useState(false);
 
-  async function copyId(id: string) {
+  useEffect(() => {
+    setPicked(kind === "ui" ? readLabUiPick() : readLabShaderPick());
+  }, [kind]);
+
+  async function copyText(text: string, mark: string) {
     try {
-      await navigator.clipboard.writeText(id);
-      setCopied(id);
-      window.setTimeout(() => setCopied((cur) => (cur === id ? null : cur)), 1600);
+      await navigator.clipboard.writeText(text);
+      setCopied(mark);
+      window.setTimeout(() => setCopied((cur) => (cur === mark ? null : cur)), 1600);
     } catch {
       setCopied(null);
+    }
+  }
+
+  function pickId(id: string) {
+    if (kind === "ui" && isLabUiId(id)) {
+      writeLabUiPick(id as LabUiId);
+      setPicked(id);
+      void copyText(chatReplyForPick("ui", id), `pick:${id}`);
+      return;
+    }
+    if (kind === "shaders" && isLabShaderId(id)) {
+      writeLabShaderPick(id as LabShaderId);
+      setPicked(id);
+      void copyText(chatReplyForPick("shaders", id), `pick:${id}`);
+    }
+  }
+
+  async function copyReply() {
+    if (!picked) return;
+    const line = chatReplyForPick(kind, picked);
+    try {
+      await navigator.clipboard.writeText(line);
+      setReplyCopied(true);
+      window.setTimeout(() => setReplyCopied(false), 1600);
+    } catch {
+      setReplyCopied(false);
     }
   }
 
@@ -30,43 +74,74 @@ export function LabApprovePanel({
     <aside className="lab-approve-panel" aria-label="How to approve">
       <div className="mb-3 flex flex-wrap gap-2">
         <StatusBadge tone="blue">Awaiting Henry</StatusBadge>
-        <StatusBadge tone="neutral">Nothing merges without your id</StatusBadge>
+        <StatusBadge tone="neutral">Nothing merges without your chat reply</StatusBadge>
+        {picked ? <StatusBadge tone="green">Picked {picked}</StatusBadge> : null}
       </div>
       <h2 className="lab-approve-title">How to approve (one minute)</h2>
       <ol className="lab-approve-steps">
         <li>Look at the candidates below.</li>
         <li>
-          Pick <b>one</b> id
+          Tap <b>Pick</b> on <b>one</b> id
           {kind === "ui" ? " for desk chrome" : " for backdrop only"}.
         </li>
         <li>
-          Reply in Cursor chat with that id + a screenshot (example:{" "}
-          <code>{ids[0]}</code>).
+          Reply in Cursor chat with the copied line (example:{" "}
+          <code>{chatReplyForPick(kind, ids[0] ?? "…")}</code>) + a screenshot.
         </li>
       </ol>
       <p className="lab-approve-ids">
         <span>Ids:</span>{" "}
         {ids.map((id) => (
-          <button
-            key={id}
-            type="button"
-            className="lab-id-copy"
-            onClick={() => void copyId(id)}
-            aria-label={`Copy candidate id ${id}`}
-          >
-            <code>{id}</code>
-            <span className="lab-id-copy-hint">
-              {copied === id ? "copied" : "copy"}
-            </span>
-          </button>
+          <span key={id} className="lab-id-actions">
+            <button
+              type="button"
+              className="lab-id-copy"
+              onClick={() => void copyText(id, id)}
+              aria-label={`Copy candidate id ${id}`}
+            >
+              <code>{id}</code>
+              <span className="lab-id-copy-hint">
+                {copied === id || copied === `pick:${id}` ? "copied" : "copy"}
+              </span>
+            </button>
+            <button
+              type="button"
+              className={`lab-id-pick ${picked === id ? "lab-id-pick-active" : ""}`}
+              onClick={() => pickId(id)}
+              aria-label={`Pick candidate ${id}`}
+              aria-pressed={picked === id}
+            >
+              {picked === id ? "Picked" : "Pick"}
+            </button>
+          </span>
         ))}
       </p>
+      {picked ? (
+        <div className="lab-pick-next">
+          <p>
+            Chat reply ready: <code>{chatReplyForPick(kind, picked)}</code>
+          </p>
+          <div className="lab-pick-actions">
+            <button type="button" className="lab-id-copy" onClick={() => void copyReply()}>
+              {replyCopied ? "Reply copied" : "Copy reply line"}
+            </button>
+            <Link
+              to="/desk"
+              className="lab-preview-link"
+              onClick={() => startLabPreview()}
+            >
+              Preview on desk (opt-in · not merged)
+            </Link>
+          </div>
+        </div>
+      ) : null}
       <p className="lab-approve-foot">
         Also review the{" "}
         <Link to={other.to} className="underline">
           {other.label}
         </Link>
-        . Home CTAs: Approve desk UI · Approve shaders. Production hero stays locked.
+        . Home CTAs: Approve desk UI · Approve shaders. Production hero stays locked until you
+        reply in chat.
       </p>
     </aside>
   );

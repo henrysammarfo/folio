@@ -9,12 +9,13 @@ Demo (hard-refresh): https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanli
 ## Step 0 — Approve lab look ← DO THIS NEXT
 
 1. Open https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app/lab/ui  
-   Pick one: `desk-density-a` · `desk-density-b` · `gate-chip`
+   Tap **Pick** on one: `desk-density-a` · `desk-density-b` · `gate-chip`  
+   (optional) **Preview on desk** — opt-in only; Exit preview anytime; not a production merge.
 2. Open https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app/lab/shaders  
-   Pick one: `ink-ledger` · `ledger-mist` · `aurora-grid`
-3. Reply in chat with the id(s) + screenshot.
+   Tap **Pick** on one: `ink-ledger` · `ledger-mist` · `aurora-grid`
+3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: desk-density-a`) + screenshot.
 
-Until you reply, premium chrome stays off home/desk on purpose.
+Until you reply in chat, premium chrome stays off home/desk on purpose.
 
 ---
 

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
@@ -14,6 +14,7 @@ import {
   getSessionBundle,
   runDeskAgent,
 } from "@/lib/desk.functions";
+import { readLabShaderPick, readLabUiPick } from "@/lib/lab-pick";
 
 export const Route = createFileRoute("/desk/settings")({
   head: () => ({
@@ -55,7 +56,14 @@ function Page() {
   const [watchWalletInput, setWatchWalletInput] = useState("");
   const [watchMsg, setWatchMsg] = useState("");
   const [watchBusy, setWatchBusy] = useState(false);
+  const [labUiPick, setLabUiPick] = useState<string | null>(null);
+  const [labShaderPick, setLabShaderPick] = useState<string | null>(null);
   const tenants = data?.session.ok ? data.session.data.tenants : [];
+
+  useEffect(() => {
+    setLabUiPick(readLabUiPick());
+    setLabShaderPick(readLabShaderPick());
+  }, []);
 
   return (
     <DeskShell eyebrow="Server preferences" title="Settings">
@@ -135,8 +143,10 @@ function Page() {
           <p>
             <span>Lab premium UI</span>
             <b>
-              Awaiting Henry candidate id — <a href="/lab/ui">/lab/ui</a> ·{" "}
-              <a href="/lab/shaders">/lab/shaders</a>
+              {labUiPick || labShaderPick
+                ? `Picked ${[labUiPick, labShaderPick].filter(Boolean).join(" · ")} · awaiting chat reply to merge — `
+                : "Awaiting Henry candidate id — "}
+              <a href="/lab/ui">/lab/ui</a> · <a href="/lab/shaders">/lab/shaders</a>
             </b>
           </p>
           <p className="mt-3 text-sm opacity-80">

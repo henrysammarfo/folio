@@ -202,3 +202,8 @@
 - Shipped acquire gate helper + honesty/blocked split; acquire UI next-step to settings/keys runbook.
 - Stocklana counts → 539 / 71 / $121k (official hackathons page); deadline conflict unchanged.
 - Goal still open — waiting on Henry lab id + Bitquery/Pyth/Privy/Supabase.
+
+## 2026-09-15 — Lab Pick + opt-in desk preview
+- Lab approve panel: Pick → localStorage + chat reply copy; Preview on desk is session-only (not a merge).
+- DeskShell banner + density/shader data attrs; settings shows picked ids; e2e covers pick→preview→exit.
+- Goal still open — Henry must reply with lab id in chat before premium merge; keys still missing.

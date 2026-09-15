@@ -66,14 +66,25 @@ test.describe("FOLIO Block 0 smoke", () => {
 
   test("lab routes stay approve-gated", async ({ page }) => {
     await page.goto("/lab/shaders");
-    await expect(page.getByText(/awaiting approval|approve/i).first()).toBeVisible();
+    await expect(page.getByText(/awaiting henry|approve/i).first()).toBeVisible();
     await expect(page.getByText(/ink-ledger|ledger-mist|aurora-grid/i).first()).toBeVisible();
     await page.goto("/lab/ui");
-    await expect(page.getByText(/awaiting approval|approve/i).first()).toBeVisible();
+    await expect(page.getByText(/awaiting henry|approve/i).first()).toBeVisible();
     await expect(page.getByText(/desk-density-a/i).first()).toBeVisible();
     await expect(page.getByText(/desk-density-b/i).first()).toBeVisible();
     await expect(page.getByText(/gate-chip/i).first()).toBeVisible();
     await expect(page.getByText(/mainnet-read|quote-only|unavailable/i).first()).toBeVisible();
+
+    // Pick is local-only; preview on desk is opt-in and never a production merge
+    await page.getByRole("button", { name: /pick candidate desk-density-a/i }).click();
+    await expect(page.getByText(/chat reply ready|approve lab ui: desk-density-a/i).first()).toBeVisible();
+    await page.getByRole("link", { name: /preview on desk/i }).click();
+    await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(page.locator("[data-lab-ui='desk-density-a']")).toHaveCount(1);
+    await page.getByRole("button", { name: /exit preview/i }).click();
+    await expect(page.getByText(/lab preview \(opt-in/i)).toHaveCount(0);
   });
 
   test("settings exposes watch-wallet bind (not Privy auth)", async ({ page }) => {

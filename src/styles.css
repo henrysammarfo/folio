@@ -240,7 +240,37 @@
 .lab-id-copy:hover code{border-color:color-mix(in oklab,var(--foreground) 35%,transparent)}
 .lab-id-copy-hint{font-size:.65rem;letter-spacing:.04em;text-transform:uppercase;opacity:.55}
 .lab-id-copy:hover .lab-id-copy-hint,.lab-id-copy:focus-visible .lab-id-copy-hint{opacity:.9}
+.lab-id-actions{display:inline-flex;align-items:center;gap:.35rem;margin:.15rem .25rem .15rem 0}
+.lab-id-pick{border:1px solid color-mix(in oklab,var(--border) 85%,transparent);background:color-mix(in oklab,var(--background) 88%,transparent);padding:.2rem .55rem;font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;border-radius:var(--radius)}
+.lab-id-pick:hover{border-color:color-mix(in oklab,var(--foreground) 35%,transparent)}
+.lab-id-pick-active{background:var(--ink);color:var(--primary-foreground);border-color:var(--ink)}
+.lab-pick-next{margin:.75rem 0;padding:.85rem 1rem;border:1px dashed color-mix(in oklab,var(--border) 90%,transparent);background:color-mix(in oklab,var(--background) 70%,transparent)}
+.lab-pick-next p{margin:0 0 .65rem;font-size:.88rem;line-height:1.45}
+.lab-pick-actions{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center}
+.lab-preview-link{font-size:.82rem;font-weight:600;text-decoration:underline}
 .lab-approve-foot{margin:0;font-size:.78rem;opacity:.8;line-height:1.45}
+.lab-preview-banner{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:.75rem 1.25rem;align-items:center;padding:.7rem 1rem;background:color-mix(in oklab,var(--ink) 92%,oklch(.72 .12 85));color:var(--primary-foreground);font-size:.78rem;line-height:1.45;border-bottom:1px solid color-mix(in oklab,var(--primary-foreground) 18%,transparent)}
+.lab-preview-banner code{font-size:.75rem;padding:.05rem .35rem;border:1px solid color-mix(in oklab,var(--primary-foreground) 35%,transparent)}
+.lab-preview-banner-actions{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}
+.lab-preview-banner-actions a{color:inherit}
+.lab-preview-banner-actions button{border:1px solid color-mix(in oklab,var(--primary-foreground) 45%,transparent);background:transparent;color:inherit;padding:.25rem .65rem;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;border-radius:var(--radius)}
+.desk-layout[data-lab-ui="desk-density-a"] .desk-content{font-size:.95em}
+.desk-layout[data-lab-ui="desk-density-a"] .panel{padding:.15rem}
+.desk-layout[data-lab-ui="desk-density-a"] .panel-body{padding:.85rem .95rem}
+.desk-layout[data-lab-ui="desk-density-a"] .desk-heading h1{letter-spacing:-.02em}
+.desk-layout[data-lab-ui="desk-density-b"] .desk-heading{border-bottom:1px solid var(--border);padding-bottom:.85rem;margin-bottom:1rem}
+.desk-layout[data-lab-ui="desk-density-b"] .desk-metrics,.desk-layout[data-lab-ui="desk-density-b"] .desk-grid{gap:1.35rem}
+.desk-layout[data-lab-ui="gate-chip"] .desk-topbar{gap:.85rem}
+.desk-layout[data-lab-ui="gate-chip"] .mode-badge,.desk-layout[data-lab-ui="gate-chip"] .status-badge{letter-spacing:.06em}
+.desk-layout[data-lab-shader="ink-ledger"] .desk-main{background:
+  radial-gradient(120% 80% at 10% -10%,color-mix(in oklab,oklch(.55 .04 240) 22%,transparent),transparent 55%),
+  var(--muted)}
+.desk-layout[data-lab-shader="ledger-mist"] .desk-main{background:
+  linear-gradient(180deg,color-mix(in oklab,oklch(.92 .02 220) 35%,transparent),transparent 40%),
+  var(--muted)}
+.desk-layout[data-lab-shader="aurora-grid"] .desk-main{background:
+  conic-gradient(from 210deg at 85% 0%,color-mix(in oklab,oklch(.7 .06 200) 18%,transparent),transparent 40%),
+  var(--muted)}
 .about-vision{max-width:42rem}
 .about-vision h2{font-family:var(--font-display);font-size:1.6rem;font-weight:400;margin:1.75rem 0 .6rem}
 .about-vision p,.about-vision li{line-height:1.65;color:var(--muted-foreground)}
