@@ -212,3 +212,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Refreshed Stocklana submission/demo packs: session secret ✅ on Vercel; counts **538/69/$121k**; blockers = lab id · Bitquery · Pyth · Privy · Supabase.
 - E2E settings asserts PYTH_API_KEY honesty row.
 - Goal still open — multi-tenant + wash + premium merge need Henry.
+
+## 2026-09-15 — Multi-tenant session fail-closed on tenant lookup + lab copy ids
+- `buildSessionFromPrivyToken` refuses to mint when tenant lookup errors (no invented empty memberships); empty after successful lookup still OK.
+- Unit coverage: happy path + tenant 503 fail-closed + empty memberships (46 tests green).
+- Lab approve panel: one-click copy candidate ids; settings points at `docs/KEYS_LANDING.md` / `npm run keys`.
+- Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { StatusBadge } from "@/components/folio-brand";
 
@@ -13,6 +14,17 @@ export function LabApprovePanel({
     kind === "ui"
       ? { to: "/lab/shaders" as const, label: "Shader lab" }
       : { to: "/lab/ui" as const, label: "UI lab" };
+  const [copied, setCopied] = useState<string | null>(null);
+
+  async function copyId(id: string) {
+    try {
+      await navigator.clipboard.writeText(id);
+      setCopied(id);
+      window.setTimeout(() => setCopied((cur) => (cur === id ? null : cur)), 1600);
+    } catch {
+      setCopied(null);
+    }
+  }
 
   return (
     <aside className="lab-approve-panel" aria-label="How to approve">
@@ -35,7 +47,18 @@ export function LabApprovePanel({
       <p className="lab-approve-ids">
         <span>Ids:</span>{" "}
         {ids.map((id) => (
-          <code key={id}>{id}</code>
+          <button
+            key={id}
+            type="button"
+            className="lab-id-copy"
+            onClick={() => void copyId(id)}
+            aria-label={`Copy candidate id ${id}`}
+          >
+            <code>{id}</code>
+            <span className="lab-id-copy-hint">
+              {copied === id ? "copied" : "copy"}
+            </span>
+          </button>
         ))}
       </p>
       <p className="lab-approve-foot">

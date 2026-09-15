@@ -134,7 +134,14 @@ function Page() {
           </p>
           <p>
             <span>Lab premium UI</span>
-            <b>Awaiting Henry candidate id — <a href="/lab/ui">/lab/ui</a> · <a href="/lab/shaders">/lab/shaders</a></b>
+            <b>
+              Awaiting Henry candidate id — <a href="/lab/ui">/lab/ui</a> ·{" "}
+              <a href="/lab/shaders">/lab/shaders</a>
+            </b>
+          </p>
+          <p className="mt-3 text-sm opacity-80">
+            Key paste order (Bitquery → Pyth → Privy → Supabase):{" "}
+            <code>docs/KEYS_LANDING.md</code> · <code>npm run keys</code>
           </p>
         </div>
       </Panel>

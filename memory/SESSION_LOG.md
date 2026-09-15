@@ -191,3 +191,9 @@
 ## 2026-09-15 — Keys landing runbook + Stocklana pack refresh
 - Docs/runbook/seed/e2e for post-key multi-tenant + Pyth/wash landing; Stocklana paste pack unblocked for secret step.
 - Awaiting Henry lab id before premium merge.
+
+## 2026-09-15 — Multi-tenant session fail-closed on tenant lookup + lab copy ids
+- `buildSessionFromPrivyToken` refuses to mint when tenant lookup errors (no invented empty memberships); empty after successful lookup still OK.
+- Unit coverage: happy path + tenant 503 fail-closed + empty memberships (46 tests green).
+- Lab approve panel: one-click copy candidate ids; settings points at `docs/KEYS_LANDING.md` / `npm run keys`.
+- Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

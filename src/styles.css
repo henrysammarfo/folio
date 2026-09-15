@@ -236,6 +236,10 @@
 .lab-approve-steps li{margin:.25rem 0}
 .lab-approve-ids{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;font-size:.85rem;margin:0 0 .65rem}
 .lab-approve-ids code{padding:.15rem .45rem;border:1px solid color-mix(in oklab,var(--border) 80%,transparent);font-size:.78rem;background:color-mix(in oklab,var(--background) 80%,transparent)}
+.lab-id-copy{display:inline-flex;align-items:center;gap:.35rem;padding:0;border:0;background:transparent;cursor:pointer;color:inherit;font:inherit}
+.lab-id-copy:hover code{border-color:color-mix(in oklab,var(--foreground) 35%,transparent)}
+.lab-id-copy-hint{font-size:.65rem;letter-spacing:.04em;text-transform:uppercase;opacity:.55}
+.lab-id-copy:hover .lab-id-copy-hint,.lab-id-copy:focus-visible .lab-id-copy-hint{opacity:.9}
 .lab-approve-foot{margin:0;font-size:.78rem;opacity:.8;line-height:1.45}
 .about-vision{max-width:42rem}
 .about-vision h2{font-family:var(--font-display);font-size:1.6rem;font-weight:400;margin:1.75rem 0 .6rem}

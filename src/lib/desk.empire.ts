@@ -19,13 +19,11 @@ import {
   FOLIO_SESSION_COOKIE,
   getAuthProviderStatus,
   loadDeskPreferences,
-  mintFolioSession,
   parseFolioSessionCookie,
   verifyFolioSessionCookieValue,
   type FolioSession,
 } from "./auth/session";
-import { verifyPrivyAccessToken } from "./auth/privy";
-import { resolveTenantMemberships } from "./auth/tenants";
+import { buildSessionFromPrivyToken } from "./auth/session-from-privy";
 import {
   FOLIO_WATCH_WALLET_COOKIE,
   mintWatchWalletCookie,
@@ -551,32 +549,20 @@ const PrivySessionInput = z.object({
 
 /**
  * Exchange a Privy access token for an httpOnly folio_session cookie.
- * Fail-closed when keys missing or Privy rejects the token.
+ * Fail-closed when keys missing, Privy rejects, or tenant lookup fails
+ * (never mint with invented empty tenants on lookup error).
  */
 export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
   .validator(PrivySessionInput)
   .handler(async ({ data }) => {
-    const identity = await verifyPrivyAccessToken(data.accessToken);
-    if (!identity.ok) {
-      return errResult(
-        "folio.session.privy",
-        identity.reason,
-        identity.detail,
-      );
-    }
-    const tenantsRes = await resolveTenantMemberships({
-      userId: identity.data.userId,
+    const built = await buildSessionFromPrivyToken({
+      accessToken: data.accessToken,
+      walletAddress: data.walletAddress ?? null,
     });
-    const tenants = tenantsRes.ok ? tenantsRes.data : [];
-    const minted = mintFolioSession({
-      userId: identity.data.userId,
-      walletAddress: data.walletAddress ?? identity.data.walletAddress,
-      tenants,
-    });
-    if (!minted.ok) {
-      return errResult("folio.session.privy", minted.reason, minted.detail);
+    if (!built.ok) {
+      return errResult("folio.session.privy", built.reason, built.detail);
     }
-    setCookie(FOLIO_SESSION_COOKIE, minted.data.cookieValue, {
+    setCookie(FOLIO_SESSION_COOKIE, built.data.cookieValue, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
@@ -589,10 +575,8 @@ export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
       asOf: new Date().toISOString(),
       source: "folio.session.privy",
       data: {
-        session: minted.data.session,
-        note: tenants.length
-          ? `httpOnly folio_session set · ${tenants.length} tenant membership(s) resolved`
-          : "httpOnly folio_session set · no tenant memberships resolved (fail-closed empty)",
+        session: built.data.session,
+        note: built.data.note,
       },
     };
   });
