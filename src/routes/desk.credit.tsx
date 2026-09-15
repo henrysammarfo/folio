@@ -31,15 +31,17 @@ function Page() {
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Market reads</ModeBadge>
         <ModeBadge mode="fork">Borrow CPI = fork</ModeBadge>
-        <ModeBadge mode="paper">Paper capacity</ModeBadge>
+        <ModeBadge mode={data?.paper.label === "wallet-read" ? "mainnet-read" : "paper"}>
+          {data?.paper.label === "wallet-read" ? "Wallet-read capacity" : "Paper capacity"}
+        </ModeBadge>
       </div>
       <div className="desk-grid">
         <Panel
           title="Illustrative capacity"
-          meta={<StatusBadge tone="blue">{isFetching ? "…" : "Paper × live LTV"}</StatusBadge>}
+          meta={<StatusBadge tone="blue">{isFetching ? "…" : data?.paper.label === "wallet-read" ? "Wallet × live LTV" : "Paper × live LTV"}</StatusBadge>}
         >
           <div className="credit-output">
-            <span>Paper collateral (live marks)</span>
+            <span>{data?.paper.label === "wallet-read" ? "Wallet-read collateral (live marks)" : "Paper collateral (live marks)"}</span>
             <b>
               {data?.paper.collateralUsd != null
                 ? data.paper.collateralUsd.toLocaleString("en-US", {

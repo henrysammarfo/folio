@@ -103,12 +103,14 @@ export type CreditBundle = {
   jupiterLend: Awaited<ReturnType<typeof fetchJupiterLendEarn>>;
   nestusd: Awaited<ReturnType<typeof fetchNestUsdStatus>>;
   paper: {
-    label: "paper";
+    /** Qty basis for collateral math — wallet-read when bound, else paper. */
+    label: "paper" | "wallet-read";
     collateralUsd: number | null;
     maxLtvUsed: number | null;
     illustrativeBorrowUsd: number | null;
     note: string;
   };
+  watchWallet: string | null;
   borrowExecution: "local-fork-or-unavailable";
 };
 
@@ -241,25 +243,52 @@ export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
 
 export const getCreditBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<CreditBundle> => {
+    const session = readVerifiedSession();
+    const displayWallet = resolveDisplayWallet(session);
+    const watch = readWatchWallet();
+
     const [kamino, jupiterLend, nestusd] = await Promise.all([
       fetchKaminoXStocksMarket(),
       fetchJupiterLendEarn(),
       fetchNestUsdStatus(),
     ]);
 
+    const creditSymbols = ["AAPLx", "NVDAx"] as const;
+    const assets = await Promise.all(
+      creditSymbols.map(async (symbol) => {
+        const [asset, multiplier] = await Promise.all([
+          fetchXStockAsset(symbol),
+          fetchXStockMultiplier(symbol),
+        ]);
+        return { symbol, asset, multiplier };
+      }),
+    );
+    const mints = assets
+      .map((a) => (a.asset.ok ? a.asset.data.solanaMint : null))
+      .filter((m): m is string => Boolean(m));
+
+    const walletBalances = displayWallet
+      ? await fetchWalletTokenBalances({ wallet: displayWallet, mints })
+      : null;
+
     let collateral: number | null = null;
     let priced = 0;
-    for (const symbol of ["AAPLx", "NVDAx"] as const) {
-      const [asset, multiplier] = await Promise.all([
-        fetchXStockAsset(symbol),
-        fetchXStockMultiplier(symbol),
-      ]);
+    let usedWalletQty = false;
+    for (const { symbol, asset, multiplier } of assets) {
       const mint = asset.ok ? asset.data.solanaMint : null;
       const price = mint
         ? await fetchJupiterTokenPrice(mint)
         : unavailablePrice("xstock_mint_missing");
       if (multiplier.ok && price.ok) {
-        const raw = paperRawFor(symbol, 0);
+        const paperRaw = paperRawFor(symbol, 0);
+        const walletUi =
+          mint && walletBalances?.ok
+            ? walletBalances.data.byMint[mint]?.uiAmount
+            : undefined;
+        const useWallet =
+          walletUi != null && Number.isFinite(walletUi) && walletUi > 0;
+        const raw = useWallet ? (walletUi as number) : paperRaw;
+        if (useWallet) usedWalletQty = true;
         collateral =
           (collateral ?? 0) +
           raw * multiplier.data.currentMultiplier * price.data.usdPrice;
@@ -277,18 +306,26 @@ export const getCreditBundle = createServerFn({ method: "GET" }).handler(
         ? collateral * maxLtvUsed
         : null;
 
+    const label = usedWalletQty ? ("wallet-read" as const) : ("paper" as const);
+    const note = usedWalletQty
+      ? "Illustrative — wallet-read qty × live Kamino maxLtv. No borrow broadcast. Watch-wallet ≠ Privy multi-tenant auth."
+      : displayWallet && walletBalances && !walletBalances.ok
+        ? `Wallet bound but balances unavailable (${walletBalances.reason}) — paper qty × live Kamino maxLtv. No borrow broadcast.`
+        : "Illustrative only — paper qty × live Kamino maxLtv. No borrow broadcast.";
+
     return {
       kamino,
       jupiterLend,
       nestusd,
       paper: {
-        label: "paper",
+        label,
         collateralUsd: collateral,
         maxLtvUsed,
         illustrativeBorrowUsd,
-        note: "Illustrative only — paper qty × live Kamino maxLtv. No borrow broadcast.",
+        note,
       },
       borrowExecution: "local-fork-or-unavailable",
+      watchWallet: watch.ok ? watch.data.wallet : null,
     };
   },
 );

@@ -73,7 +73,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Session UX: tenant list + clear httpOnly cookie; prefs service-role fetch when keyed.
 - Yahoo leftovers removed; `/execution` copy softened (no false Pass theater).
 - Premium UI still approve-gated on `/lab/*` — awaiting Henry candidate id.
-- Keys still empty: Privy / Supabase / Bitquery / FOLIO_SESSION_SECRET.
+- Keys still empty: Privy / Supabase / Bitquery. `FOLIO_SESSION_SECRET` set locally for watch-wallet + session signing.
 
 
 ## Latest progress (2026-09-15)
@@ -83,3 +83,11 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Stocklana live counts refreshed: **528 registered / 67 submissions / $115k hero pool**; deadline hero SEP 25 (re-check timeline vs hero at submit).
 - Broadcast still paused; Privy/Supabase/Bitquery still empty → wash + multi-tenant sessions remain fail-closed.
 - Premium UI still approve-gated on `/lab/*`.
+
+
+## 2026-09-15 wallet-read credit + demo
+
+- Credit collateral math prefers wallet-read qty when watch-wallet/Privy wallet bound; falls back to paper with honest labels.
+- `npm run replay` one-command verify (unit + e2e + empire smoke + build).
+- Vercel project `folio` linked to GitHub (`prj_pzvYDMnYiSDcJNsv5NCdy5UVeExq`); preview URL pending green build on `main` — feature work is on `cursor/folio-wallet-read-f1ec`.
+- Broadcast still paused; wash/multi-tenant still fail-closed without Bitquery/Privy/Supabase.

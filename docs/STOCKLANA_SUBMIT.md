@@ -5,14 +5,12 @@ Deadline: **2026-09-18 20:00 UTC** · Budget: ≤~$1 · Broadcast: paused
 ## Before submit
 
 - [ ] Re-check Stocklana registration counts live (do not invent) — last check 2026-09-15: **528 registered**, **67 submissions**, **$115k** hero pool (main track $100k + bounties), deadline **re-check live** (hero SEP 25 / timeline may still say 18 Sep 20:00 UTC)
-- [ ] Demo URL reachable (Block 0 spine)
+- [ ] Demo URL reachable (Block 0 spine) — Vercel project `folio` linked: https://folio-teamtitanlink.vercel.app (confirm deploy green; set env keys in Vercel)
 - [ ] Replay green locally:
 
 ```bash
-npm test
-npm run test:e2e
-npx tsx scripts/smoke-empire.mts
-npm run build
+npm run replay
+# equivalent: npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build
 ```
 
 - [ ] Pitch order locked (truth → wash → buy → credit → agent) — see `docs/DEMO_SCRIPT.md`
@@ -29,7 +27,7 @@ npm run build
 | `BITQUERY_API_KEY` | Live wash tape (still heuristic) |
 | `PRIVY_APP_ID` + `PRIVY_APP_SECRET` | Wallet identity |
 | `SUPABASE_*` + migration applied | Tenant memberships / prefs |
-| `FOLIO_SESSION_SECRET` (≥16) | httpOnly `folio_session` mint/verify |
+| `FOLIO_SESSION_SECRET` (≥16) | httpOnly `folio_session` mint/verify + watch-wallet cookie |
 | Optional `JUPITER_API_KEY` | If quote/price becomes gated |
 
 ## UI approve gate

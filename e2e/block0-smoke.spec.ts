@@ -62,4 +62,26 @@ test.describe("FOLIO Block 0 smoke", () => {
     await page.goto("/lab/ui");
     await expect(page.getByText(/awaiting approval|approve/i).first()).toBeVisible();
   });
+
+  test("settings exposes watch-wallet bind (not Privy auth)", async ({ page }) => {
+    await page.goto("/desk/settings");
+    await expect(page.getByText(/settings|session|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/watch wallet|watch-wallet/);
+    expect(body).toMatch(/not.*privy|not privy|≠ privy|multi-tenant/);
+    expect(body).not.toMatch(/unhackable|nation-state/);
+  });
+
+  test("credit page labels capacity source", async ({ page }) => {
+    await page.goto("/desk/credit");
+    await expect(page.getByText(/credit|collateral|kamino|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/paper|wallet-read|collateral|ltv/);
+    expect(body).toMatch(/no borrow broadcast|fork|unavailable|illustrative/);
+  });
+
 });

@@ -73,3 +73,10 @@
 - Positions prefer Privy session wallet, else watch-wallet, else paper qty — labeled honestly.
 - Settings UI bind/clear watch wallet; unit tests for merge + cookie HMAC.
 - Live Stocklana: 528 registered, 67 submissions, $115k hero prize pool; deadline hero SEP 25 (verify at submit).
+
+## 2026-09-15 — Credit wallet-read + Vercel project + replay
+
+- Credit bundle uses wallet-read qty when bound (else paper), labeled honestly.
+- Added `npm run replay` / `npm run smoke`.
+- Created Vercel git project `folio` (team teamtitanlink) for demo URL path.
+- Still blocked on Bitquery/Privy/Supabase keys + Henry lab approve for premium chrome merge.
