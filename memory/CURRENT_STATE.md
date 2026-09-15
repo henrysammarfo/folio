@@ -129,3 +129,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `/desk/positions` SSR-prefetches live bundle.
 - Vercel preview READY on honesty push; `/network` live shows NestUSD/wash/broadcast/auth fail-closed; `/truth` ~1.003269×.
 - Still need: Bitquery/Privy/Supabase keys, Henry lab approve, Vercel `FOLIO_SESSION_SECRET`.
+
+## 2026-09-15 desk overview SSR
+
+- `/desk/` first paint uses SSR positions+credit.
+- Settings shows Auth fail-closed / Broadcast off from live session policy.

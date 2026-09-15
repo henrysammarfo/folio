@@ -121,3 +121,8 @@
 
 - `/desk/positions` SSR-prefetches positions bundle (wallet-read vs paper labels on first paint).
 - Stocklana submit checklist: mode badges + `/network` honesty ticked against live Vercel preview; Vercel `FOLIO_SESSION_SECRET` still required (matrix shows missing).
+
+## 2026-09-15 — Desk overview SSR + settings auth badge
+
+- `/desk/` SSR-prefetches positions+credit bundles.
+- Settings ModeBadges reflect broadcast hard-false + auth fail-closed from session bundle.

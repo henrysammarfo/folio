@@ -61,7 +61,12 @@ function Page() {
     <DeskShell eyebrow="Server preferences" title="Settings">
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Mainnet read</ModeBadge>
-        <ModeBadge mode="unavailable">Broadcast off</ModeBadge>
+        <ModeBadge mode={data?.networkPolicy.broadcast ? "mainnet-read" : "unavailable"}>
+          {data?.networkPolicy.broadcast ? "Broadcast armed" : "Broadcast off"}
+        </ModeBadge>
+        <ModeBadge mode={data?.auth.ok ? "mainnet-read" : "unavailable"}>
+          {data?.auth.ok ? "Auth keys present" : "Auth fail-closed"}
+        </ModeBadge>
         <ModeBadge mode="paper">Paper agent</ModeBadge>
       </div>
       <div className="desk-grid">
