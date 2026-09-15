@@ -50,9 +50,36 @@ describe("runPaperAgent live spine", () => {
     if (!res.ok) return;
     expect(res.data.caps.broadcast).toBe(false);
     expect(res.data.spine.truth?.multiplier).toBeCloseTo(1.003269);
+    expect(res.data.spine.truth?.pendingMultiplier).toBeNull();
     expect(res.data.reply).toMatch(/1\.003269/);
+    expect(res.data.reply).toMatch(/no pending newMultiplier|pending CA/i);
     expect(res.data.reply).toMatch(/broadcast=paused/);
     expect(res.data.reply).toMatch(/AgentRouter key missing/);
+  });
+
+  it("surfaces pending CA on truth spine when newMultiplier is live", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/multiplier")) {
+        return new Response(
+          JSON.stringify({
+            currentMultiplier: 1.003269,
+            newMultiplier: 2.0,
+            activationDateTime: 1_800_000_000,
+            reason: "split",
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      return new Response(`unexpected ${url}`, { status: 500 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const res = await runPaperAgent("truth AAPLx");
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.data.spine.truth?.pendingMultiplier).toBeCloseTo(2);
+    expect(res.data.reply).toMatch(/pending CA 2\.000000/);
   });
 
   it("attaches quote-only spine for quote intents", async () => {
@@ -100,10 +127,12 @@ describe("runPaperAgent live spine", () => {
     if (!res.ok) return;
     expect(res.data.caps.broadcast).toBe(false);
     expect(res.data.spine.quote?.outUiAmount).toBeCloseTo(4);
+    expect(res.data.spine.quote?.cacheLabel).toBe("live");
     expect(res.data.spine.gates?.washOk).toBe(false);
     expect(res.data.spine.gates?.canReview).toBe(false);
     expect(res.data.spine.gates?.blockedReasons.join(" ")).toMatch(/BITQUERY_API_KEY/);
     expect(res.data.reply).toMatch(/quote-only/);
+    expect(res.data.reply).toMatch(/\blive\b/);
     expect(res.data.reply).toMatch(/Never a fill|acquire gates blocked/i);
   });
 

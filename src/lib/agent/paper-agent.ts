@@ -14,6 +14,8 @@ export type AgentSpineEvidence = {
   truth?: {
     symbol: string;
     multiplier: number | null;
+    /** Live xStocks pending newMultiplier — null means none on feed. */
+    pendingMultiplier: number | null;
     mode: string;
     note: string;
   };
@@ -22,6 +24,8 @@ export type AgentSpineEvidence = {
     spendUsdc: number;
     outUiAmount: number | null;
     mode: string;
+    /** Jupiter source honesty: live | cached | stale-cache | fail reason. */
+    cacheLabel: "live" | "cached" | "stale-cache" | "unavailable";
     note: string;
   };
   /** Same acquire-desk discipline — quote path never soft-sells a blocked wash. */
@@ -98,6 +102,7 @@ export async function fetchPaperAgentSpine(
           truth: {
             symbol: intent.symbol,
             multiplier: null,
+            pendingMultiplier: null,
             mode: "unavailable",
             note,
           },
@@ -105,12 +110,18 @@ export async function fetchPaperAgentSpine(
         facts: `Truth ${intent.symbol} fail-closed (${note}). ${broadcastNote}.`,
       };
     }
-    const note = `live ×${mult.data.currentMultiplier.toFixed(6)} · ${mult.source}`;
+    const pending = mult.data.pendingMultiplier;
+    const caNote =
+      pending != null
+        ? `pending CA ${pending.toFixed(6)}×`
+        : "no pending newMultiplier on live feed";
+    const note = `live ×${mult.data.currentMultiplier.toFixed(6)} · ${caNote} · ${mult.source}`;
     return {
       spine: {
         truth: {
           symbol: intent.symbol,
           multiplier: mult.data.currentMultiplier,
+          pendingMultiplier: pending,
           mode: mult.mode,
           note,
         },
@@ -131,6 +142,7 @@ export async function fetchPaperAgentSpine(
           spendUsdc: intent.spendUsdc,
           outUiAmount: null,
           mode: "unavailable",
+          cacheLabel: "unavailable",
           note,
         },
         gates: {
@@ -188,6 +200,7 @@ export async function fetchPaperAgentSpine(
           spendUsdc: intent.spendUsdc,
           outUiAmount: null,
           mode: "unavailable",
+          cacheLabel: "unavailable",
           note,
         },
         gates,
@@ -196,7 +209,12 @@ export async function fetchPaperAgentSpine(
     };
   }
 
-  const note = `quote-only out≈${quote.data.outUiAmount.toFixed(6)} ${intent.symbol} · impact ${quote.data.priceImpactPct ?? "n/a"} · routes=${quote.data.routePlanLength}`;
+  const cacheLabel: "live" | "cached" | "stale-cache" = quote.source.includes("stale")
+    ? "stale-cache"
+    : quote.source.includes("cached")
+      ? "cached"
+      : "live";
+  const note = `quote-only out≈${quote.data.outUiAmount.toFixed(6)} ${intent.symbol} · ${cacheLabel} · impact ${quote.data.priceImpactPct ?? "n/a"} · routes=${quote.data.routePlanLength}`;
   const gateLine = gates.canReview
     ? "acquire gates clear (still never a fill)"
     : `acquire gates blocked: ${gates.blockedReasons.join("; ") || "fail-closed"}`;
@@ -207,6 +225,7 @@ export async function fetchPaperAgentSpine(
         spendUsdc: intent.spendUsdc,
         outUiAmount: quote.data.outUiAmount,
         mode: quote.mode,
+        cacheLabel,
         note,
       },
       gates,
@@ -266,11 +285,11 @@ export async function runPaperAgent(
           {
             role: "system",
             content:
-              "You are FOLIO paper agent. Never claim fills, broadcasts, or unhackable security. If acquire gates are blocked, say so plainly. Reply in ≤2 short sentences. Live spine facts are authoritative.",
+              "You are FOLIO paper agent. Never claim fills, broadcasts, or unhackable security. If acquire gates are blocked, say so plainly. Mention pending corporate-action multiplier only when the live spine includes one; otherwise say none. Reply in ≤2 short sentences. Live spine facts are authoritative.",
           },
           {
             role: "user",
-            content: `User said: ${raw}\nParsed intent: ${JSON.stringify(intent)}\nLive spine: ${facts}\nRemind: paper mode, broadcast disabled, wash fail-closed without Bitquery.`,
+            content: `User said: ${raw}\nParsed intent: ${JSON.stringify(intent)}\nLive spine: ${facts}\nRemind: paper mode, broadcast disabled, wash fail-closed without Bitquery, Jupiter may be live/cached/stale-labeled.`,
           },
         ],
       }),

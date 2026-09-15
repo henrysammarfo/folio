@@ -242,3 +242,8 @@
 - Acquire surfaces Jupiter live/cached/stale + pending CA on checks/review.
 - Stocklana → **545** registered / **72** submissions / **$121k**.
 - Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Guarded paper agent CA/Jupiter honesty
+- Agent truth facts include pending CA or none; quote facts include cacheLabel.
+- Position detail Pending corporate action row; settings copy updated.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.

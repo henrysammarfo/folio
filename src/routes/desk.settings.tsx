@@ -564,6 +564,8 @@ function Page() {
         <p className="mb-3 text-sm opacity-80">
           Runs live xStocks multiplier / Jupiter quote-only reads and the same acquire wash
           gates on quote intents. Never broadcasts. AgentRouter expands NL only when keyed.
+          Truth spine labels pending corporate-action multiplier (or none); quotes label
+          Jupiter live/cached/stale.
         </p>
         <div className="form-grid">
           <label>

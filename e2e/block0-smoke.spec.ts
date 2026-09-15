@@ -195,6 +195,18 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
+  test("position detail surfaces pending CA honestly", async ({ page }) => {
+    await page.goto("/desk/positions/AAPLx");
+    await expect(page.getByText(/AAPLx|position|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/pending corporate action/);
+    expect(body).toMatch(/none on live feed|pending|\d+\.\d+×/);
+    expect(body).toMatch(/api multiplier|on-chain effective/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet|4\.0000/);
+  });
+
   test("public credit shows live Kamino / NestUSD honesty", async ({ page }) => {
     await page.goto("/credit");
     await expect(page.getByText(/credit|liquidity|FOLIO/i).first()).toBeVisible({

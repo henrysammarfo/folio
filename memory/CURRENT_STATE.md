@@ -270,3 +270,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Acquire checks/review label Jupiter cached/stale/live + pending CA honesty.
 - Stocklana live: **545** / **72** / **$121k**; deadline conflict SEP 25 hero vs timeline 18 Sep 16:00 ET.
 - Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Paper agent CA + Jupiter cache labels + position pending
+- Paper agent truth spine surfaces pendingMultiplier / none; quote spine labels live|cached|stale-cache.
+- Position detail shows Pending corporate action from live feed.
+- Vitest paper-agent **7** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

@@ -71,6 +71,16 @@ function Page() {
               <b>{row.multiplier != null ? `${row.multiplier.toFixed(6)}×` : "unavailable"}</b>
             </p>
             <p>
+              <span>Pending corporate action</span>
+              <b>
+                {row.pendingMultiplier != null
+                  ? `${row.pendingMultiplier.toFixed(6)}×`
+                  : row.multiplier != null
+                    ? "None on live feed"
+                    : "unavailable"}
+              </b>
+            </p>
+            <p>
               <span>On-chain effective</span>
               <b>
                 {row.onchainEffectiveMultiplier != null
