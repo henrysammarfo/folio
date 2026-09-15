@@ -82,3 +82,5 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Stocklana registered **536** / submissions **69** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana (WebFetch) | 2026-09-15 |
 | Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)**; stocklana.fun shows **18 SEP 2026 · 23:59 UTC** | CONFIRMED conflict — re-check at submit | official + stocklana.fun | 2026-09-15 |
 | Ephemeral wallet inspect (no FOLIO_SESSION_SECRET) on `/desk/positions?inspect=` | SHIPPED | mainnet-read only; labeled not auth | 2026-09-15 |
+
+| Ephemeral inspect on `/desk/credit?inspect=` | SHIPPED | same binding priority as positions; labeled not auth | 2026-09-15 |

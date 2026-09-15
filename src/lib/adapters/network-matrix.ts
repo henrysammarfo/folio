@@ -113,6 +113,12 @@ export function buildNetworkMatrix(input: {
         : "FOLIO_SESSION_SECRET missing · watch-wallet bind disabled",
     },
     {
+      capability: "Ephemeral wallet inspect",
+      mode: "mainnet-read",
+      detail:
+        "Always on · ?inspect=<pubkey> on /desk/positions + /desk/credit · not auth · no FOLIO_SESSION_SECRET required",
+    },
+    {
       capability: "Broadcast swap / borrow",
       mode: input.broadcastFunded ? "mainnet-read" : "unavailable",
       detail: input.broadcastFunded

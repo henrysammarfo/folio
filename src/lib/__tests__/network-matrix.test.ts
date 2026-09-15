@@ -39,6 +39,8 @@ describe("buildNetworkMatrix honesty", () => {
 
     expect(byCap["Kamino xStocks market (read)"]?.mode).toBe("mainnet-read");
     expect(byCap["Watch-wallet mainnet-read qty"]?.mode).toBe("mainnet-read");
+    expect(byCap["Ephemeral wallet inspect"]?.mode).toBe("mainnet-read");
+    expect(byCap["Ephemeral wallet inspect"]?.detail).toMatch(/not auth|\?inspect=/i);
     expect(byCap["On-chain Scaled UI (Token-2022)"]?.detail).toMatch(/public RPC fallback/);
   });
 

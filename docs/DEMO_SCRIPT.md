@@ -19,6 +19,9 @@ Verified on this preview (SSO off): `/truth` ~1.003269× · `/network` NestUSD/w
 
 Set `FOLIO_SESSION_SECRET` (+ `BROADCAST_PAUSED=true`) in Vercel before demos that need watch-wallet bind.
 
+Without the Vercel secret, demo wallet-read via ephemeral inspect:
+`/desk/positions?inspect=<pubkey>` and `/desk/credit?inspect=<pubkey>` (labeled not-auth).
+
 Stocklana live (2026-09-15 WebFetch, re-check at submit): **536** registered · **69** submissions · **$121k** hero · deadline conflict SEP 25 hero vs **18 Sep 20:00 UTC** timeline.
 
 Paste pack: `docs/STOCKLANA_SUBMISSION.md`
@@ -28,7 +31,7 @@ Paste pack: `docs/STOCKLANA_SUBMISSION.md`
 1. `/truth?symbol=AAPLx` — multiplier + economic shares
 2. `/desk/acquire` — run checks; wash blocked without Bitquery (honest)
 3. `/network` — capability matrix badges
-4. `/desk/settings` — bind watch wallet (optional) → `/desk/positions` + `/desk/credit`
+4. `/desk/positions?inspect=<pubkey>` — ephemeral wallet-read (or settings bind if secret set) → `/desk/credit?inspect=<pubkey>`
 5. `/lab/shaders` + `/lab/ui` — approve gate (not production)
 
 ## Replay

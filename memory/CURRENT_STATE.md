@@ -166,3 +166,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Priority: Privy session → watch-wallet cookie → ephemeral inspect. Inspect labeled not-auth / not multi-tenant.
 - Stocklana live: **536** registered / **69** submissions / **$121k** hero; deadline conflict unchanged — re-check at submit.
 - Still blocked for full objective: Bitquery / Privy / Supabase keys + Henry lab approve + Vercel `FOLIO_SESSION_SECRET`.
+
+## 2026-09-15 credit ephemeral inspect
+
+- `/desk/credit?inspect=` + public `/credit?inspect=` pass through to credit bundle.
+- Network matrix lists ephemeral inspect as always-on mainnet-read (not auth).
+- Still blocked: Bitquery/Privy/Supabase keys + Henry lab approve + Vercel FOLIO_SESSION_SECRET for watch-wallet bind.

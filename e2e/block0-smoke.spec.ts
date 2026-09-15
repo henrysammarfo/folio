@@ -156,4 +156,20 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
+
+  test("credit supports ephemeral wallet inspect without session secret", async ({
+    page,
+  }) => {
+    const inspect = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+    await page.goto(`/desk/credit?inspect=${inspect}`);
+    await expect(page.getByText(/credit|collateral|kamino|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/inspect|ephemeral|mainnet/);
+    expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);
+    expect(body).toMatch(/nestusd|kamino|no borrow|fork|unavailable|illustrative/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
+  });
+
 });

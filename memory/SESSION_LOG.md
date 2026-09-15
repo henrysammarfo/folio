@@ -162,3 +162,8 @@
 - Unit tests for resolveDisplayWallet priority; e2e covers inspect copy.
 - Stocklana counts refreshed to 536 / 69 via official WebFetch.
 - Goal still open: keys + UI approve + Vercel session secret.
+
+## 2026-09-15 — Credit inspect + matrix row
+
+- Wired `?inspect=` on desk/public credit; matrix row for ephemeral inspect; demo/submit docs + e2e.
+- Goal still open pending keys + lab approve + Vercel session secret.

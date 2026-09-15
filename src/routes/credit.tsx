@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PublicShell, Metric } from "@/components/public-page";
@@ -22,17 +23,27 @@ export const Route = createFileRoute("/credit")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (search) =>
+    z
+      .object({
+        /** Ephemeral mainnet-read inspect pubkey — not auth. */
+        inspect: z.string().max(64).optional().catch(undefined),
+      })
+      .parse(search),
+  loaderDeps: ({ search }) => ({ inspect: search.inspect }),
   /** Prefetch live credit honesty for first paint (NestUSD never Ready). */
-  loader: async () => getCreditBundle({ data: {} }),
+  loader: async ({ deps }) =>
+    getCreditBundle({ data: { inspectWallet: deps.inspect } }),
   component: Page,
 });
 
 function Page() {
   const initial = Route.useLoaderData();
+  const { inspect } = Route.useSearch();
   const fetchCredit = useServerFn(getCreditBundle);
   const { data } = useQuery({
-    queryKey: ["public-credit-bundle"],
-    queryFn: () => fetchCredit({ data: {} }),
+    queryKey: ["public-credit-bundle", inspect ?? ""],
+    queryFn: () => fetchCredit({ data: { inspectWallet: inspect } }),
     initialData: initial,
     initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,
@@ -133,8 +144,17 @@ function Page() {
           <b>Capacity hidden until verified public metrics</b>
         </div>
       </div>
+      <p className="mt-4 text-sm opacity-80">
+        {data?.walletSource === "inspect"
+          ? "Capacity uses ephemeral inspect wallet-read qty (not auth / not multi-tenant)."
+          : "Optional: append ?inspect=<pubkey> for ephemeral mainnet-read capacity without a session secret."}
+      </p>
       <p className="mt-6 text-sm">
-        <Link to="/desk/credit" className="underline">
+        <Link
+          to="/desk/credit"
+          search={inspect ? { inspect } : {}}
+          className="underline"
+        >
           Open live credit desk →
         </Link>
       </p>
