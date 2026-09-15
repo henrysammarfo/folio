@@ -206,3 +206,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Settings readiness + network matrix label the missing key honestly; unit tests cover no-fetch fail-closed + Bearer parse.
 - Vercel now has `SOLANA_RPC_URL=https://api.mainnet-beta.solana.com` (encrypted) alongside `FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED`.
 - Still blocked for full objective: Henry lab id · Bitquery · Privy · Supabase · funded broadcast · `PYTH_API_KEY`.
+
+## 2026-09-15 — Keys landing runbook + Stocklana pack refresh
+- Added `docs/KEYS_LANDING.md` + `supabase/seed/demo_tenant.sql` + `npm run keys` readiness printer (no secret values).
+- Refreshed Stocklana submission/demo packs: session secret ✅ on Vercel; counts **538/69/$121k**; blockers = lab id · Bitquery · Pyth · Privy · Supabase.
+- E2E settings asserts PYTH_API_KEY honesty row.
+- Goal still open — multi-tenant + wash + premium merge need Henry.

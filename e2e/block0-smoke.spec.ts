@@ -87,6 +87,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     );
     expect(body).toMatch(/production readiness|henry actions/);
     expect(body).toMatch(/bitquery_api_key|wash fail-closed|wash tape/);
+    expect(body).toMatch(/pyth_api_key|hermes|pyth diverge fail-closed/);
     expect(body).toMatch(/privy|multi-tenant fail-closed/);
     expect(body).toMatch(/supabase|tenants fail-closed/);
     expect(body).not.toMatch(/unhackable|nation-state/);

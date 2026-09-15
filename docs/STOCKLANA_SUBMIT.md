@@ -41,14 +41,17 @@ npm run replay
 
 ## Keys to land (Henry)
 
+See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readiness (no values).
+
 | Key | Unlocks |
 |---|---|
-| `BITQUERY_API_KEY` | Live wash tape (still heuristic) |
+| `BITQUERY_API_KEY` | Live wash tape (fail-closed until set) |
+| `PYTH_API_KEY` | Hermes equity diverge (fail-closed until set; Aug 2026 auth) |
 | `PRIVY_APP_ID` + `PRIVY_APP_SECRET` | Wallet identity |
 | `SUPABASE_URL` + `SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` + migration | Tenant memberships / prefs |
-| `FOLIO_SESSION_SECRET` (≥16) — **also set on Vercel** | httpOnly `folio_session` + watch-wallet cookie |
+| `FOLIO_SESSION_SECRET` (≥16) — **set on Vercel** | httpOnly `folio_session` + watch-wallet cookie |
 | Optional `JUPITER_API_KEY` | If quote/price becomes gated |
-| Optional `SOLANA_RPC_URL` | Private RPC (public mainnet fallback works for reads) |
+| `SOLANA_RPC_URL` — **set on Vercel** (public mainnet) | Scaled UI + wallet reads (fallback still labeled) |
 
 ## UI approve gate (reply with one id)
 

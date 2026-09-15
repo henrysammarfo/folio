@@ -66,7 +66,9 @@ Optional same sitting (unlocks Pyth diverge vs Jupiter):
 | `SUPABASE_ANON_KEY` | Project settings → API |
 | `SUPABASE_SERVICE_ROLE_KEY` | Project settings → API (server only — never expose to browser) |
 
-Run migration `supabase/migrations/*folio_tenants*` when keys land.
+Run migration `supabase/migrations/*folio_tenants*` when keys land. Optional seed: `supabase/seed/demo_tenant.sql`.
+
+Full checklist when pasting keys: `docs/KEYS_LANDING.md`.
 
 ---
 

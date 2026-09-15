@@ -187,3 +187,7 @@
 ## 2026-09-15 — Pyth auth gate + RPC on Vercel
 - Shipped PYTH_API_KEY Hermes Bearer path (fail-closed without key); settings/matrix honesty; SOLANA_RPC_URL on Vercel.
 - Goal still open — multi-tenant + wash + premium merge need Henry.
+
+## 2026-09-15 — Keys landing runbook + Stocklana pack refresh
+- Docs/runbook/seed/e2e for post-key multi-tenant + Pyth/wash landing; Stocklana paste pack unblocked for secret step.
+- Awaiting Henry lab id before premium merge.

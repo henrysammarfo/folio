@@ -1,6 +1,7 @@
 # FOLIO — Stocklana demo script (≤8 seconds spoken)
 
-Deadline: **2026-09-18 20:00 UTC** · Network: mainnet-read + quote-only · Budget: ≤~$1
+Deadline conflict — **re-check at submit**: hero **SEP 25, 2026** vs timeline often **18 Sep 20:00 UTC**.  
+Network: mainnet-read + quote-only · Budget: ≤~$1 · Broadcast: paused
 
 ## Pitch order (lock)
 
@@ -10,30 +11,32 @@ Deadline: **2026-09-18 20:00 UTC** · Network: mainnet-read + quote-only · Budg
 4. **Credit** — “Kamino xStocks LTV is live (AAPLx 40%). Borrow CPI stays fork/unavailable until funded. Bind a watch wallet for mainnet-read qty — still not Privy multi-tenant auth.”
 5. **Agent** — “Paper by default, metered, caps on. No mentor spam until this URL works.”
 
-
 ## Live demo URL
 
 https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app
 
 Home CTAs (live): **Approve desk UI** · **Approve shaders** → `/lab/ui` · `/lab/shaders` (Henry picks id before premium merge).
 
-Verified on this preview (SSO off): `/truth` ~1.003269× · `/network` NestUSD/wash/broadcast fail-closed · `/desk/credit` NestUSD unverified (not Ready).
+Verified on this preview (SSO off):
 
-Set `FOLIO_SESSION_SECRET` (+ `BROADCAST_PAUSED=true`) in Vercel before demos that need watch-wallet bind.
+- `/truth` ~1.003× Scaled UI
+- `/network` NestUSD / wash / Pyth / broadcast fail-closed until keyed
+- `/desk/settings` — **Watch-wallet secret set** · bind ready; Bitquery/Pyth/Privy/Supabase still missing
+- Watch-wallet bind live-verified (mainnet-read qty, not Privy auth)
 
-Without the Vercel secret, demo wallet-read via ephemeral inspect:
-`/desk/positions?inspect=<pubkey>` and `/desk/credit?inspect=<pubkey>` (labeled not-auth).
+Ephemeral inspect still works without bind:  
+`/desk/positions?inspect=<pubkey>` · `/desk/credit?inspect=<pubkey>` (labeled not-auth).
 
-Stocklana live (2026-09-15 WebFetch, re-check at submit): **536** registered · **69** submissions · **$121k** hero · deadline conflict SEP 25 hero vs **18 Sep 20:00 UTC** timeline.
+Stocklana live (2026-09-15, re-check at submit): **538** registered · **69** submissions · **$121k** hero.
 
-Paste pack: `docs/STOCKLANA_SUBMISSION.md`
+Paste pack: `docs/STOCKLANA_SUBMISSION.md` · Keys when ready: `docs/KEYS_LANDING.md`
 
 ## Click path
 
 1. `/truth?symbol=AAPLx` — multiplier + economic shares
 2. `/desk/acquire` — run checks; wash blocked without Bitquery (honest)
 3. `/network` — capability matrix badges
-4. `/desk/positions?inspect=<pubkey>` — ephemeral wallet-read (or settings bind if secret set) → `/desk/credit?inspect=<pubkey>`
+4. `/desk/settings` — bind watch wallet (secret already on Vercel) → `/desk/positions` qty
 5. `/lab/shaders` + `/lab/ui` — approve gate (not production)
 
 ## Replay
