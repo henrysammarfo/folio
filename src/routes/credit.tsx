@@ -23,7 +23,7 @@ export const Route = createFileRoute("/credit")({
     ],
   }),
   /** Prefetch live credit honesty for first paint (NestUSD never Ready). */
-  loader: async () => getCreditBundle(),
+  loader: async () => getCreditBundle({ data: {} }),
   component: Page,
 });
 
@@ -32,7 +32,7 @@ function Page() {
   const fetchCredit = useServerFn(getCreditBundle);
   const { data } = useQuery({
     queryKey: ["public-credit-bundle"],
-    queryFn: () => fetchCredit(),
+    queryFn: () => fetchCredit({ data: {} }),
     initialData: initial,
     initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,

@@ -31,7 +31,15 @@ import {
   mintWatchWalletCookie,
   verifyWatchWalletCookieValue,
 } from "./auth/watch-wallet";
-import { fetchWalletTokenBalances } from "./adapters/wallet-balances";
+import {
+  fetchWalletTokenBalances,
+  isLikelySolanaPubkey,
+} from "./adapters/wallet-balances";
+import {
+  resolveWalletBinding,
+  type WalletBindingSource,
+} from "./wallet-binding";
+export type { WalletBindingSource } from "./wallet-binding";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
@@ -66,11 +74,16 @@ function readWatchWallet(): AdapterResult<{ wallet: string }> {
   }
 }
 
-/** Prefer Privy-bound session wallet, else optional watch-wallet cookie. */
-function resolveDisplayWallet(session: AdapterResult<FolioSession>): string | null {
-  if (session.ok && session.data.walletAddress) return session.data.walletAddress;
+function resolveDisplayWallet(
+  session: AdapterResult<FolioSession>,
+  inspectWallet?: string | null,
+): { wallet: string | null; source: WalletBindingSource } {
   const watch = readWatchWallet();
-  return watch.ok ? watch.data.wallet : null;
+  return resolveWalletBinding({
+    sessionWallet: session.ok ? session.data.walletAddress : null,
+    watchWallet: watch.ok ? watch.data.wallet : null,
+    inspectWallet: inspectWallet ?? null,
+  });
 }
 
 export type PositionRow = {
@@ -95,6 +108,9 @@ export type PositionsBundle = {
   note: string;
   auth: ReturnType<typeof getAuthProviderStatus>;
   watchWallet: string | null;
+  /** Ephemeral ?inspect= pubkey — mainnet-read only, not a session. */
+  inspectWallet: string | null;
+  walletSource: WalletBindingSource;
   walletBalances: Awaited<ReturnType<typeof fetchWalletTokenBalances>> | null;
 };
 
@@ -111,6 +127,9 @@ export type CreditBundle = {
     note: string;
   };
   watchWallet: string | null;
+  /** Ephemeral inspect pubkey when no session/watch-wallet bound. */
+  inspectWallet: string | null;
+  walletSource: WalletBindingSource;
   borrowExecution: "local-fork-or-unavailable";
 };
 
@@ -142,11 +161,22 @@ export type SessionBundle = {
   sessionSecretPresent: boolean;
 };
 
-export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
-  async (): Promise<PositionsBundle> => {
+const InspectWalletInput = z
+  .object({
+    /** Optional ephemeral mainnet-read inspect pubkey (no cookie / not auth). */
+    inspectWallet: z.string().max(64).optional(),
+  })
+  .default({});
+
+export const getPositionsBundle = createServerFn({ method: "GET" })
+  .validator(InspectWalletInput)
+  .handler(async ({ data }): Promise<PositionsBundle> => {
     const session = readVerifiedSession();
     const auth = getAuthProviderStatus(session.ok ? session : null);
-    const displayWallet = resolveDisplayWallet(session);
+    const { wallet: displayWallet, source: walletSource } = resolveDisplayWallet(
+      session,
+      data.inspectWallet,
+    );
 
     const assets = await Promise.all(
       WATCHLIST.map(async (symbol) => {
@@ -201,6 +231,7 @@ export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
       ];
       if (onchain.ok) labels.push("onchain-scaled-ui");
       if (!displayWallet) labels.push("wallet-unbound");
+      if (walletSource === "inspect") labels.push("inspect-ephemeral");
       if (displayWallet && walletBalances && !walletBalances.ok) {
         labels.push("wallet-read-unavailable");
       }
@@ -227,26 +258,43 @@ export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
     }
 
     const watch = readWatchWallet();
-    const note = displayWallet
-      ? walletBalances?.ok
-        ? `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). Multipliers/prices live. Watch-wallet ≠ Privy multi-tenant auth.`
-        : `Wallet bound for read but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing paper qty. Multipliers/prices live.`
-      : "Quantities are paper labels until Privy session wallet or watch-wallet bind. Multipliers/prices are live mainnet reads.";
+    const inspectActive = walletSource === "inspect" ? displayWallet : null;
+    let note: string;
+    if (!displayWallet) {
+      note =
+        "Quantities are paper labels until Privy session wallet, watch-wallet bind, or ephemeral inspect. Multipliers/prices are live mainnet reads.";
+    } else if (walletBalances?.ok) {
+      const tag =
+        walletSource === "inspect"
+          ? "Ephemeral inspect (not auth / not multi-tenant)"
+          : walletSource === "watch-wallet"
+            ? "Watch-wallet ≠ Privy multi-tenant auth"
+            : "Privy session wallet";
+      note = `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). Multipliers/prices live. ${tag}.`;
+    } else {
+      note = `Wallet selected for read but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing paper qty. Multipliers/prices live.`;
+    }
 
     return {
       rows,
       note,
       auth,
       watchWallet: watch.ok ? watch.data.wallet : null,
+      inspectWallet: inspectActive,
+      walletSource,
       walletBalances,
     };
   },
 );
 
-export const getCreditBundle = createServerFn({ method: "GET" }).handler(
-  async (): Promise<CreditBundle> => {
+export const getCreditBundle = createServerFn({ method: "GET" })
+  .validator(InspectWalletInput)
+  .handler(async ({ data }): Promise<CreditBundle> => {
     const session = readVerifiedSession();
-    const displayWallet = resolveDisplayWallet(session);
+    const { wallet: displayWallet, source: walletSource } = resolveDisplayWallet(
+      session,
+      data.inspectWallet,
+    );
     const watch = readWatchWallet();
 
     const [kamino, jupiterLend, nestusd] = await Promise.all([
@@ -309,11 +357,18 @@ export const getCreditBundle = createServerFn({ method: "GET" }).handler(
         : null;
 
     const label = usedWalletQty ? ("wallet-read" as const) : ("paper" as const);
-    const note = usedWalletQty
-      ? "Illustrative — wallet-read qty × live Kamino maxLtv. No borrow broadcast. Watch-wallet ≠ Privy multi-tenant auth."
-      : displayWallet && walletBalances && !walletBalances.ok
-        ? `Wallet bound but balances unavailable (${walletBalances.reason}) — paper qty × live Kamino maxLtv. No borrow broadcast.`
-        : "Illustrative only — paper qty × live Kamino maxLtv. No borrow broadcast.";
+    const inspectActive = walletSource === "inspect" ? displayWallet : null;
+    let note: string;
+    if (usedWalletQty) {
+      note =
+        walletSource === "inspect"
+          ? "Illustrative — ephemeral inspect wallet-read qty × live Kamino maxLtv. No borrow broadcast. Inspect ≠ Privy multi-tenant auth."
+          : "Illustrative — wallet-read qty × live Kamino maxLtv. No borrow broadcast. Watch-wallet ≠ Privy multi-tenant auth.";
+    } else if (displayWallet && walletBalances && !walletBalances.ok) {
+      note = `Wallet selected but balances unavailable (${walletBalances.reason}) — paper qty × live Kamino maxLtv. No borrow broadcast.`;
+    } else {
+      note = "Illustrative only — paper qty × live Kamino maxLtv. No borrow broadcast.";
+    }
 
     return {
       kamino,
@@ -328,6 +383,8 @@ export const getCreditBundle = createServerFn({ method: "GET" }).handler(
       },
       borrowExecution: "local-fork-or-unavailable",
       watchWallet: watch.ok ? watch.data.wallet : null,
+      inspectWallet: inspectActive,
+      walletSource,
     };
   },
 );

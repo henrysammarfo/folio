@@ -14,7 +14,7 @@ export const Route = createFileRoute("/desk/credit")({
     ],
   }),
   /** Prefetch so NestUSD fail-closed + capacity labels show on first paint. */
-  loader: async () => getCreditBundle(),
+  loader: async () => getCreditBundle({ data: {} }),
   component: Page,
 });
 
@@ -23,7 +23,7 @@ function Page() {
   const fetchCredit = useServerFn(getCreditBundle);
   const { data, isFetching } = useQuery({
     queryKey: ["credit-bundle"],
-    queryFn: () => fetchCredit(),
+    queryFn: () => fetchCredit({ data: {} }),
     initialData: initial,
     initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,

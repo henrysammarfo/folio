@@ -113,7 +113,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Network matrix splits Kamino / Jupiter Lend / NestUSD; NestUSD + wash-without-Bitquery + broadcast stay **unavailable/fail-closed** (no false mainnet-read).
 - Matrix also surfaces multi-tenant keys, watch-wallet secret, Scaled UI RPC fallback.
 - `/network` SSR-prefetches live matrix.
-- Stocklana live: **534 registered / 67 submissions / $121k** hero; deadline hero SEP 25 vs timeline 18 Sep 20:00 UTC — re-check at submit.
+- Stocklana live: **536 registered / 67 submissions / $121k** hero; deadline hero SEP 25 vs timeline 18 Sep 20:00 UTC — re-check at submit.
 - Wash matrix row forced `unavailable` when Bitquery key missing (not just detail text).
 - Keys still empty: Privy / Supabase / Bitquery. Set `FOLIO_SESSION_SECRET` on Vercel for watch-wallet.
 - Premium UI still approve-gated (`ink-ledger` / `ledger-mist` / `aurora-grid` · `desk-density-a` / `desk-density-b` / `gate-chip`).
@@ -145,7 +145,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 - `/lab/ui` candidates differentiated: dense ledger (`desk-density-a`), quiet metric strip (`desk-density-b`), ModeBadge chip row (`gate-chip`) with motion (respects prefers-reduced-motion).
 - `/lab/shaders` reply chip lists `ink-ledger` · `ledger-mist` · `aurora-grid`; hero still locked.
-- Stocklana live WebFetch: **534** registered / **68** submissions / **$121k** hero; deadline conflict unchanged — re-check at submit.
+- Stocklana live WebFetch: **536** registered / **69** submissions / **$121k** hero; deadline conflict unchanged — re-check at submit.
 - Added `docs/STOCKLANA_SUBMISSION.md` paste pack; submit checklist ticks verified honesty items; Vercel `FOLIO_SESSION_SECRET` still Henry-owned.
 - Still blocked for full objective: Bitquery / Privy / Supabase keys + lab approve + Vercel session secret.
 
@@ -159,3 +159,10 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Public `/credit` SSR-prefetches `getCreditBundle` — live Kamino LTV, NestUSD fail-closed (never Ready), borrow fork/off.
 - Public `/execution` SSR-prefetches `getNetworkBundle` — wash/quote/broadcast honesty badges on first paint.
 - Block 0 e2e now 10 tests (added public credit + execution honesty).
+
+## 2026-09-15 ephemeral wallet inspect
+
+- `/desk/positions?inspect=<pubkey>` mainnet-reads balances without `FOLIO_SESSION_SECRET` / watch-wallet cookie.
+- Priority: Privy session → watch-wallet cookie → ephemeral inspect. Inspect labeled not-auth / not multi-tenant.
+- Stocklana live: **536** registered / **69** submissions / **$121k** hero; deadline conflict unchanged — re-check at submit.
+- Still blocked for full objective: Bitquery / Privy / Supabase keys + Henry lab approve + Vercel `FOLIO_SESSION_SECRET`.

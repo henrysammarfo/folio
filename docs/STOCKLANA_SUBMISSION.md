@@ -2,7 +2,7 @@
 
 Re-check live counts on https://hackathons.solana.com/hackathons/stocklana before final submit.
 
-**Live (2026-09-15 WebFetch):** 534 registered · **68** submissions · hero prize **$121,000** · hero deadline SEP 25 vs timeline **Fri 18 Sep 2026 20:00 UTC** — confirm which the form uses.
+**Live (2026-09-15 WebFetch):** 536 registered · **69** submissions · hero prize **$121,000** · hero deadline SEP 25 vs timeline **Fri 18 Sep 2026 20:00 UTC** — confirm which the form uses.
 
 ## Form fields (paste)
 

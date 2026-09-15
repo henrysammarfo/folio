@@ -9,8 +9,8 @@ Budget: ≤~$1 · Broadcast: paused
 
 Source: https://hackathons.solana.com/hackathons/stocklana
 
-- Registered: **534**
-- Submissions: **68**
+- Registered: **536**
+- Submissions: **69**
 - Prize pool hero: **$121,000** (Foundation main track $100k + bounty tracks)
 - Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 20:00 UTC**
 

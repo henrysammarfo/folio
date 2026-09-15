@@ -155,3 +155,10 @@
 - Wired marketing `/credit` and `/execution` to live desk bundles (SSR) so judges see Empire honesty without opening desk.
 - NestUSD still never Ready; broadcast paused; wash fail-closed without Bitquery.
 - Goal still blocked on Bitquery/Privy/Supabase keys + Henry lab approve + Vercel FOLIO_SESSION_SECRET.
+
+## 2026-09-15 — Ephemeral wallet inspect (no Vercel secret)
+
+- Shipped `?inspect=` on positions (+ credit bundle input) so public Vercel demo can show wallet-read path without `FOLIO_SESSION_SECRET`.
+- Unit tests for resolveDisplayWallet priority; e2e covers inspect copy.
+- Stocklana counts refreshed to 536 / 69 via official WebFetch.
+- Goal still open: keys + UI approve + Vercel session secret.

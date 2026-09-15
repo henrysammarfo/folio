@@ -19,7 +19,7 @@ Verified on this preview (SSO off): `/truth` ~1.003269× · `/network` NestUSD/w
 
 Set `FOLIO_SESSION_SECRET` (+ `BROADCAST_PAUSED=true`) in Vercel before demos that need watch-wallet bind.
 
-Stocklana live (2026-09-15 WebFetch, re-check at submit): **534** registered · **68** submissions · **$121k** hero · deadline conflict SEP 25 hero vs **18 Sep 20:00 UTC** timeline.
+Stocklana live (2026-09-15 WebFetch, re-check at submit): **536** registered · **69** submissions · **$121k** hero · deadline conflict SEP 25 hero vs **18 Sep 20:00 UTC** timeline.
 
 Paste pack: `docs/STOCKLANA_SUBMISSION.md`
 

@@ -16,8 +16,8 @@ export const Route = createFileRoute("/desk/")({
   /** Prefetch overview bundles so qty/credit honesty paints on first load. */
   loader: async () => {
     const [positions, credit] = await Promise.all([
-      getPositionsBundle(),
-      getCreditBundle(),
+      getPositionsBundle({ data: {} }),
+      getCreditBundle({ data: {} }),
     ]);
     return { positions, credit };
   },
@@ -30,14 +30,14 @@ function Page() {
   const fetchCredit = useServerFn(getCreditBundle);
   const positions = useQuery({
     queryKey: ["positions-bundle"],
-    queryFn: () => fetchPositions(),
+    queryFn: () => fetchPositions({ data: {} }),
     initialData: initial.positions,
     initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
   const credit = useQuery({
     queryKey: ["credit-bundle"],
-    queryFn: () => fetchCredit(),
+    queryFn: () => fetchCredit({ data: {} }),
     initialData: initial.credit,
     initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,

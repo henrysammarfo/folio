@@ -14,7 +14,7 @@ export const Route = createFileRoute("/desk/positions/$symbol")({
     ],
   }),
   /** Prefetch so wallet-read vs paper qty label is honest on first paint. */
-  loader: async () => getPositionsBundle(),
+  loader: async () => getPositionsBundle({ data: {} }),
   component: Page,
 });
 
@@ -24,7 +24,7 @@ function Page() {
   const fetchPositions = useServerFn(getPositionsBundle);
   const { data, isFetching } = useQuery({
     queryKey: ["positions-bundle"],
-    queryFn: () => fetchPositions(),
+    queryFn: () => fetchPositions({ data: {} }),
     initialData: initial,
     initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,

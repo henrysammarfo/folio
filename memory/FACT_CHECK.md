@@ -69,8 +69,16 @@ Sources: https://hackathons.solana.com/hackathons/stocklana (jina/WebFetch live 
 
 Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 
-| Stocklana registered **534** / submissions **67** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana | 2026-09-15 |
+| Stocklana registered **536** / submissions **67** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana | 2026-09-15 |
 | Stocklana deadline conflict: hero SEP 25 vs timeline Fri 18 Sep 20:00 UTC | CONFIRMED conflict — re-check at submit | same page hero + timeline | 2026-09-15 |
 | Network matrix NestUSD labeled unavailable (not mainnet-read) | CONFIRMED in-repo | buildNetworkMatrix NestUSD row | 2026-09-15 |
 | AAPLx currentMultiplier ≈ 1.0032690125398187 | CONFIRMED live | api.xstocks.fi AAPLx multiplier | 2026-09-15 |
-| Stocklana registered **534** / submissions **68** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana (WebFetch) | 2026-09-15 |
+| Stocklana registered **536** / submissions **69** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana (WebFetch) | 2026-09-15 |
+
+## Live Stocklana re-check (2026-09-15 ~18:05 UTC)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Stocklana registered **536** / submissions **69** / hero pool **$121k** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana (WebFetch) | 2026-09-15 |
+| Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)**; stocklana.fun shows **18 SEP 2026 · 23:59 UTC** | CONFIRMED conflict — re-check at submit | official + stocklana.fun | 2026-09-15 |
+| Ephemeral wallet inspect (no FOLIO_SESSION_SECRET) on `/desk/positions?inspect=` | SHIPPED | mainnet-read only; labeled not auth | 2026-09-15 |
