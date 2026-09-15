@@ -148,3 +148,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Stocklana live WebFetch: **534** registered / **68** submissions / **$121k** hero; deadline conflict unchanged — re-check at submit.
 - Added `docs/STOCKLANA_SUBMISSION.md` paste pack; submit checklist ticks verified honesty items; Vercel `FOLIO_SESSION_SECRET` still Henry-owned.
 - Still blocked for full objective: Bitquery / Privy / Supabase keys + lab approve + Vercel session secret.
+
+## 2026-09-15 settings watch-wallet secret honesty
+
+- SessionBundle exposes `sessionSecretPresent` (FOLIO_SESSION_SECRET ≥16).
+- `/desk/settings` ModeBadge + Watch wallet panel show secret set/missing; bind disabled when missing (Vercel Henry action still required).

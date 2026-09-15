@@ -138,6 +138,8 @@ export type SessionBundle = {
     customProgramDeploy: false;
   };
   watchWallet: string | null;
+  /** FOLIO_SESSION_SECRET ≥16 — watch-wallet bind + cookie signing (not Privy). */
+  sessionSecretPresent: boolean;
 };
 
 export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
@@ -428,6 +430,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     const userId = session.ok ? session.data.userId : null;
     const preferences = await loadDeskPreferences(tenantId, userId);
     const watch = readWatchWallet();
+    const sessionSecretPresent =
+      (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
     return {
       auth,
       session,
@@ -440,6 +444,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         customProgramDeploy: false,
       },
       watchWallet: watch.ok ? watch.data.wallet : null,
+      sessionSecretPresent,
     };
   },
 );

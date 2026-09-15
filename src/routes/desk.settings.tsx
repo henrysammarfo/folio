@@ -67,6 +67,11 @@ function Page() {
         <ModeBadge mode={data?.auth.ok ? "mainnet-read" : "unavailable"}>
           {data?.auth.ok ? "Auth keys present" : "Auth fail-closed"}
         </ModeBadge>
+        <ModeBadge mode={data?.sessionSecretPresent ? "mainnet-read" : "unavailable"}>
+          {data?.sessionSecretPresent
+            ? "Watch-wallet secret set"
+            : "Watch-wallet secret missing"}
+        </ModeBadge>
         <ModeBadge mode="paper">Paper agent</ModeBadge>
       </div>
       <div className="desk-grid">
@@ -245,11 +250,18 @@ function Page() {
       
       <Panel
         title="Watch wallet (mainnet-read qty)"
-        meta={<StatusBadge tone="amber">Not Privy auth</StatusBadge>}
+        meta={
+          <StatusBadge tone={data?.sessionSecretPresent ? "green" : "amber"}>
+            {data?.sessionSecretPresent ? "Secret ready" : "Secret missing"}
+          </StatusBadge>
+        }
       >
         <p className="mb-3 text-sm opacity-80">
           Bind a Solana pubkey for mainnet token-balance reads on Positions. Requires{" "}
           <code>FOLIO_SESSION_SECRET</code> only — this is <b>not</b> multi-tenant Privy auth.
+          {data?.sessionSecretPresent
+            ? null
+            : " Set FOLIO_SESSION_SECRET (≥16) in Vercel env to enable bind on the public demo."}{" "}
           Currently:{" "}
           {data?.watchWallet ? (
             <code>{data.watchWallet.slice(0, 4)}…{data.watchWallet.slice(-4)}</code>
@@ -270,7 +282,9 @@ function Page() {
           <button
             type="button"
             className="wallet-pill"
-            disabled={watchBusy || !watchWalletInput.trim()}
+            disabled={
+              watchBusy || !watchWalletInput.trim() || !data?.sessionSecretPresent
+            }
             onClick={async () => {
               setWatchBusy(true);
               setWatchMsg("");

@@ -143,3 +143,9 @@
 - Refreshed Stocklana counts to **68** submissions; added `docs/STOCKLANA_SUBMISSION.md`.
 - Keys still empty (Bitquery/Privy/Supabase); Vercel `FOLIO_SESSION_SECRET` still missing on preview; broadcast remains paused.
 - Goal not complete — awaiting keys + Henry lab id + Vercel secret.
+
+## 2026-09-15 — Watch-wallet secret honesty on settings
+
+- Surfaced FOLIO_SESSION_SECRET readiness on settings (ModeBadge + panel + bind disable).
+- Lab polish + Stocklana 68 submit paste pack already on preview READY.
+- Goal still blocked on Bitquery/Privy/Supabase keys + Henry lab approve + Vercel secret.
