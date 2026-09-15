@@ -57,7 +57,13 @@ function Page() {
           {mult?.ok ? "xStocks live" : "Multiplier unavailable"}
         </ModeBadge>
         <ModeBadge mode={data?.jupiterPrice.ok ? data.jupiterPrice.mode : "unavailable"}>
-          {data?.jupiterPrice.ok ? "Jupiter price live" : "Jupiter price unavailable"}
+          {!data?.jupiterPrice.ok
+            ? "Jupiter price unavailable"
+            : data.jupiterPrice.source.includes("stale")
+              ? "Jupiter price stale-cache"
+              : data.jupiterPrice.source.includes("cached")
+                ? "Jupiter price cached"
+                : "Jupiter price live"}
         </ModeBadge>
         <ModeBadge mode={data?.pyth.ok ? data.pyth.mode : "unavailable"}>
           {data?.pyth.ok ? "Pyth live" : "Pyth unavailable"}
@@ -186,9 +192,19 @@ function Page() {
             </span>
           </li>
           <li>
-            {data?.diverge.pass === false ? <AlertTriangle /> : <CheckCircle2 />}
+            {data?.diverge.pass === false ? (
+              <AlertTriangle />
+            ) : data?.diverge.pass === true ? (
+              <CheckCircle2 />
+            ) : (
+              <FileClock />
+            )}
             <span>
-              <b>Diverge gate</b> {data?.diverge.note ?? "pending"}
+              <b>Diverge gate</b>{" "}
+              {data?.diverge.pass == null
+                ? data?.diverge.note ??
+                  "unavailable — no invent-a-pass (Pyth and venue both required)"
+                : (data.diverge.note ?? "pending")}
             </span>
           </li>
         </ol>

@@ -129,3 +129,7 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | AgentRouter WAF fails whole paper agent turn | REJECTED (fixed) | Live spine reply returns with nlExpansion=failed; NL skipped and labeled | 2026-09-15 |
 | `smoke:keys` invents wash clear / multi-tenant ok without keys | REJECTED | Baseline skips missing; multi_tenant fail-closed; empty Privy token must fail-closed | 2026-09-15 |
 | Blocking keys present in local smoke env | MISSING | smoke:keys → still need bitquery, pyth, privy, supabase | 2026-09-15 |
+| Position detail drops ?inspect= wallet-read mid-click | REJECTED (fixed) | Detail loaderDeps + search.inspect; list/overview links pass inspect | 2026-09-15 |
+| Truth diverge CheckCircle when pass===null | REJECTED (fixed) | Clock icon + unavailable note until scored | 2026-09-15 |
+| Execution wash “Heuristic” when Bitquery missing | REJECTED (fixed) | Badge = Fail-closed | 2026-09-15 |
+| Activity CA prefs ModeBadge = mainnet-read | REJECTED (fixed) | Preference → paper mode; Nest.credit ≠ NestUSD events added | 2026-09-15 |

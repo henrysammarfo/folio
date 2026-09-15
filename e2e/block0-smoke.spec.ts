@@ -108,6 +108,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/agentrouter|live spine only|nl optional/);
     expect(body).toMatch(/privy|multi-tenant fail-closed/);
     expect(body).toMatch(/supabase|tenants fail-closed/);
+    expect(body).toMatch(/smoke:keys|keys_landing|npm run keys/);
     expect(body).toMatch(/active tenant/);
     expect(body).toMatch(/rls|service-role|jwt sub/);
     expect(body).toMatch(/strict fail-closed/);
@@ -123,6 +124,7 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/nest\.credit|vault awareness|not nestusd/);
     expect(body).toMatch(/corporate-action alerts/);
     expect(body).toMatch(
       /corporate action|pending multiplier|no pending|no session prefs|multiplier/,
@@ -232,7 +234,9 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/wash/);
     expect(body).toMatch(/quote/);
     expect(body).toMatch(/broadcast paused|broadcast remains paused|broadcast off/);
-    expect(body).toMatch(/bitquery|fail-closed|unavailable|heuristic|keyed/);
+    expect(body).toMatch(/bitquery|fail-closed|unavailable|keyed/);
+    // Missing Bitquery must not paint Heuristic-as-green theater
+    expect(body).toMatch(/fail-closed/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
@@ -248,6 +252,45 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/inspect|ephemeral|mainnet/);
     expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
+  });
+
+  test("position detail keeps inspect wallet-read continuity", async ({ page }) => {
+    const inspect = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+    await page.goto(`/desk/positions/AAPLx?inspect=${inspect}`);
+    await expect(page.getByText(/AAPLx|position|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/inspect|ephemeral/);
+    expect(body).toMatch(/wallet-read|inspect ephemeral|not auth|not multi-tenant/);
+    expect(body).toMatch(/pending corporate action/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet|4\.0000/);
+  });
+
+  test("truth diverge gate does not invent a pass checkmark", async ({ page }) => {
+    await page.goto("/truth");
+    await expect(page.getByText(/FOLIO|truth|multiplier|Scaled/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/diverge gate/);
+    // Without Pyth key, diverge must stay labeled unavailable — not silent pass theater
+    expect(body).toMatch(/pyth unavailable|unavailable|no invent|diverge/);
+    expect(body).toMatch(/jupiter price (live|cached|stale-cache|unavailable)/);
+    expect(body).not.toMatch(/unhackable|nation-state|4\.0000/);
+  });
+
+  test("activity labels Jupiter cache + Nest.credit ≠ NestUSD", async ({ page }) => {
+    await page.goto("/desk/activity");
+    await expect(page.getByText(/activity|events|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/jupiter route inspected|jupiter quote unavailable/);
+    expect(body).toMatch(/live|cached|stale-cache|unavailable/);
+    expect(body).toMatch(/nest\.credit|not nestusd/);
+    expect(body).toMatch(/nestusd.*fail-closed|fail-closed.*nestusd|≠ nest\.credit/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 

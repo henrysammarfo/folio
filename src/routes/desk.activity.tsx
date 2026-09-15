@@ -35,18 +35,12 @@ function Page() {
         <ModeBadge mode="mainnet-read">Live-derived</ModeBadge>
         <ModeBadge mode="quote-only">No broadcast log</ModeBadge>
         <ModeBadge
-          mode={
-            data?.prefsFromSession
-              ? data.corporateActionAlerts
-                ? "mainnet-read"
-                : "paper"
-              : "unavailable"
-          }
+          mode={data?.prefsFromSession ? "paper" : "unavailable"}
         >
           {data?.prefsFromSession
             ? data.corporateActionAlerts
-              ? "CA alerts · on"
-              : "CA alerts · off"
+              ? "CA alerts · on (pref)"
+              : "CA alerts · off (pref)"
             : "CA alerts · no session"}
         </ModeBadge>
       </div>

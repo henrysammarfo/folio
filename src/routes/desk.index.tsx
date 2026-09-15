@@ -198,7 +198,12 @@ function Page() {
         >
           <div className="position-list">
             {rows.map((p) => (
-              <Link key={p.symbol} to="/desk/positions/$symbol" params={{ symbol: p.symbol }}>
+              <Link
+                key={p.symbol}
+                to="/desk/positions/$symbol"
+                params={{ symbol: p.symbol }}
+                search={inspect ? { inspect } : {}}
+              >
                 <span className="asset-icon">{p.symbol[0]}</span>
                 <p>
                   <b>{p.symbol}</b>

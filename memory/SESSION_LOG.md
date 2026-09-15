@@ -258,3 +258,7 @@
 - Live run (no Bitquery/Pyth/Privy/Supabase): SKIP probes · FC multi_tenant · OK broadcast/session/agentrouter.
 - Tenant migration user_id indexes; KEYS_LANDING / STOCKLANA_SUBMIT updated.
 - Vitest 76 green. Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Inspect continuity + badge honesty
+- Detail route + list/overview links carry `?inspect=`; truth diverge no checkmark on null; Jupiter cache labels; execution Fail-closed; activity Nest.credit≠NestUSD + Jupiter cache.
+- Goal open: Henry lab Pick + keys.

@@ -170,6 +170,7 @@ function Page() {
               key={p.symbol}
               to="/desk/positions/$symbol"
               params={{ symbol: p.symbol }}
+              search={inspect ? { inspect } : {}}
             >
               <span>
                 <b>{p.symbol}</b>

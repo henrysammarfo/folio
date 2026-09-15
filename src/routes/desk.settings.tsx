@@ -113,8 +113,20 @@ function Page() {
         <ModeBadge mode={data?.networkPolicy.broadcast ? "mainnet-read" : "unavailable"}>
           {data?.networkPolicy.broadcast ? "Broadcast armed" : "Broadcast off"}
         </ModeBadge>
-        <ModeBadge mode={data?.auth.ok ? "mainnet-read" : "unavailable"}>
-          {data?.auth.ok ? "Auth keys present" : "Auth fail-closed"}
+        <ModeBadge
+          mode={
+            data?.auth.ok && data.auth.data.sessionReady
+              ? "mainnet-read"
+              : data?.auth.ok
+                ? "paper"
+                : "unavailable"
+          }
+        >
+          {data?.auth.ok && data.auth.data.sessionReady
+            ? "Session ready"
+            : data?.auth.ok
+              ? "Auth keys · no session"
+              : "Auth fail-closed"}
         </ModeBadge>
         <ModeBadge mode={data?.sessionSecretPresent ? "mainnet-read" : "unavailable"}>
           {data?.sessionSecretPresent
@@ -200,7 +212,8 @@ function Page() {
           </p>
           <p className="mt-3 text-sm opacity-80">
             Key paste order (Bitquery → Pyth → Privy → Supabase):{" "}
-            <code>docs/KEYS_LANDING.md</code> · <code>npm run keys</code>
+            <code>docs/KEYS_LANDING.md</code> · <code>npm run keys</code> ·{" "}
+            <code>npm run smoke:keys</code>
           </p>
         </div>
       </Panel>

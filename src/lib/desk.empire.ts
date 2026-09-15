@@ -449,7 +449,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
     const decimals =
       asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
 
-    const [wash, jupiterQuote, pools, kamino] = await Promise.all([
+    const [wash, jupiterQuote, pools, kamino, nestCredit, nestusd] = await Promise.all([
       evaluateWashGate({ symbol, mint, notionalUsd: 1 }),
       mint
         ? fetchJupiterQuote({
@@ -462,7 +462,17 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         ? fetchRaydiumPoolsForMint(mint)
         : Promise.resolve(errResult("api-v3.raydium.io", "mint_missing")),
       fetchKaminoXStocksMarket(),
+      fetchNestCreditVaults(),
+      fetchNestUsdStatus(),
     ]);
+
+    const jupiterCacheLabel = jupiterQuote.ok
+      ? jupiterQuote.source.includes("stale")
+        ? "stale-cache"
+        : jupiterQuote.source.includes("cached")
+          ? "cached"
+          : "live"
+      : null;
 
     const now = new Date().toISOString();
     const events: ActivityEvent[] = [
@@ -507,15 +517,16 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           ? "Preference only — live CA signal = xStocks multiplier pending/current (above)."
           : "Mint httpOnly session (Privy + Supabase) to persist CA alert preference per active tenant.",
         tone: prefsFromSession && corporateActionAlerts ? "blue" : "neutral",
-        mode: prefsFromSession ? "mainnet-read" : "unavailable",
+        /** Pref ≠ mainnet feed — paper until session prefs backed by live CA calendar (none). */
+        mode: prefsFromSession ? "paper" : "unavailable",
       },
       {
         at: now,
         title: jupiterQuote.ok
-          ? "Jupiter route inspected"
+          ? `Jupiter route inspected · ${jupiterCacheLabel}`
           : "Jupiter quote unavailable",
         detail: jupiterQuote.ok
-          ? `out ${jupiterQuote.data.outUiAmount.toFixed(6)} · quote-only · $1 USDC`
+          ? `out ${jupiterQuote.data.outUiAmount.toFixed(6)} · quote-only · $1 USDC · ${jupiterCacheLabel}`
           : jupiterQuote.reason,
         tone: jupiterQuote.ok ? "blue" : "amber",
         mode: jupiterQuote.ok ? jupiterQuote.mode : "unavailable",
@@ -539,6 +550,26 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           : kamino.reason,
         tone: kamino.ok ? "blue" : "amber",
         mode: kamino.ok ? kamino.mode : "unavailable",
+      },
+      {
+        at: now,
+        title: nestCredit.ok
+          ? "Nest.credit vault awareness"
+          : "Nest.credit unavailable",
+        detail: nestCredit.ok
+          ? `${nestCredit.data.vaultCount} vaults · ${nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
+          : nestCredit.reason,
+        tone: nestCredit.ok ? "blue" : "amber",
+        mode: nestCredit.ok ? nestCredit.mode : "unavailable",
+      },
+      {
+        at: now,
+        title: "NestUSD borrow capacity",
+        detail: nestusd.ok
+          ? "Unexpected NestUSD ok — still risk-labeled"
+          : `${nestusd.reason} — fail-closed (≠ Nest.credit)`,
+        tone: "amber",
+        mode: "unavailable",
       },
       {
         at: now,

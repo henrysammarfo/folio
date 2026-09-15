@@ -139,7 +139,7 @@ export function buildNetworkMatrix(input: {
       capability: "Ephemeral wallet inspect",
       mode: "mainnet-read",
       detail:
-        "Always on · ?inspect=<pubkey> on /desk + /desk/positions + /desk/credit · not auth · no FOLIO_SESSION_SECRET required",
+        "Always on · ?inspect=<pubkey> on /desk · /desk/positions · /desk/positions/$symbol · /desk/credit · not auth · no FOLIO_SESSION_SECRET required",
     },
     {
       capability: "Broadcast swap / borrow",

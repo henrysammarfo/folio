@@ -287,3 +287,10 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Migration indexes: `tenant_members_user_id_idx` · `desk_preferences_user_id_idx`.
 - Docs: KEYS_LANDING + STOCKLANA_SUBMIT reference smoke:keys; optional AGENTROUTER noted.
 - Vitest **76** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Inspect continuity + false-green honesty
+- Position detail honors `?inspect=` (loader + links from list/overview) so wallet-read qty does not flip to paper mid-click.
+- Truth: Jupiter badge labels live|cached|stale-cache; diverge gate uses checkmark only when `pass === true` (null → clock, not invent-a-pass).
+- Execution wash badge: Fail-closed (not Heuristic theater) when Bitquery missing.
+- Settings auth badge: keys ≠ session ready; activity CA prefs mode=paper; Jupiter route + Nest.credit ≠ NestUSD on activity stream.
+- Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
