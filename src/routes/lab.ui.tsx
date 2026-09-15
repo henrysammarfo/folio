@@ -39,6 +39,7 @@ function Page() {
     >
       <div className="mb-4 flex flex-wrap gap-2">
         <StatusBadge tone="blue">Awaiting approval</StatusBadge>
+        <StatusBadge tone="neutral">Reply: desk-density-a · desk-density-b · gate-chip</StatusBadge>
         <StatusBadge tone="neutral">API_KEY_21ST ready</StatusBadge>
       </div>
       <div className="lab-grid">

@@ -36,3 +36,19 @@ Re-verify competitor flaws and Stocklana counts before submit.
 | NestUSD public capacity metrics endpoint verified for FOLIO | REJECTED for now | No verified in-repo endpoint — fail-closed / risk-labeled | 2026-09-15 |
 | Raydium v3 pools-by-mint returns AAPLx pools | CONFIRMED live | `api-v3.raydium.io/pools/info/mint` | 2026-09-15 |
 | Colosseum World’s Fair requires working MVP + honesty over fake mainnet fills | CONFIRMED (secondary sources) | Colosseum/World’s Fair coverage; FOLIO NETWORK_POLICY | 2026-09-15 |
+
+
+## Live Stocklana re-check (2026-09-15 16:27 UTC)
+
+Source: https://hackathons.solana.com/hackathons/stocklana (Tavily)
+
+| Claim | Live value | Status |
+|---|---|---|
+| Prize pool | **$100,000** | Confirmed |
+| Registered | **145** | Confirmed (do not invent; re-check at submit) |
+| Submissions | **12** | Confirmed at check time |
+| Deadline | **Fri 18 Sep 2026, 20:00 UTC** (4:00pm ET) | Confirmed |
+| Live since | Fri 11 Sep 2026, 12:00 UTC | Confirmed |
+| Judging | through 2 Oct 2026 | Confirmed |
+
+Do **not** quote older ~500/57 registration counts.

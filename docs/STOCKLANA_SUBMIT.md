@@ -4,7 +4,7 @@ Deadline: **2026-09-18 20:00 UTC** · Budget: ≤~$1 · Broadcast: paused
 
 ## Before submit
 
-- [ ] Re-check Stocklana registration counts live (do not invent)
+- [ ] Re-check Stocklana registration counts live (do not invent) — last check 2026-09-15: **145 registered**, **12 submissions**, **$100k**, deadline **18 Sep 20:00 UTC**
 - [ ] Demo URL reachable (Block 0 spine)
 - [ ] Replay green locally:
 
