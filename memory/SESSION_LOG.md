@@ -109,3 +109,10 @@
 - Wash row mode forced `unavailable` without Bitquery (not just detail string).
 - Live Stocklana (official page): **534** registered, 67 submissions, $121k hero pool; deadline conflict SEP 25 hero vs 18 Sep 20:00 UTC timeline.
 - Submit pack lists lab candidate ids for Henry approve gate.
+
+## 2026-09-15 — Desk SSR + NestUSD/broadcast honesty
+
+- SSR-prefetch loaders on `/desk/credit`, `/desk/settings`, `/desk/acquire` so fail-closed labels paint before client fetch.
+- NestUSD badge never says Ready (probed · risk-labeled / reason / Risk · unverified).
+- `networkPolicy.broadcast` hard-false until funded (not merely `!isBroadcastPaused()`).
+- Network matrix honesty + Stocklana 534/67/$121k already committed.

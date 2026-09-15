@@ -117,3 +117,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Wash matrix row forced `unavailable` when Bitquery key missing (not just detail text).
 - Keys still empty: Privy / Supabase / Bitquery. Set `FOLIO_SESSION_SECRET` on Vercel for watch-wallet.
 - Premium UI still approve-gated (`ink-ledger` / `ledger-mist` / `aurora-grid` · `desk-density-a` / `desk-density-b` / `gate-chip`).
+
+## 2026-09-15 desk SSR honesty
+
+- `/desk/credit|settings|acquire` SSR-prefetch live bundles.
+- NestUSD UI never paints Ready; broadcast policy hard-false until funded.
+- Still blocked on Bitquery/Privy/Supabase keys + Henry lab approve + Vercel `FOLIO_SESSION_SECRET`.

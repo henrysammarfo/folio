@@ -435,7 +435,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
       networkPolicy: {
         mainnetRead: true,
         quoteOnly: true,
-        broadcast: !isBroadcastPaused(),
+        // Unfunded · ≤~$1 — never report Enabled just because BROADCAST_PAUSED=false.
+        broadcast: false,
         customProgramDeploy: false,
       },
       watchWallet: watch.ok ? watch.data.wallet : null,

@@ -13,14 +13,19 @@ export const Route = createFileRoute("/desk/credit")({
       { name: "description", content: "Labeled Kamino / Jupiter Lend / NestUSD credit reads." },
     ],
   }),
+  /** Prefetch so NestUSD fail-closed + capacity labels show on first paint. */
+  loader: async () => getCreditBundle(),
   component: Page,
 });
 
 function Page() {
+  const initial = Route.useLoaderData();
   const fetchCredit = useServerFn(getCreditBundle);
   const { data, isFetching } = useQuery({
     queryKey: ["credit-bundle"],
     queryFn: () => fetchCredit(),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,
   });
 
@@ -82,7 +87,11 @@ function Page() {
             <p>
               <span>NestUSD</span>
               <StatusBadge tone="amber">
-                {data?.nestusd.ok ? "Ready" : data && !data.nestusd.ok ? data.nestusd.reason : "Risk / unverified"}
+                {data?.nestusd.ok
+                  ? "Probed · risk-labeled"
+                  : data && !data.nestusd.ok
+                    ? data.nestusd.reason
+                    : "Risk / unverified"}
               </StatusBadge>
             </p>
             <p>

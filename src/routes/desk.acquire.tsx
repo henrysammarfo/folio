@@ -24,10 +24,13 @@ export const Route = createFileRoute("/desk/acquire")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  /** Prefetch default AAPLx $1 quote so wash fail-closed is visible by checks step. */
+  loader: async () => getAcquireBundle({ data: { symbol: "AAPLx", spendUsdc: 1 } }),
   component: Page,
 });
 
 function Page() {
+  const initial = Route.useLoaderData();
   const [step, setStep] = useState(1);
   const [symbol, setSymbol] = useState<(typeof SYMBOLS)[number]>("AAPLx");
   const [amount, setAmount] = useState("1");
@@ -40,6 +43,8 @@ function Page() {
     queryKey: ["acquire", symbol, spendUsdc],
     queryFn: () => fetchAcquire({ data: { symbol, spendUsdc } }),
     enabled,
+    initialData: symbol === "AAPLx" && spendUsdc === 1 ? initial : undefined,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
 

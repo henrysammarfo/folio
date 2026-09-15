@@ -25,10 +25,13 @@ export const Route = createFileRoute("/desk/settings")({
       },
     ],
   }),
+  /** Prefetch session/auth/broadcast honesty for first paint. */
+  loader: async () => getSessionBundle(),
   component: Page,
 });
 
 function Page() {
+  const initial = Route.useLoaderData();
   const queryClient = useQueryClient();
   const fetchSession = useServerFn(getSessionBundle);
   const runAgent = useServerFn(runDeskAgent);
@@ -39,6 +42,8 @@ function Page() {
   const { data, refetch } = useQuery({
     queryKey: ["session-bundle"],
     queryFn: () => fetchSession(),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 30_000,
   });
   const [prompt, setPrompt] = useState("truth AAPLx");
