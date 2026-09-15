@@ -87,3 +87,11 @@
 - Added `vercel.json` framework `tanstack-start` (project was `tanstack-start-lovable`).
 - Desk home labels wallet-read vs paper; demo script mentions watch-wallet + `npm run replay`.
 - Verified: vitest 28, playwright 7, smoke-empire live adapters, VERCEL=1 build emits Build Output API.
+
+## 2026-09-15 — Public demo URL + RPC fallback
+
+- Disabled Vercel Authentication on project `folio` so Stocklana judges can open the preview without SSO.
+- Preview READY: `https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app`.
+- Added `resolveSolanaRpcUrl()` public mainnet fallback when `SOLANA_RPC_URL` unset (labeled source; still fail-closed on errors).
+- Henry still needs to set `FOLIO_SESSION_SECRET` (+ Bitquery/Privy/Supabase when ready) in Vercel env for watch-wallet / multi-tenant.
+- Broadcast still paused; lab UI still approve-gated.

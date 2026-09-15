@@ -1,3 +1,4 @@
+import { resolveSolanaRpcUrl } from "./solana-rpc";
 import { errResult, okResult, type AdapterResult } from "./types";
 
 export type ScaledUiOnchain = {
@@ -27,11 +28,10 @@ function effectiveMultiplier(
 export async function fetchScaledUiOnchain(
   mint: string,
 ): Promise<AdapterResult<ScaledUiOnchain>> {
-  const source = "solana-rpc.scaled-ui";
-  const rpc = process.env["SOLANA_RPC_URL"];
-  if (!rpc) {
-    return errResult(source, "solana_rpc_missing", "SOLANA_RPC_URL unset — on-chain Scaled UI read unavailable.");
-  }
+  const { url: rpc, publicFallback } = resolveSolanaRpcUrl();
+  const source = publicFallback
+    ? "solana-rpc.scaled-ui.public-fallback"
+    : "solana-rpc.scaled-ui";
   try {
     const res = await fetch(rpc, {
       method: "POST",

@@ -1,3 +1,4 @@
+import { resolveSolanaRpcUrl } from "./solana-rpc";
 import { errResult, okResult, type AdapterResult } from "./types";
 
 /** SPL Token + Token-2022 program ids (Solana mainnet). */
@@ -150,14 +151,7 @@ export async function fetchWalletTokenBalances(params: {
   if (!isLikelySolanaPubkey(wallet)) {
     return errResult(source, "wallet_pubkey_invalid", "Expected a base58 Solana pubkey.");
   }
-  const rpc = process.env["SOLANA_RPC_URL"]?.trim();
-  if (!rpc) {
-    return errResult(
-      source,
-      "solana_rpc_missing",
-      "SOLANA_RPC_URL unset — wallet balance read unavailable.",
-    );
-  }
+  const { url: rpc } = resolveSolanaRpcUrl();
 
   const mintFilter = params.mints?.length ? new Set(params.mints) : undefined;
   const [spl, t22] = await Promise.all([

@@ -91,6 +91,15 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `npm run replay` one-command verify (unit + e2e + empire smoke + build).
 - Vercel project `folio` linked to GitHub (`prj_pzvYDMnYiSDcJNsv5NCdy5UVeExq`); feature work on `cursor/folio-wallet-read-f1ec`.
 - Nitro preset: `vercel` when `VERCEL=1`, else `node-server` for local preview/e2e; `vercel.json` framework `tanstack-start`.
-- Verified locally: 28 unit + 7 e2e green; empire smoke live (wash/auth fail-closed; scaled-ui/pools/kamino ok).
+- Verified locally: **31** unit + 7 e2e green; empire smoke live (wash/auth fail-closed; scaled-ui/pools/kamino ok).
 - Broadcast still paused; wash/multi-tenant still fail-closed without Bitquery/Privy/Supabase.
 - Demo env still needed on Vercel: `SOLANA_RPC_URL`, `FOLIO_SESSION_SECRET`, `BROADCAST_PAUSED=true` (+ keys when landed).
+
+## 2026-09-15 Vercel public demo + RPC fallback
+
+- Preview deploy **READY**: https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app (SSO protection disabled for public demo).
+- Nitro `vercel` preset fix shipped; home/`/truth`/`/desk`/`/desk/settings` return 200 publicly.
+- `resolveSolanaRpcUrl()` prefers `SOLANA_RPC_URL`, else labeled public mainnet RPC fallback for Scaled UI + wallet-read (still fail-closed on RPC errors).
+- Watch-wallet bind on Vercel still needs `FOLIO_SESSION_SECRET` in project env (CLI not authenticated here — set in Vercel dashboard).
+- Broadcast remains paused; wash/multi-tenant still fail-closed without Bitquery/Privy/Supabase.
+- Premium UI still approve-gated on `/lab/*` until Henry names a candidate id.
