@@ -6,7 +6,7 @@ import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
 import { getPositionsBundle } from "@/lib/desk.functions";
 
-export const Route = createFileRoute("/desk/positions/$symbol")({
+export const Route = createFileRoute("/desk/positions_/$symbol")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.symbol} — FOLIO` },
