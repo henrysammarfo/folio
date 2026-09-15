@@ -66,3 +66,10 @@
 - Prefs: service-role desk_preferences fetch when keys+tenant present.
 - Removed Yahoo leftovers; softened /execution copy (no false Pass theater).
 - Tests: broadcast helper + diverge gate unit coverage.
+
+## 2026-09-15 — Wallet-read positions + Stocklana fact refresh
+
+- Added `wallet-balances` adapter (SPL + Token-2022 via SOLANA_RPC_URL) and signed `folio_watch_wallet` cookie.
+- Positions prefer Privy session wallet, else watch-wallet, else paper qty — labeled honestly.
+- Settings UI bind/clear watch wallet; unit tests for merge + cookie HMAC.
+- Live Stocklana: 528 registered, 67 submissions, $115k hero prize pool; deadline hero SEP 25 (verify at submit).

@@ -33,7 +33,17 @@ function Page() {
     <DeskShell eyebrow="Ownership ledger" title="Positions">
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Live multipliers</ModeBadge>
-        <ModeBadge mode="paper">Paper quantities</ModeBadge>
+        <ModeBadge
+          mode={
+            data?.rows.some((r) => r.qtySource === "wallet-read")
+              ? "mainnet-read"
+              : "paper"
+          }
+        >
+          {data?.rows.some((r) => r.qtySource === "wallet-read")
+            ? "Wallet-read qty"
+            : "Paper quantities"}
+        </ModeBadge>
         <ModeBadge
           mode={
             data?.auth.ok && data.auth.data.sessionReady
@@ -43,9 +53,11 @@ function Page() {
         >
           {data?.auth.ok && data.auth.data.sessionReady
             ? "Session bound"
-            : data?.auth.ok
-              ? "Keys present · no session"
-              : "Wallet unbound"}
+            : data?.watchWallet
+              ? "Watch-wallet bound"
+              : data?.auth.ok
+                ? "Keys present · no session"
+                : "Wallet unbound"}
         </ModeBadge>
       </div>
       <Panel
@@ -61,7 +73,7 @@ function Page() {
         <div className="data-table">
           <div className="table-head">
             <span>Asset</span>
-            <span>Paper raw</span>
+            <span>Qty</span>
             <span>Multiplier</span>
             <span>Economic</span>
             <span>Value</span>
@@ -73,7 +85,10 @@ function Page() {
                 <b>{p.symbol}</b>
                 <small>{p.name}</small>
               </span>
-              <span>{p.paperRaw.toFixed(4)}</span>
+              <span>
+                {p.qty.toFixed(4)}
+                <small>{p.qtySource === "wallet-read" ? "wallet" : "paper"}</small>
+              </span>
               <span>{p.multiplier != null ? `${p.multiplier.toFixed(6)}×` : "—"}</span>
               <span>{p.economicShares != null ? p.economicShares.toFixed(4) : "—"}</span>
               <span>

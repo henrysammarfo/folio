@@ -280,6 +280,8 @@ export {
   runDeskAgent,
   createSessionFromPrivyToken,
   clearFolioSession,
+  bindWatchWallet,
+  clearWatchWallet,
 } from "./desk.empire";
 export type {
   PositionsBundle,

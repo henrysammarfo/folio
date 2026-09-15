@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { deleteCookie, getCookie, setCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
-import { errResult, okResult, type AdapterResult } from "./adapters/types";
+import { errResult, type AdapterResult } from "./adapters/types";
 import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
 import {
   fetchJupiterQuote,
@@ -26,6 +26,12 @@ import {
 } from "./auth/session";
 import { verifyPrivyAccessToken } from "./auth/privy";
 import { resolveTenantMemberships } from "./auth/tenants";
+import {
+  FOLIO_WATCH_WALLET_COOKIE,
+  mintWatchWalletCookie,
+  verifyWatchWalletCookieValue,
+} from "./auth/watch-wallet";
+import { fetchWalletTokenBalances } from "./adapters/wallet-balances";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
@@ -45,17 +51,36 @@ function readVerifiedSession(): AdapterResult<FolioSession> {
     const value = getCookie(FOLIO_SESSION_COOKIE);
     return verifyFolioSessionCookieValue(value);
   } catch {
-    // Outside request context (unit smoke) — fall back to harness header.
     const g = globalThis as { __FOLIO_COOKIE_HEADER__?: string };
     return parseFolioSessionCookie(g.__FOLIO_COOKIE_HEADER__ ?? null);
   }
+}
+
+function readWatchWallet(): AdapterResult<{ wallet: string }> {
+  try {
+    const value = getCookie(FOLIO_WATCH_WALLET_COOKIE);
+    return verifyWatchWalletCookieValue(value);
+  } catch {
+    const g = globalThis as { __FOLIO_WATCH_WALLET_COOKIE__?: string };
+    return verifyWatchWalletCookieValue(g.__FOLIO_WATCH_WALLET_COOKIE__ ?? null);
+  }
+}
+
+/** Prefer Privy-bound session wallet, else optional watch-wallet cookie. */
+function resolveDisplayWallet(session: AdapterResult<FolioSession>): string | null {
+  if (session.ok && session.data.walletAddress) return session.data.walletAddress;
+  const watch = readWatchWallet();
+  return watch.ok ? watch.data.wallet : null;
 }
 
 export type PositionRow = {
   symbol: string;
   name: string;
   mint: string | null;
+  /** Display qty: wallet UI amount when bound, else paper. */
+  qty: number;
   paperRaw: number;
+  qtySource: "wallet-read" | "paper";
   multiplier: number | null;
   onchainEffectiveMultiplier: number | null;
   economicShares: number | null;
@@ -69,6 +94,8 @@ export type PositionsBundle = {
   rows: PositionRow[];
   note: string;
   auth: ReturnType<typeof getAuthProviderStatus>;
+  watchWallet: string | null;
+  walletBalances: Awaited<ReturnType<typeof fetchWalletTokenBalances>> | null;
 };
 
 export type CreditBundle = {
@@ -108,38 +135,71 @@ export type SessionBundle = {
     broadcast: boolean;
     customProgramDeploy: false;
   };
+  watchWallet: string | null;
 };
 
 export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<PositionsBundle> => {
     const session = readVerifiedSession();
     const auth = getAuthProviderStatus(session.ok ? session : null);
-    const rows: PositionRow[] = [];
+    const displayWallet = resolveDisplayWallet(session);
 
-    for (const symbol of WATCHLIST) {
+    const assets = await Promise.all(
+      WATCHLIST.map(async (symbol) => {
+        const [asset, multiplier] = await Promise.all([
+          fetchXStockAsset(symbol),
+          fetchXStockMultiplier(symbol),
+        ]);
+        return { symbol, asset, multiplier };
+      }),
+    );
+    const mints = assets
+      .map((a) => (a.asset.ok ? a.asset.data.solanaMint : null))
+      .filter((m): m is string => Boolean(m));
+
+    const walletBalances = displayWallet
+      ? await fetchWalletTokenBalances({ wallet: displayWallet, mints })
+      : null;
+
+    const rows: PositionRow[] = [];
+    for (const { symbol, asset, multiplier } of assets) {
       const paperRaw = paperRawFor(symbol);
-      const [asset, multiplier] = await Promise.all([
-        fetchXStockAsset(symbol),
-        fetchXStockMultiplier(symbol),
-      ]);
       const mint = asset.ok ? asset.data.solanaMint : null;
       const [price, onchain] = await Promise.all([
-        mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
+        mint
+          ? fetchJupiterTokenPrice(mint)
+          : Promise.resolve(unavailablePrice("xstock_mint_missing")),
         mint
           ? fetchScaledUiOnchain(mint)
           : Promise.resolve(errResult("solana-rpc.scaled-ui", "mint_missing")),
       ]);
 
+      const walletUi =
+        mint && walletBalances?.ok
+          ? walletBalances.data.byMint[mint]?.uiAmount
+          : undefined;
+      const qtySource: PositionRow["qtySource"] =
+        walletUi != null && Number.isFinite(walletUi) ? "wallet-read" : "paper";
+      const qty = qtySource === "wallet-read" ? (walletUi as number) : paperRaw;
+
       const mult = multiplier.ok ? multiplier.data.currentMultiplier : null;
       const onchainEff = onchain.ok ? onchain.data.effectiveMultiplier : null;
-      const economicShares = mult != null ? paperRaw * mult : null;
+      const economicShares = mult != null ? qty * mult : null;
       const usdPrice = price.ok ? price.data.usdPrice : null;
       const paperValueUsd =
-        economicShares != null && usdPrice != null ? economicShares * usdPrice : null;
+        economicShares != null && usdPrice != null
+          ? economicShares * usdPrice
+          : null;
 
-      const labels = ["paper-qty", "mainnet-read-multiplier"];
+      const labels = [
+        qtySource === "wallet-read" ? "wallet-read-qty" : "paper-qty",
+        "mainnet-read-multiplier",
+      ];
       if (onchain.ok) labels.push("onchain-scaled-ui");
-      if (!auth.ok) labels.push("wallet-unbound");
+      if (!displayWallet) labels.push("wallet-unbound");
+      if (displayWallet && walletBalances && !walletBalances.ok) {
+        labels.push("wallet-read-unavailable");
+      }
 
       let health: PositionRow["health"] = "Unavailable";
       if (multiplier.ok && asset.ok && price.ok) health = "Verified";
@@ -149,7 +209,9 @@ export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
         symbol,
         name: asset.ok ? asset.data.name : symbol,
         mint,
+        qty,
         paperRaw,
+        qtySource,
         multiplier: mult,
         onchainEffectiveMultiplier: onchainEff,
         economicShares,
@@ -160,10 +222,19 @@ export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
       });
     }
 
+    const watch = readWatchWallet();
+    const note = displayWallet
+      ? walletBalances?.ok
+        ? `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). Multipliers/prices live. Watch-wallet ≠ Privy multi-tenant auth.`
+        : `Wallet bound for read but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing paper qty. Multipliers/prices live.`
+      : "Quantities are paper labels until Privy session wallet or watch-wallet bind. Multipliers/prices are live mainnet reads.";
+
     return {
       rows,
-      note: "Quantities are paper labels until Privy wallet binding. Multipliers/prices are live mainnet reads.",
+      note,
       auth,
+      watchWallet: watch.ok ? watch.data.wallet : null,
+      walletBalances,
     };
   },
 );
@@ -190,7 +261,8 @@ export const getCreditBundle = createServerFn({ method: "GET" }).handler(
       if (multiplier.ok && price.ok) {
         const raw = paperRawFor(symbol, 0);
         collateral =
-          (collateral ?? 0) + raw * multiplier.data.currentMultiplier * price.data.usdPrice;
+          (collateral ?? 0) +
+          raw * multiplier.data.currentMultiplier * price.data.usdPrice;
         priced += 1;
       }
     }
@@ -201,7 +273,9 @@ export const getCreditBundle = createServerFn({ method: "GET" }).handler(
       : undefined;
     const maxLtvUsed = aaplReserve?.maxLtv ?? null;
     const illustrativeBorrowUsd =
-      collateral != null && maxLtvUsed != null ? collateral * maxLtvUsed : null;
+      collateral != null && maxLtvUsed != null
+        ? collateral * maxLtvUsed
+        : null;
 
     return {
       kamino,
@@ -227,14 +301,15 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
       fetchXStockAsset(symbol),
     ]);
     const mint = asset.ok ? asset.data.solanaMint : null;
-    const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
+    const decimals =
+      asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
 
     const [wash, jupiterQuote, pools, kamino] = await Promise.all([
-      evaluateWashGate({ symbol, mint, notionalUsd: 100 }),
+      evaluateWashGate({ symbol, mint, notionalUsd: 1 }),
       mint
         ? fetchJupiterQuote({
             outputMint: mint,
-            amountRaw: 100_000_000,
+            amountRaw: 1_000_000,
             outputDecimals: decimals,
           })
         : Promise.resolve(unavailableQuote("mint_missing")),
@@ -257,9 +332,11 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
       },
       {
         at: now,
-        title: jupiterQuote.ok ? "Jupiter route inspected" : "Jupiter quote unavailable",
+        title: jupiterQuote.ok
+          ? "Jupiter route inspected"
+          : "Jupiter quote unavailable",
         detail: jupiterQuote.ok
-          ? `out ${jupiterQuote.data.outUiAmount.toFixed(6)} · quote-only`
+          ? `out ${jupiterQuote.data.outUiAmount.toFixed(6)} · quote-only · $1 USDC`
           : jupiterQuote.reason,
         tone: jupiterQuote.ok ? "blue" : "amber",
         mode: jupiterQuote.ok ? jupiterQuote.mode : "unavailable",
@@ -275,7 +352,9 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
       },
       {
         at: now,
-        title: kamino.ok ? "Kamino xStocks market read" : "Kamino read unavailable",
+        title: kamino.ok
+          ? "Kamino xStocks market read"
+          : "Kamino read unavailable",
         detail: kamino.ok
           ? `${kamino.data.reserves.length} reserves · borrow CPI not broadcast`
           : kamino.reason,
@@ -284,8 +363,12 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
       },
       {
         at: now,
-        title: pools.ok ? `Raydium pools for ${symbol}` : "Pool awareness unavailable",
-        detail: pools.ok ? `${pools.data.raydium.length} pools observed` : pools.reason,
+        title: pools.ok
+          ? `Raydium pools for ${symbol}`
+          : "Pool awareness unavailable",
+        detail: pools.ok
+          ? `${pools.data.raydium.length} pools observed`
+          : pools.reason,
         tone: pools.ok ? "neutral" : "amber",
         mode: pools.ok ? pools.mode : "unavailable",
       },
@@ -302,9 +385,12 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<SessionBundle> => {
     const session = readVerifiedSession();
     const auth = getAuthProviderStatus(session.ok ? session : null);
-    const tenantId = session.ok ? (session.data.tenants[0]?.tenantId ?? null) : null;
+    const tenantId = session.ok
+      ? (session.data.tenants[0]?.tenantId ?? null)
+      : null;
     const userId = session.ok ? session.data.userId : null;
     const preferences = await loadDeskPreferences(tenantId, userId);
+    const watch = readWatchWallet();
     return {
       auth,
       session,
@@ -315,6 +401,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         broadcast: !isBroadcastPaused(),
         customProgramDeploy: false,
       },
+      watchWallet: watch.ok ? watch.data.wallet : null,
     };
   },
 );
@@ -333,18 +420,23 @@ const PrivySessionInput = z.object({
 });
 
 /**
- * Exchange a Privy access token for an httpOnly folio_session cookie value.
+ * Exchange a Privy access token for an httpOnly folio_session cookie.
  * Fail-closed when keys missing or Privy rejects the token.
- * Sets httpOnly folio_session via setCookie — never localStorage.
  */
 export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
   .validator(PrivySessionInput)
   .handler(async ({ data }) => {
     const identity = await verifyPrivyAccessToken(data.accessToken);
     if (!identity.ok) {
-      return errResult("folio.session.privy", identity.reason, identity.detail);
+      return errResult(
+        "folio.session.privy",
+        identity.reason,
+        identity.detail,
+      );
     }
-    const tenantsRes = await resolveTenantMemberships({ userId: identity.data.userId });
+    const tenantsRes = await resolveTenantMemberships({
+      userId: identity.data.userId,
+    });
     const tenants = tenantsRes.ok ? tenantsRes.data : [];
     const minted = mintFolioSession({
       userId: identity.data.userId,
@@ -354,7 +446,6 @@ export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
     if (!minted.ok) {
       return errResult("folio.session.privy", minted.reason, minted.detail);
     }
-    // Bind httpOnly cookie on the response — never localStorage.
     setCookie(FOLIO_SESSION_COOKIE, minted.data.cookieValue, {
       path: "/",
       httpOnly: true,
@@ -362,23 +453,94 @@ export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
       maxAge: 60 * 60 * 12,
       secure: process.env["NODE_ENV"] === "production",
     });
-    return okResult("mainnet-read", "folio.session.privy", {
-      session: minted.data.session,
-      note: tenants.length
-        ? `httpOnly folio_session set · ${tenants.length} tenant membership(s) resolved`
-        : "httpOnly folio_session set · no tenant memberships resolved (fail-closed empty)",
-    });
+    return {
+      ok: true as const,
+      mode: "mainnet-read" as const,
+      asOf: new Date().toISOString(),
+      source: "folio.session.privy",
+      data: {
+        session: minted.data.session,
+        note: tenants.length
+          ? `httpOnly folio_session set · ${tenants.length} tenant membership(s) resolved`
+          : "httpOnly folio_session set · no tenant memberships resolved (fail-closed empty)",
+      },
+    };
   });
 
+export const clearFolioSession = createServerFn({ method: "POST" }).handler(
+  async () => {
+    try {
+      deleteCookie(FOLIO_SESSION_COOKIE, { path: "/" });
+      return {
+        ok: true as const,
+        mode: "mainnet-read" as const,
+        asOf: new Date().toISOString(),
+        source: "folio.session.clear",
+        data: {
+          cleared: true as const,
+          note: "httpOnly folio_session cleared — no localStorage residue.",
+        },
+      };
+    } catch (e) {
+      return errResult("folio.session.clear", "clear_failed", String(e));
+    }
+  },
+);
 
-export const clearFolioSession = createServerFn({ method: "POST" }).handler(async () => {
-  try {
-    deleteCookie(FOLIO_SESSION_COOKIE, { path: "/" });
-    return okResult("mainnet-read", "folio.session.clear", {
-      cleared: true as const,
-      note: "httpOnly folio_session cleared — no localStorage residue.",
-    });
-  } catch (e) {
-    return errResult("folio.session.clear", "clear_failed", String(e));
-  }
+const WatchWalletInput = z.object({
+  wallet: z.string().min(32).max(64),
 });
+
+/**
+ * Bind an optional httpOnly watch-wallet for mainnet-read position qty.
+ * Requires FOLIO_SESSION_SECRET only — NOT Privy multi-tenant auth.
+ */
+export const bindWatchWallet = createServerFn({ method: "POST" })
+  .validator(WatchWalletInput)
+  .handler(async ({ data }) => {
+    const minted = mintWatchWalletCookie(data.wallet);
+    if (!minted.ok) {
+      return errResult(
+        "folio.watch-wallet.bind",
+        minted.reason,
+        minted.detail,
+      );
+    }
+    setCookie(FOLIO_WATCH_WALLET_COOKIE, minted.data.cookieValue, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      secure: process.env["NODE_ENV"] === "production",
+    });
+    return {
+      ok: true as const,
+      mode: "mainnet-read" as const,
+      asOf: new Date().toISOString(),
+      source: "folio.watch-wallet.bind",
+      data: {
+        wallet: minted.data.wallet,
+        note: "Watch-wallet bound for mainnet-read qty. Not a Privy session.",
+      },
+    };
+  });
+
+export const clearWatchWallet = createServerFn({ method: "POST" }).handler(
+  async () => {
+    try {
+      deleteCookie(FOLIO_WATCH_WALLET_COOKIE, { path: "/" });
+      return {
+        ok: true as const,
+        mode: "mainnet-read" as const,
+        asOf: new Date().toISOString(),
+        source: "folio.watch-wallet.clear",
+        data: {
+          cleared: true as const,
+          note: "Watch-wallet cookie cleared.",
+        },
+      };
+    } catch (e) {
+      return errResult("folio.watch-wallet.clear", "clear_failed", String(e));
+    }
+  },
+);

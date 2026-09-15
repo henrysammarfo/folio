@@ -38,7 +38,9 @@ function Page() {
     >
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Mainnet read</ModeBadge>
-        <ModeBadge mode="paper">Paper qty</ModeBadge>
+        <ModeBadge mode={row?.qtySource === "wallet-read" ? "mainnet-read" : "paper"}>
+          {row?.qtySource === "wallet-read" ? "Wallet-read qty" : "Paper qty"}
+        </ModeBadge>
       </div>
       <Panel
         title={row?.name ?? symbol}
@@ -49,7 +51,14 @@ function Page() {
         ) : (
           <div className="policy-list">
             <p>
-              <span>Paper raw</span>
+              <span>Display qty</span>
+              <b>
+                {row.qty.toFixed(4)}{" "}
+                <small>({row.qtySource === "wallet-read" ? "wallet-read" : "paper"})</small>
+              </b>
+            </p>
+            <p>
+              <span>Paper raw (fallback)</span>
               <b>{row.paperRaw.toFixed(4)}</b>
             </p>
             <p>

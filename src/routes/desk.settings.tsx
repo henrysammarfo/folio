@@ -7,7 +7,9 @@ import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
 import { Switch } from "@/components/ui/switch";
 import {
+  bindWatchWallet,
   clearFolioSession,
+  clearWatchWallet,
   createSessionFromPrivyToken,
   getSessionBundle,
   runDeskAgent,
@@ -32,6 +34,8 @@ function Page() {
   const runAgent = useServerFn(runDeskAgent);
   const createSession = useServerFn(createSessionFromPrivyToken);
   const clearSession = useServerFn(clearFolioSession);
+  const bindWatch = useServerFn(bindWatchWallet);
+  const clearWatch = useServerFn(clearWatchWallet);
   const { data, refetch } = useQuery({
     queryKey: ["session-bundle"],
     queryFn: () => fetchSession(),
@@ -43,6 +47,9 @@ function Page() {
   const [privyToken, setPrivyToken] = useState("");
   const [sessionMsg, setSessionMsg] = useState<string>("");
   const [sessionBusy, setSessionBusy] = useState(false);
+  const [watchWalletInput, setWatchWalletInput] = useState("");
+  const [watchMsg, setWatchMsg] = useState("");
+  const [watchBusy, setWatchBusy] = useState(false);
   const tenants = data?.session.ok ? data.session.data.tenants : [];
 
   return (
@@ -223,6 +230,80 @@ function Page() {
             Clear httpOnly session
           </button>
         </div>
+      </Panel>
+
+      
+      <Panel
+        title="Watch wallet (mainnet-read qty)"
+        meta={<StatusBadge tone="amber">Not Privy auth</StatusBadge>}
+      >
+        <p className="mb-3 text-sm opacity-80">
+          Bind a Solana pubkey for mainnet token-balance reads on Positions. Requires{" "}
+          <code>FOLIO_SESSION_SECRET</code> only — this is <b>not</b> multi-tenant Privy auth.
+          Currently:{" "}
+          {data?.watchWallet ? (
+            <code>{data.watchWallet.slice(0, 4)}…{data.watchWallet.slice(-4)}</code>
+          ) : (
+            "none"
+          )}
+        </p>
+        <div className="form-grid">
+          <label>
+            Wallet pubkey
+            <input
+              value={watchWalletInput}
+              onChange={(e) => setWatchWalletInput(e.target.value)}
+              placeholder="Base58 pubkey"
+              autoComplete="off"
+            />
+          </label>
+          <button
+            type="button"
+            className="wallet-pill"
+            disabled={watchBusy || !watchWalletInput.trim()}
+            onClick={async () => {
+              setWatchBusy(true);
+              setWatchMsg("");
+              try {
+                const res = await bindWatch({ data: { wallet: watchWalletInput.trim() } });
+                if (res.ok) {
+                  setWatchMsg(res.data.note);
+                  setWatchWalletInput("");
+                  await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+                  await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
+                  await refetch();
+                } else {
+                  setWatchMsg(`${res.reason}${res.detail ? ` — ${res.detail}` : ""}`);
+                }
+              } finally {
+                setWatchBusy(false);
+              }
+            }}
+          >
+            {watchBusy ? "Binding…" : "Bind watch wallet"}
+          </button>
+          <button
+            type="button"
+            className="wallet-pill"
+            disabled={watchBusy || !data?.watchWallet}
+            onClick={async () => {
+              setWatchBusy(true);
+              setWatchMsg("");
+              try {
+                const res = await clearWatch();
+                setWatchMsg(res.ok ? res.data.note : "Failed to clear watch wallet");
+                await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+                await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
+                await refetch();
+              } finally {
+                setWatchBusy(false);
+              }
+            }}
+          >
+            Clear watch wallet
+          </button>
+        </div>
+        {watchMsg ? <p className="mt-3 text-sm">{watchMsg}</p> : null}
       </Panel>
 
       <Panel title="Paper agent" meta={<StatusBadge tone="blue">Caps · no broadcast</StatusBadge>}>

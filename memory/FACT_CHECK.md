@@ -52,3 +52,19 @@ Source: https://hackathons.solana.com/hackathons/stocklana (Tavily)
 | Judging | through 2 Oct 2026 | Confirmed |
 
 Do **not** quote older ~500/57 registration counts.
+
+
+## Live Stocklana re-check (2026-09-15 16:45 UTC)
+
+Sources: https://hackathons.solana.com/hackathons/stocklana (jina/WebFetch live page) + Tavily index (may lag)
+
+| Claim | Live value | Status |
+|---|---|---|
+| Prize pool (hero total) | **$115,000** | Confirmed on live page (main track still lists $100,000 + bounty tracks) |
+| Registered | **528** | Confirmed live page (Tavily index still showed 145 — do not invent; prefer live page) |
+| Submissions | **67** | Confirmed live page (Tavily index still showed 12) |
+| Deadline (hero) | **SEP 25, 2026** | Confirmed on live hero; timeline text may still mention Fri 18 Sep 4pm ET — **re-check at submit** |
+| AAPLx multiplier | ≈ **1.00327** | Confirmed via api.xstocks.fi |
+| Token program IDs | Tokenkeg… / TokenzQd… | Confirmed executable on mainnet RPC |
+
+Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.

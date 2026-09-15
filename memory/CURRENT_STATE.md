@@ -47,7 +47,7 @@ World’s Fair still wins on **working honesty**: live multiplier + wash refuse 
 ## Keys
 
 Present in `.env`: Tavily, TinyFish, AgentRouter, 21st, Shaders, Solana RPC.
-Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated).
+Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESSION_SECRET` set locally for watch-wallet + session signing readiness.
 **Rotate all chat-pasted keys after hackathon.**
 
 ## Live deltas (do not regress)
@@ -74,3 +74,12 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated).
 - Yahoo leftovers removed; `/execution` copy softened (no false Pass theater).
 - Premium UI still approve-gated on `/lab/*` — awaiting Henry candidate id.
 - Keys still empty: Privy / Supabase / Bitquery / FOLIO_SESSION_SECRET.
+
+
+## Latest progress (2026-09-15)
+
+- Watch-wallet httpOnly cookie + mainnet SPL/Token-2022 balance reads wired into Positions (qtySource wallet-read | paper).
+- Settings: bind/clear watch wallet (requires FOLIO_SESSION_SECRET; **not** Privy multi-tenant auth).
+- Stocklana live counts refreshed: **528 registered / 67 submissions / $115k hero pool**; deadline hero SEP 25 (re-check timeline vs hero at submit).
+- Broadcast still paused; Privy/Supabase/Bitquery still empty → wash + multi-tenant sessions remain fail-closed.
+- Premium UI still approve-gated on `/lab/*`.

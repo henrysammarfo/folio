@@ -7,7 +7,7 @@
 | B002 | Med | AgentRouter may return Aliyun WAF HTML from some cloud IPs — treat non-JSON as fail-closed. |
 | B003 | Med | TinyFish Agent automation needs credits; Search path preferred. |
 | B004 | Med | Public Solana RPC may rate-limit — prefer dedicated `SOLANA_RPC_URL` when provided. |
-| B006 | Med | Privy/Supabase/Bitquery keys still empty — wash + multi-tenant sessions stay fail-closed until Henry lands keys. |
+| B006 | Med | Privy/Supabase/Bitquery keys still empty — wash + multi-tenant sessions stay fail-closed until Henry lands keys. Watch-wallet mainnet-read qty path works with FOLIO_SESSION_SECRET alone (not multi-tenant auth). |
 | B007 | Low | Premium UI candidates remain on `/lab/*` until Henry approves an id. |
 
 ## Closed
