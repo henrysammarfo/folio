@@ -16,6 +16,7 @@ import { Route as DeskRouteImport } from './routes/desk'
 import { Route as ExecutionRouteImport } from './routes/execution'
 import { Route as NetworkRouteImport } from './routes/network'
 import { Route as TruthRouteImport } from './routes/truth'
+import { Route as DeskIndexRouteImport } from './routes/desk.index'
 import { Route as DeskAcquireRouteImport } from './routes/desk.acquire'
 import { Route as DeskActivityRouteImport } from './routes/desk.activity'
 import { Route as DeskCreditRouteImport } from './routes/desk.credit'
@@ -57,6 +58,11 @@ const TruthRoute = TruthRouteImport.update({
   id: '/truth',
   path: '/truth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DeskIndexRoute = DeskIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DeskRoute,
 } as any)
 const DeskAcquireRoute = DeskAcquireRouteImport.update({
   id: '/acquire',
@@ -102,13 +108,13 @@ export interface FileRoutesByFullPath {
   '/desk/credit': typeof DeskCreditRoute
   '/desk/positions': typeof DeskPositionsRouteWithChildren
   '/desk/settings': typeof DeskSettingsRoute
+  '/desk/': typeof DeskIndexRoute
   '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/credit': typeof CreditRoute
-  '/desk': typeof DeskRouteWithChildren
   '/execution': typeof ExecutionRoute
   '/network': typeof NetworkRoute
   '/truth': typeof TruthRoute
@@ -117,6 +123,7 @@ export interface FileRoutesByTo {
   '/desk/credit': typeof DeskCreditRoute
   '/desk/positions': typeof DeskPositionsRouteWithChildren
   '/desk/settings': typeof DeskSettingsRoute
+  '/desk': typeof DeskIndexRoute
   '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
 }
 export interface FileRoutesById {
@@ -133,6 +140,7 @@ export interface FileRoutesById {
   '/desk/credit': typeof DeskCreditRoute
   '/desk/positions': typeof DeskPositionsRouteWithChildren
   '/desk/settings': typeof DeskSettingsRoute
+  '/desk/': typeof DeskIndexRoute
   '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
 }
 export interface FileRouteTypes {
@@ -150,13 +158,13 @@ export interface FileRouteTypes {
     | '/desk/credit'
     | '/desk/positions'
     | '/desk/settings'
+    | '/desk/'
     | '/desk/positions/$symbol'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/credit'
-    | '/desk'
     | '/execution'
     | '/network'
     | '/truth'
@@ -165,6 +173,7 @@ export interface FileRouteTypes {
     | '/desk/credit'
     | '/desk/positions'
     | '/desk/settings'
+    | '/desk'
     | '/desk/positions/$symbol'
   id:
     | '__root__'
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/desk/credit'
     | '/desk/positions'
     | '/desk/settings'
+    | '/desk/'
     | '/desk/positions/$symbol'
   fileRoutesById: FileRoutesById
 }
@@ -244,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TruthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/desk/': {
+      id: '/desk/'
+      path: '/'
+      fullPath: '/desk/'
+      preLoaderRoute: typeof DeskIndexRouteImport
+      parentRoute: typeof DeskRoute
+    }
     '/desk/acquire': {
       id: '/desk/acquire'
       path: '/acquire'
@@ -307,6 +324,7 @@ interface DeskRouteChildren {
   DeskCreditRoute: typeof DeskCreditRoute
   DeskPositionsRoute: typeof DeskPositionsRouteWithChildren
   DeskSettingsRoute: typeof DeskSettingsRoute
+  DeskIndexRoute: typeof DeskIndexRoute
 }
 
 const DeskRouteChildren: DeskRouteChildren = {
@@ -315,6 +333,7 @@ const DeskRouteChildren: DeskRouteChildren = {
   DeskCreditRoute: DeskCreditRoute,
   DeskPositionsRoute: DeskPositionsRouteWithChildren,
   DeskSettingsRoute: DeskSettingsRoute,
+  DeskIndexRoute: DeskIndexRoute,
 }
 
 const DeskRouteWithChildren = DeskRoute._addFileChildren(DeskRouteChildren)
