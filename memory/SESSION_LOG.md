@@ -291,3 +291,7 @@
 ## 2026-09-15 — Network matrix membership + role-gate honesty
 - Matrix rows for membership wallet priority + role-gated prefs.
 - Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Pyth Equity.US/Crypto.xStock + RLS writer policies
+- Dual Pyth references on truth; desk_prefs RLS owner/trader write; Stocklana **546**/72/$121k.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase(+JWT); broadcast paused.

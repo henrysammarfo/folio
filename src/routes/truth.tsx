@@ -66,7 +66,16 @@ function Page() {
                 : "Jupiter price live"}
         </ModeBadge>
         <ModeBadge mode={data?.pyth.ok ? data.pyth.mode : "unavailable"}>
-          {data?.pyth.ok ? "Pyth live" : "Pyth unavailable"}
+          {data?.pyth.ok
+            ? data.pyth.data.feedSymbol?.startsWith("Equity.US.")
+              ? "Pyth Equity.US"
+              : "Pyth equity live"
+            : "Pyth equity unavailable"}
+        </ModeBadge>
+        <ModeBadge mode={data?.pythXStock.ok ? data.pythXStock.mode : "unavailable"}>
+          {data?.pythXStock.ok
+            ? data.pythXStock.data.feedSymbol ?? "Pyth Crypto.xStock"
+            : "Pyth Crypto.xStock off"}
         </ModeBadge>
       </div>
 
@@ -178,6 +187,20 @@ function Page() {
                 : mult?.ok
                   ? " none on live feed (no invented calendar)"
                   : " unavailable"}
+            </span>
+          </li>
+          <li>
+            <Database />
+            <span>
+              <b>Pyth references</b>
+              {data?.pyth.ok
+                ? ` ${data.pyth.data.feedSymbol ?? "Equity.US"} $${data.pyth.data.price.toFixed(2)}`
+                : data?.pyth && !data.pyth.ok
+                  ? ` equity ${data.pyth.reason}`
+                  : " equity unavailable"}
+              {data?.pythXStock.ok
+                ? ` · ${data.pythXStock.data.feedSymbol ?? "Crypto.xStock"} $${data.pythXStock.data.price.toFixed(2)} (secondary)`
+                : " · Crypto.xStock secondary off until keyed/mapped"}
             </span>
           </li>
           <li>

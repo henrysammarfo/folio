@@ -325,3 +325,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 ## 2026-09-15 — Network matrix membership + role-gate rows
 - Matrix documents membership→session→watch→inspect qty priority and owner/trader prefs write (viewer fail-closed).
 - Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase (+ JWT) · funded broadcast.
+
+## 2026-09-15 — Pyth Equity.US + Crypto.xStock + RLS role write
+- Hermes maps Equity.US AAPL/NVDA/TSLA + Crypto.AAPLX/NVDAX/TSLAX; `/truth` surfaces both (diverge still Equity vs Jupiter).
+- Supabase desk_prefs RLS: select self; insert/update/delete require owner/trader.
+- Stocklana live re-check: **546** / **72** / **$121k**. Vitest **99** green. Still blocked: Henry lab id · keys · funded broadcast.

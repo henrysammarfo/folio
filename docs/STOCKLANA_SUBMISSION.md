@@ -2,7 +2,7 @@
 
 Re-check live counts on https://hackathons.solana.com/hackathons/stocklana before final submit.
 
-**Live (2026-09-15 WebFetch):** **545** registered · **72** submissions · hero prize **$121,000** · hero deadline **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET** — confirm which the form uses at submit.
+**Live (2026-09-15 WebFetch):** **546** registered · **72** submissions · hero prize **$121,000** · hero deadline **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET** — confirm which the form uses at submit.
 
 ## Form fields (paste)
 
@@ -24,7 +24,7 @@ FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after
 4. Settings readiness: `…/desk/settings` (secret set · wash/Pyth/Privy/Supabase fail-closed)
 5. Demo script: `docs/DEMO_SCRIPT.md`
 
-**Track fit:** Investing / credit & yield / infrastructure (honest price + corporate-action truth + borrow reads)
+**Track fit:** Investing / credit & yield / infrastructure (honest price + corporate-action truth + borrow reads). **Pyth bounty:** Equity.US.* vs Jupiter venue diverge on `/truth` + acquire; Crypto.{SYM}X/USD labeled secondary when keyed.
 
 ## Henry blockers before “production complete”
 

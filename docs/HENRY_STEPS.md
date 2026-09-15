@@ -66,6 +66,9 @@ Optional same sitting (unlocks Pyth diverge vs Jupiter):
 | `SUPABASE_URL` | Project settings → API |
 | `SUPABASE_ANON_KEY` | Project settings → API |
 | `SUPABASE_SERVICE_ROLE_KEY` | Project settings → API (server only — never expose to browser) |
+| `SUPABASE_JWT_SECRET` | Project settings → API → **JWT Secret** (≥16) |
+
+`SUPABASE_JWT_SECRET` arms the user-JWT RLS path (`sub` = Privy DID). Without it FOLIO keeps a labeled service-role fallback. Desk prefs RLS: viewers read-only; owner/trader write.
 
 Run migration `supabase/migrations/*folio_tenants*` when keys land. Optional seed: `supabase/seed/demo_tenant.sql`.
 

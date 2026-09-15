@@ -49,7 +49,7 @@ Verify: Settings auth badge still fail-closed until Supabase lands (both require
 | `SUPABASE_SERVICE_ROLE_KEY` | Project settings → API (**server only** · labeled fallback) |
 | `SUPABASE_JWT_SECRET` | Project settings → API → **JWT Secret** (≥16) |
 
-`SUPABASE_JWT_SECRET` arms the **user-JWT RLS path**: server mints short-lived HS256 JWTs with `sub` = Privy DID so PostgREST policies (`auth.jwt() ->> 'sub'`) authorize tenants/prefs. Without it, FOLIO keeps a labeled **service-role** fallback (not end-user authz).
+`SUPABASE_JWT_SECRET` arms the **user-JWT RLS path**: server mints short-lived HS256 JWTs with `sub` = Privy DID so PostgREST policies (`auth.jwt() ->> 'sub'`) authorize tenants/prefs. Desk prefs write policies require owner/trader membership (viewers read-only). Without the JWT secret, FOLIO keeps a labeled **service-role** fallback (not end-user authz).
 
 Then:
 

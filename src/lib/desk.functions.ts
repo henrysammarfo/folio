@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
-import { divergeBps, fetchPythEquityPrice } from "./adapters/pyth";
+import { divergeBps, fetchPythEquityPrice, fetchPythXStockUsdPrice } from "./adapters/pyth";
 import { fetchJupiterQuote, fetchJupiterTokenPrice } from "./adapters/jupiter";
 import { evaluateWashGate, washAllowsSize } from "./adapters/wash";
 import { buildAcquireGateMessages } from "./acquire-gates";
@@ -64,7 +64,10 @@ export type TruthBundle = {
   symbol: string;
   asset: AdapterResult<XStockAsset>;
   multiplier: AdapterResult<XStockMultiplier>;
+  /** Equity.US.* Hermes reference (Stocklana Pyth bounty primary). */
   pyth: AdapterResult<PythPrice>;
+  /** Crypto.{SYM}X/USD Hermes reference — labeled secondary; not a solo gate. */
+  pythXStock: AdapterResult<PythPrice>;
   jupiterPrice: AdapterResult<JupiterTokenPrice>;
   diverge: {
     pass: boolean | null;
@@ -134,8 +137,9 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       (asset.ok ? asset.data.underlyingSymbol : symbol.replace(/x$/i, "").toUpperCase()) ||
       "AAPL";
     const mint = asset.ok ? asset.data.solanaMint : null;
-    const [pyth, jupiterPrice] = await Promise.all([
+    const [pyth, pythXStock, jupiterPrice] = await Promise.all([
       fetchPythEquityPrice(underlying),
+      fetchPythXStockUsdPrice(symbol),
       mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
     ]);
 
@@ -146,13 +150,17 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       note: "Need two live references to score diverge",
     };
 
+    const xStockNote = pythXStock.ok
+      ? ` · ${pythXStock.data.feedSymbol ?? "Crypto.xStock/USD"} live (secondary)`
+      : "";
+
     if (pyth.ok && jupiterPrice.ok) {
       const d = divergeBps(pyth.data.price, jupiterPrice.data.usdPrice, 75);
       diverge = {
         pass: d.pass,
         divergeBps: d.divergeBps,
         bandBps: d.bandBps,
-        note: `Pyth ${underlying} vs Jupiter venue`,
+        note: `${pyth.data.feedSymbol ?? `Pyth ${underlying}`} vs Jupiter venue${xStockNote}`,
       };
     } else if (
       jupiterPrice.ok &&
@@ -168,14 +176,14 @@ export const getTruthBundle = createServerFn({ method: "GET" })
         pass: d.pass,
         divergeBps: d.divergeBps,
         bandBps: d.bandBps,
-        note: "Jupiter stockData vs Jupiter venue (Pyth Hermes price updates unavailable on this egress)",
+        note: `Jupiter stockData vs Jupiter venue (Pyth Hermes price updates unavailable on this egress)${xStockNote}`,
       };
     } else if (!pyth.ok) {
       diverge = {
         pass: null,
         divergeBps: null,
         bandBps: 75,
-        note: `Pyth unavailable: ${pyth.reason}`,
+        note: `Pyth unavailable: ${pyth.reason}${xStockNote}`,
       };
     }
 
@@ -189,6 +197,7 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       asset,
       multiplier,
       pyth,
+      pythXStock,
       jupiterPrice,
       diverge,
       paperRaw,

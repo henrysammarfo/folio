@@ -4,7 +4,7 @@
 |---|---|---|
 | xStocks multiplier + asset | mainnet-read | api.xstocks.fi `network=Solana` |
 | On-chain Scaled UI | mainnet-read | Token-2022 via SOLANA_RPC_URL (or labeled public RPC fallback) |
-| Pyth Hermes equity | unavailable / mainnet-read | Price updates need `PYTH_API_KEY` — fail-closed |
+| Pyth Hermes equity | unavailable / mainnet-read | Equity.US.* (+ Crypto.xStock/USD secondary) · `PYTH_API_KEY` fail-closed |
 | Jupiter Price v3 | mainnet-read | Venue + optional stockData · TTL 30s · stale≤120s on 429 |
 | Jupiter swap quote | quote-only | No broadcast · TTL 20s · stale≤120s on 429 |
 | Raydium pool awareness | mainnet-read | Awareness only · not a route guarantee · wash still required |

@@ -147,3 +147,6 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Acquire wash “Heuristic clear” when Bitquery keyed | SUPERSEDED | Label now “Tape clear” | 2026-09-15 |
 | Viewer can save desk prefs | REJECTED | prefsWriteBlockedReason + updateDeskPreferences prefs_role_denied; settings switches disabled | 2026-09-15 |
 | Qty binding invents foreign pubkey over membership wallet | REJECTED | resolveWalletBinding: membership → session → watch → inspect | 2026-09-15 |
+| Stocklana registered **546** / submissions **72** / prize **$121,000** | CONFIRMED live (re-check) | hackathons.solana.com WebFetch; deadline hero SEP 25 vs timeline 18 Sep 16:00 ET | 2026-09-15 |
+| Pyth diverge uses Equity.US.* vs Jupiter; Crypto.xStock/USD secondary | CONFIRMED (code) | `equityUsFeedId` + `fetchPythXStockUsdPrice`; gate still equity↔venue | 2026-09-15 |
+| Viewer can upsert desk_preferences via user-JWT RLS alone | REJECTED | desk_prefs_writer_* policies require owner/trader membership | 2026-09-15 |

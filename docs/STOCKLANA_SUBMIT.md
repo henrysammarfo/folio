@@ -9,10 +9,11 @@ Budget: ≤~$1 · Broadcast: paused
 
 Source: https://hackathons.solana.com/hackathons/stocklana
 
-- Registered: **545**
+- Registered: **546**
 - Submissions: **72**
 - Prize pool hero: **$121,000** (Foundation main track $100k + bounty tracks)
 - Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)** — confirm which the form uses at submit
+- Bounty note: Pyth market-data track — FOLIO diverge uses Equity.US.* vs Jupiter; Crypto.xStock/USD secondary on `/truth`
 
 Do not invent newer counts — refresh the page before the submission form.
 Paste pack: `docs/STOCKLANA_SUBMISSION.md`

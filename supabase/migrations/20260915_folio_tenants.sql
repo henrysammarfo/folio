@@ -54,6 +54,51 @@ create policy tenants_member_select on public.tenants
 create policy tenant_members_self_select on public.tenant_members
   for select using (user_id = coalesce(auth.jwt() ->> 'sub', ''));
 
-create policy desk_prefs_self_all on public.desk_preferences
-  for all using (user_id = coalesce(auth.jwt() ->> 'sub', ''))
-  with check (user_id = coalesce(auth.jwt() ->> 'sub', ''));
+-- Desk prefs: any member may read their own row; only owner/trader may write.
+-- Mirrors src/lib/auth/role-gates.ts — viewers fail-closed at RLS + app.
+drop policy if exists desk_prefs_self_all on public.desk_preferences;
+
+create policy desk_prefs_self_select on public.desk_preferences
+  for select using (user_id = coalesce(auth.jwt() ->> 'sub', ''));
+
+create policy desk_prefs_writer_insert on public.desk_preferences
+  for insert with check (
+    user_id = coalesce(auth.jwt() ->> 'sub', '')
+    and exists (
+      select 1 from public.tenant_members m
+      where m.tenant_id = desk_preferences.tenant_id
+        and m.user_id = coalesce(auth.jwt() ->> 'sub', '')
+        and m.role in ('owner', 'trader')
+    )
+  );
+
+create policy desk_prefs_writer_update on public.desk_preferences
+  for update using (
+    user_id = coalesce(auth.jwt() ->> 'sub', '')
+    and exists (
+      select 1 from public.tenant_members m
+      where m.tenant_id = desk_preferences.tenant_id
+        and m.user_id = coalesce(auth.jwt() ->> 'sub', '')
+        and m.role in ('owner', 'trader')
+    )
+  )
+  with check (
+    user_id = coalesce(auth.jwt() ->> 'sub', '')
+    and exists (
+      select 1 from public.tenant_members m
+      where m.tenant_id = desk_preferences.tenant_id
+        and m.user_id = coalesce(auth.jwt() ->> 'sub', '')
+        and m.role in ('owner', 'trader')
+    )
+  );
+
+create policy desk_prefs_writer_delete on public.desk_preferences
+  for delete using (
+    user_id = coalesce(auth.jwt() ->> 'sub', '')
+    and exists (
+      select 1 from public.tenant_members m
+      where m.tenant_id = desk_preferences.tenant_id
+        and m.user_id = coalesce(auth.jwt() ->> 'sub', '')
+        and m.role in ('owner', 'trader')
+    )
+  );

@@ -59,7 +59,7 @@ export function buildNetworkMatrix(input: {
       capability: "Pyth Hermes equity reference",
       mode: modeOf(input.pyth),
       detail: input.pyth.ok
-        ? input.pyth.source
+        ? `${input.pyth.source} · Equity.US.* (+ Crypto.xStock/USD secondary on /truth)`
         : `${detailOf(input.pyth)} (PYTH_API_KEY required since Hermes Aug 2026 auth — fail-closed)`,
     },
     {
