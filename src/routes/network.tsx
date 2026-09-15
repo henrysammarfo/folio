@@ -52,7 +52,7 @@ function Page() {
     <PublicShell
       eyebrow="Network matrix"
       title="No blurred lines between demo and live."
-      intro="Stocklana + Colosseum World’s Fair path: mainnet READ for truth, Jupiter quote-only, local fork for CPI proofs. Custom mainnet program deploy is out of the ≤~$1 budget. Broadcast stays paused until funded and explicitly confirmed."
+      intro="Stocklana + Colosseum World’s Fair path: mainnet READ for truth, Jupiter quote-only, borrow CPI unavailable until funded (no fork harness on this budget). Custom mainnet program deploy is out of the ≤~$1 budget. Broadcast stays paused until funded and explicitly confirmed."
     >
       <div className="mb-4 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Mainnet-primary truth</ModeBadge>

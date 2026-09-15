@@ -207,3 +207,9 @@
 - Lab approve panel: Pick → localStorage + chat reply copy; Preview on desk is session-only (not a merge).
 - DeskShell banner + density/shader data attrs; settings shows picked ids; e2e covers pick→preview→exit.
 - Goal still open — Henry must reply with lab id in chat before premium merge; keys still missing.
+
+## 2026-09-15 — Prefs write + tenant enrich + paper spine + borrow honesty
+- Softened borrow CPI honesty: unavailable until funded (no fork harness theater).
+- Multi-tenant: `saveDeskPreferences` upsert; settings switches when session+tenant; membership shows slug/display/wallet.
+- Paper agent always runs live Block 0 truth/quote spine with `broadcast=false`; AgentRouter optional.
+- Still waiting on Henry: lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

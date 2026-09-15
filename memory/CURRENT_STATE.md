@@ -21,7 +21,7 @@
 | Kamino xStocks / Jupiter Lend earn / Raydium pools | **Mainnet READ** (labeled) |
 | NestUSD capacity | **Unavailable** until verified endpoint |
 | Swap / borrow broadcast | **Disabled** (≤~$1 budget) |
-| Borrow CPI proofs | **Local mainnet-fork** when unfunded |
+| Borrow CPI proofs | **Unavailable until funded** (no fork harness shipped) |
 | Custom program mainnet deploy | **Out** (rent ≫ $1) |
 | Optional policy harness | Devnet OK if labeled |
 
@@ -232,3 +232,10 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Settings readiness shows picked ids when present; HENRY_STEPS Step 0 updated.
 - Unit 53 green; block0 e2e 14 green (includes pick → preview → exit).
 - Still blocked for full objective: Henry chat lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Prefs write + tenant enrich + paper spine + borrow honesty
+- Softened borrow CPI copy: **unavailable until funded** (no local fork harness theater).
+- `saveDeskPreferences` upsert + settings switches enabled when httpOnly session has a tenant.
+- Tenant resolve embeds `slug` / `display_name` / `wallet_address` into session memberships.
+- Paper agent always hits live Block 0 truth/quote spine (`broadcast=false`); AgentRouter optional NL only.
+- Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

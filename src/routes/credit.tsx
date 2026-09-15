@@ -105,7 +105,7 @@ function Page() {
         />
         <Metric
           label="Borrow execution"
-          value="Fork / off"
+          value="Off / unavailable"
           detail={data?.borrowExecution ?? "Unfunded ≤~$1 budget"}
         />
       </div>

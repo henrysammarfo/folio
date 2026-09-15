@@ -13,6 +13,7 @@ import {
   createSessionFromPrivyToken,
   getSessionBundle,
   runDeskAgent,
+  updateDeskPreferences,
 } from "@/lib/desk.functions";
 import { readLabShaderPick, readLabUiPick } from "@/lib/lab-pick";
 
@@ -36,6 +37,7 @@ function Page() {
   const queryClient = useQueryClient();
   const fetchSession = useServerFn(getSessionBundle);
   const runAgent = useServerFn(runDeskAgent);
+  const savePrefs = useServerFn(updateDeskPreferences);
   const createSession = useServerFn(createSessionFromPrivyToken);
   const clearSession = useServerFn(clearFolioSession);
   const bindWatch = useServerFn(bindWatchWallet);
@@ -58,7 +60,40 @@ function Page() {
   const [watchBusy, setWatchBusy] = useState(false);
   const [labUiPick, setLabUiPick] = useState<string | null>(null);
   const [labShaderPick, setLabShaderPick] = useState<string | null>(null);
+  const [prefsBusy, setPrefsBusy] = useState(false);
+  const [prefsMsg, setPrefsMsg] = useState("");
   const tenants = data?.session.ok ? data.session.data.tenants : [];
+  const prefsTenant = tenants[0] ?? null;
+  const prefsEditable = Boolean(
+    data?.session.ok && prefsTenant && data?.auth.ok,
+  );
+  const corporateAlerts = data?.preferences.ok
+    ? data.preferences.data.corporateActionAlerts
+    : true;
+  const strictFailClosed = data?.preferences.ok
+    ? data.preferences.data.strictFailClosed
+    : true;
+
+  async function persistPrefs(next: {
+    corporateActionAlerts: boolean;
+    strictFailClosed: boolean;
+  }) {
+    if (!prefsEditable) return;
+    setPrefsBusy(true);
+    setPrefsMsg("");
+    try {
+      const res = await savePrefs({ data: next });
+      if (res.ok) {
+        setPrefsMsg("Saved to Supabase desk_preferences.");
+        await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+        await refetch();
+      } else {
+        setPrefsMsg(`${res.reason}${res.detail ? ` — ${res.detail}` : ""}`);
+      }
+    } finally {
+      setPrefsBusy(false);
+    }
+  }
 
   useEffect(() => {
     setLabUiPick(readLabUiPick());
@@ -210,18 +245,24 @@ function Page() {
             <span>
               <b>Corporate-action alerts</b>
               <small>
-                {data?.preferences.ok
-                  ? "Server-persisted"
+                {prefsEditable
+                  ? data?.preferences.ok
+                    ? "Server-persisted · first tenant"
+                    : "Session ready · save will upsert prefs row"
                   : data && !data.preferences.ok
                     ? data.preferences.reason
                     : "Server prefs unavailable — not using localStorage"}
               </small>
             </span>
             <Switch
-              checked={
-                data?.preferences.ok ? data.preferences.data.corporateActionAlerts : true
-              }
-              disabled
+              checked={corporateAlerts}
+              disabled={!prefsEditable || prefsBusy}
+              onCheckedChange={(checked) => {
+                void persistPrefs({
+                  corporateActionAlerts: checked,
+                  strictFailClosed,
+                });
+              }}
             />
           </label>
           <label className="setting-row">
@@ -230,10 +271,17 @@ function Page() {
               <small>Stop when any required signal is unresolved</small>
             </span>
             <Switch
-              checked={data?.preferences.ok ? data.preferences.data.strictFailClosed : true}
-              disabled
+              checked={strictFailClosed}
+              disabled={!prefsEditable || prefsBusy}
+              onCheckedChange={(checked) => {
+                void persistPrefs({
+                  corporateActionAlerts: corporateAlerts,
+                  strictFailClosed: checked,
+                });
+              }}
             />
           </label>
+          {prefsMsg ? <p className="mt-2 text-sm opacity-80">{prefsMsg}</p> : null}
         </Panel>
       </div>
 
@@ -298,7 +346,25 @@ function Page() {
             <ul className="mt-2 space-y-1 text-sm">
               {tenants.map((t) => (
                 <li key={`${t.tenantId}:${t.userId}`}>
-                  <code>{t.tenantId.slice(0, 8)}…</code> · {t.role}
+                  <b>{t.displayName ?? t.slug ?? t.tenantId.slice(0, 8)}</b>
+                  {t.slug ? (
+                    <>
+                      {" "}
+                      · <code>{t.slug}</code>
+                    </>
+                  ) : null}{" "}
+                  · {t.role}
+                  {t.walletAddress ? (
+                    <>
+                      {" "}
+                      · wallet{" "}
+                      <code>
+                        {t.walletAddress.slice(0, 4)}…{t.walletAddress.slice(-4)}
+                      </code>
+                    </>
+                  ) : (
+                    " · no membership wallet"
+                  )}
                 </li>
               ))}
             </ul>
@@ -412,7 +478,11 @@ function Page() {
         {watchMsg ? <p className="mt-3 text-sm">{watchMsg}</p> : null}
       </Panel>
 
-      <Panel title="Paper agent" meta={<StatusBadge tone="blue">Caps · no broadcast</StatusBadge>}>
+      <Panel title="Paper agent" meta={<StatusBadge tone="blue">Live spine · no broadcast</StatusBadge>}>
+        <p className="mb-3 text-sm opacity-80">
+          Runs live xStocks multiplier / Jupiter quote-only reads for parsed intents. Never
+          broadcasts. AgentRouter expands NL only when keyed.
+        </p>
         <div className="form-grid">
           <label>
             Prompt
@@ -428,7 +498,7 @@ function Page() {
                 const res = await runAgent({ data: { prompt } });
                 setAgentOut(
                   res.ok
-                    ? `${res.data.reply} (metered ~$${res.data.meteredCostUsd.toFixed(6)})`
+                    ? `${res.data.reply} (metered ~$${res.data.meteredCostUsd.toFixed(6)}; broadcast=${res.data.caps.broadcast})`
                     : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
                 );
               } finally {

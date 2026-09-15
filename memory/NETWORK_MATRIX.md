@@ -8,7 +8,7 @@
 | Jupiter Price v3 | mainnet-read | Venue + optional stockData |
 | Jupiter swap quote | quote-only | No broadcast |
 | Wash / Bitquery | unavailable | Key missing or query fail — **fail-closed** (mode forced unavailable without key) |
-| Kamino xStocks reserves | mainnet-read | Market 5wJe…Lsua · borrow CPI = fork until funded |
+| Kamino xStocks reserves | mainnet-read | Market 5wJe…Lsua · borrow CPI unavailable until funded (no fork harness) |
 | Jupiter Lend earn | mainnet-read | Earn vaults only — labeled (not xStock borrow) |
 | NestUSD | unavailable | Unverified endpoint · fail-closed |
 | Multi-tenant sessions | unavailable | PRIVY_* / SUPABASE_* missing · fail-closed |

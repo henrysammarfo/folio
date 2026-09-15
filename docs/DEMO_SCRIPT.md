@@ -8,8 +8,8 @@ Network: mainnet-read + quote-only · Budget: ≤~$1 · Broadcast: paused
 1. **Truth** — “Token balances lie after splits. FOLIO reads the live xStocks Scaled UI multiplier — AAPLx ≈ 1.003× today, not a demo 4×.”
 2. **Wash** — “If the tape is missing or linked-flow looks dirty, we fail closed. No silent green.”
 3. **Buy** — “Jupiter quote-only on mainnet. Review the route — we do not broadcast on a dollar budget.”
-4. **Credit** — “Kamino xStocks LTV is live (AAPLx 40%). Borrow CPI stays fork/unavailable until funded. Bind a watch wallet for mainnet-read qty — still not Privy multi-tenant auth.”
-5. **Agent** — “Paper by default, metered, caps on. No mentor spam until this URL works.”
+4. **Credit** — “Kamino xStocks LTV is live (AAPLx 40%). Borrow CPI stays unavailable until funded — we do not fake a fork harness. Bind a watch wallet for mainnet-read qty — still not Privy multi-tenant auth.”
+5. **Agent** — “Paper by default, live truth/quote spine, metered, caps on. No mentor spam until this URL works.”
 
 ## Live demo URL
 

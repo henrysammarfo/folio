@@ -15,6 +15,11 @@ export type TenantMembership = {
   tenantId: string;
   userId: string;
   role: "owner" | "trader" | "viewer";
+  /** Optional wallet on membership row — not inventable client-side. */
+  walletAddress: string | null;
+  /** From joined tenants row when Supabase embed succeeds. */
+  slug: string | null;
+  displayName: string | null;
 };
 
 export type FolioSession = {
@@ -108,12 +113,11 @@ export type DeskPreference = {
   strictFailClosed: boolean;
 };
 
-/** Server-persisted prefs — fail-closed without Supabase + session. */
-export async function loadDeskPreferences(
+function prefsAuthGate(
+  source: string,
   tenantId: string | null,
   userId?: string | null,
-): Promise<AdapterResult<DeskPreference>> {
-  const source = "folio.prefs";
+): AdapterResult<{ url: string; serviceKey: string; tenantId: string; userId: string }> {
   const auth = getAuthProviderStatus();
   if (!auth.ok) {
     return errResult(source, "prefs_require_auth", auth.detail ?? auth.reason);
@@ -132,17 +136,32 @@ export async function loadDeskPreferences(
       "No verified user on session — refusing localStorage fallback.",
     );
   }
-
   const url = process.env["SUPABASE_URL"]?.trim();
   const serviceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim();
   if (!url || !serviceKey) {
     return errResult(source, "supabase_keys_missing", "SUPABASE_URL / SERVICE_ROLE_KEY required.");
   }
+  return okResult("mainnet-read", source, {
+    url,
+    serviceKey,
+    tenantId,
+    userId: userId.trim(),
+  });
+}
+
+/** Server-persisted prefs — fail-closed without Supabase + session. */
+export async function loadDeskPreferences(
+  tenantId: string | null,
+  userId?: string | null,
+): Promise<AdapterResult<DeskPreference>> {
+  const source = "folio.prefs";
+  const gate = prefsAuthGate(source, tenantId, userId);
+  if (!gate.ok) return gate;
 
   try {
-    const endpoint = new URL("/rest/v1/desk_preferences", url);
-    endpoint.searchParams.set("tenant_id", `eq.${tenantId}`);
-    endpoint.searchParams.set("user_id", `eq.${userId.trim()}`);
+    const endpoint = new URL("/rest/v1/desk_preferences", gate.data.url);
+    endpoint.searchParams.set("tenant_id", `eq.${gate.data.tenantId}`);
+    endpoint.searchParams.set("user_id", `eq.${gate.data.userId}`);
     endpoint.searchParams.set(
       "select",
       "corporate_action_alerts,strict_fail_closed",
@@ -152,8 +171,8 @@ export async function loadDeskPreferences(
     const res = await fetch(endpoint, {
       method: "GET",
       headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
+        apikey: gate.data.serviceKey,
+        Authorization: `Bearer ${gate.data.serviceKey}`,
         Accept: "application/json",
       },
       signal: AbortSignal.timeout(15_000),
@@ -192,6 +211,66 @@ export async function loadDeskPreferences(
 }
 
 /**
+ * Upsert server prefs via service role. Fail-closed without auth/tenant/user.
+ * Never writes to localStorage.
+ */
+export async function saveDeskPreferences(
+  tenantId: string | null,
+  userId: string | null | undefined,
+  prefs: DeskPreference,
+): Promise<AdapterResult<DeskPreference>> {
+  const source = "folio.prefs.save";
+  const gate = prefsAuthGate(source, tenantId, userId);
+  if (!gate.ok) return gate;
+
+  try {
+    const endpoint = new URL("/rest/v1/desk_preferences", gate.data.url);
+    endpoint.searchParams.set("on_conflict", "tenant_id,user_id");
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        apikey: gate.data.serviceKey,
+        Authorization: `Bearer ${gate.data.serviceKey}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=representation",
+      },
+      signal: AbortSignal.timeout(15_000),
+      body: JSON.stringify({
+        tenant_id: gate.data.tenantId,
+        user_id: gate.data.userId,
+        corporate_action_alerts: Boolean(prefs.corporateActionAlerts),
+        strict_fail_closed: Boolean(prefs.strictFailClosed),
+        updated_at: new Date().toISOString(),
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      return errResult(
+        source,
+        "prefs_save_http_error",
+        `HTTP ${res.status} ${body.slice(0, 180)} — fail-closed.`,
+      );
+    }
+
+    const rows = (await res.json()) as Array<{
+      corporate_action_alerts?: boolean;
+      strict_fail_closed?: boolean;
+    }>;
+    const row = Array.isArray(rows) ? rows[0] : undefined;
+    return okResult("mainnet-read", source, {
+      corporateActionAlerts: Boolean(
+        row?.corporate_action_alerts ?? prefs.corporateActionAlerts,
+      ),
+      strictFailClosed: Boolean(row?.strict_fail_closed ?? prefs.strictFailClosed),
+    });
+  } catch (e) {
+    return errResult(source, "prefs_save_failed", `${String(e)} — fail-closed.`);
+  }
+}
+
+/**
  * Mint a signed folio_session cookie value.
  * Call only after Privy JWT verification. Fail-closed without keys/secret.
  */
@@ -214,11 +293,19 @@ export function mintFolioSession(
   const ttlSec = input.ttlSec ?? 60 * 60 * 12;
   const issuedAt = new Date();
   const expiresAt = new Date(issuedAt.getTime() + ttlSec * 1000);
+  const tenants: TenantMembership[] = (input.tenants ?? []).map((t) => ({
+    tenantId: t.tenantId,
+    userId: t.userId,
+    role: t.role,
+    walletAddress: t.walletAddress ?? null,
+    slug: t.slug ?? null,
+    displayName: t.displayName ?? null,
+  }));
   const session: FolioSession = {
     sessionId: crypto.randomUUID(),
     userId: input.userId.trim(),
     walletAddress: input.walletAddress ?? null,
-    tenants: input.tenants ?? [],
+    tenants,
     issuedAt: issuedAt.toISOString(),
     expiresAt: expiresAt.toISOString(),
   };
@@ -267,7 +354,21 @@ export function verifyFolioSessionCookieValue(
     if (Date.parse(session.expiresAt) <= Date.now()) {
       return errResult(source, "session_expired", "folio_session expired — re-auth via Privy.");
     }
-    return okResult("mainnet-read", source, session);
+    const tenants: TenantMembership[] = (session.tenants ?? []).flatMap((t) => {
+      if (!t?.tenantId || !t?.userId) return [];
+      if (t.role !== "owner" && t.role !== "trader" && t.role !== "viewer") return [];
+      return [
+        {
+          tenantId: t.tenantId,
+          userId: t.userId,
+          role: t.role,
+          walletAddress: t.walletAddress ?? null,
+          slug: t.slug ?? null,
+          displayName: t.displayName ?? null,
+        },
+      ];
+    });
+    return okResult("mainnet-read", source, { ...session, tenants });
   } catch (e) {
     return errResult(source, "session_parse_failed", String(e));
   }

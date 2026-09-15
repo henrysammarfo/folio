@@ -49,7 +49,7 @@ function Page() {
     <DeskShell eyebrow="Collateral workspace" title="Credit">
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Market reads</ModeBadge>
-        <ModeBadge mode="fork">Borrow CPI = fork</ModeBadge>
+        <ModeBadge mode="unavailable">Borrow CPI = off</ModeBadge>
         <ModeBadge mode={walletRead ? "mainnet-read" : "paper"}>
           {walletRead ? "Wallet-read capacity" : "Paper capacity"}
         </ModeBadge>
@@ -206,7 +206,7 @@ function Page() {
             <p>
               <span>Borrow execution</span>
               <StatusBadge tone="neutral">
-                {data?.borrowExecution ?? "local-fork-or-unavailable"}
+                {data?.borrowExecution ?? "unavailable-until-funded"}
               </StatusBadge>
             </p>
           </div>

@@ -110,3 +110,6 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Hermes `/v2/updates/price/latest` returns 401 without API key from this egress | CONFIRMED | curl 401 unauthorized; price_feeds still 200 | 2026-09-15 |
 | FOLIO fail-closes Pyth without `PYTH_API_KEY` (no invented price) | CONFIRMED | unit test + adapter early return `pyth_api_key_missing` | 2026-09-15 |
 | `SOLANA_RPC_URL` set on Vercel folio project | CONFIRMED | Vercel env API create encrypted all targets | 2026-09-15 |
+
+| Borrow CPI “local fork” shipped | REJECTED as theater | No fork harness in repo — labeled unavailable-until-funded | 2026-09-15 |
+| Paper agent live spine (truth/quote) | CONFIRMED in code | `fetchPaperAgentSpine` → xStocks + Jupiter quote-only; caps.broadcast=false | 2026-09-15 |

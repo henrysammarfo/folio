@@ -5,9 +5,31 @@ export type TenantResolveInput = {
   userId: string;
 };
 
+type TenantMemberRow = {
+  tenant_id?: string;
+  user_id?: string;
+  role?: string;
+  wallet_address?: string | null;
+  tenants?:
+    | { slug?: string | null; display_name?: string | null }
+    | Array<{ slug?: string | null; display_name?: string | null }>
+    | null;
+};
+
+function tenantEmbed(
+  row: TenantMemberRow,
+): { slug: string | null; displayName: string | null } {
+  const embed = Array.isArray(row.tenants) ? row.tenants[0] : row.tenants;
+  return {
+    slug: embed?.slug?.trim() || null,
+    displayName: embed?.display_name?.trim() || null,
+  };
+}
+
 /**
  * Resolve tenant memberships for a Privy subject via Supabase service role.
  * Fail-closed when keys missing or the query errors — never invent tenants.
+ * Embeds tenants.slug / display_name when the FK join is available.
  */
 export async function resolveTenantMemberships(
   input: TenantResolveInput,
@@ -30,7 +52,10 @@ export async function resolveTenantMemberships(
   try {
     const endpoint = new URL("/rest/v1/tenant_members", url);
     endpoint.searchParams.set("user_id", `eq.${input.userId.trim()}`);
-    endpoint.searchParams.set("select", "tenant_id,user_id,role,wallet_address");
+    endpoint.searchParams.set(
+      "select",
+      "tenant_id,user_id,role,wallet_address,tenants(slug,display_name)",
+    );
 
     const res = await fetch(endpoint, {
       method: "GET",
@@ -51,12 +76,7 @@ export async function resolveTenantMemberships(
       );
     }
 
-    const rows = (await res.json()) as Array<{
-      tenant_id?: string;
-      user_id?: string;
-      role?: string;
-      wallet_address?: string | null;
-    }>;
+    const rows = (await res.json()) as TenantMemberRow[];
 
     if (!Array.isArray(rows)) {
       return errResult(source, "supabase_tenants_malformed", "Expected array of memberships.");
@@ -65,14 +85,19 @@ export async function resolveTenantMemberships(
     const tenants: TenantMembership[] = [];
     for (const row of rows) {
       if (!row.tenant_id || !row.user_id) continue;
-      const role = row.role === "owner" || row.role === "trader" || row.role === "viewer"
-        ? row.role
-        : null;
+      const role =
+        row.role === "owner" || row.role === "trader" || row.role === "viewer"
+          ? row.role
+          : null;
       if (!role) continue;
+      const embed = tenantEmbed(row);
       tenants.push({
         tenantId: row.tenant_id,
         userId: row.user_id,
         role,
+        walletAddress: row.wallet_address?.trim() || null,
+        slug: embed.slug,
+        displayName: embed.displayName,
       });
     }
 

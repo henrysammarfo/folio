@@ -38,6 +38,9 @@ describe("buildNetworkMatrix honesty", () => {
     expect(byCap["Multi-tenant sessions (Privy + Supabase)"]?.mode).toBe("unavailable");
 
     expect(byCap["Kamino xStocks market (read)"]?.mode).toBe("mainnet-read");
+    expect(byCap["Kamino xStocks market (read)"]?.detail).toMatch(
+      /no fork harness|unavailable until funded/i,
+    );
     expect(byCap["Watch-wallet mainnet-read qty"]?.mode).toBe("mainnet-read");
     expect(byCap["Ephemeral wallet inspect"]?.mode).toBe("mainnet-read");
     expect(byCap["Ephemeral wallet inspect"]?.detail).toMatch(/not auth|\?inspect=/i);

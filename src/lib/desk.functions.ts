@@ -325,6 +325,7 @@ export {
   getActivityBundle,
   getSessionBundle,
   runDeskAgent,
+  updateDeskPreferences,
   createSessionFromPrivyToken,
   clearFolioSession,
   bindWatchWallet,

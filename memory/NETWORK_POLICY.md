@@ -13,7 +13,7 @@ We are **mainnet-primary for truth**, not “full mainnet broadcast everything,�
 | Pool / Kamino / Jup Lend / NestUSD | **Mainnet READ** | Markets live on mainnet |
 | Wash / Bitquery | **Mainnet READ** (fail-closed until key) | Tape is mainnet |
 | Swap / borrow **broadcast** | **Disabled** until funded + explicit confirm | ≤~$1 cannot cover program rent or sized credit |
-| Borrow / CPI proofs | **Local mainnet-fork** | Honest CPI without spend |
+| Borrow / CPI proofs | **Unavailable until funded** | No fork harness shipped on ≤~$1; label honestly |
 | Optional FOLIO policy harness | **Devnet OK** | Free airdrop experiments only — never labeled as mainnet fill |
 | Custom program **mainnet deploy** | **Out** | ~1 SOL rent for ~200KB ≫ $1 |
 

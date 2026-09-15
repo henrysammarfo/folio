@@ -81,7 +81,7 @@ export function buildNetworkMatrix(input: {
       capability: "Kamino xStocks market (read)",
       mode: modeOf(input.kamino),
       detail: input.kamino.ok
-        ? `${input.kamino.source} · borrow CPI = local fork until funded`
+        ? `${input.kamino.source} · borrow CPI unavailable until funded (no fork harness)`
         : detailOf(input.kamino),
     },
     {

@@ -20,6 +20,7 @@ import {
   getAuthProviderStatus,
   loadDeskPreferences,
   parseFolioSessionCookie,
+  saveDeskPreferences,
   verifyFolioSessionCookieValue,
   type FolioSession,
 } from "./auth/session";
@@ -128,7 +129,8 @@ export type CreditBundle = {
   /** Ephemeral inspect pubkey when no session/watch-wallet bound. */
   inspectWallet: string | null;
   walletSource: WalletBindingSource;
-  borrowExecution: "local-fork-or-unavailable";
+  /** Honest label — no local fork harness shipped; borrow stays off until funded. */
+  borrowExecution: "unavailable-until-funded";
 };
 
 export type ActivityEvent = {
@@ -388,7 +390,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
         illustrativeBorrowUsd,
         note,
       },
-      borrowExecution: "local-fork-or-unavailable",
+      borrowExecution: "unavailable-until-funded",
       watchWallet: watch.ok ? watch.data.wallet : null,
       inspectWallet: inspectActive,
       walletSource,
@@ -459,7 +461,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           ? "Kamino xStocks market read"
           : "Kamino read unavailable",
         detail: kamino.ok
-          ? `${kamino.data.reserves.length} reserves · borrow CPI not broadcast`
+          ? `${kamino.data.reserves.length} reserves · borrow CPI unavailable (no broadcast)`
           : kamino.reason,
         tone: kamino.ok ? "blue" : "amber",
         mode: kamino.ok ? kamino.mode : "unavailable",
@@ -541,6 +543,30 @@ const AgentInput = z.object({
 export const runDeskAgent = createServerFn({ method: "POST" })
   .validator(AgentInput)
   .handler(async ({ data }) => runPaperAgent(data.prompt));
+
+const PrefsInput = z.object({
+  corporateActionAlerts: z.boolean(),
+  strictFailClosed: z.boolean(),
+});
+
+/** Persist desk prefs for the first tenant on the verified session — fail-closed. */
+export const updateDeskPreferences = createServerFn({ method: "POST" })
+  .validator(PrefsInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSession();
+    if (!session.ok) {
+      return errResult(
+        "folio.prefs.save",
+        "prefs_require_session",
+        session.detail ?? session.reason,
+      );
+    }
+    const tenantId = session.data.tenants[0]?.tenantId ?? null;
+    return saveDeskPreferences(tenantId, session.data.userId, {
+      corporateActionAlerts: data.corporateActionAlerts,
+      strictFailClosed: data.strictFailClosed,
+    });
+  });
 
 const PrivySessionInput = z.object({
   accessToken: z.string().min(1).max(8_192),

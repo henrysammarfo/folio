@@ -1,9 +1,28 @@
 import { errResult, okResult, type AdapterResult } from "../adapters/types";
+import { fetchXStockAsset, fetchXStockMultiplier } from "../adapters/xstocks";
+import { fetchJupiterQuote } from "../adapters/jupiter";
+import { isBroadcastPaused } from "../broadcast";
 
 export type AgentIntent =
   | { kind: "quote"; symbol: string; spendUsdc: number }
   | { kind: "truth"; symbol: string }
   | { kind: "unknown"; raw: string };
+
+export type AgentSpineEvidence = {
+  truth?: {
+    symbol: string;
+    multiplier: number | null;
+    mode: string;
+    note: string;
+  };
+  quote?: {
+    symbol: string;
+    spendUsdc: number;
+    outUiAmount: number | null;
+    mode: string;
+    note: string;
+  };
+};
 
 export type AgentTurn = {
   mode: "paper";
@@ -11,6 +30,7 @@ export type AgentTurn = {
   meteredCostUsd: number;
   model: string | null;
   reply: string;
+  spine: AgentSpineEvidence;
   caps: { maxSpendUsdc: number; broadcast: false };
 };
 
@@ -43,19 +63,123 @@ export function parsePaperIntent(raw: string): AgentIntent {
   return { kind: "unknown", raw: text };
 }
 
-/** Paper-default agent. AgentRouter only when keyed; never broadcasts. */
+/** Live Block 0 reads for paper agent — never broadcasts. */
+export async function fetchPaperAgentSpine(
+  intent: AgentIntent,
+): Promise<{ spine: AgentSpineEvidence; facts: string }> {
+  const broadcastNote = isBroadcastPaused()
+    ? "broadcast=paused"
+    : "broadcast=policy-false";
+
+  if (intent.kind === "unknown") {
+    return {
+      spine: {},
+      facts: `No live spine for free text. Caps: ≤$${MAX_SPEND}, ${broadcastNote}.`,
+    };
+  }
+
+  if (intent.kind === "truth") {
+    const mult = await fetchXStockMultiplier(intent.symbol);
+    if (!mult.ok) {
+      const note = `${mult.reason}${mult.detail ? ` — ${mult.detail}` : ""}`;
+      return {
+        spine: {
+          truth: {
+            symbol: intent.symbol,
+            multiplier: null,
+            mode: "unavailable",
+            note,
+          },
+        },
+        facts: `Truth ${intent.symbol} fail-closed (${note}). ${broadcastNote}.`,
+      };
+    }
+    const note = `live ×${mult.data.currentMultiplier.toFixed(6)} · ${mult.source}`;
+    return {
+      spine: {
+        truth: {
+          symbol: intent.symbol,
+          multiplier: mult.data.currentMultiplier,
+          mode: mult.mode,
+          note,
+        },
+      },
+      facts: `Truth ${intent.symbol}: ${note}. ${broadcastNote}.`,
+    };
+  }
+
+  const asset = await fetchXStockAsset(intent.symbol);
+  if (!asset.ok || !asset.data.solanaMint) {
+    const note = !asset.ok
+      ? `${asset.reason}${asset.detail ? ` — ${asset.detail}` : ""}`
+      : "xstock_mint_missing";
+    return {
+      spine: {
+        quote: {
+          symbol: intent.symbol,
+          spendUsdc: intent.spendUsdc,
+          outUiAmount: null,
+          mode: "unavailable",
+          note,
+        },
+      },
+      facts: `Quote ${intent.symbol} fail-closed (${note}). ${broadcastNote}.`,
+    };
+  }
+
+  const amountRaw = Math.round(intent.spendUsdc * 1_000_000);
+  const quote = await fetchJupiterQuote({
+    outputMint: asset.data.solanaMint,
+    amountRaw,
+    outputDecimals: asset.data.decimals ?? 8,
+  });
+
+  if (!quote.ok) {
+    const note = `${quote.reason}${quote.detail ? ` — ${quote.detail}` : ""}`;
+    return {
+      spine: {
+        quote: {
+          symbol: intent.symbol,
+          spendUsdc: intent.spendUsdc,
+          outUiAmount: null,
+          mode: "unavailable",
+          note,
+        },
+      },
+      facts: `Quote ${intent.spendUsdc} USDC → ${intent.symbol} fail-closed (${note}). ${broadcastNote}.`,
+    };
+  }
+
+  const note = `quote-only out≈${quote.data.outUiAmount.toFixed(6)} ${intent.symbol} · impact ${quote.data.priceImpactPct ?? "n/a"} · routes=${quote.data.routePlanLength}`;
+  return {
+    spine: {
+      quote: {
+        symbol: intent.symbol,
+        spendUsdc: intent.spendUsdc,
+        outUiAmount: quote.data.outUiAmount,
+        mode: quote.mode,
+        note,
+      },
+    },
+    facts: `Quote ${intent.spendUsdc} USDC → ${intent.symbol}: ${note}. ${broadcastNote}. Never a fill.`,
+  };
+}
+
+/** Paper-default agent. Live Block 0 spine always; AgentRouter only when keyed; never broadcasts. */
 export async function runPaperAgent(raw: string): Promise<AdapterResult<AgentTurn>> {
   const source = "folio.agent.paper";
   const intent = parsePaperIntent(raw);
   const key = process.env["AGENTROUTER_API_KEY"]?.trim();
   const base = process.env["AGENTROUTER_BASE_URL"]?.trim() || "https://agentrouter.org/v1";
   const model = process.env["AGENTROUTER_MODEL"]?.trim() || "gpt-4o-mini";
+  const { spine, facts } = await fetchPaperAgentSpine(intent);
 
   const baseTurn = {
     mode: "paper" as const,
     intent,
     meteredCostUsd: 0,
     model: key ? model : null,
+    spine,
     caps: { maxSpendUsdc: MAX_SPEND, broadcast: false as const },
   };
 
@@ -70,7 +194,7 @@ export async function runPaperAgent(raw: string): Promise<AdapterResult<AgentTur
   if (!key) {
     return okResult("paper", source, {
       ...baseTurn,
-      reply: `Parsed ${intent.kind} for ${"symbol" in intent ? intent.symbol : "?"} — AgentRouter key missing, so no NL expansion. Caps: ≤$${MAX_SPEND}, broadcast=false.`,
+      reply: `${facts} AgentRouter key missing — live spine only, no NL expansion.`,
     });
   }
 
@@ -89,11 +213,11 @@ export async function runPaperAgent(raw: string): Promise<AdapterResult<AgentTur
           {
             role: "system",
             content:
-              "You are FOLIO paper agent. Never claim fills, broadcasts, or unhackable security. Reply in ≤2 short sentences. Intent is already parsed.",
+              "You are FOLIO paper agent. Never claim fills, broadcasts, or unhackable security. Reply in ≤2 short sentences. Live spine facts are authoritative.",
           },
           {
             role: "user",
-            content: `User said: ${raw}\nParsed intent: ${JSON.stringify(intent)}\nRemind: paper mode, broadcast disabled, wash fail-closed without Bitquery.`,
+            content: `User said: ${raw}\nParsed intent: ${JSON.stringify(intent)}\nLive spine: ${facts}\nRemind: paper mode, broadcast disabled, wash fail-closed without Bitquery.`,
           },
         ],
       }),
@@ -109,7 +233,7 @@ export async function runPaperAgent(raw: string): Promise<AdapterResult<AgentTur
     return okResult("paper", source, {
       ...baseTurn,
       meteredCostUsd: (tokens / 1_000_000) * 0.15,
-      reply,
+      reply: `${reply} · ${facts}`,
     });
   } catch (e) {
     return errResult(source, "agentrouter_failed", String(e));

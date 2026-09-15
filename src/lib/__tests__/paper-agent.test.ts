@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { parsePaperIntent } from "../agent/paper-agent";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { parsePaperIntent, runPaperAgent } from "../agent/paper-agent";
 
 describe("parsePaperIntent", () => {
   it("parses quote intents with spend cap semantics left to runner", () => {
@@ -11,5 +11,95 @@ describe("parsePaperIntent", () => {
   });
   it("returns unknown for free text", () => {
     expect(parsePaperIntent("buy everything")).toMatchObject({ kind: "unknown" });
+  });
+});
+
+describe("runPaperAgent live spine", () => {
+  const prevKey = process.env["AGENTROUTER_API_KEY"];
+  const prevBroadcast = process.env["BROADCAST_PAUSED"];
+
+  beforeEach(() => {
+    delete process.env["AGENTROUTER_API_KEY"];
+    process.env["BROADCAST_PAUSED"] = "true";
+    vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    if (prevKey == null) delete process.env["AGENTROUTER_API_KEY"];
+    else process.env["AGENTROUTER_API_KEY"] = prevKey;
+    if (prevBroadcast == null) delete process.env["BROADCAST_PAUSED"];
+    else process.env["BROADCAST_PAUSED"] = prevBroadcast;
+  });
+
+  it("attaches live multiplier facts for truth intents (no AgentRouter)", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/multiplier")) {
+        return new Response(
+          JSON.stringify({ currentMultiplier: 1.003269 }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      return new Response(`unexpected ${url}`, { status: 500 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const res = await runPaperAgent("truth AAPLx");
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.data.caps.broadcast).toBe(false);
+    expect(res.data.spine.truth?.multiplier).toBeCloseTo(1.003269);
+    expect(res.data.reply).toMatch(/1\.003269/);
+    expect(res.data.reply).toMatch(/broadcast=paused/);
+    expect(res.data.reply).toMatch(/AgentRouter key missing/);
+  });
+
+  it("attaches quote-only spine for quote intents", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/assets/AAPLx?") || (url.includes("/assets/AAPLx") && !url.includes("multiplier"))) {
+        return new Response(
+          JSON.stringify({
+            symbol: "AAPLx",
+            name: "Apple",
+            underlyingSymbol: "AAPL",
+            deployments: [
+              {
+                network: "Solana",
+                address: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+                decimals: 8,
+              },
+            ],
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      if (url.includes("api.jup.ag/swap/v1/quote")) {
+        return new Response(
+          JSON.stringify({
+            inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            inAmount: "1000000",
+            outAmount: "400000000",
+            otherAmountThreshold: "398000000",
+            slippageBps: 50,
+            priceImpactPct: "0.01",
+            routePlan: [{}, {}],
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      return new Response(`unexpected ${url}`, { status: 500 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const res = await runPaperAgent("quote 1 USDC AAPLx");
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.data.caps.broadcast).toBe(false);
+    expect(res.data.spine.quote?.outUiAmount).toBeCloseTo(4);
+    expect(res.data.reply).toMatch(/quote-only/);
+    expect(res.data.reply).toMatch(/Never a fill/);
   });
 });
