@@ -18,14 +18,19 @@ export const Route = createFileRoute("/desk/positions")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  /** Prefetch so wallet-read vs paper qty labels paint on first load. */
+  loader: async () => getPositionsBundle(),
   component: Page,
 });
 
 function Page() {
+  const initial = Route.useLoaderData();
   const fetchPositions = useServerFn(getPositionsBundle);
   const { data, isFetching, isError, error } = useQuery({
     queryKey: ["positions-bundle"],
     queryFn: () => fetchPositions(),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
 

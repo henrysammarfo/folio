@@ -116,3 +116,8 @@
 - NestUSD badge never says Ready (probed · risk-labeled / reason / Risk · unverified).
 - `networkPolicy.broadcast` hard-false until funded (not merely `!isBroadcastPaused()`).
 - Network matrix honesty + Stocklana 534/67/$121k already committed.
+
+## 2026-09-15 — Positions SSR + submit checklist
+
+- `/desk/positions` SSR-prefetches positions bundle (wallet-read vs paper labels on first paint).
+- Stocklana submit checklist: mode badges + `/network` honesty ticked against live Vercel preview; Vercel `FOLIO_SESSION_SECRET` still required (matrix shows missing).

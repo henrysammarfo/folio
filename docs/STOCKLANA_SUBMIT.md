@@ -18,6 +18,8 @@ Do not invent newer counts — refresh the page before the submission form.
 ## Before submit
 
 - [x] Demo URL reachable (Block 0 spine) — https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app (SSO off). Set `FOLIO_SESSION_SECRET` (+ optional `SOLANA_RPC_URL`) in Vercel env for watch-wallet; public RPC fallback covers Scaled UI reads when RPC unset. `BROADCAST_PAUSED=true` recommended in Vercel.
+- [ ] Vercel env: `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true` (preview matrix currently reports watch-wallet secret missing)
+
 - [ ] Replay green locally:
 
 ```bash
@@ -26,8 +28,8 @@ npm run replay
 ```
 
 - [ ] Pitch order locked (truth → wash → buy → credit → agent) — see `docs/DEMO_SCRIPT.md`
-- [ ] Mode badges visible on `/truth`, `/desk/acquire`, `/network`, `/desk/credit`
-- [ ] `/network` shows NestUSD unavailable, wash fail-closed without Bitquery, broadcast paused
+- [x] Mode badges visible on `/truth`, `/desk/acquire`, `/network`, `/desk/credit` (verified on Vercel preview SSR)
+- [x] `/network` shows NestUSD unavailable, wash fail-closed without Bitquery, broadcast paused (verified live preview)
 - [ ] Wash fail-closed without Bitquery (Continue disabled)
 - [ ] No “unhackable” / nation-state claims anywhere
 - [ ] No claim of mainnet fill / mint / borrow unless actually funded + confirmed

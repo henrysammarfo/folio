@@ -123,3 +123,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `/desk/credit|settings|acquire` SSR-prefetch live bundles.
 - NestUSD UI never paints Ready; broadcast policy hard-false until funded.
 - Still blocked on Bitquery/Privy/Supabase keys + Henry lab approve + Vercel `FOLIO_SESSION_SECRET`.
+
+## 2026-09-15 positions SSR
+
+- `/desk/positions` SSR-prefetches live bundle.
+- Vercel preview READY on honesty push; `/network` live shows NestUSD/wash/broadcast/auth fail-closed; `/truth` ~1.003269×.
+- Still need: Bitquery/Privy/Supabase keys, Henry lab approve, Vercel `FOLIO_SESSION_SECRET`.
