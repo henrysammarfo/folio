@@ -13,15 +13,20 @@ export const Route = createFileRoute("/desk/positions/$symbol")({
       { name: "description", content: `Live multiplier and paper economics for ${params.symbol}.` },
     ],
   }),
+  /** Prefetch so wallet-read vs paper qty label is honest on first paint. */
+  loader: async () => getPositionsBundle(),
   component: Page,
 });
 
 function Page() {
   const { symbol } = Route.useParams();
+  const initial = Route.useLoaderData();
   const fetchPositions = useServerFn(getPositionsBundle);
   const { data, isFetching } = useQuery({
     queryKey: ["positions-bundle"],
     queryFn: () => fetchPositions(),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
   const row = data?.rows.find((r) => r.symbol.toLowerCase() === symbol.toLowerCase());

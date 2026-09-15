@@ -134,3 +134,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 - `/desk/` first paint uses SSR positions+credit.
 - Settings shows Auth fail-closed / Broadcast off from live session policy.
+
+## 2026-09-15 activity SSR + smoke honesty
+
+- Desk activity + position detail SSR.
+- Empire smoke fails closed if matrix lies about NestUSD/wash/broadcast/auth.
+- Still blocked: Bitquery/Privy/Supabase keys, Henry lab approve, Vercel FOLIO_SESSION_SECRET.

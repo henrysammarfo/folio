@@ -75,6 +75,8 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/watch wallet|watch-wallet/);
     expect(body).toMatch(/not.*privy|not privy|≠ privy|multi-tenant/);
+    expect(body).toMatch(/auth fail-closed|keys missing|privy \+ supabase/);
+    expect(body).toMatch(/broadcast off|broadcast.*unavailable|broadcast disabled/);
     expect(body).not.toMatch(/unhackable|nation-state/);
   });
 
@@ -90,6 +92,18 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/unverified|risk|fail-closed|unavailable/);
     // Never paint NestUSD as ready/live without a verified endpoint.
     expect(body).not.toMatch(/nestusd[\s\S]{0,40}ready/);
+  });
+
+
+  test("positions page labels paper vs wallet-read qty", async ({ page }) => {
+    await page.goto("/desk/positions");
+    await expect(page.getByText(/positions|ownership|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/paper|wallet-read|wallet/);
+    expect(body).toMatch(/qty|quantity|multiplier|aapl/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
 });

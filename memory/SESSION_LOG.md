@@ -130,3 +130,9 @@
 ## 2026-09-15 — DEMO_SCRIPT live URL
 
 - Added verified Vercel preview URL + honesty beats + Stocklana 534/67/$121k note.
+
+## 2026-09-15 — Activity SSR + empire smoke honesty
+
+- `/desk/activity` + `/desk/positions/$symbol` SSR-prefetch.
+- e2e: settings auth fail-closed + positions paper/wallet-read labels.
+- `smoke-empire` asserts NestUSD/wash/broadcast/multi-tenant stay unavailable without keys.
