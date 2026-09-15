@@ -194,3 +194,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Lab: shared `LabApprovePanel` with copyable ids + how-to; `/about` Accra grit + fail-closed vision for judges.
 - **Henry rotate** any chat-pasted Vercel token.
 - Still blocked for full objective: lab candidate id · Bitquery · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Watch-wallet bind verified live + Stocklana refresh
+- Playwright against preview: bind `Tokenkeg…` succeeded → “Watch-wallet bound for mainnet-read qty. Not a Privy session.” Settings shows Currently: Toke…Q5DA.
+- Artifact: `/opt/cursor/artifacts/screenshots/watch-wallet-bind-live.png`
+- Stocklana live (jina): **538** registered / **69** submissions / **$121k** / deadline hero **SEP 25** (timeline still mentions 18 Sep — re-check at submit).
+- Next Henry gate: Step 0 lab id. Then Bitquery → Privy → Supabase. Goal not complete.

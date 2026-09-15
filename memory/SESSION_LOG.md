@@ -178,3 +178,8 @@
 - Shipped clearer lab approve panel + Accra `/about` vision; HENRY_STEPS Step 1 marked done.
 - Next Henry gate: lab id (+ rotate token). Then Bitquery → Privy → Supabase one-by-one.
 - Goal not complete — multi-tenant + wash green + premium merge still open.
+
+## 2026-09-15 — Live watch-wallet bind + Stocklana 538
+- Verified bind on Vercel preview (Playwright); screenshot saved.
+- Stocklana: 538 / 69 / $121k; SEP 25 hero deadline conflict unchanged.
+- Awaiting Henry lab approve before premium merge; keys still empty for wash + multi-tenant.

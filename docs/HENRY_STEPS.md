@@ -6,7 +6,7 @@ Demo (hard-refresh): https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanli
 
 ---
 
-## Step 0 — Approve lab look (do this before or with Step 1)
+## Step 0 — Approve lab look ← DO THIS NEXT
 
 1. Open https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app/lab/ui  
    Pick one: `desk-density-a` · `desk-density-b` · `gate-chip`
@@ -29,7 +29,7 @@ Demo: https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app/d
 
 **Rotate** any Vercel token pasted in chat (Account → Tokens). Do not paste tokens in chat again.
 
-What this unlocked: watch-wallet bind on the public demo. Broadcast stays paused.
+What this unlocked: watch-wallet bind on the public demo (live-verified: bind Tokenkeg… → cookie set, Positions can mainnet-read qty). Broadcast stays paused.
 
 ---
 

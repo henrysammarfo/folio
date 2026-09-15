@@ -93,3 +93,11 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | `BROADCAST_PAUSED=true` on Vercel | CONFIRMED | env API + settings readiness `broadcastPaused:true` | 2026-09-15 |
 | Settings badge **Watch-wallet secret set** | CONFIRMED live | https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app/desk/settings | 2026-09-15 |
 | Bitquery / Privy / Supabase on Vercel | MISSING | env API lists only session secret + broadcast; wash + multi-tenant fail-closed | 2026-09-15 |
+
+## Live watch-wallet bind + Stocklana (2026-09-15 ~18:53 UTC)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Watch-wallet bind works on Vercel preview with session secret | CONFIRMED | Playwright bind Tokenkeg… → success note + Currently Toke…Q5DA | 2026-09-15 |
+| Stocklana registered **538** / submissions **69** / prize **$121,000** / deadline hero **SEP 25, 2026** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana via jina | 2026-09-15 |
+| Timeline / stocklana.fun may still say 18 Sep | CONFLICT — re-check at submit | same sources as prior | 2026-09-15 |
