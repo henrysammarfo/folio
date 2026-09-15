@@ -305,3 +305,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Desk chrome: Quote-only sidebar/topbar (killed fake search); overview/credit/settings/about badges conditional.
 - Network matrix + empire smoke + docs: Raydium pool awareness (not route guarantee).
 - Vitest **79** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Supabase user-JWT RLS path
+- `mintSupabaseUserJwt` / `resolveSupabaseRestAuth`: prefer HS256 user JWT (`sub`=Privy DID) + anon for tenants/prefs; labeled service-role fallback without `SUPABASE_JWT_SECRET`.
+- Settings readiness + RLS note + keys-smoke/KEYS_LANDING/.env.example document JWT secret.
+- Vitest **84** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase (+ JWT secret) · funded broadcast.
