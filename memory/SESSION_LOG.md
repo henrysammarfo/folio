@@ -95,3 +95,8 @@
 - Added `resolveSolanaRpcUrl()` public mainnet fallback when `SOLANA_RPC_URL` unset (labeled source; still fail-closed on errors).
 - Henry still needs to set `FOLIO_SESSION_SECRET` (+ Bitquery/Privy/Supabase when ready) in Vercel env for watch-wallet / multi-tenant.
 - Broadcast still paused; lab UI still approve-gated.
+
+## 2026-09-15 — Truth SSR prefetch
+
+- `/truth` loader prefetches `getTruthBundle` so first paint shows live xStocks multiplier (verified locally ~1.003269×), not empty placeholders.
+- Public Vercel demo remains up; set `FOLIO_SESSION_SECRET` in Vercel for watch-wallet.

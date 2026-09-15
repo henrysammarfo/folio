@@ -103,3 +103,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Watch-wallet bind on Vercel still needs `FOLIO_SESSION_SECRET` in project env (CLI not authenticated here — set in Vercel dashboard).
 - Broadcast remains paused; wash/multi-tenant still fail-closed without Bitquery/Privy/Supabase.
 - Premium UI still approve-gated on `/lab/*` until Henry names a candidate id.
+
+## 2026-09-15 Truth SSR
+
+- `/truth` server loader prefetches live bundle; local SSR shows ~1.003269× (not fixture 4.0×).

@@ -24,14 +24,19 @@ export const Route = createFileRoute("/truth")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  /** Prefetch live bundle on the server so first paint is not empty placeholders. */
+  loader: async () => getTruthBundle({ data: { symbol: "AAPLx" } }),
   component: Page,
 });
 
 function Page() {
+  const initial = Route.useLoaderData();
   const fetchTruth = useServerFn(getTruthBundle);
   const { data, isLoading, isError, error, dataUpdatedAt } = useQuery({
     queryKey: ["truth", "AAPLx"],
     queryFn: () => fetchTruth({ data: { symbol: "AAPLx" } }),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     refetchInterval: 60_000,
     staleTime: 30_000,
   });
