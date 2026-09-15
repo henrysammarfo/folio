@@ -220,3 +220,7 @@
 - Paper agent quote path shares wash + acquire gates; RLS honesty note on SessionBundle.
 - Softened remaining fork theater (mode badge / about). Vitest 65 green.
 - Goal open: Henry lab Pick reply + Bitquery/Pyth/Privy/Supabase; broadcast stays paused.
+
+## 2026-09-15 — Acquire strict surface + activity CA pref honesty
+- Surface session vs public strict-fail-closed on acquire; activity labels CA alert preference without inventing a calendar feed.
+- E2E + Stocklana/docs URLs on prefs preview. Goal still open for Henry lab id + keys.

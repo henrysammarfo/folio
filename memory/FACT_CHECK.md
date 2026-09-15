@@ -117,3 +117,5 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Active tenant switch invents foreign membership | REJECTED | `setActiveTenant` / mint validate against session.tenants only | 2026-09-15 |
 | Strict fail-closed blocks missing Pyth on acquire | CONFIRMED unit | `buildAcquireGateMessages` + prefs load in `getAcquireBundle` | 2026-09-15 |
 | Mode badge “Local fork” as shipped CPI mode | SUPERSEDED | Label now **Unfunded CPI**; borrow remains unavailable-until-funded | 2026-09-15 |
+| Corporate-action alerts imply a separate CA calendar feed | REJECTED | Activity labels preference + live signal = xStocks multiplier only | 2026-09-15 |
+| Public acquire applies tenant strictFailClosed without session | REJECTED | `prefsFromSession=false` → strict off; honesty-only Pyth until session | 2026-09-15 |

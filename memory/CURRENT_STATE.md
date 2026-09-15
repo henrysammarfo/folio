@@ -247,3 +247,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Settings: active-tenant switch + RLS honesty note (service-role until Privy→Supabase JWT `sub`).
 - Mode badge `fork` → **Unfunded CPI**; about copy drops fork-simulation theater.
 - Vitest **65** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Acquire strict surface + CA pref honesty on activity
+- AcquireBundle exposes `strictFailClosed` / `prefsFromSession`; UI badge + honesty copy for public vs session.
+- Activity stream labels corporate-action alert preference honestly (live signal = xStocks multiplier; no invented CA calendar).
+- E2E covers settings Active tenant/RLS/strict/wash + activity CA + acquire strict-no-session.
+- Docs/demo URLs point at prefs preview. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

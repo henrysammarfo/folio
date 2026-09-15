@@ -146,6 +146,12 @@ export type ActivityEvent = {
 export type ActivityBundle = {
   events: ActivityEvent[];
   note: string;
+  /**
+   * Corporate-action alert preference from active-tenant prefs when session exists.
+   * Live CA signal today = xStocks multiplier — no separate calendar feed yet.
+   */
+  corporateActionAlerts: boolean | null;
+  prefsFromSession: boolean;
 };
 
 export type SessionBundle = {
@@ -410,6 +416,18 @@ export const getCreditBundle = createServerFn({ method: "GET" })
 export const getActivityBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<ActivityBundle> => {
     const symbol = "AAPLx";
+    const session = readVerifiedSession();
+    const activeTenantId = session.ok
+      ? resolveActiveTenantId(session.data)
+      : null;
+    const prefs = session.ok
+      ? await loadDeskPreferences(activeTenantId, session.data.userId)
+      : null;
+    const prefsFromSession = Boolean(prefs?.ok);
+    const corporateActionAlerts = prefs?.ok
+      ? prefs.data.corporateActionAlerts
+      : null;
+
     const [multiplier, asset] = await Promise.all([
       fetchXStockMultiplier(symbol),
       fetchXStockAsset(symbol),
@@ -443,6 +461,19 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         detail: multiplier.ok ? multiplier.source : multiplier.reason,
         tone: multiplier.ok ? "green" : "amber",
         mode: multiplier.ok ? multiplier.mode : "unavailable",
+      },
+      {
+        at: now,
+        title: prefsFromSession
+          ? corporateActionAlerts
+            ? "Corporate-action alerts · on"
+            : "Corporate-action alerts · off"
+          : "Corporate-action alerts · no session prefs",
+        detail: prefsFromSession
+          ? "Live CA signal today = xStocks multiplier / Scaled UI — no separate CA calendar feed yet (honest label)."
+          : "Mint httpOnly session (Privy + Supabase) to persist CA alert preference per active tenant.",
+        tone: prefsFromSession && corporateActionAlerts ? "blue" : "neutral",
+        mode: prefsFromSession ? "mainnet-read" : "unavailable",
       },
       {
         at: now,
@@ -491,6 +522,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
     return {
       events,
       note: "Live-derived activity — not a fabricated ledger. Broadcast remains disabled.",
+      corporateActionAlerts,
+      prefsFromSession,
     };
   },
 );

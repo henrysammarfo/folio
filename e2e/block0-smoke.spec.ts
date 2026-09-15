@@ -105,7 +105,42 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/pyth_api_key|hermes|pyth diverge fail-closed/);
     expect(body).toMatch(/privy|multi-tenant fail-closed/);
     expect(body).toMatch(/supabase|tenants fail-closed/);
+    expect(body).toMatch(/active tenant/);
+    expect(body).toMatch(/rls|service-role|jwt sub/);
+    expect(body).toMatch(/strict fail-closed/);
+    expect(body).toMatch(/wash gates|acquire wash|live spine/);
     expect(body).not.toMatch(/unhackable|nation-state/);
+  });
+
+  test("activity labels corporate-action preference honestly", async ({ page }) => {
+    await page.goto("/desk/activity");
+    await expect(page.getByText(/activity|events|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/corporate-action alerts/);
+    expect(body).toMatch(/no session prefs|multiplier|scaled ui|calendar feed/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
+  });
+
+  test("acquire surfaces strict prefs scope without inventing a session", async ({
+    page,
+  }) => {
+    await page.goto("/desk/acquire");
+    await expect(page.getByText(/acquire|quote|wash|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const step1 = page.getByRole("button", { name: /^Continue$/i }).first();
+    if (await step1.isEnabled().catch(() => false)) {
+      await step1.click();
+      await page.getByText(/wash|checks|policy|gate|fail-closed/i).first().waitFor({
+        timeout: 30_000,
+      });
+    }
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/strict prefs · no session|strict fail-closed|no session/);
+    expect(body).toMatch(/bitquery_api_key/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
   test("desk overview supports ephemeral wallet inspect without session secret", async ({
@@ -129,7 +164,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/paper|wallet-read|collateral|ltv/);
-    expect(body).toMatch(/no borrow broadcast|fork|unavailable|illustrative/);
+    expect(body).toMatch(/no borrow broadcast|unavailable|illustrative|unfunded/);
     expect(body).toMatch(/nestusd/);
     expect(body).toMatch(/unverified|risk|fail-closed|unavailable/);
     // Never paint NestUSD as ready/live without a verified endpoint.
@@ -156,7 +191,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/kamino/);
     expect(body).toMatch(/nestusd/);
-    expect(body).toMatch(/no broadcast|fork|off|unfunded/);
+    expect(body).toMatch(/no broadcast|unavailable|off|unfunded/);
     expect(body).toMatch(/unverified|risk|fail-closed|hidden|unavailable/);
     expect(body).not.toMatch(/nestusd[\s\S]{0,40}ready/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);

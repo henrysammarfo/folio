@@ -10,15 +10,15 @@ Re-check live counts on https://hackathons.solana.com/hackathons/stocklana befor
 
 **One-liner:** Honest stock desk on Solana — live share truth, wash fail-closed, Jupiter quote-only, credit reads without fake fills.
 
-**Demo URL:** https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app
+**Demo URL:** https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app
 
-**Repo:** https://github.com/henrysammarfo/folio (branch `cursor/folio-wallet-read-f1ec` / PR #2)
+**Repo:** https://github.com/henrysammarfo/folio (branch `cursor/folio-prefs-agent-honesty-f1ec` / PR #3)
 
 **Pitch (≤ short paragraph):**
 FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after corporate actions — we read the live xStocks Scaled UI multiplier (AAPLx ≈ 1.003× today). If wash tape is missing or linked-flow looks dirty, acquire stays fail-closed. Jupiter quotes stay quote-only on a ≤~$1 budget with broadcast paused. Credit shows live Kamino LTV with NestUSD labeled unavailable until a verified endpoint exists. Watch-wallet mainnet-read qty is live on the public demo; multi-tenant Privy + Supabase sessions are wired but fail-closed without keys. We do not claim unhackable security.
 
 **Links judges can open:**
-1. Demo: https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app
+1. Demo: https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app
 2. Truth: `…/truth?symbol=AAPLx`
 3. Network honesty: `…/network`
 4. Settings readiness: `…/desk/settings` (secret set · wash/Pyth/Privy/Supabase fail-closed)

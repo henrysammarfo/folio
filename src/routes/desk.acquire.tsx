@@ -68,6 +68,21 @@ function Page() {
         <ModeBadge mode={data?.wash.ok ? data.wash.mode : "unavailable"}>
           {data?.wash.ok && data.wash.data.pass ? "Wash clear" : "Wash fail-closed"}
         </ModeBadge>
+        <ModeBadge
+          mode={
+            data?.prefsFromSession && data.strictFailClosed
+              ? "mainnet-read"
+              : data?.prefsFromSession
+                ? "paper"
+                : "unavailable"
+          }
+        >
+          {data?.prefsFromSession
+            ? data.strictFailClosed
+              ? "Strict fail-closed · session prefs"
+              : "Strict off · session prefs"
+            : "Strict prefs · no session"}
+        </ModeBadge>
       </div>
 
       <div className="stepper">
@@ -202,7 +217,9 @@ function Page() {
                 <p>
                   <b>Honesty labels</b>
                   <span className="ml-2 text-sm opacity-70">
-                    (do not invent a pass · do not alone block review)
+                    {data.strictFailClosed
+                      ? "(strict fail-closed on · unresolved required signals also block review)"
+                      : "(do not invent a pass · do not alone block review unless Strict is on)"}
                   </span>
                 </p>
                 <ul>
@@ -211,6 +228,12 @@ function Page() {
                   ))}
                 </ul>
               </div>
+            ) : null}
+            {data && !data.prefsFromSession ? (
+              <p className="mt-3 text-sm opacity-80">
+                Strict fail-closed prefs apply after Privy + Supabase mint an httpOnly session
+                (active tenant). Public demo stays honesty-labeled for missing Pyth until then.
+              </p>
             ) : null}
             {data &&
             (data.gates.blockedReasons.some((r) => /BITQUERY_API_KEY|PYTH_API_KEY/.test(r)) ||

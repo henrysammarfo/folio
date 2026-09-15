@@ -253,7 +253,7 @@ function Page() {
               <small>
                 {prefsEditable
                   ? data?.preferences.ok
-                    ? `Server-persisted · active tenant ${prefsTenant?.slug ?? prefsTenant?.tenantId.slice(0, 8) ?? "—"}`
+                    ? `Server-persisted · active tenant ${prefsTenant?.slug ?? prefsTenant?.tenantId.slice(0, 8) ?? "—"} · live signal = xStocks multiplier (no separate CA calendar yet)`
                     : "Session ready · save will upsert prefs for active tenant"
                   : data && !data.preferences.ok
                     ? data.preferences.reason

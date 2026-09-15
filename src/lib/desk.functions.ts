@@ -28,16 +28,23 @@ import {
 export { isBroadcastPaused } from "./broadcast";
 
 /** Load strictFailClosed from active-tenant prefs when a session exists; else false. */
-async function loadStrictFailClosedPref(): Promise<boolean> {
+async function loadStrictFailClosedPref(): Promise<{
+  strictFailClosed: boolean;
+  prefsFromSession: boolean;
+}> {
   try {
     const value = getCookie(FOLIO_SESSION_COOKIE);
     const session = verifyFolioSessionCookieValue(value);
-    if (!session.ok) return false;
+    if (!session.ok) return { strictFailClosed: false, prefsFromSession: false };
     const tenantId = resolveActiveTenantId(session.data);
     const prefs = await loadDeskPreferences(tenantId, session.data.userId);
-    return prefs.ok ? prefs.data.strictFailClosed : false;
+    if (!prefs.ok) return { strictFailClosed: false, prefsFromSession: false };
+    return {
+      strictFailClosed: prefs.data.strictFailClosed,
+      prefsFromSession: true,
+    };
   } catch {
-    return false;
+    return { strictFailClosed: false, prefsFromSession: false };
   }
 }
 
@@ -76,6 +83,13 @@ export type AcquireBundle = {
   jupiterPrice: AdapterResult<JupiterTokenPrice>;
   wash: AdapterResult<WashVerdict>;
   jupiter: AdapterResult<JupiterQuote>;
+  /**
+   * From active-tenant desk prefs when a verified session exists.
+   * Without session: false (public demo stays honesty-labeled for missing Pyth).
+   */
+  strictFailClosed: boolean;
+  /** True when prefs were loaded from an authenticated active tenant. */
+  prefsFromSession: boolean;
   gates: {
     truthOk: boolean;
     washOk: boolean;
@@ -83,7 +97,7 @@ export type AcquireBundle = {
     divergeOk: boolean;
     canReview: boolean;
     blockedReasons: string[];
-    /** Labeled gaps that do not alone block review (e.g. missing Pyth). */
+    /** Labeled gaps that do not alone block review (e.g. missing Pyth) unless strict. */
     honestyNotes: string[];
   };
 };
@@ -228,7 +242,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       diverge = { kind: "pyth_missing" };
     }
 
-    const strictFailClosed = await loadStrictFailClosedPref();
+    const prefs = await loadStrictFailClosedPref();
     const gateMsgs = buildAcquireGateMessages({
       truthOk,
       tradingHalted: Boolean(asset.ok && asset.data.isTradingHalted),
@@ -239,7 +253,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       quoteOk: jupiter.ok,
       quoteReason: jupiter.ok ? null : jupiter.reason,
       diverge,
-      strictFailClosed,
+      strictFailClosed: prefs.strictFailClosed,
     });
 
     return {
@@ -251,6 +265,8 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       jupiterPrice,
       wash,
       jupiter,
+      strictFailClosed: prefs.strictFailClosed,
+      prefsFromSession: prefs.prefsFromSession,
       gates: {
         truthOk,
         washOk,

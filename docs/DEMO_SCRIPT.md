@@ -13,7 +13,7 @@ Network: mainnet-read + quote-only · Budget: ≤~$1 · Broadcast: paused
 
 ## Live demo URL
 
-https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app
+https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app
 
 Home CTAs (live): **Approve desk UI** · **Approve shaders** → `/lab/ui` · `/lab/shaders` (Henry picks id before premium merge).
 

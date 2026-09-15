@@ -34,6 +34,21 @@ function Page() {
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Live-derived</ModeBadge>
         <ModeBadge mode="quote-only">No broadcast log</ModeBadge>
+        <ModeBadge
+          mode={
+            data?.prefsFromSession
+              ? data.corporateActionAlerts
+                ? "mainnet-read"
+                : "paper"
+              : "unavailable"
+          }
+        >
+          {data?.prefsFromSession
+            ? data.corporateActionAlerts
+              ? "CA alerts · on"
+              : "CA alerts · off"
+            : "CA alerts · no session"}
+        </ModeBadge>
       </div>
       <Panel
         title="Event stream"
