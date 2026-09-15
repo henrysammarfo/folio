@@ -22,6 +22,8 @@ import { Route as DeskActivityRouteImport } from './routes/desk.activity'
 import { Route as DeskCreditRouteImport } from './routes/desk.credit'
 import { Route as DeskPositionsRouteImport } from './routes/desk.positions'
 import { Route as DeskSettingsRouteImport } from './routes/desk.settings'
+import { Route as LabShadersRouteImport } from './routes/lab.shaders'
+import { Route as LabUiRouteImport } from './routes/lab.ui'
 import { Route as DeskPositionsSymbolRouteImport } from './routes/desk.positions.$symbol'
 
 const IndexRoute = IndexRouteImport.update({
@@ -89,6 +91,16 @@ const DeskSettingsRoute = DeskSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => DeskRoute,
 } as any)
+const LabShadersRoute = LabShadersRouteImport.update({
+  id: '/lab/shaders',
+  path: '/lab/shaders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabUiRoute = LabUiRouteImport.update({
+  id: '/lab/ui',
+  path: '/lab/ui',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DeskPositionsSymbolRoute = DeskPositionsSymbolRouteImport.update({
   id: '/$symbol',
   path: '/$symbol',
@@ -108,6 +120,8 @@ export interface FileRoutesByFullPath {
   '/desk/credit': typeof DeskCreditRoute
   '/desk/positions': typeof DeskPositionsRouteWithChildren
   '/desk/settings': typeof DeskSettingsRoute
+  '/lab/shaders': typeof LabShadersRoute
+  '/lab/ui': typeof LabUiRoute
   '/desk/': typeof DeskIndexRoute
   '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
 }
@@ -123,6 +137,8 @@ export interface FileRoutesByTo {
   '/desk/credit': typeof DeskCreditRoute
   '/desk/positions': typeof DeskPositionsRouteWithChildren
   '/desk/settings': typeof DeskSettingsRoute
+  '/lab/shaders': typeof LabShadersRoute
+  '/lab/ui': typeof LabUiRoute
   '/desk': typeof DeskIndexRoute
   '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
 }
@@ -140,6 +156,8 @@ export interface FileRoutesById {
   '/desk/credit': typeof DeskCreditRoute
   '/desk/positions': typeof DeskPositionsRouteWithChildren
   '/desk/settings': typeof DeskSettingsRoute
+  '/lab/shaders': typeof LabShadersRoute
+  '/lab/ui': typeof LabUiRoute
   '/desk/': typeof DeskIndexRoute
   '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
 }
@@ -158,6 +176,8 @@ export interface FileRouteTypes {
     | '/desk/credit'
     | '/desk/positions'
     | '/desk/settings'
+    | '/lab/shaders'
+    | '/lab/ui'
     | '/desk/'
     | '/desk/positions/$symbol'
   fileRoutesByTo: FileRoutesByTo
@@ -173,6 +193,8 @@ export interface FileRouteTypes {
     | '/desk/credit'
     | '/desk/positions'
     | '/desk/settings'
+    | '/lab/shaders'
+    | '/lab/ui'
     | '/desk'
     | '/desk/positions/$symbol'
   id:
@@ -189,6 +211,8 @@ export interface FileRouteTypes {
     | '/desk/credit'
     | '/desk/positions'
     | '/desk/settings'
+    | '/lab/shaders'
+    | '/lab/ui'
     | '/desk/'
     | '/desk/positions/$symbol'
   fileRoutesById: FileRoutesById
@@ -201,6 +225,8 @@ export interface RootRouteChildren {
   ExecutionRoute: typeof ExecutionRoute
   NetworkRoute: typeof NetworkRoute
   TruthRoute: typeof TruthRoute
+  LabShadersRoute: typeof LabShadersRoute
+  LabUiRoute: typeof LabUiRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -296,6 +322,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeskSettingsRouteImport
       parentRoute: typeof DeskRoute
     }
+    '/lab/shaders': {
+      id: '/lab/shaders'
+      path: '/lab/shaders'
+      fullPath: '/lab/shaders'
+      preLoaderRoute: typeof LabShadersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lab/ui': {
+      id: '/lab/ui'
+      path: '/lab/ui'
+      fullPath: '/lab/ui'
+      preLoaderRoute: typeof LabUiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/desk/positions/$symbol': {
       id: '/desk/positions/$symbol'
       path: '/$symbol'
@@ -346,6 +386,8 @@ const rootRouteChildren: RootRouteChildren = {
   ExecutionRoute: ExecutionRoute,
   NetworkRoute: NetworkRoute,
   TruthRoute: TruthRoute,
+  LabShadersRoute: LabShadersRoute,
+  LabUiRoute: LabUiRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

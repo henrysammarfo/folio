@@ -1,26 +1,45 @@
-# folio
+# FOLIO
 
-GO THROUGH MD ATTACHED ,CREATE GOOD BRAND,logo WILL USE FORR future MERCH AND HODDIES , CREATE FULL PAGES AND ROUTES AND DASHBOARD ALL FLOWS ,ROUTES EERYTHING , USE THE RIGHT PRO PREMIUM ICONS , SUBPAGES FULL should match template prompt design
+Honest stock desk on Solana for **xStocks** — truth (Scaled UI multiplier) · safe route (wash fail-closed) · credit without selling.
 
-AND USE THIS TEMPLATE
+## Soft pitch
 
-This project was built with [Lovable](https://lovable.dev).
+FOLIO buys the US stocks you want on Solana — keeps your share count honest, won’t buy in shady pools, and lets you borrow cash without selling.
 
-## Build with Lovable
+## Network policy (Stocklana + Colosseum World’s Fair)
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/0260bdbc-df4c-4ae9-b7bb-2cc21127254d).
+- **Mainnet READ** for xStocks / Jupiter price / pool & credit reads  
+- **Quote-only** Jupiter swaps (labeled; no silent broadcast)  
+- **Local mainnet-fork** for borrow CPI proofs when unfunded  
+- **No custom mainnet program deploy** on a ≤~$1 test budget  
+- See [`memory/NETWORK_POLICY.md`](memory/NETWORK_POLICY.md)
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+## Develop
 
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+```bash
+npm install
+cp .env.example .env   # fill keys; never commit .env
 npm run dev
 ```
+
+```bash
+npm run build
+npm run preview
+```
+
+## Live Block 0 spine
+
+Server functions in `src/lib/desk.functions.ts` call fail-closed adapters:
+
+- `src/lib/adapters/xstocks.ts` — live multiplier (`network=Solana`)
+- `src/lib/adapters/pyth.ts` — Hermes (may be unavailable on some egress → labeled)
+- `src/lib/adapters/jupiter.ts` — Price v3 + swap quote
+- `src/lib/adapters/wash.ts` — Bitquery gate (fail-closed until keyed)
+
+## Security honesty
+
+We do **not** claim unhackable / nation-state-proof security. Residual risk is tracked in `memory/THREAT_MODEL.md`.
+
+## Keys
+
+All secrets live in gitignored `.env`. Rotate anything pasted into chat after the hackathon.

@@ -1,6 +1,161 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, Database, FileClock } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { AlertTriangle, CheckCircle2, Database, FileClock } from "lucide-react";
 import { PublicShell, Metric } from "@/components/public-page";
 import { StatusBadge } from "@/components/folio-brand";
-export const Route=createFileRoute("/truth")({head:()=>({meta:[{title:"Share Truth — FOLIO"},{name:"description",content:"See raw and economic xStock balances with corporate-action provenance."},{property:"og:title",content:"Share Truth — FOLIO"},{property:"og:description",content:"See raw and economic xStock balances with corporate-action provenance."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:Page});
-function Page(){return <PublicShell eyebrow="Corporate-action ledger" title="One balance. Every truth behind it." intro="Token balances alone can lie after splits, consolidations and distributions. FOLIO keeps raw units, multipliers and economic ownership in one auditable view."><div className="metrics-grid"><Metric label="Raw token balance" value="12.5000" detail="Token-2022 account amount"/><Metric label="Action multiplier" value="4.0000×" detail="Verified 4-for-1 split"/><Metric label="Economic shares" value="50.0000" detail="Raw × active multiplier"/></div><section className="feature-band"><div><StatusBadge tone="green">Verified</StatusBadge><h2>AAPLx ownership proof</h2><p>Every transform cites its source, effective date and observed ledger state.</p></div><ol className="timeline"><li><FileClock/><span><b>Aug 28, 2026</b>4-for-1 multiplier became effective</span></li><li><Database/><span><b>Source quorum</b>xStocks API and issuer reference aligned</span></li><li><CheckCircle2/><span><b>Current</b>Economic balance verified</span></li></ol></section></PublicShell>}
+import { ModeBadge } from "@/components/mode-badge";
+import { getTruthBundle } from "@/lib/desk.functions";
+
+export const Route = createFileRoute("/truth")({
+  head: () => ({
+    meta: [
+      { title: "Share Truth — FOLIO" },
+      {
+        name: "description",
+        content: "Live raw vs economic xStock balances with corporate-action provenance.",
+      },
+      { property: "og:title", content: "Share Truth — FOLIO" },
+      {
+        property: "og:description",
+        content: "Live raw vs economic xStock balances with corporate-action provenance.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Page,
+});
+
+function Page() {
+  const fetchTruth = useServerFn(getTruthBundle);
+  const { data, isLoading, isError, error, dataUpdatedAt } = useQuery({
+    queryKey: ["truth", "AAPLx"],
+    queryFn: () => fetchTruth({ data: { symbol: "AAPLx" } }),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+  });
+
+  const mult = data?.multiplier;
+  const asset = data?.asset;
+  const raw = data?.demoRawBalance ?? null;
+  const economic = data?.economicShares ?? null;
+
+  return (
+    <PublicShell
+      eyebrow="Corporate-action ledger"
+      title="One balance. Every truth behind it."
+      intro="Token balances alone can lie after dividends and splits. FOLIO reads the live xStocks Scaled UI multiplier on Solana mainnet and shows raw vs economic ownership — no fixture 4.0× theater."
+    >
+      <div className="mb-4 flex flex-wrap gap-2">
+        <ModeBadge mode={mult?.ok ? mult.mode : "unavailable"}>
+          {mult?.ok ? "xStocks live" : "Multiplier unavailable"}
+        </ModeBadge>
+        <ModeBadge mode={data?.jupiterPrice.ok ? data.jupiterPrice.mode : "unavailable"}>
+          {data?.jupiterPrice.ok ? "Jupiter price live" : "Jupiter price unavailable"}
+        </ModeBadge>
+        <ModeBadge mode={data?.pyth.ok ? data.pyth.mode : "unavailable"}>
+          {data?.pyth.ok ? "Pyth live" : "Pyth unavailable"}
+        </ModeBadge>
+      </div>
+
+      <div className="metrics-grid">
+        <Metric
+          label="Demo raw balance"
+          value={raw != null ? raw.toFixed(4) : isLoading ? "…" : "—"}
+          detail="Illustrative raw (wallet RPC wiring next)"
+        />
+        <Metric
+          label="Live action multiplier"
+          value={
+            mult?.ok ? `${mult.data.currentMultiplier.toFixed(6)}×` : isLoading ? "…" : "—"
+          }
+          detail={
+            mult?.ok
+              ? `api.xstocks.fi · Solana · ${new Date(mult.asOf).toLocaleTimeString()}`
+              : mult
+                ? mult.reason
+                : "Loading…"
+          }
+        />
+        <Metric
+          label="Economic shares"
+          value={economic != null ? economic.toFixed(4) : isLoading ? "…" : "—"}
+          detail="raw × live multiplier"
+        />
+      </div>
+
+      {(isError || (data && !mult?.ok)) && (
+        <section className="feature-band mt-6">
+          <div>
+            <StatusBadge tone="amber">Fail closed</StatusBadge>
+            <h2>Truth feed issue</h2>
+            <p>
+              {isError
+                ? String(error)
+                : mult && !mult.ok
+                  ? `${mult.reason}${mult.detail ? ` — ${mult.detail}` : ""}`
+                  : "Unknown"}
+            </p>
+          </div>
+        </section>
+      )}
+
+      <section className="feature-band">
+        <div>
+          <StatusBadge tone={mult?.ok ? "green" : "amber"}>
+            {mult?.ok ? "Live" : "Blocked"}
+          </StatusBadge>
+          <h2>{asset?.ok ? asset.data.name : "AAPLx"} ownership math</h2>
+          <p>
+            {asset?.ok
+              ? `Underlying ${asset.data.underlyingSymbol} · mint ${asset.data.solanaMint ?? "unknown"}`
+              : "Asset metadata pending or unavailable."}
+          </p>
+          {data?.jupiterPrice.ok ? (
+            <p className="mt-2 text-sm opacity-80">
+              Jupiter venue ${data.jupiterPrice.data.usdPrice.toFixed(2)}
+              {data.jupiterPrice.data.stockRefPrice != null
+                ? ` · stockData $${data.jupiterPrice.data.stockRefPrice.toFixed(2)}`
+                : ""}
+              {data.diverge.divergeBps != null
+                ? ` · diverge ${data.diverge.divergeBps.toFixed(1)} bps`
+                : ""}
+            </p>
+          ) : null}
+          {dataUpdatedAt ? (
+            <p className="mt-2 text-xs opacity-60">
+              Refreshed {new Date(dataUpdatedAt).toLocaleString()}
+            </p>
+          ) : null}
+        </div>
+        <ol className="timeline">
+          <li>
+            <FileClock />
+            <span>
+              <b>Live multiplier</b>
+              {mult?.ok
+                ? ` ${mult.data.currentMultiplier.toFixed(6)}× from xStocks public API`
+                : " unavailable — UI will not invent a split"}
+            </span>
+          </li>
+          <li>
+            <Database />
+            <span>
+              <b>Venue check</b>
+              {data?.jupiterPrice.ok
+                ? " Jupiter Price v3 mainnet"
+                : " Jupiter price unavailable"}
+            </span>
+          </li>
+          <li>
+            {data?.diverge.pass === false ? <AlertTriangle /> : <CheckCircle2 />}
+            <span>
+              <b>Diverge gate</b> {data?.diverge.note ?? "pending"}
+            </span>
+          </li>
+        </ol>
+      </section>
+    </PublicShell>
+  );
+}
