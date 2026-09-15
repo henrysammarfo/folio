@@ -126,3 +126,4 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Jupiter invents quote/price on HTTP 429 | REJECTED | Fail-closed `jupiter_rate_limited` unless prior live ok within 120s stale window; source labeled cached/stale-cache | 2026-09-15 |
 | Corporate-action pending invents a calendar event | REJECTED | Truth/activity only surface live xStocks pendingMultiplier / none | 2026-09-15 |
 | Paper agent invents pending CA or fill | REJECTED | Truth spine labels pending/none from live multiplier; quote never a fill; wash gates shared | 2026-09-15 |
+| AgentRouter WAF fails whole paper agent turn | REJECTED (fixed) | Live spine reply returns with nlExpansion=failed; NL skipped and labeled | 2026-09-15 |

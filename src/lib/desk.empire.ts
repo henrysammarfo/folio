@@ -174,6 +174,8 @@ export type SessionBundle = {
   watchWallet: string | null;
   /** FOLIO_SESSION_SECRET ≥16 — watch-wallet bind + cookie signing (not Privy). */
   sessionSecretPresent: boolean;
+  /** AGENTROUTER_API_KEY present — NL expansion optional; live spine always runs. */
+  agentRouterKeyPresent: boolean;
   /**
    * RLS honesty: until Privy DID maps into Supabase JWT `sub`, desk prefs/tenants
    * are service-role server only — anon RLS policies are placeholders.
@@ -186,6 +188,7 @@ export type SessionBundle = {
     supabaseConfigured: boolean;
     sessionSecretPresent: boolean;
     pythApiKeyPresent: boolean;
+    agentRouterKeyPresent: boolean;
     broadcastPaused: boolean;
   };
 };
@@ -584,6 +587,9 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim(),
     );
     const pythApiKeyPresent = Boolean(process.env["PYTH_API_KEY"]?.trim());
+    const agentRouterKeyPresent = Boolean(
+      process.env["AGENTROUTER_API_KEY"]?.trim(),
+    );
     return {
       auth,
       session,
@@ -598,6 +604,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
       },
       watchWallet: watch.ok ? watch.data.wallet : null,
       sessionSecretPresent,
+      agentRouterKeyPresent,
       rlsNote:
         "Service-role server path only until Privy DID → Supabase JWT sub mapping lands. Anon RLS policies are placeholders — not end-user authz yet.",
       readiness: {
@@ -606,6 +613,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         supabaseConfigured,
         sessionSecretPresent,
         pythApiKeyPresent,
+        agentRouterKeyPresent,
         broadcastPaused: isBroadcastPaused(),
       },
     };

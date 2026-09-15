@@ -1,4 +1,4 @@
-import { errResult, okResult, type AdapterResult } from "../adapters/types";
+import { okResult, type AdapterResult } from "../adapters/types";
 import { fetchXStockAsset, fetchXStockMultiplier } from "../adapters/xstocks";
 import { fetchJupiterQuote } from "../adapters/jupiter";
 import { evaluateWashGate, washAllowsSize } from "../adapters/wash";
@@ -45,6 +45,9 @@ export type AgentTurn = {
   reply: string;
   spine: AgentSpineEvidence;
   caps: { maxSpendUsdc: number; broadcast: false };
+  /** AgentRouter NL expansion status — spine stays authoritative either way. */
+  nlExpansion: "off" | "ok" | "failed";
+  nlExpansionNote: string | null;
 };
 
 const MAX_SPEND = 25;
@@ -258,6 +261,8 @@ export async function runPaperAgent(
   if (intent.kind === "unknown") {
     return okResult("paper", source, {
       ...baseTurn,
+      nlExpansion: "off",
+      nlExpansionNote: null,
       reply:
         "Paper agent only. Try: `truth AAPLx` or `quote 25 USDC AAPLx`. Broadcast is disabled.",
     });
@@ -266,6 +271,8 @@ export async function runPaperAgent(
   if (!key) {
     return okResult("paper", source, {
       ...baseTurn,
+      nlExpansion: "off",
+      nlExpansionNote: "AGENTROUTER_API_KEY missing",
       reply: `${facts} AgentRouter key missing — live spine only, no NL expansion.`,
     });
   }
@@ -295,21 +302,72 @@ export async function runPaperAgent(
       }),
     });
     if (!res.ok) {
-      return errResult(source, "agentrouter_http_error", `HTTP ${res.status}`);
+      const body = await res.text().catch(() => "");
+      const waf =
+        body.trimStart().startsWith("<!doctype") ||
+        body.trimStart().startsWith("<html") ||
+        /waf|aliyun|access denied/i.test(body);
+      return okResult("paper", source, {
+        ...baseTurn,
+        nlExpansion: "failed",
+        nlExpansionNote: waf
+          ? `AgentRouter HTTP ${res.status} returned HTML/WAF — live spine kept (NL skipped)`
+          : `AgentRouter HTTP ${res.status} — live spine kept (NL skipped)`,
+        reply: `${facts} AgentRouter NL failed (HTTP ${res.status}${waf ? " · WAF/HTML" : ""}) — live spine only. Never a fill.`,
+      });
     }
-    const json = (await res.json()) as {
+    const contentType = res.headers.get("content-type") ?? "";
+    const rawBody = await res.text();
+    if (
+      !contentType.includes("json") ||
+      rawBody.trimStart().startsWith("<!") ||
+      rawBody.trimStart().startsWith("<html")
+    ) {
+      return okResult("paper", source, {
+        ...baseTurn,
+        nlExpansion: "failed",
+        nlExpansionNote:
+          "AgentRouter returned non-JSON (WAF/HTML) — live spine kept (NL skipped)",
+        reply: `${facts} AgentRouter NL failed (WAF/HTML) — live spine only. Never a fill.`,
+      });
+    }
+    let json: {
       choices?: Array<{ message?: { content?: string } }>;
       usage?: { total_tokens?: number };
     };
+    try {
+      json = JSON.parse(rawBody) as typeof json;
+    } catch {
+      return okResult("paper", source, {
+        ...baseTurn,
+        nlExpansion: "failed",
+        nlExpansionNote: "AgentRouter JSON parse failed — live spine kept (NL skipped)",
+        reply: `${facts} AgentRouter NL failed (bad JSON) — live spine only. Never a fill.`,
+      });
+    }
     const reply = json.choices?.[0]?.message?.content?.trim();
-    if (!reply) return errResult(source, "agentrouter_empty");
+    if (!reply) {
+      return okResult("paper", source, {
+        ...baseTurn,
+        nlExpansion: "failed",
+        nlExpansionNote: "AgentRouter empty completion — live spine kept (NL skipped)",
+        reply: `${facts} AgentRouter NL empty — live spine only. Never a fill.`,
+      });
+    }
     const tokens = json.usage?.total_tokens ?? 0;
     return okResult("paper", source, {
       ...baseTurn,
       meteredCostUsd: (tokens / 1_000_000) * 0.15,
+      nlExpansion: "ok",
+      nlExpansionNote: null,
       reply: `${reply} · ${facts}`,
     });
   } catch (e) {
-    return errResult(source, "agentrouter_failed", String(e));
+    return okResult("paper", source, {
+      ...baseTurn,
+      nlExpansion: "failed",
+      nlExpansionNote: `AgentRouter error — live spine kept: ${String(e).slice(0, 160)}`,
+      reply: `${facts} AgentRouter NL failed — live spine only. Never a fill.`,
+    });
   }
 }

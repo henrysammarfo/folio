@@ -276,3 +276,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Position detail shows Pending corporate action from live feed.
 - Flattened `/desk/positions/$symbol` via `desk.positions_.$symbol` (was nested without Outlet → list page stole the URL).
 - Vitest **72** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Paper agent WAF-resilient spine fallback
+- AgentRouter WAF/HTML/errors no longer fail the whole turn — live Block 0 spine reply returns with `nlExpansion=failed`.
+- Settings readiness surfaces AGENTROUTER_API_KEY; paper agent UI prints spine + nl status.
+- B002 mitigated. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

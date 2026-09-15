@@ -158,6 +158,14 @@ function Page() {
             </b>
           </p>
           <p>
+            <span>AGENTROUTER_API_KEY</span>
+            <b>
+              {data?.readiness.agentRouterKeyPresent
+                ? "Set · NL optional (spine always; WAF → spine-only)"
+                : "Missing · live spine only"}
+            </b>
+          </p>
+          <p>
             <span>Privy (PRIVY_APP_ID / SECRET)</span>
             <b>
               {data?.readiness.privyConfigured
@@ -563,9 +571,10 @@ function Page() {
       <Panel title="Paper agent" meta={<StatusBadge tone="blue">Live spine · no broadcast</StatusBadge>}>
         <p className="mb-3 text-sm opacity-80">
           Runs live xStocks multiplier / Jupiter quote-only reads and the same acquire wash
-          gates on quote intents. Never broadcasts. AgentRouter expands NL only when keyed.
-          Truth spine labels pending corporate-action multiplier (or none); quotes label
-          Jupiter live/cached/stale.
+          gates on quote intents. Never broadcasts. AgentRouter expands NL only when keyed —
+          if AgentRouter returns WAF/HTML or errors, the live spine reply still returns
+          (NL skipped, labeled). Truth spine labels pending corporate-action multiplier (or
+          none); quotes label Jupiter live/cached/stale.
         </p>
         <div className="form-grid">
           <label>
@@ -580,10 +589,36 @@ function Page() {
               setBusy(true);
               try {
                 const res = await runAgent({ data: { prompt } });
+                if (!res.ok) {
+                  setAgentOut(
+                    `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                  );
+                  return;
+                }
+                const spineBits = [
+                  res.data.spine.truth
+                    ? `truth ×${res.data.spine.truth.multiplier?.toFixed(6) ?? "—"} · pending ${
+                        res.data.spine.truth.pendingMultiplier != null
+                          ? `${res.data.spine.truth.pendingMultiplier.toFixed(6)}×`
+                          : "none"
+                      }`
+                    : null,
+                  res.data.spine.quote
+                    ? `quote ${res.data.spine.quote.cacheLabel} out=${
+                        res.data.spine.quote.outUiAmount?.toFixed(6) ?? "—"
+                      }`
+                    : null,
+                  res.data.spine.gates
+                    ? `gates canReview=${res.data.spine.gates.canReview}`
+                    : null,
+                  `nl=${res.data.nlExpansion}`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ");
                 setAgentOut(
-                  res.ok
-                    ? `${res.data.reply} (metered ~$${res.data.meteredCostUsd.toFixed(6)}; broadcast=${res.data.caps.broadcast})`
-                    : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                  `${res.data.reply}\n[${spineBits}; metered ~$${res.data.meteredCostUsd.toFixed(6)}; broadcast=${res.data.caps.broadcast}${
+                    res.data.nlExpansionNote ? `; ${res.data.nlExpansionNote}` : ""
+                  }]`,
                 );
               } finally {
                 setBusy(false);
@@ -593,7 +628,9 @@ function Page() {
             {busy ? "Running…" : "Run paper agent"}
           </button>
         </div>
-        {agentOut ? <p className="mt-3 text-sm">{agentOut}</p> : null}
+        {agentOut ? (
+          <pre className="mt-3 whitespace-pre-wrap text-sm opacity-90">{agentOut}</pre>
+        ) : null}
       </Panel>
     </DeskShell>
   );

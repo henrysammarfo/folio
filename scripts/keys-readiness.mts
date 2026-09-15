@@ -2,7 +2,7 @@
  * Print fail-closed key readiness for FOLIO (no secrets printed).
  * Usage: npx tsx scripts/keys-readiness.mts
  */
-const rows: Array<{ name: string; ok: boolean; note: string }> = [
+const rows: Array<{ name: string; ok: boolean; note: string; required?: boolean }> = [
   {
     name: "FOLIO_SESSION_SECRET",
     ok: (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16,
@@ -17,6 +17,7 @@ const rows: Array<{ name: string; ok: boolean; note: string }> = [
     name: "SOLANA_RPC_URL",
     ok: Boolean(process.env["SOLANA_RPC_URL"]?.trim()),
     note: "optional — public mainnet fallback if unset",
+    required: false,
   },
   {
     name: "BITQUERY_API_KEY",
@@ -27,6 +28,12 @@ const rows: Array<{ name: string; ok: boolean; note: string }> = [
     name: "PYTH_API_KEY",
     ok: Boolean(process.env["PYTH_API_KEY"]?.trim()),
     note: "Hermes equity diverge — fail-closed when missing",
+  },
+  {
+    name: "AGENTROUTER_API_KEY",
+    ok: Boolean(process.env["AGENTROUTER_API_KEY"]?.trim()),
+    note: "optional NL for paper agent — live spine always; WAF → spine-only",
+    required: false,
   },
   {
     name: "PRIVY_APP_ID + PRIVY_APP_SECRET",
@@ -49,7 +56,7 @@ const rows: Array<{ name: string; ok: boolean; note: string }> = [
 let missing = 0;
 for (const r of rows) {
   const mark = r.ok ? "SET " : "MISS";
-  if (!r.ok) missing += 1;
+  if (!r.ok && r.required !== false) missing += 1;
   console.log(`${mark}  ${r.name} — ${r.note}`);
 }
 

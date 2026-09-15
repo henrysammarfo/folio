@@ -247,3 +247,8 @@
 - Agent truth facts include pending CA or none; quote facts include cacheLabel.
 - Position detail Pending corporate action row; settings copy updated.
 - Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — AgentRouter WAF → spine-only (B002)
+- Paper agent never drops live spine when AgentRouter returns WAF HTML / bad JSON.
+- Settings readiness + structured agent output include nlExpansion.
+- Goal open: Henry lab Pick + keys.

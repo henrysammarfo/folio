@@ -136,6 +136,37 @@ describe("runPaperAgent live spine", () => {
     expect(res.data.reply).toMatch(/Never a fill|acquire gates blocked/i);
   });
 
+  it("keeps live spine when AgentRouter returns WAF HTML", async () => {
+    process.env["AGENTROUTER_API_KEY"] = "test-agentrouter-key";
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/multiplier")) {
+        return new Response(
+          JSON.stringify({ currentMultiplier: 1.003269 }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      if (url.includes("/chat/completions")) {
+        return new Response("<!doctype html><html><body>WAF</body></html>", {
+          status: 200,
+          headers: { "Content-Type": "text/html" },
+        });
+      }
+      return new Response(`unexpected ${url}`, { status: 500 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const res = await runPaperAgent("truth AAPLx");
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.data.nlExpansion).toBe("failed");
+    expect(res.data.nlExpansionNote ?? "").toMatch(/WAF|HTML|non-JSON/i);
+    expect(res.data.spine.truth?.multiplier).toBeCloseTo(1.003269);
+    expect(res.data.reply).toMatch(/1\.003269/);
+    expect(res.data.reply).toMatch(/live spine only|Never a fill/i);
+    expect(res.data.caps.broadcast).toBe(false);
+  });
+
   it("labels wash-blocked quote when Bitquery returns dirty tape", async () => {
     process.env["BITQUERY_API_KEY"] = "test-bitquery-key";
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
