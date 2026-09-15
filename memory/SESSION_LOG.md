@@ -21,3 +21,14 @@
 - Wired `/truth`, `/desk/acquire`, `/network` to live bundles.
 - Removed  vite package, telemetry hook, README/AGENTS marketing; hero media preserved.
 - Lab routes `/lab/shaders` + `/lab/ui` for approve gate.
+
+
+## 2026-09-15 — Empire depth + desk de-fixture
+
+- Confirmed Colosseum/World’s Fair network posture: **mainnet-read + quote-only + fork**, not full broadcast; documented in CURRENT_STATE / NETWORK_POLICY.
+- Deep live research: Token-2022 Scaled UI effective-multiplier rules; Bitquery wash detector docs; Kamino xStocks market reserves (AAPLx maxLtv 0.40); Jupiter Lend earn tokens; Raydium mint pools; NestUSD left fail-closed pending verified metrics endpoint.
+- Added adapters: `scaled-ui`, `kamino`, `jupiter-lend`, `pools`, `nestusd`; auth session scaffold; paper agent.
+- Wired `desk.empire` bundles into positions / credit / activity / settings / desk index — removed fixture `4.0000×` positions export.
+- Vitest: market math, wash fail-closed, paper intent — 8/8 green.
+- Removed `.lovable/` directory; Lovable package already gone from package.json.
+- Broadcast / mentor DMs still paused until Block 0 demo URL.

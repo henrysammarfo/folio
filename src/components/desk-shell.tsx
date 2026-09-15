@@ -41,9 +41,3 @@ export function DeskShell({ title, eyebrow, children, actions }: { title: string
 export function Panel({ title, meta, children, className = "" }: { title: string; meta?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return <section className={`panel ${className}`}><header><h2>{title}</h2>{meta}</header><div className="panel-body">{children}</div></section>;
 }
-
-export const positions = [
-  { symbol: "AAPLx", name: "Apple xStock", raw: "12.5000", multiplier: "4.0000×", economic: "50.0000", value: "$11,700.50", health: "Verified" },
-  { symbol: "NVDAx", name: "NVIDIA xStock", raw: "8.2400", multiplier: "1.0000×", economic: "8.2400", value: "$1,455.18", health: "Verified" },
-  { symbol: "TSLAx", name: "Tesla xStock", raw: "5.1000", multiplier: "1.0000×", economic: "5.1000", value: "$2,025.21", health: "Review" },
-];

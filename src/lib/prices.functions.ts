@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { PriceMap, Quote } from "./market";
-import { holdings } from "./market";
+import { UNDERLYING_SYMBOLS } from "./market";
 
 type YahooChart = {
   chart?: {
@@ -30,7 +30,7 @@ async function fetchQuote(symbol: string): Promise<Quote | null> {
 }
 
 export const getPrices = createServerFn({ method: "GET" }).handler(async (): Promise<PriceMap> => {
-  const symbols = [...new Set(holdings.map((h) => h.underlying))];
+  const symbols = UNDERLYING_SYMBOLS;
   const results = await Promise.all(symbols.map((s) => fetchQuote(s).catch(() => null)));
   const map: PriceMap = {};
   for (const q of results) if (q) map[q.symbol] = q;

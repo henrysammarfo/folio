@@ -1,3 +1,117 @@
-import { createFileRoute } from "@tanstack/react-router"; import { useState } from "react"; import { DeskShell, Panel } from "@/components/desk-shell"; import { StatusBadge } from "@/components/folio-brand";
-export const Route=createFileRoute("/desk/credit")({head:()=>({meta:[{title:"Credit Workspace — FOLIO"},{name:"description",content:"Model credit against verified xStock balances."},{property:"og:title",content:"Credit Workspace — FOLIO"},{property:"og:description",content:"Model credit against verified xStock balances."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:Page});
-function Page(){const [ltv,setLtv]=useState(35);return <DeskShell eyebrow="Collateral workspace" title="Credit"><div className="desk-grid"><Panel title="Borrowing model" meta={<StatusBadge tone="blue">Local fork</StatusBadge>}><label className="range-control"><span>Target LTV <b>{ltv}%</b></span><input type="range" min="10" max="55" value={ltv} onChange={e=>setLtv(Number(e.target.value))}/></label><div className="credit-output"><span>Illustrative capacity</span><b>${(13155*ltv/100).toLocaleString(undefined,{maximumFractionDigits:0})}</b><small>Not a live offer</small></div></Panel><Panel title="Provider paths"><div className="policy-list"><p><span>Kamino</span><StatusBadge tone="blue">Fork modeled</StatusBadge></p><p><span>Jupiter Lend</span><StatusBadge tone="neutral">Market read</StatusBadge></p><p><span>NestUSD</span><StatusBadge tone="amber">Risk review</StatusBadge></p></div></Panel></div></DeskShell>}
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { DeskShell, Panel } from "@/components/desk-shell";
+import { StatusBadge } from "@/components/folio-brand";
+import { ModeBadge } from "@/components/mode-badge";
+import { getCreditBundle } from "@/lib/desk.functions";
+
+export const Route = createFileRoute("/desk/credit")({
+  head: () => ({
+    meta: [
+      { title: "Credit — FOLIO" },
+      { name: "description", content: "Labeled Kamino / Jupiter Lend / NestUSD credit reads." },
+    ],
+  }),
+  component: Page,
+});
+
+function Page() {
+  const fetchCredit = useServerFn(getCreditBundle);
+  const { data, isFetching } = useQuery({
+    queryKey: ["credit-bundle"],
+    queryFn: () => fetchCredit(),
+    staleTime: 20_000,
+  });
+
+  const reserves = data?.kamino.ok ? data.kamino.data.reserves : [];
+
+  return (
+    <DeskShell eyebrow="Collateral workspace" title="Credit">
+      <div className="mb-3 flex flex-wrap gap-2">
+        <ModeBadge mode="mainnet-read">Market reads</ModeBadge>
+        <ModeBadge mode="fork">Borrow CPI = fork</ModeBadge>
+        <ModeBadge mode="paper">Paper capacity</ModeBadge>
+      </div>
+      <div className="desk-grid">
+        <Panel
+          title="Illustrative capacity"
+          meta={<StatusBadge tone="blue">{isFetching ? "…" : "Paper × live LTV"}</StatusBadge>}
+        >
+          <div className="credit-output">
+            <span>Paper collateral (live marks)</span>
+            <b>
+              {data?.paper.collateralUsd != null
+                ? data.paper.collateralUsd.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                    maximumFractionDigits: 0,
+                  })
+                : "—"}
+            </b>
+            <small>
+              AAPLx maxLtv {data?.paper.maxLtvUsed != null ? `${(data.paper.maxLtvUsed * 100).toFixed(0)}%` : "—"} ·
+              illustrative borrow{" "}
+              {data?.paper.illustrativeBorrowUsd != null
+                ? data.paper.illustrativeBorrowUsd.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                    maximumFractionDigits: 0,
+                  })
+                : "—"}
+            </small>
+            <small>{data?.paper.note}</small>
+          </div>
+        </Panel>
+        <Panel title="Provider paths">
+          <div className="policy-list">
+            <p>
+              <span>Kamino xStocks</span>
+              <StatusBadge tone={data?.kamino.ok ? "green" : "amber"}>
+                {data?.kamino.ok ? "Mainnet read" : data && !data.kamino.ok ? data.kamino.reason : "…"}
+              </StatusBadge>
+            </p>
+            <p>
+              <span>Jupiter Lend earn</span>
+              <StatusBadge tone={data?.jupiterLend.ok ? "blue" : "amber"}>
+                {data?.jupiterLend.ok ? "Earn vaults" : data && !data.jupiterLend.ok ? data.jupiterLend.reason : "…"}
+              </StatusBadge>
+            </p>
+            <p>
+              <span>NestUSD</span>
+              <StatusBadge tone="amber">
+                {data?.nestusd.ok ? "Ready" : data && !data.nestusd.ok ? data.nestusd.reason : "Risk / unverified"}
+              </StatusBadge>
+            </p>
+            <p>
+              <span>Borrow execution</span>
+              <StatusBadge tone="neutral">{data?.borrowExecution ?? "local-fork-or-unavailable"}</StatusBadge>
+            </p>
+          </div>
+        </Panel>
+      </div>
+      <Panel title="Kamino reserves (live)" meta={<StatusBadge tone="green">xStocks market</StatusBadge>}>
+        <div className="data-table">
+          <div className="table-head">
+            <span>Asset</span>
+            <span>Max LTV</span>
+            <span>Borrow APY</span>
+            <span>Supply</span>
+            <span>Borrow</span>
+          </div>
+          {reserves.slice(0, 12).map((r) => (
+            <div key={r.mint}>
+              <span>
+                <b>{r.symbol}</b>
+              </span>
+              <span>{(r.maxLtv * 100).toFixed(0)}%</span>
+              <span>{(r.borrowApy * 100).toFixed(2)}%</span>
+              <span>{r.totalSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+              <span>{r.totalBorrow.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+            </div>
+          ))}
+        </div>
+      </Panel>
+    </DeskShell>
+  );
+}

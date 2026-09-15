@@ -7,35 +7,51 @@
 
 - **One job:** Honest stock desk on Solana (truth · safe route · credit).
 - **Pitch order:** (1) honest share counts (2) won’t buy wash (3) buy on Solana (4) borrow without selling (5) guarded agent.
-- **Soft:** FOLIO buys the US stocks you want on Solana — keeps your share count honest, won’t buy in shady pools, and lets you borrow cash without selling.
+- Soft: FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
+
+## Network verdict (Stocklana + Colosseum World’s Fair)
+
+**Mainnet-primary READ + quote-only.** Not full mainnet broadcast-everything. Not “devnet cosplay as mainnet.”
+
+| Layer | Policy |
+|---|---|
+| xStocks multiplier / mint / Scaled UI | **Mainnet READ** (API + on-chain Token-2022) |
+| Jupiter price + swap quote | **Mainnet READ / quote-only** |
+| Wash / Bitquery | **Mainnet READ**, fail-closed until keyed+wired |
+| Kamino xStocks / Jupiter Lend earn / Raydium pools | **Mainnet READ** (labeled) |
+| NestUSD capacity | **Unavailable** until verified endpoint |
+| Swap / borrow broadcast | **Disabled** (≤~$1 budget) |
+| Borrow CPI proofs | **Local mainnet-fork** when unfunded |
+| Custom program mainnet deploy | **Out** (rent ≫ $1) |
+| Optional policy harness | Devnet OK if labeled |
+
+World’s Fair still wins on **working honesty**: live multiplier + wash refuse + Jupiter quote + credit reads with mode badges beats fake mainnet fills.
 
 ## Repo reality
 
 | Layer | Status |
 |---|---|
-|  TanStack Start UI (public + desk routes) | Present — was fixture-heavy |
-| Live xStocks ScaledUiAmount / multiplier | Wiring in progress |
-| Live Pyth diverge + Jupiter quote | Wiring in progress |
-| Wash / Bitquery | Fail-closed until `BITQUERY_API_KEY` |
-| Privy + Supabase multi-tenant | Scaffold — needs keys |
-| Custom mainnet program deploy | **Out of budget** (≤~$1 spend) |
-| Broadcast / mentor spam | **PAUSED** until Block 0 live demo |
+| Live Block 0 spine (truth / acquire / network) | Wired |
+| Positions / credit / activity / settings | Live bundles (paper qty labeled) |
+| On-chain Scaled UI reader | Live when `SOLANA_RPC_URL` set |
+| Kamino xStocks market reserves | Live mainnet-read |
+| Jupiter Lend earn vaults | Live mainnet-read (not xStock borrow) |
+| Raydium pool awareness | Live mainnet-read |
+| NestUSD | Fail-closed / risk-labeled |
+| Privy + Supabase sessions | Scaffold fail-closed (keys empty) |
+| Paper agent + meter stub | Wired on settings |
+| Vitest unit | Green (multiplier / diverge / wash / intent) |
+| Lovable traces | Removed (`.lovable` deleted; vite config independent) |
 
-## Network policy (funds law)
+## Keys
 
-- Real xStocks liquidity / Kamino markets: **mainnet only**
-- Jupiter DCA depth: **mainnet** (devnet ≈ empty)
-- FOLIO policy harness: **devnet OK**
-- xStocks API · Pyth · Jupiter **quote** · pool GETs: **mainnet READ**
-- CPI borrow proofs: **local mainnet-fork** when unfunded
+Present in `.env`: Tavily, TinyFish, AgentRouter, 21st, Shaders, Solana RPC.
+Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated).
+**Rotate all chat-pasted keys after hackathon.**
 
-## Keys (names only — values in gitignored `.env`)
+## Live deltas (do not regress)
 
-Present: Tavily, TinyFish, AgentRouter, 21st, Shaders, public Solana RPC.
-Missing for full E2E: Privy, Supabase, Bitquery, dedicated RPC, Jupiter (if gated).
-
-## Fact-check deltas vs bible (2026-09-15 live)
-
-- Stocklana prize/deadline: **confirmed** $100k · 18 Sep 2026 20:00 UTC.
-- Registered/submissions in older docs (~500/57) were **stale**; re-check page at submit.
-- AAPLx live multiplier ≈ **1.003…** (not fixture 4.0×) — UI must show live API, not demo splits.
+- AAPLx multiplier ≈ **1.00327** (not fixture 4.0×)
+- Mint `XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp`, decimals **8**
+- On-chain effective Scaled UI matches pending API multiplier when timestamp elapsed
+- Kamino AAPLx **maxLtv 0.40** on market `5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua`

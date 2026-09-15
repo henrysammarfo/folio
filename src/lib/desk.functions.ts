@@ -265,3 +265,18 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     };
   },
 );
+export {
+  getPositionsBundle,
+  getCreditBundle,
+  getActivityBundle,
+  getSessionBundle,
+  runDeskAgent,
+} from "./desk.empire";
+export type {
+  PositionsBundle,
+  CreditBundle,
+  ActivityBundle,
+  SessionBundle,
+  PositionRow,
+  ActivityEvent,
+} from "./desk.empire";

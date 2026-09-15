@@ -1,15 +1,16 @@
 # FOLIO — NETWORK MATRIX
 
-| Capability | Mode | Status |
+| Capability | Mode | Detail |
 |---|---|---|
-| xStocks asset + multiplier | Mainnet READ | Live adapter |
-| Pyth equity / Hermes | Mainnet READ | Live adapter |
-| Jupiter swap quote | Mainnet READ (quote-only) | Live adapter |
-| Wash / Bitquery tape | Mainnet READ | Fail-closed until key |
-| Raydium / Meteora / Orca pool reads | Mainnet READ | Planned |
-| Kamino / Jupiter Lend / NestUSD | Mainnet READ · borrow CPI = fork if unfunded | Planned labeled |
-| Broadcast swap / borrow | Mainnet WRITE | Disabled until funded + explicit user confirm (≤~$1 test budget) |
-| FOLIO custom program | Mainnet deploy | **Skipped** (budget) |
-| Agent (stonkfly-style) | Paper default | AgentRouter when key works |
-
-Every UI surface must show mode badges: `mainnet-read` | `quote-only` | `fork` | `unavailable` | `paper`.
+| xStocks multiplier + asset | mainnet-read | api.xstocks.fi `network=Solana` |
+| On-chain Scaled UI | mainnet-read | Token-2022 via SOLANA_RPC_URL |
+| Pyth Hermes equity | unavailable / mainnet-read | Price updates 401 on some egress — fail-closed |
+| Jupiter Price v3 | mainnet-read | Venue + optional stockData |
+| Jupiter swap quote | quote-only | No broadcast |
+| Wash / Bitquery | unavailable | Key missing or query not wired — fail-closed |
+| Kamino xStocks reserves | mainnet-read | Market 5wJe…Lsua |
+| Jupiter Lend earn | mainnet-read | Earn vaults only — labeled |
+| Raydium pools | mainnet-read | Awareness only |
+| NestUSD | unavailable | Unverified endpoint |
+| Broadcast swap/borrow | unavailable | ≤~$1 budget |
+| Custom program deploy | unavailable | Rent exceeds budget |
