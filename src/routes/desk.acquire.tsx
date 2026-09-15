@@ -143,7 +143,13 @@ function Page() {
             <p>
               <span>Corporate-action / asset</span>
               <StatusBadge tone={data?.gates.truthOk ? "green" : "amber"}>
-                {data?.gates.truthOk ? "Verified live" : data ? "Blocked" : "…"}
+                {data?.gates.truthOk
+                  ? data.multiplier.ok && data.multiplier.data.pendingMultiplier != null
+                    ? `Live · pending ${data.multiplier.data.pendingMultiplier.toFixed(6)}×`
+                    : "Verified live · no pending CA"
+                  : data
+                    ? "Blocked"
+                    : "…"}
               </StatusBadge>
             </p>
             <p>
@@ -174,7 +180,13 @@ function Page() {
               <span>Jupiter route</span>
               <StatusBadge tone={data?.gates.quoteOk ? "blue" : "amber"}>
                 {data?.gates.quoteOk && data.jupiter.ok
-                  ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
+                  ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol} · ${
+                      data.jupiter.source.includes("stale")
+                        ? "stale-cache"
+                        : data.jupiter.source.includes("cached")
+                          ? "cached"
+                          : "live"
+                    }`
                   : data?.jupiter && !data.jupiter.ok
                     ? data.jupiter.reason
                     : "…"}
@@ -270,6 +282,15 @@ function Page() {
                   ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
                   : "Unavailable"}
               </b>
+              {data?.jupiter.ok ? (
+                <small>
+                  {data.jupiter.source.includes("stale")
+                    ? "Stale-cache after 429 · not invented"
+                    : data.jupiter.source.includes("cached")
+                      ? "Short TTL cache hit · quote-only"
+                      : "Fresh Jupiter quote · quote-only"}
+                </small>
+              ) : null}
             </div>
             <div>
               <span>Multiplier</span>
@@ -278,6 +299,13 @@ function Page() {
                   ? `${data.multiplier.data.currentMultiplier.toFixed(6)}×`
                   : "—"}
               </b>
+              {data?.multiplier.ok ? (
+                <small>
+                  {data.multiplier.data.pendingMultiplier != null
+                    ? `Pending CA ${data.multiplier.data.pendingMultiplier.toFixed(6)}×`
+                    : "No pending newMultiplier on live feed"}
+                </small>
+              ) : null}
             </div>
             <div>
               <span>Wash</span>

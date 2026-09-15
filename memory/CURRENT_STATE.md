@@ -264,3 +264,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Truth + activity surface live xStocks `pendingMultiplier` (or honest “none”) — CA signal still not a separate calendar feed.
 - Network matrix Jupiter rows label TTL + stale-429 policy; Vitest **71+** green. Preview READY on `300e676` with CA pending **None** + activity “no pending multiplier”.
 - Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Desk/acquire CA + Jupiter source + Stocklana 545/72
+- Positions rows carry `pendingMultiplier`; desk policy shows Live · no pending + Nest.credit ≠ NestUSD.
+- Acquire checks/review label Jupiter cached/stale/live + pending CA honesty.
+- Stocklana live: **545** / **72** / **$121k**; deadline conflict SEP 25 hero vs timeline 18 Sep 16:00 ET.
+- Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

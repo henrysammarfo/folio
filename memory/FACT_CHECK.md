@@ -100,7 +100,8 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 |---|---|---|---|
 | Watch-wallet bind works on Vercel preview with session secret | CONFIRMED | Playwright bind Tokenkeg… → success note + Currently Toke…Q5DA | 2026-09-15 |
 | Stocklana registered **538** / submissions **69** / prize **$121,000** / deadline hero **SEP 25, 2026** | SUPERSEDED by 539/71 | prior jina snapshot | 2026-09-15 |
-| Stocklana registered **539** / submissions **71** / prize **$121,000** / deadline hero **SEP 25, 2026** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana WebFetch (Registered 539 · Submissions 71 · Prize Pool $121,000) | 2026-09-15 |
+| Stocklana registered **539** / submissions **71** / prize **$121,000** / deadline hero **SEP 25, 2026** | SUPERSEDED by 545/72 | prior WebFetch | 2026-09-15 |
+| Stocklana registered **545** / submissions **72** / prize **$121,000** / deadline hero **SEP 25, 2026** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana WebFetch (Registered 545 · Submissions 72 · Prize Pool $121,000); timeline still Fri 18 Sep 16:00 ET | 2026-09-15 |
 | Timeline Fri 18 Sep 2026 16:00 ET; stocklana.fun HACKATHON CLOSE 18 Sep 2026 23:59 UTC | CONFLICT vs hero SEP 25 — re-check at submit | hackathons page timeline + stocklana.fun | 2026-09-15 |
 
 ## Hermes auth (2026-09-15)

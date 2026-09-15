@@ -97,6 +97,8 @@ export type PositionRow = {
   paperRaw: number;
   qtySource: "wallet-read" | "paper";
   multiplier: number | null;
+  /** Live xStocks newMultiplier when a CA is pending — null means none on feed. */
+  pendingMultiplier: number | null;
   onchainEffectiveMultiplier: number | null;
   economicShares: number | null;
   usdPrice: number | null;
@@ -275,6 +277,9 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
         paperRaw,
         qtySource,
         multiplier: mult,
+        pendingMultiplier: multiplier.ok
+          ? multiplier.data.pendingMultiplier
+          : null,
         onchainEffectiveMultiplier: onchainEff,
         economicShares,
         usdPrice,

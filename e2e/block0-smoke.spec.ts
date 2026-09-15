@@ -146,6 +146,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/strict prefs · no session|strict fail-closed|no session/);
     expect(body).toMatch(/bitquery_api_key/);
+    expect(body).toMatch(/no pending ca|pending \d|verified live|corporate-action/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
@@ -160,6 +161,9 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/inspect|ephemeral|mainnet/);
     expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);
+    expect(body).toMatch(/live · no pending|pending \d|corporate actions/);
+    expect(body).toMatch(/nest\.credit|not nestusd/);
+    expect(body).toMatch(/nestusd borrow|fail-closed/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 

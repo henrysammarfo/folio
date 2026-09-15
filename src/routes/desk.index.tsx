@@ -224,11 +224,32 @@ function Page() {
           <div className="policy-list">
             <p>
               <span>Corporate actions</span>
-              <b>{verified > 0 ? "Live API" : "Pending"}</b>
+              <b>
+                {(() => {
+                  const aapl = rows.find((r) => r.symbol === "AAPLx") ?? rows[0];
+                  if (!aapl || aapl.multiplier == null) return "Multiplier unavailable";
+                  if (aapl.pendingMultiplier != null) {
+                    return `Pending ${aapl.pendingMultiplier.toFixed(6)}×`;
+                  }
+                  return "Live · no pending";
+                })()}
+              </b>
             </p>
             <p>
               <span>Kamino market</span>
               <b>{credit.data?.kamino.ok ? "Mainnet read" : "Unavailable"}</b>
+            </p>
+            <p>
+              <span>Nest.credit</span>
+              <b>
+                {credit.data?.nestCredit.ok
+                  ? `${credit.data.nestCredit.data.vaultCount} vaults · not NestUSD`
+                  : "Unavailable"}
+              </b>
+            </p>
+            <p>
+              <span>NestUSD borrow</span>
+              <b>Fail-closed</b>
             </p>
             <p>
               <span>Wash pressure</span>

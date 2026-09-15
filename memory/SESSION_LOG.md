@@ -236,3 +236,9 @@
 - Preview verified: Pending CA **None**; activity “Corporate action · no pending multiplier”; Jupiter price source labeled cached.
 - Network matrix details include TTL/stale-429 policy.
 - Goal open: Henry lab Pick reply + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Desk policy CA + acquire Jupiter source + Stocklana refresh
+- Desk overview policy: Live · no pending CA, Nest.credit vaults, NestUSD fail-closed.
+- Acquire surfaces Jupiter live/cached/stale + pending CA on checks/review.
+- Stocklana → **545** registered / **72** submissions / **$121k**.
+- Goal open: Henry lab Pick + keys.

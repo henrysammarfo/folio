@@ -2,7 +2,7 @@
 
 Re-check live counts on https://hackathons.solana.com/hackathons/stocklana before final submit.
 
-**Live (2026-09-15 WebFetch):** **539** registered · **71** submissions · hero prize **$121,000** · hero deadline **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET** / stocklana.fun **18 Sep 2026 · 23:59 UTC** — confirm which the form uses at submit.
+**Live (2026-09-15 WebFetch):** **545** registered · **72** submissions · hero prize **$121,000** · hero deadline **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET** — confirm which the form uses at submit.
 
 ## Form fields (paste)
 
@@ -15,7 +15,7 @@ Re-check live counts on https://hackathons.solana.com/hackathons/stocklana befor
 **Repo:** https://github.com/henrysammarfo/folio (branch `cursor/folio-prefs-agent-honesty-f1ec` / PR #3)
 
 **Pitch (≤ short paragraph):**
-FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after corporate actions — we read the live xStocks Scaled UI multiplier (AAPLx ≈ 1.003× today). If wash tape is missing or linked-flow looks dirty, acquire stays fail-closed. Jupiter quotes stay quote-only on a ≤~$1 budget with broadcast paused. Credit shows live Kamino LTV with NestUSD labeled unavailable until a verified endpoint exists. Watch-wallet mainnet-read qty is live on the public demo; multi-tenant Privy + Supabase sessions are wired but fail-closed without keys. We do not claim unhackable security.
+FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after corporate actions — we read the live xStocks Scaled UI multiplier (AAPLx ≈ 1.003× today) and surface pending newMultiplier honestly (or none). If wash tape is missing or linked-flow looks dirty, acquire stays fail-closed. Jupiter quotes stay quote-only with short TTL / labeled stale-on-429 and broadcast paused on a ≤~$1 budget. Credit shows live Kamino LTV, Nest.credit vault awareness, and NestUSD labeled unavailable until a verified borrow endpoint exists. Watch-wallet mainnet-read qty is live on the public demo; multi-tenant Privy + Supabase sessions are wired but fail-closed without keys. We do not claim unhackable security.
 
 **Links judges can open:**
 1. Demo: https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app
@@ -39,4 +39,6 @@ FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after
 ## Walkthrough artifacts
 
 - Watch-wallet bind live: `/opt/cursor/artifacts/screenshots/watch-wallet-bind-live.png`
+- Truth CA pending: `/opt/cursor/artifacts/screenshots/demo-truth-ca-pending.png`
+- Activity CA pending: `/opt/cursor/artifacts/screenshots/demo-activity-ca-pending.png`
 - Lab approve CTAs + candidates: `/lab/ui` · `/lab/shaders`
