@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Github, Linkedin } from "lucide-react";
 import { FolioMark } from "@/components/folio-brand";
+import { getTruthBundle } from "@/lib/desk.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,10 +30,18 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
+  /** Prefetch live AAPLx multiplier so first viewport copy is not fixture theater. */
+  loader: async () => getTruthBundle({ data: { symbol: "AAPLx" } }),
   component: Home,
 });
 
 function Home() {
+  const truth = Route.useLoaderData();
+  const mult = truth?.multiplier;
+  const liveLine = mult?.ok
+    ? `AAPLx live ${mult.data.currentMultiplier.toFixed(6)}× on Solana — not fixture 4×. Broadcast stays off.`
+    : "Live share-count truth on Solana — never fixture 4×. Broadcast stays off until funded.";
+
   return (
     <div className="cinematic-home">
       <div className="home-media">
@@ -59,9 +68,8 @@ function Home() {
         <p className="home-eyebrow">Corporate-action prime desk</p>
         <h1>Own the economic truth.</h1>
         <div className="home-copy">
-          FOLIO keeps your Solana stock share count honest, refuses shady pools,
-          and opens credit without forcing a sale. Premium chrome stays in lab
-          until Henry approves a look.
+          FOLIO keeps Solana stock share counts honest and refuses shady pools.{" "}
+          {liveLine} Lab chrome waits on Henry’s approve.
         </div>
         <div className="home-cta-row">
           <Link to="/desk" className="home-cta">

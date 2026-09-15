@@ -262,3 +262,7 @@
 ## 2026-09-15 — Inspect continuity + badge honesty
 - Detail route + list/overview links carry `?inspect=`; truth diverge no checkmark on null; Jupiter cache labels; execution Fail-closed; activity Nest.credit≠NestUSD + Jupiter cache.
 - Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Home live × in hero copy
+- SSR truth bundle → AAPLx live multiplier in home supporting sentence (not fixture 4×); Stocklana still 545/72/$121k.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.

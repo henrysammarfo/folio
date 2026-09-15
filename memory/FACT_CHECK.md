@@ -133,3 +133,5 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Truth diverge CheckCircle when pass===null | REJECTED (fixed) | Clock icon + unavailable note until scored | 2026-09-15 |
 | Execution wash “Heuristic” when Bitquery missing | REJECTED (fixed) | Badge = Fail-closed | 2026-09-15 |
 | Activity CA prefs ModeBadge = mainnet-read | REJECTED (fixed) | Preference → paper mode; Nest.credit ≠ NestUSD events added | 2026-09-15 |
+| Home hero invents fixture 4× share count | REJECTED | SSR live AAPLx multiplier woven into copy (or honest unavailable) | 2026-09-15 |
+| Stocklana registered **545** / submissions **72** / prize **$121,000** | CONFIRMED live (re-check) | hackathons.solana.com WebFetch; deadline hero SEP 25 vs timeline 18 Sep 16:00 ET | 2026-09-15 |

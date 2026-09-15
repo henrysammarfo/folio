@@ -4,6 +4,11 @@ test.describe("FOLIO Block 0 smoke", () => {
   test("home renders brand", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByText(/FOLIO/i).first()).toBeVisible();
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    // Live multiplier woven into hero copy — never fixture 4× theater
+    expect(body).toMatch(/aapl|live|solana|broadcast/);
+    expect(body).not.toMatch(/\b4\.0000\s*×|\bfixture 4× theater only\b/);
+    expect(body).toMatch(/not fixture 4|never fixture 4/);
   });
 
   test("truth page shows live or unavailable multiplier (never fixture 4.0×)", async ({

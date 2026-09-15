@@ -294,3 +294,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Execution wash badge: Fail-closed (not Heuristic theater) when Bitquery missing.
 - Settings auth badge: keys ≠ session ready; activity CA prefs mode=paper; Jupiter route + Nest.credit ≠ NestUSD on activity stream.
 - Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Home live multiplier in hero copy
+- `/` SSR-prefetches `getTruthBundle(AAPLx)` and weaves live × (or honest unavailable) into the single supporting sentence — no fixture 4×, no new hero stats strip.
+- Stocklana re-check: **545** / **72** / **$121k**; deadline conflict unchanged.
+- Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
