@@ -66,3 +66,11 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated).
 - Auth: HMAC `folio_session` mint/verify (`FOLIO_SESSION_SECRET`); settings shows `sessionReady` separately from keys-present.
 - Lab `/lab/shaders` + `/lab/ui` remain approve-gated; production hero untouched.
 - Broadcast / mentor spam still paused.
+
+## 2026-09-15 honesty pass
+- `canReview` requires `divergeOk` as well as truth/wash/quote.
+- Quote inspection default $1 / max $25; broadcast remains paused (`isBroadcastPaused`).
+- Session UX: tenant list + clear httpOnly cookie; prefs service-role fetch when keyed.
+- Yahoo leftovers removed; `/execution` copy softened (no false Pass theater).
+- Premium UI still approve-gated on `/lab/*` — awaiting Henry candidate id.
+- Keys still empty: Privy / Supabase / Bitquery / FOLIO_SESSION_SECRET.

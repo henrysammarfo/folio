@@ -56,3 +56,13 @@
 - Settings binds Privy token → httpOnly Set-Cookie.
 - `docs/STOCKLANA_SUBMIT.md` checklist.
 - Tests: 19 unit + 5 e2e green.
+
+## 2026-09-15 — Honesty gates + session UX
+
+- Acquire: divergeOk wired into canReview; default spend $1; quote cap 25; broadcast still off.
+- Broadcast single-source `isBroadcastPaused()` shared by network + settings.
+- Positions badge: sessionReady vs keys-present.
+- Settings: tenant membership list + clear httpOnly session.
+- Prefs: service-role desk_preferences fetch when keys+tenant present.
+- Removed Yahoo leftovers; softened /execution copy (no false Pass theater).
+- Tests: broadcast helper + diverge gate unit coverage.

@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, setCookie } from "@tanstack/react-start/server";
+import { deleteCookie, getCookie, setCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { errResult, okResult, type AdapterResult } from "./adapters/types";
 import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
@@ -28,6 +28,7 @@ import { verifyPrivyAccessToken } from "./auth/privy";
 import { resolveTenantMemberships } from "./auth/tenants";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
+import { isBroadcastPaused } from "./broadcast";
 
 const WATCHLIST = ["AAPLx", "NVDAx", "TSLAx"] as const;
 
@@ -104,14 +105,15 @@ export type SessionBundle = {
   networkPolicy: {
     mainnetRead: true;
     quoteOnly: true;
-    broadcast: false;
+    broadcast: boolean;
     customProgramDeploy: false;
   };
 };
 
 export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<PositionsBundle> => {
-    const auth = getAuthProviderStatus();
+    const session = readVerifiedSession();
+    const auth = getAuthProviderStatus(session.ok ? session : null);
     const rows: PositionRow[] = [];
 
     for (const symbol of WATCHLIST) {
@@ -301,7 +303,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     const session = readVerifiedSession();
     const auth = getAuthProviderStatus(session.ok ? session : null);
     const tenantId = session.ok ? (session.data.tenants[0]?.tenantId ?? null) : null;
-    const preferences = await loadDeskPreferences(tenantId);
+    const userId = session.ok ? session.data.userId : null;
+    const preferences = await loadDeskPreferences(tenantId, userId);
     return {
       auth,
       session,
@@ -309,7 +312,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
       networkPolicy: {
         mainnetRead: true,
         quoteOnly: true,
-        broadcast: false,
+        broadcast: !isBroadcastPaused(),
         customProgramDeploy: false,
       },
     };
@@ -343,7 +346,7 @@ export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
     }
     const tenantsRes = await resolveTenantMemberships({ userId: identity.data.userId });
     const tenants = tenantsRes.ok ? tenantsRes.data : [];
-const minted = mintFolioSession({
+    const minted = mintFolioSession({
       userId: identity.data.userId,
       walletAddress: data.walletAddress ?? identity.data.walletAddress,
       tenants,
@@ -361,6 +364,21 @@ const minted = mintFolioSession({
     });
     return okResult("mainnet-read", "folio.session.privy", {
       session: minted.data.session,
-      note: "httpOnly folio_session Set-Cookie after Privy verify — resolve Supabase tenants next.",
+      note: tenants.length
+        ? `httpOnly folio_session set · ${tenants.length} tenant membership(s) resolved`
+        : "httpOnly folio_session set · no tenant memberships resolved (fail-closed empty)",
     });
   });
+
+
+export const clearFolioSession = createServerFn({ method: "POST" }).handler(async () => {
+  try {
+    deleteCookie(FOLIO_SESSION_COOKIE, { path: "/" });
+    return okResult("mainnet-read", "folio.session.clear", {
+      cleared: true as const,
+      note: "httpOnly folio_session cleared — no localStorage residue.",
+    });
+  } catch (e) {
+    return errResult("folio.session.clear", "clear_failed", String(e));
+  }
+});

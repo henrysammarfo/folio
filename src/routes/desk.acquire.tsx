@@ -30,7 +30,7 @@ export const Route = createFileRoute("/desk/acquire")({
 function Page() {
   const [step, setStep] = useState(1);
   const [symbol, setSymbol] = useState<(typeof SYMBOLS)[number]>("AAPLx");
-  const [amount, setAmount] = useState("100");
+  const [amount, setAmount] = useState("1");
   const spendUsdc = Number(amount);
   const ready = Number.isFinite(spendUsdc) && spendUsdc > 0;
 
@@ -95,11 +95,12 @@ function Page() {
               </select>
             </label>
             <label>
-              Spend (USDC)
+              Spend (USDC) · quote inspection ≤25 · broadcast off (≤~$1 budget)
               <input
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 inputMode="decimal"
+                max={25}
               />
             </label>
             <div className="quote-preview">
@@ -129,7 +130,7 @@ function Page() {
               <span>Wash / linked flow</span>
               <StatusBadge tone={data?.gates.washOk ? "green" : "amber"}>
                 {data?.gates.washOk && data.wash.ok
-                  ? `Pass · ${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
+                  ? `Heuristic clear · ${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
                   : data?.wash && data.wash.ok
                     ? `${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
                     : data?.wash && !data.wash.ok
@@ -161,12 +162,22 @@ function Page() {
             </p>
             <p>
               <span>Pyth / venue diverge</span>
-              <StatusBadge tone={data?.pyth.ok ? "green" : "amber"}>
-                {data?.pyth.ok
-                  ? "Pyth live"
-                  : data?.pyth && !data.pyth.ok
-                    ? `Pyth: ${data.pyth.reason}`
-                    : "…"}
+              <StatusBadge
+                tone={
+                  data?.gates.divergeOk === false
+                    ? "amber"
+                    : data?.pyth.ok
+                      ? "green"
+                      : "amber"
+                }
+              >
+                {data?.gates.divergeOk === false
+                  ? "Blocked — outside band"
+                  : data?.pyth.ok
+                    ? "Pyth live · in band or unchecked pair"
+                    : data?.pyth && !data.pyth.ok
+                      ? `Pyth: ${data.pyth.reason}`
+                      : "…"}
               </StatusBadge>
             </p>
             {data && data.gates.blockedReasons.length > 0 ? (

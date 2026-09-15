@@ -18,7 +18,7 @@ const SymbolInput = z.object({
 
 const QuoteInput = z.object({
   symbol: z.string().min(2).max(16).default("AAPLx"),
-  spendUsdc: z.number().positive().max(1_000_000),
+  spendUsdc: z.number().positive().max(25), // quote inspection cap; broadcast still off (≤~$1 budget)
 });
 
 export type TruthBundle = {
@@ -51,11 +51,14 @@ export type AcquireBundle = {
     truthOk: boolean;
     washOk: boolean;
     quoteOk: boolean;
+    divergeOk: boolean;
     canReview: boolean;
     blockedReasons: string[];
   };
 };
 
+import { isBroadcastPaused } from "./broadcast";
+export { isBroadcastPaused } from "./broadcast";
 export type NetworkBundle = {
   rows: MatrixRow[];
   broadcastPaused: boolean;
@@ -193,10 +196,16 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
     }
     if (!jupiter.ok) blockedReasons.push(`Jupiter quote: ${jupiter.reason}`);
 
+    let divergeOk = true;
     if (pyth.ok && jupiterPrice.ok) {
       const d = divergeBps(pyth.data.price, jupiterPrice.data.usdPrice, 75);
-      if (!d.pass) blockedReasons.push("Pyth vs Jupiter venue diverge outside band");
+      if (!d.pass) {
+        divergeOk = false;
+        blockedReasons.push("Pyth vs Jupiter venue diverge outside band");
+      }
     }
+    // Missing Pyth does not invent a pass — only live diverge failures block.
+    // Unavailable Pyth is labeled on the UI; quote path may still review when wash+truth+jupiter hold.
 
     return {
       symbol,
@@ -211,7 +220,8 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         truthOk,
         washOk,
         quoteOk: jupiter.ok,
-        canReview: truthOk && washOk && jupiter.ok,
+        divergeOk,
+        canReview: truthOk && washOk && jupiter.ok && divergeOk,
         blockedReasons,
       },
     };
@@ -258,7 +268,7 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         bitqueryKeyPresent: Boolean(process.env["BITQUERY_API_KEY"]),
         broadcastFunded: false,
       }),
-      broadcastPaused: process.env["BROADCAST_PAUSED"] !== "false",
+      broadcastPaused: isBroadcastPaused(),
     };
   },
 );
@@ -269,6 +279,7 @@ export {
   getSessionBundle,
   runDeskAgent,
   createSessionFromPrivyToken,
+  clearFolioSession,
 } from "./desk.empire";
 export type {
   PositionsBundle,

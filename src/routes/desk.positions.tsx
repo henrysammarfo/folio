@@ -34,8 +34,18 @@ function Page() {
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Live multipliers</ModeBadge>
         <ModeBadge mode="paper">Paper quantities</ModeBadge>
-        <ModeBadge mode={data?.auth.ok ? data.auth.mode : "unavailable"}>
-          {data?.auth.ok ? "Auth ready" : "Wallet unbound"}
+        <ModeBadge
+          mode={
+            data?.auth.ok && data.auth.data.sessionReady
+              ? data.auth.mode
+              : "unavailable"
+          }
+        >
+          {data?.auth.ok && data.auth.data.sessionReady
+            ? "Session bound"
+            : data?.auth.ok
+              ? "Keys present · no session"
+              : "Wallet unbound"}
         </ModeBadge>
       </div>
       <Panel

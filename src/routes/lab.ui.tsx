@@ -49,7 +49,7 @@ function Page() {
             <div className="lab-desk-preview" aria-hidden>
               <div>
                 <span>AAPLx</span>
-                <b>1.003269×</b>
+                <b>1.003269×</b><small> sample</small>
               </div>
               <div>
                 <span>Wash</span>

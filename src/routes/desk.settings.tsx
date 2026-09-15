@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
 import { Switch } from "@/components/ui/switch";
 import {
+  clearFolioSession,
   createSessionFromPrivyToken,
   getSessionBundle,
   runDeskAgent,
@@ -30,6 +31,7 @@ function Page() {
   const fetchSession = useServerFn(getSessionBundle);
   const runAgent = useServerFn(runDeskAgent);
   const createSession = useServerFn(createSessionFromPrivyToken);
+  const clearSession = useServerFn(clearFolioSession);
   const { data, refetch } = useQuery({
     queryKey: ["session-bundle"],
     queryFn: () => fetchSession(),
@@ -41,6 +43,7 @@ function Page() {
   const [privyToken, setPrivyToken] = useState("");
   const [sessionMsg, setSessionMsg] = useState<string>("");
   const [sessionBusy, setSessionBusy] = useState(false);
+  const tenants = data?.session.ok ? data.session.data.tenants : [];
 
   return (
     <DeskShell eyebrow="Server preferences" title="Settings">
@@ -180,6 +183,46 @@ function Page() {
           </button>
         </div>
         {sessionMsg ? <p className="mt-3 text-sm">{sessionMsg}</p> : null}
+        <div className="mt-4">
+          <b className="text-sm">Tenant memberships</b>
+          {tenants.length === 0 ? (
+            <p className="mt-1 text-sm opacity-80">
+              None resolved — fail-closed empty until Supabase{" "}
+              <code>tenant_members</code> rows exist for this Privy subject.
+            </p>
+          ) : (
+            <ul className="mt-2 space-y-1 text-sm">
+              {tenants.map((t) => (
+                <li key={`${t.tenantId}:${t.userId}`}>
+                  <code>{t.tenantId.slice(0, 8)}…</code> · {t.role}
+                </li>
+              ))}
+            </ul>
+          )}
+          <button
+            type="button"
+            className="wallet-pill mt-3"
+            disabled={sessionBusy || !(data?.session.ok)}
+            onClick={async () => {
+              setSessionBusy(true);
+              setSessionMsg("");
+              try {
+                const res = await clearSession();
+                setSessionMsg(
+                  res.ok
+                    ? res.data.note
+                    : "Failed to clear session",
+                );
+                await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+                await refetch();
+              } finally {
+                setSessionBusy(false);
+              }
+            }}
+          >
+            Clear httpOnly session
+          </button>
+        </div>
       </Panel>
 
       <Panel title="Paper agent" meta={<StatusBadge tone="blue">Caps · no broadcast</StatusBadge>}>

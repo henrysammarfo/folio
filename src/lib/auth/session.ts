@@ -98,7 +98,7 @@ export function getAuthProviderStatus(
     sessionReady,
     persistence: "httpOnly-server",
     note: sessionReady
-      ? "Verified httpOnly folio_session — resolve tenant_members via Supabase RLS next."
+      ? "Verified httpOnly folio_session — tenant_members resolved at mint when Supabase is reachable."
       : "Keys + signing secret present — mint folio_session after Privy JWT verify. No localStorage auth.",
   });
 }
@@ -111,23 +111,84 @@ export type DeskPreference = {
 /** Server-persisted prefs — fail-closed without Supabase + session. */
 export async function loadDeskPreferences(
   tenantId: string | null,
+  userId?: string | null,
 ): Promise<AdapterResult<DeskPreference>> {
+  const source = "folio.prefs";
   const auth = getAuthProviderStatus();
   if (!auth.ok) {
-    return errResult("folio.prefs", "prefs_require_auth", auth.detail ?? auth.reason);
+    return errResult(source, "prefs_require_auth", auth.detail ?? auth.reason);
   }
   if (!tenantId) {
     return errResult(
-      "folio.prefs",
+      source,
       "prefs_require_tenant",
       "No tenant membership on session — refusing localStorage fallback.",
     );
   }
-  return errResult(
-    "folio.prefs",
-    "prefs_table_not_wired",
-    "Apply supabase/migrations/20260915_folio_tenants.sql then wire service-role reads — refusing localStorage.",
-  );
+  if (!userId?.trim()) {
+    return errResult(
+      source,
+      "prefs_require_user",
+      "No verified user on session — refusing localStorage fallback.",
+    );
+  }
+
+  const url = process.env["SUPABASE_URL"]?.trim();
+  const serviceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim();
+  if (!url || !serviceKey) {
+    return errResult(source, "supabase_keys_missing", "SUPABASE_URL / SERVICE_ROLE_KEY required.");
+  }
+
+  try {
+    const endpoint = new URL("/rest/v1/desk_preferences", url);
+    endpoint.searchParams.set("tenant_id", `eq.${tenantId}`);
+    endpoint.searchParams.set("user_id", `eq.${userId.trim()}`);
+    endpoint.searchParams.set(
+      "select",
+      "corporate_action_alerts,strict_fail_closed",
+    );
+    endpoint.searchParams.set("limit", "1");
+
+    const res = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(15_000),
+    });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      return errResult(
+        source,
+        "prefs_http_error",
+        `HTTP ${res.status} ${body.slice(0, 180)} — fail-closed.`,
+      );
+    }
+
+    const rows = (await res.json()) as Array<{
+      corporate_action_alerts?: boolean;
+      strict_fail_closed?: boolean;
+    }>;
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return errResult(
+        source,
+        "prefs_row_missing",
+        "No desk_preferences row for this tenant/user — apply migration and seed; refusing localStorage.",
+      );
+    }
+
+    const row = rows[0]!;
+    return okResult("mainnet-read", source, {
+      corporateActionAlerts: Boolean(row.corporate_action_alerts ?? true),
+      strictFailClosed: Boolean(row.strict_fail_closed ?? true),
+    });
+  } catch (e) {
+    return errResult(source, "prefs_fetch_failed", `${String(e)} — fail-closed.`);
+  }
 }
 
 /**
