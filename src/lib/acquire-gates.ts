@@ -19,6 +19,11 @@ export type AcquireGateInputs = {
     | { kind: "blocked" }
     | { kind: "pyth_missing" }
     | { kind: "unavailable" };
+  /**
+   * When true (desk preference), unresolved required signals — including
+   * missing Pyth — also block review instead of honesty-only labeling.
+   */
+  strictFailClosed?: boolean;
 };
 
 export type AcquireGateMessages = {
@@ -64,6 +69,17 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
   } else if (input.diverge.kind === "pyth_missing") {
     honestyNotes.push(
       "Pyth: PYTH_API_KEY missing · Hermes equity reference unavailable (labeled; does not invent a pass)",
+    );
+    if (input.strictFailClosed) {
+      divergeOk = false;
+      blockedReasons.push(
+        "Strict fail-closed: PYTH_API_KEY missing · Hermes reference required before review",
+      );
+    }
+  } else if (input.diverge.kind === "unavailable" && input.strictFailClosed) {
+    divergeOk = false;
+    blockedReasons.push(
+      "Strict fail-closed: venue diverge unresolved · review blocked",
     );
   }
 

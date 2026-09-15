@@ -27,6 +27,8 @@ export type FolioSession = {
   userId: string;
   walletAddress: string | null;
   tenants: TenantMembership[];
+  /** Selected tenant for prefs / desk scope — must be a membership id. */
+  activeTenantId: string | null;
   issuedAt: string;
   expiresAt: string;
 };
@@ -35,8 +37,21 @@ export type MintSessionInput = {
   userId: string;
   walletAddress?: string | null;
   tenants?: TenantMembership[];
+  /** Optional; defaults to first membership when omitted. */
+  activeTenantId?: string | null;
   ttlSec?: number;
 };
+
+/** Membership-validated active tenant — never invents an id outside the session. */
+export function resolveActiveTenantId(
+  session: FolioSession,
+): string | null {
+  const membershipIds = new Set(session.tenants.map((t) => t.tenantId));
+  if (session.activeTenantId && membershipIds.has(session.activeTenantId)) {
+    return session.activeTenantId;
+  }
+  return session.tenants[0]?.tenantId ?? null;
+}
 
 export const FOLIO_SESSION_COOKIE = "folio_session";
 
@@ -301,11 +316,18 @@ export function mintFolioSession(
     slug: t.slug ?? null,
     displayName: t.displayName ?? null,
   }));
+  const membershipIds = new Set(tenants.map((t) => t.tenantId));
+  const requestedActive = input.activeTenantId?.trim() || null;
+  const activeTenantId =
+    requestedActive && membershipIds.has(requestedActive)
+      ? requestedActive
+      : (tenants[0]?.tenantId ?? null);
   const session: FolioSession = {
     sessionId: crypto.randomUUID(),
     userId: input.userId.trim(),
     walletAddress: input.walletAddress ?? null,
     tenants,
+    activeTenantId,
     issuedAt: issuedAt.toISOString(),
     expiresAt: expiresAt.toISOString(),
   };
@@ -368,7 +390,16 @@ export function verifyFolioSessionCookieValue(
         },
       ];
     });
-    return okResult("mainnet-read", source, { ...session, tenants });
+    const membershipIds = new Set(tenants.map((t) => t.tenantId));
+    const activeTenantId =
+      session.activeTenantId && membershipIds.has(session.activeTenantId)
+        ? session.activeTenantId
+        : (tenants[0]?.tenantId ?? null);
+    return okResult("mainnet-read", source, {
+      ...session,
+      tenants,
+      activeTenantId,
+    });
   } catch (e) {
     return errResult(source, "session_parse_failed", String(e));
   }

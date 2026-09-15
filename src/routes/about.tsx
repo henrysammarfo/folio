@@ -41,10 +41,10 @@ function Page() {
         </blockquote>
         <div>
           <p>
-            FOLIO never fabricates equity mints, fills, or user traction. It separates live reads
-            from fork simulations and keeps every refusal legible — wash without Bitquery stays
-            fail-closed; NestUSD stays hidden until the endpoint is verified; broadcast stays off
-            until funded.
+            FOLIO never fabricates equity mints, fills, or user traction. It separates live mainnet
+            reads from unfunded borrow CPI (no fork harness theater) and keeps every refusal
+            legible — wash without Bitquery stays fail-closed; NestUSD stays hidden until the
+            endpoint is verified; broadcast stays off until funded.
           </p>
           <p>
             <b>Henry Sam Marfo</b>

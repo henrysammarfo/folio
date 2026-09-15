@@ -213,3 +213,10 @@
 - Multi-tenant: `saveDeskPreferences` upsert; settings switches when session+tenant; membership shows slug/display/wallet.
 - Paper agent always runs live Block 0 truth/quote spine with `broadcast=false`; AgentRouter optional.
 - Still waiting on Henry: lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Active tenant + strict prefs + paper wash gates
+- `activeTenantId` on folio_session (membership-validated); settings switch remints cookie via `setActiveTenant`.
+- Acquire loads `strictFailClosed` from active-tenant prefs — missing/unresolved Pyth blocks review when strict.
+- Paper agent quote path shares wash + acquire gates; RLS honesty note on SessionBundle.
+- Softened remaining fork theater (mode badge / about). Vitest 65 green.
+- Goal open: Henry lab Pick reply + Bitquery/Pyth/Privy/Supabase; broadcast stays paused.

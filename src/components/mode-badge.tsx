@@ -12,7 +12,7 @@ const TONE: Record<IntegrationMode, string> = {
 const LABEL: Record<IntegrationMode, string> = {
   "mainnet-read": "Mainnet read",
   "quote-only": "Quote only",
-  fork: "Local fork",
+  fork: "Unfunded CPI",
   paper: "Paper",
   unavailable: "Unavailable",
 };

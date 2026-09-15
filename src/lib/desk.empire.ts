@@ -19,7 +19,9 @@ import {
   FOLIO_SESSION_COOKIE,
   getAuthProviderStatus,
   loadDeskPreferences,
+  mintFolioSession,
   parseFolioSessionCookie,
+  resolveActiveTenantId,
   saveDeskPreferences,
   verifyFolioSessionCookieValue,
   type FolioSession,
@@ -149,6 +151,8 @@ export type ActivityBundle = {
 export type SessionBundle = {
   auth: ReturnType<typeof getAuthProviderStatus>;
   session: AdapterResult<FolioSession>;
+  /** Membership-validated active tenant — null when session missing/empty. */
+  activeTenantId: string | null;
   preferences: Awaited<ReturnType<typeof loadDeskPreferences>>;
   networkPolicy: {
     mainnetRead: true;
@@ -159,6 +163,11 @@ export type SessionBundle = {
   watchWallet: string | null;
   /** FOLIO_SESSION_SECRET ≥16 — watch-wallet bind + cookie signing (not Privy). */
   sessionSecretPresent: boolean;
+  /**
+   * RLS honesty: until Privy DID maps into Supabase JWT `sub`, desk prefs/tenants
+   * are service-role server only — anon RLS policies are placeholders.
+   */
+  rlsNote: string;
   /** Production readiness flags — fail-closed honesty for Henry / Stocklana ops. */
   readiness: {
     bitqueryKeyPresent: boolean;
@@ -490,11 +499,11 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<SessionBundle> => {
     const session = readVerifiedSession();
     const auth = getAuthProviderStatus(session.ok ? session : null);
-    const tenantId = session.ok
-      ? (session.data.tenants[0]?.tenantId ?? null)
+    const activeTenantId = session.ok
+      ? resolveActiveTenantId(session.data)
       : null;
     const userId = session.ok ? session.data.userId : null;
-    const preferences = await loadDeskPreferences(tenantId, userId);
+    const preferences = await loadDeskPreferences(activeTenantId, userId);
     const watch = readWatchWallet();
     const sessionSecretPresent =
       (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
@@ -514,6 +523,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     return {
       auth,
       session,
+      activeTenantId,
       preferences,
       networkPolicy: {
         mainnetRead: true,
@@ -524,6 +534,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
       },
       watchWallet: watch.ok ? watch.data.wallet : null,
       sessionSecretPresent,
+      rlsNote:
+        "Service-role server path only until Privy DID → Supabase JWT sub mapping lands. Anon RLS policies are placeholders — not end-user authz yet.",
       readiness: {
         bitqueryKeyPresent,
         privyConfigured,
@@ -549,7 +561,7 @@ const PrefsInput = z.object({
   strictFailClosed: z.boolean(),
 });
 
-/** Persist desk prefs for the first tenant on the verified session — fail-closed. */
+/** Persist desk prefs for the active tenant on the verified session — fail-closed. */
 export const updateDeskPreferences = createServerFn({ method: "POST" })
   .validator(PrefsInput)
   .handler(async ({ data }) => {
@@ -561,11 +573,76 @@ export const updateDeskPreferences = createServerFn({ method: "POST" })
         session.detail ?? session.reason,
       );
     }
-    const tenantId = session.data.tenants[0]?.tenantId ?? null;
+    const tenantId = resolveActiveTenantId(session.data);
     return saveDeskPreferences(tenantId, session.data.userId, {
       corporateActionAlerts: data.corporateActionAlerts,
       strictFailClosed: data.strictFailClosed,
     });
+  });
+
+const ActiveTenantInput = z.object({
+  tenantId: z.string().uuid(),
+});
+
+/**
+ * Switch active tenant on the httpOnly folio_session — membership-validated.
+ * Remints the signed cookie; never invents a tenant outside session.tenants.
+ */
+export const setActiveTenant = createServerFn({ method: "POST" })
+  .validator(ActiveTenantInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSession();
+    if (!session.ok) {
+      return errResult(
+        "folio.session.active_tenant",
+        "active_tenant_requires_session",
+        session.detail ?? session.reason,
+      );
+    }
+    const membership = session.data.tenants.find(
+      (t) => t.tenantId === data.tenantId,
+    );
+    if (!membership) {
+      return errResult(
+        "folio.session.active_tenant",
+        "active_tenant_not_member",
+        "Tenant id is not on this session — refusing invent-a-membership switch.",
+      );
+    }
+    const remainingMs = Date.parse(session.data.expiresAt) - Date.now();
+    const ttlSec = Math.max(60, Math.floor(remainingMs / 1000));
+    const minted = mintFolioSession({
+      userId: session.data.userId,
+      walletAddress: session.data.walletAddress,
+      tenants: session.data.tenants,
+      activeTenantId: data.tenantId,
+      ttlSec,
+    });
+    if (!minted.ok) {
+      return errResult(
+        "folio.session.active_tenant",
+        minted.reason,
+        minted.detail,
+      );
+    }
+    setCookie(FOLIO_SESSION_COOKIE, minted.data.cookieValue, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: ttlSec,
+      secure: process.env["NODE_ENV"] === "production",
+    });
+    return {
+      ok: true as const,
+      mode: "mainnet-read" as const,
+      asOf: new Date().toISOString(),
+      source: "folio.session.active_tenant",
+      data: {
+        activeTenantId: data.tenantId,
+        session: minted.data.session,
+        note: `Active tenant set to ${membership.slug ?? membership.displayName ?? data.tenantId.slice(0, 8)}…`,
+      },
+    };
   });
 
 const PrivySessionInput = z.object({

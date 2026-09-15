@@ -1,6 +1,8 @@
 import { errResult, okResult, type AdapterResult } from "../adapters/types";
 import { fetchXStockAsset, fetchXStockMultiplier } from "../adapters/xstocks";
 import { fetchJupiterQuote } from "../adapters/jupiter";
+import { evaluateWashGate, washAllowsSize } from "../adapters/wash";
+import { buildAcquireGateMessages } from "../acquire-gates";
 import { isBroadcastPaused } from "../broadcast";
 
 export type AgentIntent =
@@ -22,6 +24,13 @@ export type AgentSpineEvidence = {
     mode: string;
     note: string;
   };
+  /** Same acquire-desk discipline — quote path never soft-sells a blocked wash. */
+  gates?: {
+    canReview: boolean;
+    washOk: boolean;
+    blockedReasons: string[];
+    honestyNotes: string[];
+  };
 };
 
 export type AgentTurn = {
@@ -38,7 +47,9 @@ const MAX_SPEND = 25;
 
 export function parsePaperIntent(raw: string): AgentIntent {
   const text = raw.trim();
-  const quote = text.match(/quote\s+(\d+(?:\.\d+)?)\s*(?:usdc)?\s*(?:of|for)?\s*([A-Z]{1,6}x)/i);
+  const quote = text.match(
+    /quote\s+(\d+(?:\.\d+)?)\s*(?:usdc)?\s*(?:of|for)?\s*([A-Z]{1,6}x)/i,
+  );
   const quoteAmt = quote?.[1];
   const quoteSym = quote?.[2];
   if (quoteAmt && quoteSym) {
@@ -63,7 +74,7 @@ export function parsePaperIntent(raw: string): AgentIntent {
   return { kind: "unknown", raw: text };
 }
 
-/** Live Block 0 reads for paper agent — never broadcasts. */
+/** Live Block 0 reads for paper agent — never broadcasts; quote path shares acquire wash gates. */
 export async function fetchPaperAgentSpine(
   intent: AgentIntent,
 ): Promise<{ spine: AgentSpineEvidence; facts: string }> {
@@ -122,17 +133,51 @@ export async function fetchPaperAgentSpine(
           mode: "unavailable",
           note,
         },
+        gates: {
+          canReview: false,
+          washOk: false,
+          blockedReasons: [`Asset/mint unavailable: ${note}`],
+          honestyNotes: [],
+        },
       },
       facts: `Quote ${intent.symbol} fail-closed (${note}). ${broadcastNote}.`,
     };
   }
 
-  const amountRaw = Math.round(intent.spendUsdc * 1_000_000);
-  const quote = await fetchJupiterQuote({
-    outputMint: asset.data.solanaMint,
-    amountRaw,
-    outputDecimals: asset.data.decimals ?? 8,
+  const mint = asset.data.solanaMint;
+  const [quote, wash] = await Promise.all([
+    fetchJupiterQuote({
+      outputMint: mint,
+      amountRaw: Math.round(intent.spendUsdc * 1_000_000),
+      outputDecimals: asset.data.decimals ?? 8,
+    }),
+    evaluateWashGate({
+      symbol: intent.symbol,
+      mint,
+      notionalUsd: intent.spendUsdc,
+    }),
+  ]);
+
+  const washOk = washAllowsSize(wash);
+  const gateMsgs = buildAcquireGateMessages({
+    truthOk: true,
+    tradingHalted: Boolean(asset.data.isTradingHalted),
+    washOk,
+    wash: wash.ok
+      ? { kind: "pressure" }
+      : { kind: "adapter", reason: wash.reason },
+    quoteOk: quote.ok,
+    quoteReason: quote.ok ? null : quote.reason,
+    // Paper agent does not invent a Pyth pass on this path.
+    diverge: { kind: "unavailable" },
   });
+
+  const gates = {
+    canReview: gateMsgs.canReview,
+    washOk,
+    blockedReasons: gateMsgs.blockedReasons,
+    honestyNotes: gateMsgs.honestyNotes,
+  };
 
   if (!quote.ok) {
     const note = `${quote.reason}${quote.detail ? ` — ${quote.detail}` : ""}`;
@@ -145,12 +190,16 @@ export async function fetchPaperAgentSpine(
           mode: "unavailable",
           note,
         },
+        gates,
       },
-      facts: `Quote ${intent.spendUsdc} USDC → ${intent.symbol} fail-closed (${note}). ${broadcastNote}.`,
+      facts: `Quote ${intent.spendUsdc} USDC → ${intent.symbol} fail-closed (${note}). Wash/review canReview=${gates.canReview}. ${broadcastNote}. Never a fill.`,
     };
   }
 
   const note = `quote-only out≈${quote.data.outUiAmount.toFixed(6)} ${intent.symbol} · impact ${quote.data.priceImpactPct ?? "n/a"} · routes=${quote.data.routePlanLength}`;
+  const gateLine = gates.canReview
+    ? "acquire gates clear (still never a fill)"
+    : `acquire gates blocked: ${gates.blockedReasons.join("; ") || "fail-closed"}`;
   return {
     spine: {
       quote: {
@@ -160,17 +209,21 @@ export async function fetchPaperAgentSpine(
         mode: quote.mode,
         note,
       },
+      gates,
     },
-    facts: `Quote ${intent.spendUsdc} USDC → ${intent.symbol}: ${note}. ${broadcastNote}. Never a fill.`,
+    facts: `Quote ${intent.spendUsdc} USDC → ${intent.symbol}: ${note}. ${gateLine}. ${broadcastNote}. Never a fill.`,
   };
 }
 
 /** Paper-default agent. Live Block 0 spine always; AgentRouter only when keyed; never broadcasts. */
-export async function runPaperAgent(raw: string): Promise<AdapterResult<AgentTurn>> {
+export async function runPaperAgent(
+  raw: string,
+): Promise<AdapterResult<AgentTurn>> {
   const source = "folio.agent.paper";
   const intent = parsePaperIntent(raw);
   const key = process.env["AGENTROUTER_API_KEY"]?.trim();
-  const base = process.env["AGENTROUTER_BASE_URL"]?.trim() || "https://agentrouter.org/v1";
+  const base =
+    process.env["AGENTROUTER_BASE_URL"]?.trim() || "https://agentrouter.org/v1";
   const model = process.env["AGENTROUTER_MODEL"]?.trim() || "gpt-4o-mini";
   const { spine, facts } = await fetchPaperAgentSpine(intent);
 
@@ -213,7 +266,7 @@ export async function runPaperAgent(raw: string): Promise<AdapterResult<AgentTur
           {
             role: "system",
             content:
-              "You are FOLIO paper agent. Never claim fills, broadcasts, or unhackable security. Reply in ≤2 short sentences. Live spine facts are authoritative.",
+              "You are FOLIO paper agent. Never claim fills, broadcasts, or unhackable security. If acquire gates are blocked, say so plainly. Reply in ≤2 short sentences. Live spine facts are authoritative.",
           },
           {
             role: "user",
@@ -222,7 +275,9 @@ export async function runPaperAgent(raw: string): Promise<AdapterResult<AgentTur
         ],
       }),
     });
-    if (!res.ok) return errResult(source, "agentrouter_http_error", `HTTP ${res.status}`);
+    if (!res.ok) {
+      return errResult(source, "agentrouter_http_error", `HTTP ${res.status}`);
+    }
     const json = (await res.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
       usage?: { total_tokens?: number };

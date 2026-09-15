@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
 import { divergeBps, fetchPythEquityPrice } from "./adapters/pyth";
@@ -18,7 +19,27 @@ import type { JupiterQuote, JupiterTokenPrice } from "./adapters/jupiter";
 import type { WashVerdict } from "./adapters/wash";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
+import {
+  FOLIO_SESSION_COOKIE,
+  loadDeskPreferences,
+  resolveActiveTenantId,
+  verifyFolioSessionCookieValue,
+} from "./auth/session";
 export { isBroadcastPaused } from "./broadcast";
+
+/** Load strictFailClosed from active-tenant prefs when a session exists; else false. */
+async function loadStrictFailClosedPref(): Promise<boolean> {
+  try {
+    const value = getCookie(FOLIO_SESSION_COOKIE);
+    const session = verifyFolioSessionCookieValue(value);
+    if (!session.ok) return false;
+    const tenantId = resolveActiveTenantId(session.data);
+    const prefs = await loadDeskPreferences(tenantId, session.data.userId);
+    return prefs.ok ? prefs.data.strictFailClosed : false;
+  } catch {
+    return false;
+  }
+}
 
 const SymbolInput = z.object({
   symbol: z.string().min(2).max(16).default("AAPLx"),
@@ -207,6 +228,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       diverge = { kind: "pyth_missing" };
     }
 
+    const strictFailClosed = await loadStrictFailClosedPref();
     const gateMsgs = buildAcquireGateMessages({
       truthOk,
       tradingHalted: Boolean(asset.ok && asset.data.isTradingHalted),
@@ -217,6 +239,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       quoteOk: jupiter.ok,
       quoteReason: jupiter.ok ? null : jupiter.reason,
       diverge,
+      strictFailClosed,
     });
 
     return {
@@ -326,6 +349,7 @@ export {
   getSessionBundle,
   runDeskAgent,
   updateDeskPreferences,
+  setActiveTenant,
   createSessionFromPrivyToken,
   clearFolioSession,
   bindWatchWallet,

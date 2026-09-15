@@ -33,6 +33,39 @@ describe("buildAcquireGateMessages", () => {
     expect(g.honestyNotes.join(" ")).toMatch(/PYTH_API_KEY/);
   });
 
+  it("blocks review on missing Pyth when strictFailClosed is on", () => {
+    const g = buildAcquireGateMessages({
+      truthOk: true,
+      tradingHalted: false,
+      washOk: true,
+      wash: { kind: "pressure" },
+      quoteOk: true,
+      quoteReason: null,
+      diverge: { kind: "pyth_missing" },
+      strictFailClosed: true,
+    });
+    expect(g.divergeOk).toBe(false);
+    expect(g.canReview).toBe(false);
+    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed.*PYTH_API_KEY/i);
+    expect(g.honestyNotes.join(" ")).toMatch(/PYTH_API_KEY/);
+  });
+
+  it("blocks unresolved diverge when strictFailClosed is on", () => {
+    const g = buildAcquireGateMessages({
+      truthOk: true,
+      tradingHalted: false,
+      washOk: true,
+      wash: { kind: "pressure" },
+      quoteOk: true,
+      quoteReason: null,
+      diverge: { kind: "unavailable" },
+      strictFailClosed: true,
+    });
+    expect(g.divergeOk).toBe(false);
+    expect(g.canReview).toBe(false);
+    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed/i);
+  });
+
   it("blocks review on live diverge outside band", () => {
     const g = buildAcquireGateMessages({
       truthOk: true,

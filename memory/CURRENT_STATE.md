@@ -239,3 +239,11 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Tenant resolve embeds `slug` / `display_name` / `wallet_address` into session memberships.
 - Paper agent always hits live Block 0 truth/quote spine (`broadcast=false`); AgentRouter optional NL only.
 - Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Active tenant + strict prefs + paper wash gates
+- Session carries membership-validated `activeTenantId`; `setActiveTenant` remints httpOnly cookie.
+- Prefs load/save + acquire `strictFailClosed` follow active tenant (missing Pyth blocks review when strict on).
+- Paper quote path runs same wash/acquire gates; never soft-sells a blocked wash.
+- Settings: active-tenant switch + RLS honesty note (service-role until Privy→Supabase JWT `sub`).
+- Mode badge `fork` → **Unfunded CPI**; about copy drops fork-simulation theater.
+- Vitest **65** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

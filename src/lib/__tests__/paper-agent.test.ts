@@ -56,6 +56,7 @@ describe("runPaperAgent live spine", () => {
   });
 
   it("attaches quote-only spine for quote intents", async () => {
+    delete process.env["BITQUERY_API_KEY"];
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.includes("/assets/AAPLx?") || (url.includes("/assets/AAPLx") && !url.includes("multiplier"))) {
@@ -99,7 +100,100 @@ describe("runPaperAgent live spine", () => {
     if (!res.ok) return;
     expect(res.data.caps.broadcast).toBe(false);
     expect(res.data.spine.quote?.outUiAmount).toBeCloseTo(4);
+    expect(res.data.spine.gates?.washOk).toBe(false);
+    expect(res.data.spine.gates?.canReview).toBe(false);
+    expect(res.data.spine.gates?.blockedReasons.join(" ")).toMatch(/BITQUERY_API_KEY/);
     expect(res.data.reply).toMatch(/quote-only/);
-    expect(res.data.reply).toMatch(/Never a fill/);
+    expect(res.data.reply).toMatch(/Never a fill|acquire gates blocked/i);
+  });
+
+  it("labels wash-blocked quote when Bitquery returns dirty tape", async () => {
+    process.env["BITQUERY_API_KEY"] = "test-bitquery-key";
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/assets/AAPLx?") || (url.includes("/assets/AAPLx") && !url.includes("multiplier"))) {
+        return new Response(
+          JSON.stringify({
+            symbol: "AAPLx",
+            name: "Apple",
+            underlyingSymbol: "AAPL",
+            deployments: [
+              {
+                network: "Solana",
+                address: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+                decimals: 8,
+              },
+            ],
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      if (url.includes("api.jup.ag/swap/v1/quote")) {
+        return new Response(
+          JSON.stringify({
+            inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            outputMint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            inAmount: "1000000",
+            outAmount: "400000000",
+            otherAmountThreshold: "398000000",
+            slippageBps: 50,
+            priceImpactPct: "0.01",
+            routePlan: [{}, {}],
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      if (url.includes("streaming.bitquery.io")) {
+        expect(init?.method).toBe("POST");
+        return new Response(
+          JSON.stringify({
+            data: {
+              Solana: {
+                DEXTrades: [
+                  {
+                    Trade: {
+                      Dex: { ProtocolName: "test" },
+                      Buy: {
+                        Account: { Address: "SameWallet" },
+                        AmountInUSD: 10,
+                      },
+                      Sell: {
+                        Account: { Address: "SameWallet" },
+                        AmountInUSD: 10,
+                      },
+                    },
+                    Transaction: { Signature: "sig1", FeePayer: "SameWallet" },
+                  },
+                  {
+                    Trade: {
+                      Dex: { ProtocolName: "test" },
+                      Buy: {
+                        Account: { Address: "SameWallet" },
+                        AmountInUSD: 10,
+                      },
+                      Sell: {
+                        Account: { Address: "SameWallet" },
+                        AmountInUSD: 10,
+                      },
+                    },
+                    Transaction: { Signature: "sig2", FeePayer: "SameWallet" },
+                  },
+                ],
+              },
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      return new Response(`unexpected ${url}`, { status: 500 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const res = await runPaperAgent("quote 1 USDC AAPLx");
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.data.spine.gates?.washOk).toBe(false);
+    expect(res.data.spine.gates?.canReview).toBe(false);
+    expect(res.data.reply).toMatch(/acquire gates blocked|wash/i);
   });
 });

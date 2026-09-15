@@ -13,6 +13,7 @@ import {
   createSessionFromPrivyToken,
   getSessionBundle,
   runDeskAgent,
+  setActiveTenant,
   updateDeskPreferences,
 } from "@/lib/desk.functions";
 import { readLabShaderPick, readLabUiPick } from "@/lib/lab-pick";
@@ -38,6 +39,7 @@ function Page() {
   const fetchSession = useServerFn(getSessionBundle);
   const runAgent = useServerFn(runDeskAgent);
   const savePrefs = useServerFn(updateDeskPreferences);
+  const switchTenant = useServerFn(setActiveTenant);
   const createSession = useServerFn(createSessionFromPrivyToken);
   const clearSession = useServerFn(clearFolioSession);
   const bindWatch = useServerFn(bindWatchWallet);
@@ -62,8 +64,12 @@ function Page() {
   const [labShaderPick, setLabShaderPick] = useState<string | null>(null);
   const [prefsBusy, setPrefsBusy] = useState(false);
   const [prefsMsg, setPrefsMsg] = useState("");
+  const [tenantBusy, setTenantBusy] = useState(false);
+  const [tenantMsg, setTenantMsg] = useState("");
   const tenants = data?.session.ok ? data.session.data.tenants : [];
-  const prefsTenant = tenants[0] ?? null;
+  const activeTenantId = data?.activeTenantId ?? null;
+  const prefsTenant =
+    tenants.find((t) => t.tenantId === activeTenantId) ?? tenants[0] ?? null;
   const prefsEditable = Boolean(
     data?.session.ok && prefsTenant && data?.auth.ok,
   );
@@ -247,8 +253,8 @@ function Page() {
               <small>
                 {prefsEditable
                   ? data?.preferences.ok
-                    ? "Server-persisted · first tenant"
-                    : "Session ready · save will upsert prefs row"
+                    ? `Server-persisted · active tenant ${prefsTenant?.slug ?? prefsTenant?.tenantId.slice(0, 8) ?? "—"}`
+                    : "Session ready · save will upsert prefs for active tenant"
                   : data && !data.preferences.ok
                     ? data.preferences.reason
                     : "Server prefs unavailable — not using localStorage"}
@@ -268,7 +274,10 @@ function Page() {
           <label className="setting-row">
             <span>
               <b>Strict fail-closed mode</b>
-              <small>Stop when any required signal is unresolved</small>
+              <small>
+                When on, unresolved required signals (including missing Pyth) block acquire
+                review — not honesty-only labels.
+              </small>
             </span>
             <Switch
               checked={strictFailClosed}
@@ -284,6 +293,79 @@ function Page() {
           {prefsMsg ? <p className="mt-2 text-sm opacity-80">{prefsMsg}</p> : null}
         </Panel>
       </div>
+
+      <Panel
+        title="Active tenant"
+        meta={
+          <StatusBadge tone={prefsTenant ? "green" : "amber"}>
+            {prefsTenant ? "Scoped" : "No membership"}
+          </StatusBadge>
+        }
+      >
+        <p className="mb-3 text-sm opacity-80">
+          Prefs and desk scope follow the membership-validated active tenant on the httpOnly
+          session. Switching remints the signed cookie — never invents a tenant outside
+          memberships.
+        </p>
+        {tenants.length === 0 ? (
+          <p className="text-sm opacity-80">
+            No tenants on session — fail-closed until Privy + Supabase memberships land.
+          </p>
+        ) : (
+          <ul className="space-y-2 text-sm">
+            {tenants.map((t) => {
+              const isActive = t.tenantId === activeTenantId;
+              return (
+                <li key={t.tenantId} className="setting-row">
+                  <span>
+                    <b>{t.displayName ?? t.slug ?? t.tenantId.slice(0, 8)}</b>
+                    <small>
+                      {t.slug ? `${t.slug} · ` : ""}
+                      {t.role}
+                      {isActive ? " · active" : ""}
+                    </small>
+                  </span>
+                  <button
+                    type="button"
+                    className="wallet-pill"
+                    disabled={tenantBusy || isActive || !data?.session.ok}
+                    onClick={async () => {
+                      setTenantBusy(true);
+                      setTenantMsg("");
+                      try {
+                        const res = await switchTenant({
+                          data: { tenantId: t.tenantId },
+                        });
+                        if (res.ok) {
+                          setTenantMsg(res.data.note);
+                          await queryClient.invalidateQueries({
+                            queryKey: ["session-bundle"],
+                          });
+                          await refetch();
+                        } else {
+                          setTenantMsg(
+                            `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                          );
+                        }
+                      } finally {
+                        setTenantBusy(false);
+                      }
+                    }}
+                  >
+                    {isActive ? "Active" : tenantBusy ? "Switching…" : "Make active"}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        {tenantMsg ? <p className="mt-3 text-sm">{tenantMsg}</p> : null}
+        {data?.rlsNote ? (
+          <p className="mt-3 text-sm opacity-80">
+            RLS: {data.rlsNote}
+          </p>
+        ) : null}
+      </Panel>
 
       <Panel
         title="Bind Privy → httpOnly session"
@@ -480,8 +562,8 @@ function Page() {
 
       <Panel title="Paper agent" meta={<StatusBadge tone="blue">Live spine · no broadcast</StatusBadge>}>
         <p className="mb-3 text-sm opacity-80">
-          Runs live xStocks multiplier / Jupiter quote-only reads for parsed intents. Never
-          broadcasts. AgentRouter expands NL only when keyed.
+          Runs live xStocks multiplier / Jupiter quote-only reads and the same acquire wash
+          gates on quote intents. Never broadcasts. AgentRouter expands NL only when keyed.
         </p>
         <div className="form-grid">
           <label>

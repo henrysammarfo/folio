@@ -113,3 +113,7 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 
 | Borrow CPI “local fork” shipped | REJECTED as theater | No fork harness in repo — labeled unavailable-until-funded | 2026-09-15 |
 | Paper agent live spine (truth/quote) | CONFIRMED in code | `fetchPaperAgentSpine` → xStocks + Jupiter quote-only; caps.broadcast=false | 2026-09-15 |
+| Paper agent quote path shares wash/acquire gates | CONFIRMED unit | wash missing key / dirty tape → gates.canReview=false; never fill | 2026-09-15 |
+| Active tenant switch invents foreign membership | REJECTED | `setActiveTenant` / mint validate against session.tenants only | 2026-09-15 |
+| Strict fail-closed blocks missing Pyth on acquire | CONFIRMED unit | `buildAcquireGateMessages` + prefs load in `getAcquireBundle` | 2026-09-15 |
+| Mode badge “Local fork” as shipped CPI mode | SUPERSEDED | Label now **Unfunded CPI**; borrow remains unavailable-until-funded | 2026-09-15 |
