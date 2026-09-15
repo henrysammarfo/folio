@@ -101,3 +101,11 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Watch-wallet bind works on Vercel preview with session secret | CONFIRMED | Playwright bind Tokenkeg… → success note + Currently Toke…Q5DA | 2026-09-15 |
 | Stocklana registered **538** / submissions **69** / prize **$121,000** / deadline hero **SEP 25, 2026** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana via jina | 2026-09-15 |
 | Timeline / stocklana.fun may still say 18 Sep | CONFLICT — re-check at submit | same sources as prior | 2026-09-15 |
+
+## Hermes auth (2026-09-15)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Hermes `/v2/updates/price/latest` returns 401 without API key from this egress | CONFIRMED | curl 401 unauthorized; price_feeds still 200 | 2026-09-15 |
+| FOLIO fail-closes Pyth without `PYTH_API_KEY` (no invented price) | CONFIRMED | unit test + adapter early return `pyth_api_key_missing` | 2026-09-15 |
+| `SOLANA_RPC_URL` set on Vercel folio project | CONFIRMED | Vercel env API create encrypted all targets | 2026-09-15 |

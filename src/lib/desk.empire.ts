@@ -165,6 +165,7 @@ export type SessionBundle = {
     privyConfigured: boolean;
     supabaseConfigured: boolean;
     sessionSecretPresent: boolean;
+    pythApiKeyPresent: boolean;
     broadcastPaused: boolean;
   };
 };
@@ -509,6 +510,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         process.env["SUPABASE_ANON_KEY"]?.trim() &&
         process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim(),
     );
+    const pythApiKeyPresent = Boolean(process.env["PYTH_API_KEY"]?.trim());
     return {
       auth,
       session,
@@ -527,6 +529,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         privyConfigured,
         supabaseConfigured,
         sessionSecretPresent,
+        pythApiKeyPresent,
         broadcastPaused: isBroadcastPaused(),
       },
     };

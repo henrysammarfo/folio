@@ -41,6 +41,12 @@ Only when I say so. Needed for live wash tape (fail-closed until then).
 |------|--------|
 | `BITQUERY_API_KEY` | Bitquery dashboard → API key → paste into Vercel + local `.env` |
 
+Optional same sitting (unlocks Pyth diverge vs Jupiter):
+
+| Name | Where |
+|------|--------|
+| `PYTH_API_KEY` | [Pyth Terminal](https://pyth.network/) → API key → Vercel + `.env` (Hermes auth required since Aug 2026) |
+
 ---
 
 ## Step 3 — Privy (after Step 2)

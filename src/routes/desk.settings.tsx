@@ -101,6 +101,14 @@ function Page() {
             </b>
           </p>
           <p>
+            <span>PYTH_API_KEY</span>
+            <b>
+              {data?.readiness.pythApiKeyPresent
+                ? "Set · Hermes equity reference live"
+                : "Missing · Pyth diverge fail-closed"}
+            </b>
+          </p>
+          <p>
             <span>Privy (PRIVY_APP_ID / SECRET)</span>
             <b>
               {data?.readiness.privyConfigured

@@ -1,6 +1,9 @@
 import { errResult, okResult, type AdapterResult } from "./types";
 
-const HERMES = "https://hermes.pyth.network";
+/** Legacy public host — price updates require auth after Pyth Core upgrade (2026-08-26). */
+const HERMES_LEGACY = "https://hermes.pyth.network";
+/** Upgraded Hermes base (docs: pyth.dourolabs.app/hermes). */
+const HERMES_UPGRADED = "https://pyth.dourolabs.app/hermes";
 
 /** Known Pyth equity price-feed IDs (Hermes search 2026-09-15). */
 const EQUITY_FEED_IDS: Record<string, string> = {
@@ -24,11 +27,31 @@ export type DivergeCheck = {
   pass: boolean;
 };
 
-async function resolveFeedId(underlying: string): Promise<string | null> {
+export function pythApiKeyPresent(
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  return (env["PYTH_API_KEY"]?.trim().length ?? 0) > 0;
+}
+
+function hermesAuthHeaders(apiKey: string): HeadersInit {
+  return {
+    Accept: "application/json",
+    Authorization: `Bearer ${apiKey}`,
+  };
+}
+
+async function resolveFeedId(
+  underlying: string,
+  apiKey: string | null,
+): Promise<string | null> {
   if (EQUITY_FEED_IDS[underlying]) return EQUITY_FEED_IDS[underlying];
   try {
-    const url = `${HERMES}/v2/price_feeds?query=${encodeURIComponent(underlying)}&asset_type=equity`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(12_000) });
+    // Catalog search still works unauthenticated on the legacy host.
+    const url = `${HERMES_LEGACY}/v2/price_feeds?query=${encodeURIComponent(underlying)}&asset_type=equity`;
+    const res = await fetch(url, {
+      headers: apiKey ? hermesAuthHeaders(apiKey) : { Accept: "application/json" },
+      signal: AbortSignal.timeout(12_000),
+    });
     if (!res.ok) return null;
     const feeds = (await res.json()) as Array<{
       id?: string;
@@ -45,61 +68,93 @@ async function resolveFeedId(underlying: string): Promise<string | null> {
 }
 
 /**
- * Hermes `/v2/updates/price/latest` returned HTTP 401 from this egress on 2026-09-15
- * while `/v2/price_feeds` still worked. We fail-closed (no fake price).
+ * Hermes price updates require `PYTH_API_KEY` after the Aug 2026 Core upgrade.
+ * Without the key we fail-closed immediately — never invent an equity reference.
  */
 export async function fetchPythEquityPrice(
   underlying: string,
 ): Promise<AdapterResult<PythPrice>> {
-  const source = "hermes.pyth.network";
+  const apiKey = process.env["PYTH_API_KEY"]?.trim() || null;
+  if (!apiKey) {
+    return errResult(
+      "hermes.pyth.network",
+      "pyth_api_key_missing",
+      "PYTH_API_KEY required for Hermes price updates (fail-closed). Catalog search alone is not a price.",
+    );
+  }
+
   try {
-    const feedId = await resolveFeedId(underlying);
-    if (!feedId) return errResult(source, "pyth_feed_not_found", underlying);
-
-    const url = `${HERMES}/v2/updates/price/latest?ids[]=${feedId}`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(12_000),
-    });
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      return errResult(
-        source,
-        res.status === 401 ? "pyth_hermes_unauthorized" : "pyth_http_error",
-        `HTTP ${res.status} ${body.slice(0, 120)}`,
-      );
+    const feedId = await resolveFeedId(underlying, apiKey);
+    if (!feedId) {
+      return errResult("hermes.pyth.network", "pyth_feed_not_found", underlying);
     }
 
-    const json = (await res.json()) as {
-      parsed?: Array<{
-        price?: { price?: string; conf?: string; expo?: number; publish_time?: number };
-      }>;
-    };
-    const p = json.parsed?.[0]?.price;
-    if (!p?.price || typeof p.expo !== "number") {
-      return errResult(source, "pyth_malformed");
+    const path = `/v2/updates/price/latest?ids[]=${feedId}`;
+    const bases = [HERMES_UPGRADED, HERMES_LEGACY];
+    let lastDetail = "";
+
+    for (const base of bases) {
+      const source = base.replace(/^https:\/\//, "");
+      const res = await fetch(`${base}${path}`, {
+        headers: hermesAuthHeaders(apiKey),
+        signal: AbortSignal.timeout(12_000),
+      });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        lastDetail = `HTTP ${res.status} ${body.slice(0, 120)}`;
+        if (res.status === 401 || res.status === 403) {
+          return errResult(source, "pyth_hermes_unauthorized", lastDetail);
+        }
+        continue;
+      }
+
+      const json = (await res.json()) as {
+        parsed?: Array<{
+          price?: {
+            price?: string;
+            conf?: string;
+            expo?: number;
+            publish_time?: number;
+          };
+        }>;
+      };
+      const p = json.parsed?.[0]?.price;
+      if (!p?.price || typeof p.expo !== "number") {
+        return errResult(source, "pyth_malformed");
+      }
+      const price = Number(p.price) * 10 ** p.expo;
+      const conf = Number(p.conf ?? "0") * 10 ** p.expo;
+      if (!Number.isFinite(price) || price <= 0) {
+        return errResult(source, "pyth_invalid_price");
+      }
+      return okResult("mainnet-read", source, {
+        underlying,
+        feedId,
+        price,
+        conf,
+        expo: p.expo,
+        publishTime: p.publish_time ?? 0,
+      });
     }
-    const price = Number(p.price) * 10 ** p.expo;
-    const conf = Number(p.conf ?? "0") * 10 ** p.expo;
-    if (!Number.isFinite(price) || price <= 0) {
-      return errResult(source, "pyth_invalid_price");
-    }
-    return okResult("mainnet-read", source, {
-      underlying,
-      feedId,
-      price,
-      conf,
-      expo: p.expo,
-      publishTime: p.publish_time ?? 0,
-    });
+
+    return errResult(
+      "hermes.pyth.network",
+      "pyth_http_error",
+      lastDetail || "All Hermes hosts failed",
+    );
   } catch (e) {
-    return errResult(source, "pyth_fetch_failed", String(e));
+    return errResult("hermes.pyth.network", "pyth_fetch_failed", String(e));
   }
 }
 
-export function divergeBps(left: number, right: number, bandBps = 50): DivergeCheck {
+export function divergeBps(
+  left: number,
+  right: number,
+  bandBps = 50,
+): DivergeCheck {
   const mid = (left + right) / 2;
-  const bps = mid > 0 ? (Math.abs(left - right) / mid) * 10_000 : Number.POSITIVE_INFINITY;
+  const bps =
+    mid > 0 ? (Math.abs(left - right) / mid) * 10_000 : Number.POSITIVE_INFINITY;
   return {
     left,
     right,

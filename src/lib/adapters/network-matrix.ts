@@ -56,7 +56,7 @@ export function buildNetworkMatrix(input: {
       mode: modeOf(input.pyth),
       detail: input.pyth.ok
         ? input.pyth.source
-        : `${detailOf(input.pyth)} (Hermes may 401 on this egress — fail-closed)`,
+        : `${detailOf(input.pyth)} (PYTH_API_KEY required since Hermes Aug 2026 auth — fail-closed)`,
     },
     {
       capability: "Jupiter Price v3 (venue + stockData)",

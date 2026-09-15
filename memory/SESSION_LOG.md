@@ -183,3 +183,7 @@
 - Verified bind on Vercel preview (Playwright); screenshot saved.
 - Stocklana: 538 / 69 / $121k; SEP 25 hero deadline conflict unchanged.
 - Awaiting Henry lab approve before premium merge; keys still empty for wash + multi-tenant.
+
+## 2026-09-15 — Pyth auth gate + RPC on Vercel
+- Shipped PYTH_API_KEY Hermes Bearer path (fail-closed without key); settings/matrix honesty; SOLANA_RPC_URL on Vercel.
+- Goal still open — multi-tenant + wash + premium merge need Henry.

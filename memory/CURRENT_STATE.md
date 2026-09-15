@@ -200,3 +200,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Artifact: `/opt/cursor/artifacts/screenshots/watch-wallet-bind-live.png`
 - Stocklana live (jina): **538** registered / **69** submissions / **$121k** / deadline hero **SEP 25** (timeline still mentions 18 Sep — re-check at submit).
 - Next Henry gate: Step 0 lab id. Then Bitquery → Privy → Supabase. Goal not complete.
+
+## 2026-09-15 — Hermes PYTH_API_KEY fail-closed + Vercel SOLANA_RPC_URL
+- Hermes price updates require auth since Pyth Core Aug 2026; adapter fail-closes without `PYTH_API_KEY` (Bearer on upgraded + legacy hosts).
+- Settings readiness + network matrix label the missing key honestly; unit tests cover no-fetch fail-closed + Bearer parse.
+- Vercel now has `SOLANA_RPC_URL=https://api.mainnet-beta.solana.com` (encrypted) alongside `FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED`.
+- Still blocked for full objective: Henry lab id · Bitquery · Privy · Supabase · funded broadcast · `PYTH_API_KEY`.
