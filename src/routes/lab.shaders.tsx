@@ -46,6 +46,7 @@ function Page() {
       <div className="mb-4 flex flex-wrap gap-2">
         <StatusBadge tone="blue">Awaiting approval</StatusBadge>
         <StatusBadge tone="neutral">Hero media untouched</StatusBadge>
+        <StatusBadge tone="neutral">Reply: ink-ledger · ledger-mist · aurora-grid</StatusBadge>
       </div>
       <div className="lab-grid">
         {CANDIDATES.map((c) => (

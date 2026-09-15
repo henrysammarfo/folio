@@ -63,8 +63,13 @@ test.describe("FOLIO Block 0 smoke", () => {
   test("lab routes stay approve-gated", async ({ page }) => {
     await page.goto("/lab/shaders");
     await expect(page.getByText(/awaiting approval|approve/i).first()).toBeVisible();
+    await expect(page.getByText(/ink-ledger|ledger-mist|aurora-grid/i).first()).toBeVisible();
     await page.goto("/lab/ui");
     await expect(page.getByText(/awaiting approval|approve/i).first()).toBeVisible();
+    await expect(page.getByText(/desk-density-a/i).first()).toBeVisible();
+    await expect(page.getByText(/desk-density-b/i).first()).toBeVisible();
+    await expect(page.getByText(/gate-chip/i).first()).toBeVisible();
+    await expect(page.getByText(/mainnet-read|quote-only|unavailable/i).first()).toBeVisible();
   });
 
   test("settings exposes watch-wallet bind (not Privy auth)", async ({ page }) => {

@@ -136,3 +136,10 @@
 - `/desk/activity` + `/desk/positions/$symbol` SSR-prefetch.
 - e2e: settings auth fail-closed + positions paper/wallet-read labels.
 - `smoke-empire` asserts NestUSD/wash/broadcast/multi-tenant stay unavailable without keys.
+
+## 2026-09-15 — Lab polish + Stocklana 68 + submission paste pack
+
+- Differentiated `/lab/ui` previews + CSS motion (rise/sheen/row-in/drift) behind approve gate only.
+- Refreshed Stocklana counts to **68** submissions; added `docs/STOCKLANA_SUBMISSION.md`.
+- Keys still empty (Bitquery/Privy/Supabase); Vercel `FOLIO_SESSION_SECRET` still missing on preview; broadcast remains paused.
+- Goal not complete — awaiting keys + Henry lab id + Vercel secret.

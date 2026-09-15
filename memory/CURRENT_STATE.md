@@ -140,3 +140,11 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Desk activity + position detail SSR.
 - Empire smoke fails closed if matrix lies about NestUSD/wash/broadcast/auth.
 - Still blocked: Bitquery/Privy/Supabase keys, Henry lab approve, Vercel FOLIO_SESSION_SECRET.
+
+## 2026-09-15 lab polish + Stocklana 68 + submit paste pack
+
+- `/lab/ui` candidates differentiated: dense ledger (`desk-density-a`), quiet metric strip (`desk-density-b`), ModeBadge chip row (`gate-chip`) with motion (respects prefers-reduced-motion).
+- `/lab/shaders` reply chip lists `ink-ledger` · `ledger-mist` · `aurora-grid`; hero still locked.
+- Stocklana live WebFetch: **534** registered / **68** submissions / **$121k** hero; deadline conflict unchanged — re-check at submit.
+- Added `docs/STOCKLANA_SUBMISSION.md` paste pack; submit checklist ticks verified honesty items; Vercel `FOLIO_SESSION_SECRET` still Henry-owned.
+- Still blocked for full objective: Bitquery / Privy / Supabase keys + lab approve + Vercel session secret.

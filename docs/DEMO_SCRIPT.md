@@ -19,7 +19,9 @@ Verified on this preview (SSO off): `/truth` ~1.003269× · `/network` NestUSD/w
 
 Set `FOLIO_SESSION_SECRET` (+ `BROADCAST_PAUSED=true`) in Vercel before demos that need watch-wallet bind.
 
-Stocklana live (2026-09-15, re-check at submit): **534** registered · **67** submissions · **$121k** hero · deadline conflict SEP 25 hero vs **18 Sep 20:00 UTC** timeline.
+Stocklana live (2026-09-15 WebFetch, re-check at submit): **534** registered · **68** submissions · **$121k** hero · deadline conflict SEP 25 hero vs **18 Sep 20:00 UTC** timeline.
+
+Paste pack: `docs/STOCKLANA_SUBMISSION.md`
 
 ## Click path
 
@@ -35,6 +37,8 @@ Stocklana live (2026-09-15, re-check at submit): **534** registered · **67** su
 npm run replay
 # = npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build
 ```
+
+Lab approve ids (not production): `ink-ledger` · `ledger-mist` · `aurora-grid` · `desk-density-a` · `desk-density-b` · `gate-chip`
 
 ## Do not say
 
