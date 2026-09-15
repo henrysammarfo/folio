@@ -3,13 +3,14 @@ import { z } from "zod";
 import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
 import { divergeBps, fetchPythEquityPrice } from "./adapters/pyth";
 import { fetchJupiterQuote, fetchJupiterTokenPrice } from "./adapters/jupiter";
-import { evaluateWashGate } from "./adapters/wash";
+import { evaluateWashGate, washAllowsSize } from "./adapters/wash";
 import { buildNetworkMatrix, type MatrixRow } from "./adapters/network-matrix";
 import type { AdapterResult } from "./adapters/types";
 import type { XStockAsset, XStockMultiplier } from "./adapters/xstocks";
 import type { PythPrice } from "./adapters/pyth";
 import type { JupiterQuote, JupiterTokenPrice } from "./adapters/jupiter";
 import type { WashVerdict } from "./adapters/wash";
+import { paperRawFor } from "./market";
 
 const SymbolInput = z.object({
   symbol: z.string().min(2).max(16).default("AAPLx"),
@@ -32,7 +33,8 @@ export type TruthBundle = {
     bandBps: number;
     note: string;
   };
-  demoRawBalance: number;
+  /** Illustrative paper qty — not wallet truth until Privy binding. */
+  paperRaw: number;
   economicShares: number | null;
 };
 
@@ -57,12 +59,6 @@ export type AcquireBundle = {
 export type NetworkBundle = {
   rows: MatrixRow[];
   broadcastPaused: boolean;
-};
-
-const DEMO_RAW: Record<string, number> = {
-  AAPLx: 12.5,
-  NVDAx: 8.24,
-  TSLAx: 5.1,
 };
 
 function unavailablePrice(reason: string): AdapterResult<JupiterTokenPrice> {
@@ -132,9 +128,9 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       };
     }
 
-    const demoRawBalance = DEMO_RAW[symbol] ?? 1;
+    const paperRaw = paperRawFor(symbol);
     const economicShares = multiplier.ok
-      ? demoRawBalance * multiplier.data.currentMultiplier
+      ? paperRaw * multiplier.data.currentMultiplier
       : null;
 
     return {
@@ -144,7 +140,7 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       pyth,
       jupiterPrice,
       diverge,
-      demoRawBalance,
+      paperRaw,
       economicShares,
     };
   });
@@ -187,11 +183,12 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
 
     const blockedReasons: string[] = [];
     const truthOk = multiplier.ok && asset.ok;
+    const washOk = washAllowsSize(wash);
     if (!truthOk) blockedReasons.push("Corporate-action / asset truth unavailable");
     if (asset.ok && asset.data.isTradingHalted) {
       blockedReasons.push("Trading halted per xStocks API");
     }
-    if (!wash.ok || !wash.data.pass) {
+    if (!washOk) {
       blockedReasons.push(wash.ok ? "Wash pressure blocked" : `Wash gate: ${wash.reason}`);
     }
     if (!jupiter.ok) blockedReasons.push(`Jupiter quote: ${jupiter.reason}`);
@@ -212,9 +209,9 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       jupiter,
       gates: {
         truthOk,
-        washOk: wash.ok && wash.data.pass,
+        washOk,
         quoteOk: jupiter.ok,
-        canReview: truthOk && jupiter.ok,
+        canReview: truthOk && washOk && jupiter.ok,
         blockedReasons,
       },
     };

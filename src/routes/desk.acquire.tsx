@@ -128,13 +128,27 @@ function Page() {
             <p>
               <span>Wash / linked flow</span>
               <StatusBadge tone={data?.gates.washOk ? "green" : "amber"}>
-                {data?.gates.washOk
-                  ? "Pass"
-                  : data?.wash && !data.wash.ok
-                    ? data.wash.reason
-                    : "…"}
+                {data?.gates.washOk && data.wash.ok
+                  ? `Pass · ${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
+                  : data?.wash && data.wash.ok
+                    ? `${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
+                    : data?.wash && !data.wash.ok
+                      ? data.wash.reason
+                      : "…"}
               </StatusBadge>
             </p>
+            {data?.wash.ok && data.wash.data.notes.length > 0 ? (
+              <div className="review-box mt-2">
+                <p>
+                  <b>Wash notes</b>
+                </p>
+                <ul>
+                  {data.wash.data.notes.map((n) => (
+                    <li key={n}>{n}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             <p>
               <span>Jupiter route</span>
               <StatusBadge tone={data?.gates.quoteOk ? "blue" : "amber"}>
@@ -200,6 +214,16 @@ function Page() {
               </b>
             </div>
             <div>
+              <span>Wash</span>
+              <b>
+                {data?.wash.ok
+                  ? `${data.wash.data.pass ? "Clear" : "Blocked"} · ${data.wash.data.pressure}`
+                  : data?.wash && !data.wash.ok
+                    ? data.wash.reason
+                    : "Unavailable"}
+              </b>
+            </div>
+            <div>
               <span>Execution</span>
               <b>Disabled · labeled quote-only</b>
             </div>
@@ -213,10 +237,21 @@ function Page() {
             </Button>
           ) : null}
           <Button
-            disabled={!ready || (step === 2 && isFetching)}
-            onClick={() => setStep(Math.min(3, step + 1))}
+            disabled={
+              !ready ||
+              (step === 2 && (isFetching || !data?.gates.canReview)) ||
+              (step === 3 && !data?.gates.canReview)
+            }
+            onClick={() => {
+              if (step === 2 && !data?.gates.canReview) return;
+              setStep(Math.min(3, step + 1));
+            }}
           >
-            {step === 3 ? "Quote reviewed" : "Continue"}
+            {step === 3
+              ? "Quote reviewed"
+              : step === 2 && data && !data.gates.canReview
+                ? "Blocked — fail-closed"
+                : "Continue"}
           </Button>
         </div>
       </Panel>

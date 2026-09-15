@@ -38,7 +38,7 @@ function Page() {
 
   const mult = data?.multiplier;
   const asset = data?.asset;
-  const raw = data?.demoRawBalance ?? null;
+  const raw = data?.paperRaw ?? null;
   const economic = data?.economicShares ?? null;
 
   return (
@@ -61,9 +61,9 @@ function Page() {
 
       <div className="metrics-grid">
         <Metric
-          label="Demo raw balance"
+          label="Paper raw balance"
           value={raw != null ? raw.toFixed(4) : isLoading ? "…" : "—"}
-          detail="Illustrative raw (wallet RPC wiring next)"
+          detail="Illustrative paper qty — not wallet truth until Privy binding"
         />
         <Metric
           label="Live action multiplier"

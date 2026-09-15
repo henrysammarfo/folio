@@ -38,9 +38,9 @@ World’s Fair still wins on **working honesty**: live multiplier + wash refuse 
 | Jupiter Lend earn vaults | Live mainnet-read (not xStock borrow) |
 | Raydium pool awareness | Live mainnet-read |
 | NestUSD | Fail-closed / risk-labeled |
-| Privy + Supabase sessions | Scaffold fail-closed (keys empty) |
+| Privy + Supabase sessions | Mint/verify httpOnly cookie path wired; fail-closed without keys+`FOLIO_SESSION_SECRET` |
 | Paper agent + meter stub | Wired on settings |
-| Vitest unit | Green (multiplier / diverge / wash / intent) |
+| Vitest unit | Green (15) — market math, wash fail-closed + heuristics + thin-tape, session cookie, paper intent |
 | Lovable traces | Removed (`.lovable` deleted; vite config independent) |
 
 ## Keys
@@ -55,3 +55,13 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated).
 - Mint `XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp`, decimals **8**
 - On-chain effective Scaled UI matches pending API multiplier when timestamp elapsed
 - Kamino AAPLx **maxLtv 0.40** on market `5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua`
+
+
+## Latest progress (2026-09-15)
+
+- Acquire gate: `canReview = truthOk && washOk && quoteOk` — Continue blocked when wash fail-closed.
+- Paper qty single source: `paperRawFor()` in `src/lib/market.ts` (truth/positions/credit).
+- Wash: Bitquery GraphQL + self-trade / fee-payer / thin-tape heuristics; fail-closed without `BITQUERY_API_KEY`.
+- Auth: HMAC `folio_session` mint/verify (`FOLIO_SESSION_SECRET`); settings shows `sessionReady` separately from keys-present.
+- Lab `/lab/shaders` + `/lab/ui` remain approve-gated; production hero untouched.
+- Broadcast / mentor spam still paused.

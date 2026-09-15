@@ -32,3 +32,14 @@
 - Vitest: market math, wash fail-closed, paper intent — 8/8 green.
 - Removed `.lovable/` directory; Lovable package already gone from package.json.
 - Broadcast / mentor DMs still paused until Block 0 demo URL.
+
+## 2026-09-15 — Acquire honesty + session mint/verify
+
+- Fixed acquire Continue to require wash clear (`canReview` includes washOk); UI surfaces pressure / sampleSize / notes.
+- Collapsed paper qty SoT via `paperRawFor`; removed duplicate DEMO_RAW/PAPER_RAW maps.
+- Auth session: mint+HMAC verify for `folio_session`; fail-closed without Privy/Supabase/`FOLIO_SESSION_SECRET`.
+- Wash scoring uses notional vs sampled USD (thin tape → elevated).
+- Tests: 15 green (session cookie + thin-tape added). `tsc --noEmit` clean.
+- Docs: `docs/DEMO_SCRIPT.md`; SQL stub `supabase/migrations/*_folio_tenants.sql`.
+- Still open: live Bitquery/Privy/Supabase keys; premium UI merge only after Henry approves lab candidate; Playwright e2e; broadcast remains off.
+

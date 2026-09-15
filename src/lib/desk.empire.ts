@@ -14,16 +14,16 @@ import { fetchKaminoXStocksMarket } from "./adapters/kamino";
 import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
 import { fetchNestUsdStatus } from "./adapters/nestusd";
 import { fetchRaydiumPoolsForMint } from "./adapters/pools";
-import { getAuthProviderStatus, loadDeskPreferences } from "./auth/session";
+import {
+  getAuthProviderStatus,
+  loadDeskPreferences,
+  parseFolioSessionCookie,
+  type FolioSession,
+} from "./auth/session";
 import { runPaperAgent } from "./agent/paper-agent";
+import { paperRawFor } from "./market";
 
 const WATCHLIST = ["AAPLx", "NVDAx", "TSLAx"] as const;
-
-const PAPER_RAW: Record<string, number> = {
-  AAPLx: 12.5,
-  NVDAx: 8.24,
-  TSLAx: 5.1,
-};
 
 function unavailablePrice(reason: string): AdapterResult<JupiterTokenPrice> {
   return errResult("api.jup.ag/price/v3", reason);
@@ -31,6 +31,16 @@ function unavailablePrice(reason: string): AdapterResult<JupiterTokenPrice> {
 
 function unavailableQuote(reason: string): AdapterResult<JupiterQuote> {
   return errResult("api.jup.ag/swap/v1/quote", reason);
+}
+
+function readCookieHeader(): string | null {
+  try {
+    // Optional harness for tests / future request binding.
+    const g = globalThis as { __FOLIO_COOKIE_HEADER__?: string };
+    return g.__FOLIO_COOKIE_HEADER__ ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export type PositionRow = {
@@ -82,6 +92,7 @@ export type ActivityBundle = {
 
 export type SessionBundle = {
   auth: ReturnType<typeof getAuthProviderStatus>;
+  session: AdapterResult<FolioSession>;
   preferences: Awaited<ReturnType<typeof loadDeskPreferences>>;
   networkPolicy: {
     mainnetRead: true;
@@ -97,7 +108,7 @@ export const getPositionsBundle = createServerFn({ method: "GET" }).handler(
     const rows: PositionRow[] = [];
 
     for (const symbol of WATCHLIST) {
-      const paperRaw = PAPER_RAW[symbol] ?? 1;
+      const paperRaw = paperRawFor(symbol);
       const [asset, multiplier] = await Promise.all([
         fetchXStockAsset(symbol),
         fetchXStockMultiplier(symbol),
@@ -168,7 +179,7 @@ export const getCreditBundle = createServerFn({ method: "GET" }).handler(
         ? await fetchJupiterTokenPrice(mint)
         : unavailablePrice("xstock_mint_missing");
       if (multiplier.ok && price.ok) {
-        const raw = PAPER_RAW[symbol] ?? 0;
+        const raw = paperRawFor(symbol, 0);
         collateral =
           (collateral ?? 0) + raw * multiplier.data.currentMultiplier * price.data.usdPrice;
         priced += 1;
@@ -247,7 +258,9 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
       {
         at: now,
         title: wash.ok && wash.data.pass ? "Wash clear" : "Wash fail-closed",
-        detail: wash.ok ? wash.data.notes.join("; ") || "pass" : wash.reason,
+        detail: wash.ok
+          ? `${wash.data.pressure} · n=${wash.data.sampleSize} · ${wash.data.notes.join("; ") || "pass"}`
+          : wash.reason,
         tone: wash.ok && wash.data.pass ? "green" : "amber",
         mode: wash.ok ? wash.mode : "unavailable",
       },
@@ -278,10 +291,13 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
 
 export const getSessionBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<SessionBundle> => {
-    const auth = getAuthProviderStatus();
-    const preferences = await loadDeskPreferences(null);
+    const session = parseFolioSessionCookie(readCookieHeader());
+    const auth = getAuthProviderStatus(session.ok ? session : null);
+    const tenantId = session.ok ? (session.data.tenants[0]?.tenantId ?? null) : null;
+    const preferences = await loadDeskPreferences(tenantId);
     return {
       auth,
+      session,
       preferences,
       networkPolicy: {
         mainnetRead: true,

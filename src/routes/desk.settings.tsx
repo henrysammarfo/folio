@@ -57,11 +57,38 @@ function Page() {
           </div>
           <div className="setting-row">
             <span>
-              <b>Auth / tenancy</b>
-              <small>Privy + Supabase httpOnly sessions</small>
+              <b>Auth providers</b>
+              <small>Privy + Supabase + FOLIO_SESSION_SECRET</small>
             </span>
             <StatusBadge tone={data?.auth.ok ? "green" : "amber"}>
-              {data?.auth.ok ? "Keys present" : data && !data.auth.ok ? data.auth.reason : "Keys missing"}
+              {data?.auth.ok
+                ? "Keys present"
+                : data && !data.auth.ok
+                  ? data.auth.reason
+                  : "Keys missing"}
+            </StatusBadge>
+          </div>
+          <div className="setting-row">
+            <span>
+              <b>httpOnly session</b>
+              <small>
+                {data?.session.ok
+                  ? `user ${data.session.data.userId.slice(0, 12)}…`
+                  : data?.session && !data.session.ok
+                    ? data.session.reason
+                    : "No verified folio_session"}
+              </small>
+            </span>
+            <StatusBadge
+              tone={
+                data?.auth.ok && data.auth.data.sessionReady
+                  ? "green"
+                  : "amber"
+              }
+            >
+              {data?.auth.ok && data.auth.data.sessionReady
+                ? "Ready"
+                : "Not ready"}
             </StatusBadge>
           </div>
         </Panel>
