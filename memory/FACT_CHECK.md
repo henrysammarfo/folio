@@ -140,7 +140,7 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Paper qty rows claim health Verified | REJECTED (fixed) | Verified requires wallet-read + live feeds; paper → Review | 2026-09-15 |
 | Desk chrome always-green Mainnet read / fake search | REJECTED (fixed) | Quote-only badges; search replaced with policy strip | 2026-09-15 |
 | Raydium pools live but absent from judge matrix | REJECTED (fixed) | Matrix + empire smoke + NETWORK_MATRIX.md awareness-only row | 2026-09-15 |
-| GitGuardian “secret” in jupiter-cache.test.ts | FALSE POSITIVE remediates | Public AAPLx mint string flagged as high-entropy; replaced with low-entropy fixtures in unit tests (not a credential; no rotate) | 2026-09-15 |
+| GitGuardian “secret” in jupiter-cache.test.ts | FALSE POSITIVE remediates | Public AAPLx mint string flagged as high-entropy; replaced with low-entropy fixtures in unit tests (not a credential; no rotate). Tip clean; GG PR check still fails on historical commit `300e676` until Henry **Skip: false positive** (no Lovable history rewrite) | 2026-09-15 |
 | Multi-tenant prefs always service-role only | SUPERSEDED | User-JWT path when SUPABASE_JWT_SECRET set; service-role remains labeled fallback | 2026-09-15 |
 | User-JWT invents RLS-ok without secret | REJECTED | mintSupabaseUserJwt fail-closes; resolveSupabaseRestAuth falls back to service-role | 2026-09-15 |
 | Raydium empty/unavailable alone blocks acquire review | REJECTED | Honesty notes only; canReview still needs truth+wash+quote+diverge | 2026-09-15 |
