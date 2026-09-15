@@ -167,3 +167,8 @@
 
 - Wired `?inspect=` on desk/public credit; matrix row for ephemeral inspect; demo/submit docs + e2e.
 - Goal still open pending keys + lab approve + Vercel session secret.
+
+## 2026-09-15 — Pause for Henry step-by-step + visible approve CTAs
+- Henry: no premium UI visible yet (by design); asked stop-for-keys step-by-step + where to approve.
+- Shipped home/desk/settings links to `/lab/ui` + `/lab/shaders`; Colosseum vision stub.
+- Do not burn autonomously — wait for lab id and Vercel Step 1 screenshot.

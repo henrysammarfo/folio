@@ -85,7 +85,25 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(
       /watch-wallet secret (set|missing)|secret (ready|missing)|folio_session_secret/,
     );
+    expect(body).toMatch(/production readiness|henry actions/);
+    expect(body).toMatch(/bitquery_api_key|wash fail-closed|wash tape/);
+    expect(body).toMatch(/privy|multi-tenant fail-closed/);
+    expect(body).toMatch(/supabase|tenants fail-closed/);
     expect(body).not.toMatch(/unhackable|nation-state/);
+  });
+
+  test("desk overview supports ephemeral wallet inspect without session secret", async ({
+    page,
+  }) => {
+    const inspect = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+    await page.goto(`/desk?inspect=${inspect}`);
+    await expect(page.getByText(/prime desk|portfolio|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/inspect|ephemeral|mainnet/);
+    expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
   test("credit page labels capacity source", async ({ page }) => {
@@ -170,6 +188,15 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);
     expect(body).toMatch(/nestusd|kamino|no borrow|fork|unavailable|illustrative/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
+  });
+
+
+  test("home surfaces lab approve CTAs", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("link", { name: /approve desk ui/i })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("link", { name: /approve shaders/i })).toBeVisible();
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/approve a look|without your approve|lab/);
   });
 
 });

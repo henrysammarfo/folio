@@ -172,3 +172,12 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `/desk/credit?inspect=` + public `/credit?inspect=` pass through to credit bundle.
 - Network matrix lists ephemeral inspect as always-on mainnet-read (not auth).
 - Still blocked: Bitquery/Privy/Supabase keys + Henry lab approve + Vercel FOLIO_SESSION_SECRET for watch-wallet bind.
+
+## 2026-09-15 — Visible lab approve path (Henry feedback)
+
+- Home hero now shows **Approve desk UI** + **Approve shaders** CTAs (premium still gated).
+- Desk sidebar foot + settings readiness link to `/lab/ui` and `/lab/shaders`.
+- Desk overview `?inspect=` + settings production readiness checklist in flight on this branch.
+- Stocklana live (jina): **538** registered / **69** submissions / **$121k**; deadline conflict SEP 25 hero vs timeline/stocklana.fun 18 Sep — re-check at submit.
+- Vision stub: `docs/COLOSSEUM_VISION.md` (Ghana / why / sustainability — expand after UI approve + keys).
+- Still blocked for full objective: Bitquery/Privy/Supabase keys + Henry lab id + Vercel `FOLIO_SESSION_SECRET`.

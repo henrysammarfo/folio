@@ -21,7 +21,7 @@ export function DeskShell({ title, eyebrow, children, actions }: { title: string
           const active = to === "/desk" ? path === to : path.startsWith(to);
           return <Link key={to} to={to} className={`desk-nav-link ${active ? "desk-nav-active" : ""}`}><Icon />{label}</Link>;
         })}</nav>
-        <div className="desk-sidebar-foot"><StatusBadge tone="green">Mainnet read</StatusBadge><p>Broadcast disabled</p></div>
+        <div className="desk-sidebar-foot"><StatusBadge tone="green">Mainnet read</StatusBadge><p>Broadcast disabled</p><p><Link to="/lab/ui">Approve lab UI</Link> · <Link to="/lab/shaders">shaders</Link></p></div>
       </aside>
       <div className="desk-main">
         <header className="desk-topbar">

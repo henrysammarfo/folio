@@ -159,6 +159,14 @@ export type SessionBundle = {
   watchWallet: string | null;
   /** FOLIO_SESSION_SECRET ≥16 — watch-wallet bind + cookie signing (not Privy). */
   sessionSecretPresent: boolean;
+  /** Production readiness flags — fail-closed honesty for Henry / Stocklana ops. */
+  readiness: {
+    bitqueryKeyPresent: boolean;
+    privyConfigured: boolean;
+    supabaseConfigured: boolean;
+    sessionSecretPresent: boolean;
+    broadcastPaused: boolean;
+  };
 };
 
 const InspectWalletInput = z
@@ -489,6 +497,18 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     const watch = readWatchWallet();
     const sessionSecretPresent =
       (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
+    const bitqueryKeyPresent = Boolean(
+      process.env["BITQUERY_API_KEY"]?.trim(),
+    );
+    const privyConfigured = Boolean(
+      process.env["PRIVY_APP_ID"]?.trim() &&
+        process.env["PRIVY_APP_SECRET"]?.trim(),
+    );
+    const supabaseConfigured = Boolean(
+      process.env["SUPABASE_URL"]?.trim() &&
+        process.env["SUPABASE_ANON_KEY"]?.trim() &&
+        process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim(),
+    );
     return {
       auth,
       session,
@@ -502,6 +522,13 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
       },
       watchWallet: watch.ok ? watch.data.wallet : null,
       sessionSecretPresent,
+      readiness: {
+        bitqueryKeyPresent,
+        privyConfigured,
+        supabaseConfigured,
+        sessionSecretPresent,
+        broadcastPaused: isBroadcastPaused(),
+      },
     };
   },
 );

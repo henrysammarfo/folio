@@ -223,3 +223,9 @@
   .lab-card{transition:none}
   .home-media video{animation:none}
 }
+
+.home-cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;margin-top:2rem}
+.home-cta-row .home-cta{margin-top:0}
+.home-cta-secondary{display:inline-flex;align-items:center;gap:.4rem;padding:.75rem 1rem;border:1px solid color-mix(in oklch,var(--primary-foreground) 55%,transparent);color:var(--primary-foreground);border-radius:var(--radius);font-size:.85rem;font-weight:600;letter-spacing:.02em;text-decoration:none;backdrop-filter:blur(6px);background:color-mix(in oklch,var(--ink) 28%,transparent)}
+.home-cta-secondary:hover{background:color-mix(in oklch,var(--ink) 45%,transparent)}
+.home-approve-hint{margin-top:.85rem;max-width:34rem;font-size:.78rem;line-height:1.45;opacity:.82}

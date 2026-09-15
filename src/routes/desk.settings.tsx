@@ -74,6 +74,63 @@ function Page() {
         </ModeBadge>
         <ModeBadge mode="paper">Paper agent</ModeBadge>
       </div>
+
+      <Panel
+        title="Production readiness"
+        meta={<StatusBadge tone="amber">Henry actions</StatusBadge>}
+      >
+        <p className="mb-3 text-sm opacity-80">
+          Fail-closed checklist for Stocklana production. Missing keys stay unavailable — we do
+          not invent wash clears, multi-tenant sessions, or broadcast.
+        </p>
+        <div className="policy-list">
+          <p>
+            <span>FOLIO_SESSION_SECRET (Vercel)</span>
+            <b>
+              {data?.readiness.sessionSecretPresent
+                ? "Set · watch-wallet bind ready"
+                : "Missing · set ≥16 chars on Vercel"}
+            </b>
+          </p>
+          <p>
+            <span>BITQUERY_API_KEY</span>
+            <b>
+              {data?.readiness.bitqueryKeyPresent
+                ? "Set · wash tape live"
+                : "Missing · wash fail-closed"}
+            </b>
+          </p>
+          <p>
+            <span>Privy (PRIVY_APP_ID / SECRET)</span>
+            <b>
+              {data?.readiness.privyConfigured
+                ? "Configured"
+                : "Missing · multi-tenant fail-closed"}
+            </b>
+          </p>
+          <p>
+            <span>Supabase URL + keys</span>
+            <b>
+              {data?.readiness.supabaseConfigured
+                ? "Configured"
+                : "Missing · tenants fail-closed"}
+            </b>
+          </p>
+          <p>
+            <span>Broadcast</span>
+            <b>
+              {data?.readiness.broadcastPaused
+                ? "Paused · ≤~$1 · quote-only"
+                : "Policy off until funded"}
+            </b>
+          </p>
+          <p>
+            <span>Lab premium UI</span>
+            <b>Awaiting Henry candidate id — <a href="/lab/ui">/lab/ui</a> · <a href="/lab/shaders">/lab/shaders</a></b>
+          </p>
+        </div>
+      </Panel>
+
       <div className="desk-grid">
         <Panel title="Network mode" meta={<StatusBadge tone="green">Safe default</StatusBadge>}>
           <div className="setting-row">
