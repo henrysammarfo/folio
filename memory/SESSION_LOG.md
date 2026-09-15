@@ -266,3 +266,8 @@
 ## 2026-09-15 — Home live × in hero copy
 - SSR truth bundle → AAPLx live multiplier in home supporting sentence (not fixture 4×); Stocklana still 545/72/$121k.
 - Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Paper agent e2e lock-in
+- E2E clicks Run paper agent → asserts `nl=` + `broadcast=false` + spine bits; never fill theater.
+- Vercel preview READY on `e1fb388` with home live AAPLx ≈1.003269×.
+- Goal open: Henry lab Pick + keys.

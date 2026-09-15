@@ -135,3 +135,5 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Activity CA prefs ModeBadge = mainnet-read | REJECTED (fixed) | Preference → paper mode; Nest.credit ≠ NestUSD events added | 2026-09-15 |
 | Home hero invents fixture 4× share count | REJECTED | SSR live AAPLx multiplier woven into copy (or honest unavailable) | 2026-09-15 |
 | Stocklana registered **545** / submissions **72** / prize **$121,000** | CONFIRMED live (re-check) | hackathons.solana.com WebFetch; deadline hero SEP 25 vs timeline 18 Sep 16:00 ET | 2026-09-15 |
+| Vercel prefs preview home shows live AAPLx ≈1.003269× | CONFIRMED live | https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/ | 2026-09-15 |
+| Paper agent e2e invents a fill | REJECTED | Playwright asserts nl= + broadcast=false + spine; no fill theater | 2026-09-15 |

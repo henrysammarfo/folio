@@ -324,4 +324,20 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/approve a look|without your approve|lab/);
   });
 
+  test("paper agent keeps live spine and never fills", async ({ page }) => {
+    await page.goto("/desk/settings");
+    await expect(page.getByText(/paper agent/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    await page.getByRole("button", { name: /run paper agent/i }).click();
+    await expect(page.locator("pre").filter({ hasText: /nl=/i })).toBeVisible({
+      timeout: 45_000,
+    });
+    const out = (await page.locator("pre").filter({ hasText: /nl=/i }).innerText()).toLowerCase();
+    expect(out).toMatch(/nl=(ok|failed|skipped)/);
+    expect(out).toMatch(/broadcast=false/);
+    expect(out).toMatch(/truth|quote|gates|×|multiplier|pending/);
+    expect(out).not.toMatch(/filled on mainnet|broadcast complete|unhackable/);
+  });
+
 });
