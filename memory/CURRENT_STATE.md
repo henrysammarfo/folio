@@ -187,3 +187,10 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `/lab/ui` candidates: `desk-density-a` · `desk-density-b` · `gate-chip`.
 - Docs: `docs/HENRY_STEPS.md` (one-step keys), expanded `docs/COLOSSEUM_VISION.md` (AMA / interview / Ghana).
 - Still waiting on Henry: lab id, Vercel FOLIO_SESSION_SECRET, Bitquery/Privy/Supabase.
+
+## 2026-09-15 — Vercel session secret LIVE + lab approve UX
+- `FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED=true` set on Vercel (all targets) via API; redeploy READY.
+- Live `/desk/settings` shows **Watch-wallet secret set** / readiness **Set · watch-wallet bind ready** (`sessionSecretPresent: true`).
+- Lab: shared `LabApprovePanel` with copyable ids + how-to; `/about` Accra grit + fail-closed vision for judges.
+- **Henry rotate** any chat-pasted Vercel token.
+- Still blocked for full objective: lab candidate id · Bitquery · Privy · Supabase · funded broadcast.

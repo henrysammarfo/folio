@@ -2,6 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicShell } from "@/components/public-page";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
+import { LabApprovePanel } from "@/components/lab-approve-panel";
+
+const UI_IDS = ["desk-density-a", "desk-density-b", "gate-chip"] as const;
 
 export const Route = createFileRoute("/lab/ui")({
   head: () => ({
@@ -20,11 +23,8 @@ function Page() {
       title="21st.dev / desk OS candidates land here first."
       intro="Install or sketch UI candidates on this lab route. Production desk tokens stay frozen until you approve a candidate id in chat."
     >
-      <div className="mb-4 flex flex-wrap gap-2">
-        <StatusBadge tone="blue">Awaiting approval</StatusBadge>
-        <StatusBadge tone="neutral">Reply: desk-density-a · desk-density-b · gate-chip</StatusBadge>
-        <StatusBadge tone="neutral">API_KEY_21ST ready</StatusBadge>
-      </div>
+      <LabApprovePanel kind="ui" ids={UI_IDS} />
+
       <div className="lab-grid">
         <article className="lab-card">
           <StatusBadge tone="amber">desk-density-a</StatusBadge>
@@ -76,14 +76,14 @@ function Page() {
           <StatusBadge tone="amber">gate-chip</StatusBadge>
           <h3>Mode chip set</h3>
           <div className="lab-chip-row" aria-hidden>
-            <ModeBadge mode="mainnet-read">mainnet-read</ModeBadge>
-            <ModeBadge mode="quote-only">quote-only</ModeBadge>
-            <ModeBadge mode="paper">paper</ModeBadge>
-            <ModeBadge mode="unavailable">unavailable</ModeBadge>
+            <ModeBadge mode="mainnet-read" />
+            <ModeBadge mode="quote-only" />
+            <ModeBadge mode="paper" />
+            <ModeBadge mode="unavailable" />
           </div>
           <p className="text-sm opacity-80">
-            mainnet-read / quote-only / paper / unavailable — already shipping as ModeBadge;
-            this candidate locks spacing + stagger for denser desk chrome.
+            mainnet-read / quote-only / paper / unavailable — already shipping as ModeBadge; this
+            candidate locks spacing + stagger for denser desk chrome.
           </p>
         </article>
       </div>

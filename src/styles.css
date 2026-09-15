@@ -229,3 +229,15 @@
 .home-cta-secondary{display:inline-flex;align-items:center;gap:.4rem;padding:.75rem 1rem;border:1px solid color-mix(in oklch,var(--primary-foreground) 55%,transparent);color:var(--primary-foreground);border-radius:var(--radius);font-size:.85rem;font-weight:600;letter-spacing:.02em;text-decoration:none;backdrop-filter:blur(6px);background:color-mix(in oklch,var(--ink) 28%,transparent)}
 .home-cta-secondary:hover{background:color-mix(in oklch,var(--ink) 45%,transparent)}
 .home-approve-hint{margin-top:.85rem;max-width:34rem;font-size:.78rem;line-height:1.45;opacity:.82}
+
+.lab-approve-panel{margin:0 0 1.75rem;padding:1.15rem 1.25rem;border:1px solid color-mix(in oklab,var(--border) 85%,transparent);background:color-mix(in oklab,var(--card) 90%,transparent)}
+.lab-approve-title{font-family:var(--font-display);font-size:1.35rem;font-weight:400;margin:0 0 .65rem}
+.lab-approve-steps{margin:0 0 .85rem;padding-left:1.15rem;line-height:1.55;font-size:.9rem}
+.lab-approve-steps li{margin:.25rem 0}
+.lab-approve-ids{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;font-size:.85rem;margin:0 0 .65rem}
+.lab-approve-ids code{padding:.15rem .45rem;border:1px solid color-mix(in oklab,var(--border) 80%,transparent);font-size:.78rem;background:color-mix(in oklab,var(--background) 80%,transparent)}
+.lab-approve-foot{margin:0;font-size:.78rem;opacity:.8;line-height:1.45}
+.about-vision{max-width:42rem}
+.about-vision h2{font-family:var(--font-display);font-size:1.6rem;font-weight:400;margin:1.75rem 0 .6rem}
+.about-vision p,.about-vision li{line-height:1.65;color:var(--muted-foreground)}
+.about-vision ol{padding-left:1.2rem}

@@ -84,3 +84,12 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Ephemeral wallet inspect (no FOLIO_SESSION_SECRET) on `/desk/positions?inspect=` | SHIPPED | mainnet-read only; labeled not auth | 2026-09-15 |
 
 | Ephemeral inspect on `/desk/credit?inspect=` | SHIPPED | same binding priority as positions; labeled not auth | 2026-09-15 |
+
+## Live Vercel session secret (2026-09-15 ~18:48 UTC)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| `FOLIO_SESSION_SECRET` present on Vercel folio project (all targets) | CONFIRMED | Vercel env API lists encrypted key; settings SSR `sessionSecretPresent:true` | 2026-09-15 |
+| `BROADCAST_PAUSED=true` on Vercel | CONFIRMED | env API + settings readiness `broadcastPaused:true` | 2026-09-15 |
+| Settings badge **Watch-wallet secret set** | CONFIRMED live | https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app/desk/settings | 2026-09-15 |
+| Bitquery / Privy / Supabase on Vercel | MISSING | env API lists only session secret + broadcast; wash + multi-tenant fail-closed | 2026-09-15 |

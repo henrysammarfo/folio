@@ -172,3 +172,9 @@
 - Henry: no premium UI visible yet (by design); asked stop-for-keys step-by-step + where to approve.
 - Shipped home/desk/settings links to `/lab/ui` + `/lab/shaders`; Colosseum vision stub.
 - Do not burn autonomously — wait for lab id and Vercel Step 1 screenshot.
+
+## 2026-09-15 — Step 1 Vercel secrets verified + lab/about polish
+- Henry pasted Vercel token; set `FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED`; redeploy READY; settings green for secret.
+- Shipped clearer lab approve panel + Accra `/about` vision; HENRY_STEPS Step 1 marked done.
+- Next Henry gate: lab id (+ rotate token). Then Bitquery → Privy → Supabase one-by-one.
+- Goal not complete — multi-tenant + wash green + premium merge still open.

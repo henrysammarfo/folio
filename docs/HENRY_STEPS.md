@@ -18,20 +18,18 @@ Until you reply, premium chrome stays off home/desk on purpose.
 
 ---
 
-## Step 1 — Vercel secrets (no paid API)
+## Step 1 — Vercel secrets (no paid API) ✅ DONE
 
-Link: https://vercel.com/teamtitanlink/folio/settings/environment-variables  
+`FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED=true` are set on Vercel (all targets) and verified live on Settings:
 
-Add for **Preview** (and Production if you want):
+- Badge: **Watch-wallet secret set**
+- Readiness: **Set · watch-wallet bind ready**
 
-| Name | Value |
-|------|--------|
-| `FOLIO_SESSION_SECRET` | any random string ≥16 characters |
-| `BROADCAST_PAUSED` | `true` |
+Demo: https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app/desk/settings  
 
-Screenshot the env list (values can be hidden) → reply here.
+**Rotate** any Vercel token pasted in chat (Account → Tokens). Do not paste tokens in chat again.
 
-What this unlocks: watch-wallet bind on the public demo. Broadcast stays paused.
+What this unlocked: watch-wallet bind on the public demo. Broadcast stays paused.
 
 ---
 
