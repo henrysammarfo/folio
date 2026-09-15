@@ -283,3 +283,7 @@
 ## 2026-09-15 — Raydium awareness on acquire
 - Acquire checks + honesty notes for Raydium pools (not route guarantee); wash “Tape clear”.
 - Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Role-gated prefs + membership wallet
+- Viewer cannot save desk prefs (server + settings UI); membership wallet preferred for qty binding.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase(+JWT); broadcast paused.

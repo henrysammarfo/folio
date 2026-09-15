@@ -17,6 +17,7 @@ import {
   updateDeskPreferences,
 } from "@/lib/desk.functions";
 import { readLabShaderPick, readLabUiPick } from "@/lib/lab-pick";
+import { canWriteDeskPrefs } from "@/lib/auth/role-gates";
 
 export const Route = createFileRoute("/desk/settings")({
   head: () => ({
@@ -70,9 +71,17 @@ function Page() {
   const activeTenantId = data?.activeTenantId ?? null;
   const prefsTenant =
     tenants.find((t) => t.tenantId === activeTenantId) ?? tenants[0] ?? null;
+  const prefsRoleWritable = canWriteDeskPrefs(prefsTenant?.role);
   const prefsEditable = Boolean(
-    data?.session.ok && prefsTenant && data?.auth.ok,
+    data?.session.ok && prefsTenant && data?.auth.ok && prefsRoleWritable,
   );
+  const prefsReadOnlyReason = !data?.session.ok
+    ? null
+    : !prefsTenant
+      ? "No active tenant membership — prefs write refused."
+      : !prefsRoleWritable
+        ? `Role ${prefsTenant.role} is read-only — owner/trader required to save desk prefs.`
+        : null;
   const corporateAlerts = data?.preferences.ok
     ? data.preferences.data.corporateActionAlerts
     : true;
@@ -282,11 +291,13 @@ function Page() {
               <small>
                 {prefsEditable
                   ? data?.preferences.ok
-                    ? `Server-persisted · active tenant ${prefsTenant?.slug ?? prefsTenant?.tenantId.slice(0, 8) ?? "—"} · live signal = xStocks multiplier (no separate CA calendar yet)`
+                    ? `Server-persisted · active tenant ${prefsTenant?.slug ?? prefsTenant?.tenantId.slice(0, 8) ?? "—"} · role ${prefsTenant?.role} · live signal = xStocks multiplier (no separate CA calendar yet)`
                     : "Session ready · save will upsert prefs for active tenant"
-                  : data && !data.preferences.ok
-                    ? data.preferences.reason
-                    : "Server prefs unavailable — not using localStorage"}
+                  : prefsReadOnlyReason
+                    ? prefsReadOnlyReason
+                    : data && !data.preferences.ok
+                      ? data.preferences.reason
+                      : "Server prefs unavailable — not using localStorage"}
               </small>
             </span>
             <Switch
@@ -306,6 +317,9 @@ function Page() {
               <small>
                 When on, unresolved required signals (including missing Pyth) block acquire
                 review — not honesty-only labels.
+                {prefsReadOnlyReason && !prefsEditable
+                  ? ` ${prefsReadOnlyReason}`
+                  : ""}
               </small>
             </span>
             <Switch

@@ -44,6 +44,10 @@ import {
   type WalletBindingSource,
 } from "./wallet-binding";
 export type { WalletBindingSource } from "./wallet-binding";
+import {
+  activeMembership,
+  prefsWriteBlockedReason,
+} from "./auth/role-gates";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
@@ -83,11 +87,28 @@ function resolveDisplayWallet(
   inspectWallet?: string | null,
 ): { wallet: string | null; source: WalletBindingSource } {
   const watch = readWatchWallet();
+  const membership = session.ok ? activeMembership(session.data) : null;
   return resolveWalletBinding({
+    membershipWallet: membership?.walletAddress ?? null,
     sessionWallet: session.ok ? session.data.walletAddress : null,
     watchWallet: watch.ok ? watch.data.wallet : null,
     inspectWallet: inspectWallet ?? null,
   });
+}
+
+function walletSourceHonestyTag(source: WalletBindingSource): string {
+  switch (source) {
+    case "membership":
+      return "Active-tenant membership wallet (tenant-scoped)";
+    case "session":
+      return "Privy session wallet";
+    case "watch-wallet":
+      return "Watch-wallet ≠ Privy multi-tenant auth";
+    case "inspect":
+      return "Ephemeral inspect (not auth / not multi-tenant)";
+    default:
+      return "No wallet bound";
+  }
 }
 
 export type PositionRow = {
@@ -267,6 +288,7 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
       ];
       if (onchain.ok) labels.push("onchain-scaled-ui");
       if (!displayWallet) labels.push("wallet-unbound");
+      if (walletSource === "membership") labels.push("membership-wallet");
       if (walletSource === "inspect") labels.push("inspect-ephemeral");
       if (displayWallet && walletBalances && !walletBalances.ok) {
         labels.push("wallet-read-unavailable");
@@ -312,15 +334,9 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
     let note: string;
     if (!displayWallet) {
       note =
-        "Quantities are paper labels until Privy session wallet, watch-wallet bind, or ephemeral inspect. Multipliers/prices are live mainnet reads.";
+        "Quantities are paper labels until membership wallet, Privy session wallet, watch-wallet bind, or ephemeral inspect. Multipliers/prices are live mainnet reads.";
     } else if (walletBalances?.ok) {
-      const tag =
-        walletSource === "inspect"
-          ? "Ephemeral inspect (not auth / not multi-tenant)"
-          : walletSource === "watch-wallet"
-            ? "Watch-wallet ≠ Privy multi-tenant auth"
-            : "Privy session wallet";
-      note = `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). Multipliers/prices live. ${tag}.`;
+      note = `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). Multipliers/prices live. ${walletSourceHonestyTag(walletSource)}.`;
     } else {
       note = `Wallet selected for read but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing paper qty. Multipliers/prices live.`;
     }
@@ -411,10 +427,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
     const inspectActive = walletSource === "inspect" ? displayWallet : null;
     let note: string;
     if (usedWalletQty) {
-      note =
-        walletSource === "inspect"
-          ? "Illustrative — ephemeral inspect wallet-read qty × live Kamino maxLtv. No borrow broadcast. Inspect ≠ Privy multi-tenant auth."
-          : "Illustrative — wallet-read qty × live Kamino maxLtv. No borrow broadcast. Watch-wallet ≠ Privy multi-tenant auth.";
+      note = `Illustrative — wallet-read qty × live Kamino maxLtv. No borrow broadcast. ${walletSourceHonestyTag(walletSource)}.`;
     } else if (displayWallet && walletBalances && !walletBalances.ok) {
       note = `Wallet selected but balances unavailable (${walletBalances.reason}) — paper qty × live Kamino maxLtv. No borrow broadcast.`;
     } else {
@@ -679,7 +692,7 @@ const PrefsInput = z.object({
   strictFailClosed: z.boolean(),
 });
 
-/** Persist desk prefs for the active tenant on the verified session — fail-closed. */
+/** Persist desk prefs for the active tenant — owner/trader only; viewers fail-closed. */
 export const updateDeskPreferences = createServerFn({ method: "POST" })
   .validator(PrefsInput)
   .handler(async ({ data }) => {
@@ -690,6 +703,11 @@ export const updateDeskPreferences = createServerFn({ method: "POST" })
         "prefs_require_session",
         session.detail ?? session.reason,
       );
+    }
+    const membership = activeMembership(session.data);
+    const roleBlock = prefsWriteBlockedReason(membership);
+    if (roleBlock) {
+      return errResult("folio.prefs.save", "prefs_role_denied", roleBlock);
     }
     const tenantId = resolveActiveTenantId(session.data);
     return saveDeskPreferences(tenantId, session.data.userId, {

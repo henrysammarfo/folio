@@ -69,22 +69,25 @@ function Page() {
         </ModeBadge>
         <ModeBadge
           mode={
-            data?.walletSource === "session" || data?.walletSource === "watch-wallet"
+            data?.walletSource === "membership" ||
+            data?.walletSource === "session" ||
+            data?.walletSource === "watch-wallet" ||
+            data?.walletSource === "inspect"
               ? "mainnet-read"
-              : data?.walletSource === "inspect"
-                ? "mainnet-read"
-                : "unavailable"
+              : "unavailable"
           }
         >
-          {data?.walletSource === "session"
-            ? "Session bound"
-            : data?.walletSource === "watch-wallet"
-              ? "Watch-wallet bound"
-              : data?.walletSource === "inspect"
-                ? "Inspect (ephemeral)"
-                : data?.auth.ok
-                  ? "Keys present · no session"
-                  : "Wallet unbound"}
+          {data?.walletSource === "membership"
+            ? "Membership wallet"
+            : data?.walletSource === "session"
+              ? "Session bound"
+              : data?.walletSource === "watch-wallet"
+                ? "Watch-wallet bound"
+                : data?.walletSource === "inspect"
+                  ? "Inspect (ephemeral)"
+                  : data?.auth.ok
+                    ? "Keys present · no session"
+                    : "Wallet unbound"}
         </ModeBadge>
       </div>
 

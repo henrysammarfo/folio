@@ -68,6 +68,7 @@ function Page() {
         </ModeBadge>
         <ModeBadge
           mode={
+            walletSource === "membership" ||
             walletSource === "session" ||
             walletSource === "watch-wallet" ||
             walletSource === "inspect"
@@ -75,13 +76,15 @@ function Page() {
               : "unavailable"
           }
         >
-          {walletSource === "session"
-            ? "Session bound"
-            : walletSource === "watch-wallet"
-              ? "Watch-wallet"
-              : walletSource === "inspect"
-                ? "Inspect ephemeral"
-                : "No wallet bind"}
+          {walletSource === "membership"
+            ? "Membership wallet"
+            : walletSource === "session"
+              ? "Session bound"
+              : walletSource === "watch-wallet"
+                ? "Watch-wallet"
+                : walletSource === "inspect"
+                  ? "Inspect ephemeral"
+                  : "No wallet bind"}
         </ModeBadge>
       </div>
       <Panel

@@ -315,3 +315,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Acquire checks surface Raydium pool count (awareness only · not a route guarantee); honesty notes never alone block `canReview`.
 - Wash badge: “Tape clear” (not Heuristic theater). Vitest **86** green.
 - Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase (+ JWT) · funded broadcast.
+
+## 2026-09-15 — Role-gated prefs + membership wallet qty
+- `role-gates`: owner/trader write desk prefs; viewer fail-closed (`prefs_role_denied`).
+- Wallet binding priority: membership → session → watch-wallet → inspect; desk qty notes/badges label membership.
+- Settings switches disabled for viewer; DeskWalletPill prefers tenant membership wallet.
+- Vitest **95** green (role-gates + membership priority). Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase (+ JWT) · funded broadcast.

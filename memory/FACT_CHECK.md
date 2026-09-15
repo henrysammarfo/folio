@@ -145,3 +145,5 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | User-JWT invents RLS-ok without secret | REJECTED | mintSupabaseUserJwt fail-closes; resolveSupabaseRestAuth falls back to service-role | 2026-09-15 |
 | Raydium empty/unavailable alone blocks acquire review | REJECTED | Honesty notes only; canReview still needs truth+wash+quote+diverge | 2026-09-15 |
 | Acquire wash “Heuristic clear” when Bitquery keyed | SUPERSEDED | Label now “Tape clear” | 2026-09-15 |
+| Viewer can save desk prefs | REJECTED | prefsWriteBlockedReason + updateDeskPreferences prefs_role_denied; settings switches disabled | 2026-09-15 |
+| Qty binding invents foreign pubkey over membership wallet | REJECTED | resolveWalletBinding: membership → session → watch → inspect | 2026-09-15 |

@@ -55,6 +55,7 @@ function Page() {
         </ModeBadge>
         <ModeBadge
           mode={
+            data?.walletSource === "membership" ||
             data?.walletSource === "session" ||
             data?.walletSource === "watch-wallet" ||
             data?.walletSource === "inspect"
@@ -62,13 +63,15 @@ function Page() {
               : "unavailable"
           }
         >
-          {data?.walletSource === "session"
-            ? "Session bound"
-            : data?.walletSource === "watch-wallet"
-              ? "Watch-wallet bound"
-              : data?.walletSource === "inspect"
-                ? "Inspect (ephemeral)"
-                : "Wallet unbound"}
+          {data?.walletSource === "membership"
+            ? "Membership wallet"
+            : data?.walletSource === "session"
+              ? "Session bound"
+              : data?.walletSource === "watch-wallet"
+                ? "Watch-wallet bound"
+                : data?.walletSource === "inspect"
+                  ? "Inspect (ephemeral)"
+                  : "Wallet unbound"}
         </ModeBadge>
       </div>
 
