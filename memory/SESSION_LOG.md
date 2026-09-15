@@ -233,4 +233,6 @@
 - Shipping short TTL cache with honest labels, plus live CA surface from xStocks.
 - Quote 20s / price 30s; 429 → stale ≤120s or fail-closed `jupiter_rate_limited`.
 - Truth metric + activity event for pendingMultiplier; preference row no longer pretends a calendar feed.
+- Preview verified: Pending CA **None**; activity “Corporate action · no pending multiplier”; Jupiter price source labeled cached.
+- Network matrix details include TTL/stale-429 policy.
 - Goal open: Henry lab Pick reply + Bitquery/Pyth/Privy/Supabase; broadcast paused.

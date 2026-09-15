@@ -55,6 +55,13 @@ describe("buildNetworkMatrix honesty", () => {
     expect(byCap["Ephemeral wallet inspect"]?.mode).toBe("mainnet-read");
     expect(byCap["Ephemeral wallet inspect"]?.detail).toMatch(/not auth|\?inspect=/i);
     expect(byCap["On-chain Scaled UI (Token-2022)"]?.detail).toMatch(/public RPC fallback/);
+
+    expect(byCap["Jupiter Price v3 (venue + stockData)"]?.detail).toMatch(
+      /TTL 30s|stale≤120s on 429/,
+    );
+    expect(byCap["Jupiter swap quote"]?.detail).toMatch(
+      /quote-only|TTL 20s|stale≤120s on 429/,
+    );
   });
 
   it("labels wash live only when Bitquery key present and gate ok", () => {

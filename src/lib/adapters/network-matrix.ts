@@ -63,12 +63,24 @@ export function buildNetworkMatrix(input: {
     {
       capability: "Jupiter Price v3 (venue + stockData)",
       mode: modeOf(input.jupiterPrice),
-      detail: detailOf(input.jupiterPrice),
+      detail: input.jupiterPrice.ok
+        ? `${input.jupiterPrice.source} · TTL 30s · stale≤120s on 429`
+        : detailOf(input.jupiterPrice),
     },
     {
       capability: "Jupiter swap quote",
       mode: modeOf(input.jupiter),
-      detail: input.jupiter.ok ? "quote-only · no broadcast" : detailOf(input.jupiter),
+      detail: input.jupiter.ok
+        ? [
+            input.jupiter.source.includes("cached") ||
+            input.jupiter.source.includes("stale")
+              ? input.jupiter.source
+              : null,
+            "quote-only · no broadcast · TTL 20s · stale≤120s on 429",
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        : detailOf(input.jupiter),
     },
     {
       capability: "Wash / linked-flow gate",
