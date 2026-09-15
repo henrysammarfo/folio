@@ -114,4 +114,31 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
+  test("public credit shows live Kamino / NestUSD honesty", async ({ page }) => {
+    await page.goto("/credit");
+    await expect(page.getByText(/credit|liquidity|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/kamino/);
+    expect(body).toMatch(/nestusd/);
+    expect(body).toMatch(/no broadcast|fork|off|unfunded/);
+    expect(body).toMatch(/unverified|risk|fail-closed|hidden|unavailable/);
+    expect(body).not.toMatch(/nestusd[\s\S]{0,40}ready/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
+  });
+
+  test("public execution shows wash/quote/broadcast honesty", async ({ page }) => {
+    await page.goto("/execution");
+    await expect(page.getByText(/execution|gate|quote|FOLIO/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/wash/);
+    expect(body).toMatch(/quote/);
+    expect(body).toMatch(/broadcast paused|broadcast remains paused|broadcast off/);
+    expect(body).toMatch(/bitquery|fail-closed|unavailable|heuristic|keyed/);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
+  });
+
 });

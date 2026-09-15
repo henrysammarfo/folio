@@ -153,3 +153,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 - SessionBundle exposes `sessionSecretPresent` (FOLIO_SESSION_SECRET ≥16).
 - `/desk/settings` ModeBadge + Watch wallet panel show secret set/missing; bind disabled when missing (Vercel Henry action still required).
+
+## 2026-09-15 public /credit + /execution live SSR
+
+- Public `/credit` SSR-prefetches `getCreditBundle` — live Kamino LTV, NestUSD fail-closed (never Ready), borrow fork/off.
+- Public `/execution` SSR-prefetches `getNetworkBundle` — wash/quote/broadcast honesty badges on first paint.
+- Block 0 e2e now 10 tests (added public credit + execution honesty).

@@ -149,3 +149,9 @@
 - Surfaced FOLIO_SESSION_SECRET readiness on settings (ModeBadge + panel + bind disable).
 - Lab polish + Stocklana 68 submit paste pack already on preview READY.
 - Goal still blocked on Bitquery/Privy/Supabase keys + Henry lab approve + Vercel secret.
+
+## 2026-09-15 — Public credit/execution live honesty
+
+- Wired marketing `/credit` and `/execution` to live desk bundles (SSR) so judges see Empire honesty without opening desk.
+- NestUSD still never Ready; broadcast paused; wash fail-closed without Bitquery.
+- Goal still blocked on Bitquery/Privy/Supabase keys + Henry lab approve + Vercel FOLIO_SESSION_SECRET.
