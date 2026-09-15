@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getCookie, setCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { errResult, okResult, type AdapterResult } from "./adapters/types";
 import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
@@ -15,10 +16,12 @@ import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
 import { fetchNestUsdStatus } from "./adapters/nestusd";
 import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import {
+  FOLIO_SESSION_COOKIE,
   getAuthProviderStatus,
   loadDeskPreferences,
   mintFolioSession,
   parseFolioSessionCookie,
+  verifyFolioSessionCookieValue,
   type FolioSession,
 } from "./auth/session";
 import { verifyPrivyAccessToken } from "./auth/privy";
@@ -35,13 +38,14 @@ function unavailableQuote(reason: string): AdapterResult<JupiterQuote> {
   return errResult("api.jup.ag/swap/v1/quote", reason);
 }
 
-function readCookieHeader(): string | null {
+function readVerifiedSession(): AdapterResult<FolioSession> {
   try {
-    // Optional harness for tests / future request binding.
-    const g = globalThis as { __FOLIO_COOKIE_HEADER__?: string };
-    return g.__FOLIO_COOKIE_HEADER__ ?? null;
+    const value = getCookie(FOLIO_SESSION_COOKIE);
+    return verifyFolioSessionCookieValue(value);
   } catch {
-    return null;
+    // Outside request context (unit smoke) — fall back to harness header.
+    const g = globalThis as { __FOLIO_COOKIE_HEADER__?: string };
+    return parseFolioSessionCookie(g.__FOLIO_COOKIE_HEADER__ ?? null);
   }
 }
 
@@ -293,7 +297,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
 
 export const getSessionBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<SessionBundle> => {
-    const session = parseFolioSessionCookie(readCookieHeader());
+    const session = readVerifiedSession();
     const auth = getAuthProviderStatus(session.ok ? session : null);
     const tenantId = session.ok ? (session.data.tenants[0]?.tenantId ?? null) : null;
     const preferences = await loadDeskPreferences(tenantId);
@@ -327,7 +331,7 @@ const PrivySessionInput = z.object({
 /**
  * Exchange a Privy access token for an httpOnly folio_session cookie value.
  * Fail-closed when keys missing or Privy rejects the token.
- * Caller must Set-Cookie from setCookie; this does not touch localStorage.
+ * Sets httpOnly folio_session via setCookie — never localStorage.
  */
 export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
   .validator(PrivySessionInput)
@@ -344,9 +348,16 @@ export const createSessionFromPrivyToken = createServerFn({ method: "POST" })
     if (!minted.ok) {
       return errResult("folio.session.privy", minted.reason, minted.detail);
     }
+    // Bind httpOnly cookie on the response — never localStorage.
+    setCookie(FOLIO_SESSION_COOKIE, minted.data.cookieValue, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 12,
+      secure: process.env["NODE_ENV"] === "production",
+    });
     return okResult("mainnet-read", "folio.session.privy", {
       session: minted.data.session,
-      setCookie: minted.data.setCookie,
-      note: "httpOnly folio_session minted after Privy verify — resolve Supabase tenants next.",
+      note: "httpOnly folio_session Set-Cookie after Privy verify — resolve Supabase tenants next.",
     });
   });

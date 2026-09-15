@@ -1,27 +1,36 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
 import { Switch } from "@/components/ui/switch";
-import { getSessionBundle, runDeskAgent } from "@/lib/desk.functions";
+import {
+  createSessionFromPrivyToken,
+  getSessionBundle,
+  runDeskAgent,
+} from "@/lib/desk.functions";
 
 export const Route = createFileRoute("/desk/settings")({
   head: () => ({
     meta: [
       { title: "Settings — FOLIO" },
-      { name: "description", content: "Server session status and paper agent — no localStorage auth." },
+      {
+        name: "description",
+        content: "Server session status and paper agent — no localStorage auth.",
+      },
     ],
   }),
   component: Page,
 });
 
 function Page() {
+  const queryClient = useQueryClient();
   const fetchSession = useServerFn(getSessionBundle);
   const runAgent = useServerFn(runDeskAgent);
-  const { data } = useQuery({
+  const createSession = useServerFn(createSessionFromPrivyToken);
+  const { data, refetch } = useQuery({
     queryKey: ["session-bundle"],
     queryFn: () => fetchSession(),
     staleTime: 30_000,
@@ -29,6 +38,9 @@ function Page() {
   const [prompt, setPrompt] = useState("truth AAPLx");
   const [agentOut, setAgentOut] = useState<string>("");
   const [busy, setBusy] = useState(false);
+  const [privyToken, setPrivyToken] = useState("");
+  const [sessionMsg, setSessionMsg] = useState<string>("");
+  const [sessionBusy, setSessionBusy] = useState(false);
 
   return (
     <DeskShell eyebrow="Server preferences" title="Settings">
@@ -80,15 +92,9 @@ function Page() {
               </small>
             </span>
             <StatusBadge
-              tone={
-                data?.auth.ok && data.auth.data.sessionReady
-                  ? "green"
-                  : "amber"
-              }
+              tone={data?.auth.ok && data.auth.data.sessionReady ? "green" : "amber"}
             >
-              {data?.auth.ok && data.auth.data.sessionReady
-                ? "Ready"
-                : "Not ready"}
+              {data?.auth.ok && data.auth.data.sessionReady ? "Ready" : "Not ready"}
             </StatusBadge>
           </div>
         </Panel>
@@ -99,11 +105,15 @@ function Page() {
               <small>
                 {data?.preferences.ok
                   ? "Server-persisted"
-                  : data && !data.preferences.ok ? data.preferences.reason : "Server prefs unavailable — not using localStorage"}
+                  : data && !data.preferences.ok
+                    ? data.preferences.reason
+                    : "Server prefs unavailable — not using localStorage"}
               </small>
             </span>
             <Switch
-              checked={data?.preferences.ok ? data.preferences.data.corporateActionAlerts : true}
+              checked={
+                data?.preferences.ok ? data.preferences.data.corporateActionAlerts : true
+              }
               disabled
             />
           </label>
@@ -119,6 +129,59 @@ function Page() {
           </label>
         </Panel>
       </div>
+
+      <Panel
+        title="Bind Privy → httpOnly session"
+        meta={<StatusBadge tone="amber">Fail-closed without keys</StatusBadge>}
+      >
+        <p className="mb-3 text-sm opacity-80">
+          Paste a Privy access token only after Privy + Supabase + FOLIO_SESSION_SECRET are set.
+          FOLIO mints an httpOnly <code>folio_session</code> cookie — never localStorage auth.
+        </p>
+        <div className="form-grid">
+          <label>
+            Privy access token
+            <input
+              value={privyToken}
+              onChange={(e) => setPrivyToken(e.target.value)}
+              placeholder="eyJ… (server-verified)"
+              autoComplete="off"
+            />
+          </label>
+          <button
+            type="button"
+            className="wallet-pill"
+            disabled={sessionBusy || !privyToken.trim()}
+            onClick={async () => {
+              setSessionBusy(true);
+              setSessionMsg("");
+              try {
+                const res = await createSession({
+                  data: { accessToken: privyToken.trim() },
+                });
+                if (res.ok) {
+                  setSessionMsg(
+                    `Session bound for ${res.data.session.userId.slice(0, 16)}… — httpOnly cookie set.`,
+                  );
+                  setPrivyToken("");
+                  await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+                  await refetch();
+                } else {
+                  setSessionMsg(
+                    `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                  );
+                }
+              } finally {
+                setSessionBusy(false);
+              }
+            }}
+          >
+            {sessionBusy ? "Verifying…" : "Mint httpOnly session"}
+          </button>
+        </div>
+        {sessionMsg ? <p className="mt-3 text-sm">{sessionMsg}</p> : null}
+      </Panel>
+
       <Panel title="Paper agent" meta={<StatusBadge tone="blue">Caps · no broadcast</StatusBadge>}>
         <div className="form-grid">
           <label>
