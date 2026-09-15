@@ -86,6 +86,10 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/paper|wallet-read|collateral|ltv/);
     expect(body).toMatch(/no borrow broadcast|fork|unavailable|illustrative/);
+    expect(body).toMatch(/nestusd/);
+    expect(body).toMatch(/unverified|risk|fail-closed|unavailable/);
+    // Never paint NestUSD as ready/live without a verified endpoint.
+    expect(body).not.toMatch(/nestusd[\s\S]{0,40}ready/);
   });
 
 });
