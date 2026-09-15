@@ -27,7 +27,7 @@ Verified on this preview (SSO off):
 Ephemeral inspect still works without bind:  
 `/desk/positions?inspect=<pubkey>` · `/desk/credit?inspect=<pubkey>` (labeled not-auth).
 
-Stocklana live (2026-09-15, re-check at submit): **538** registered · **69** submissions · **$121k** hero.
+Stocklana live (2026-09-15, re-check at submit): **539** registered · **71** submissions · **$121k** hero. Deadline conflict: hero SEP 25 vs timeline/stocklana.fun 18 Sep.
 
 Paste pack: `docs/STOCKLANA_SUBMISSION.md` · Keys when ready: `docs/KEYS_LANDING.md`
 

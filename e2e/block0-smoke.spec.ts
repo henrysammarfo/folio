@@ -28,11 +28,15 @@ test.describe("FOLIO Block 0 smoke", () => {
     const step1 = page.getByRole("button", { name: /^Continue$/i }).first();
     if (await step1.isEnabled().catch(() => false)) {
       await step1.click();
-      await page.getByText(/wash|checks|policy|gate/i).first().waitFor({ timeout: 30_000 });
+      await page.getByText(/wash|checks|policy|gate|fail-closed/i).first().waitFor({
+        timeout: 30_000,
+      });
     }
 
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/wash|fail|blocked|unavailable|bitquery|quote|check/);
+    // Named env on checks — no silent wash fallback
+    expect(body).toMatch(/bitquery_api_key/);
 
     // Under wash fail-closed, advancing to review must be blocked
     const advance = page.getByRole("button", { name: /continue|blocked|fail-closed/i }).first();

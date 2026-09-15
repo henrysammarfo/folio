@@ -197,3 +197,8 @@
 - Unit coverage: happy path + tenant 503 fail-closed + empty memberships (46 tests green).
 - Lab approve panel: one-click copy candidate ids; settings points at `docs/KEYS_LANDING.md` / `npm run keys`.
 - Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Acquire fail-closed naming + Stocklana refresh
+- Shipped acquire gate helper + honesty/blocked split; acquire UI next-step to settings/keys runbook.
+- Stocklana counts → 539 / 71 / $121k (official hackathons page); deadline conflict unchanged.
+- Goal still open — waiting on Henry lab id + Bitquery/Pyth/Privy/Supabase.

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -196,6 +196,33 @@ function Page() {
                   ))}
                 </ul>
               </div>
+            ) : null}
+            {data && data.gates.honestyNotes.length > 0 ? (
+              <div className="review-box mt-3">
+                <p>
+                  <b>Honesty labels</b>
+                  <span className="ml-2 text-sm opacity-70">
+                    (do not invent a pass · do not alone block review)
+                  </span>
+                </p>
+                <ul>
+                  {data.gates.honestyNotes.map((r) => (
+                    <li key={r}>{r}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {data &&
+            (data.gates.blockedReasons.some((r) => /BITQUERY_API_KEY|PYTH_API_KEY/.test(r)) ||
+              data.gates.honestyNotes.some((r) => /PYTH_API_KEY/.test(r))) ? (
+              <p className="mt-3 text-sm opacity-80">
+                Next:{" "}
+                <Link to="/desk/settings" className="underline">
+                  Settings readiness
+                </Link>{" "}
+                · keys runbook <code>docs/KEYS_LANDING.md</code> ·{" "}
+                <code>npm run keys</code>
+              </p>
             ) : null}
             <Button variant="outline" type="button" onClick={() => refetch()} className="mt-2">
               Refresh live gates

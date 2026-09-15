@@ -4,6 +4,7 @@ import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
 import { divergeBps, fetchPythEquityPrice } from "./adapters/pyth";
 import { fetchJupiterQuote, fetchJupiterTokenPrice } from "./adapters/jupiter";
 import { evaluateWashGate, washAllowsSize } from "./adapters/wash";
+import { buildAcquireGateMessages } from "./acquire-gates";
 import { buildNetworkMatrix, type MatrixRow } from "./adapters/network-matrix";
 import { fetchKaminoXStocksMarket } from "./adapters/kamino";
 import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
@@ -61,6 +62,8 @@ export type AcquireBundle = {
     divergeOk: boolean;
     canReview: boolean;
     blockedReasons: string[];
+    /** Labeled gaps that do not alone block review (e.g. missing Pyth). */
+    honestyNotes: string[];
   };
 };
 
@@ -189,28 +192,32 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
           outputDecimals: decimals,
         });
 
-    const blockedReasons: string[] = [];
     const truthOk = multiplier.ok && asset.ok;
     const washOk = washAllowsSize(wash);
-    if (!truthOk) blockedReasons.push("Corporate-action / asset truth unavailable");
-    if (asset.ok && asset.data.isTradingHalted) {
-      blockedReasons.push("Trading halted per xStocks API");
-    }
-    if (!washOk) {
-      blockedReasons.push(wash.ok ? "Wash pressure blocked" : `Wash gate: ${wash.reason}`);
-    }
-    if (!jupiter.ok) blockedReasons.push(`Jupiter quote: ${jupiter.reason}`);
 
-    let divergeOk = true;
+    let diverge:
+      | { kind: "ok" }
+      | { kind: "blocked" }
+      | { kind: "pyth_missing" }
+      | { kind: "unavailable" } = { kind: "unavailable" };
     if (pyth.ok && jupiterPrice.ok) {
       const d = divergeBps(pyth.data.price, jupiterPrice.data.usdPrice, 75);
-      if (!d.pass) {
-        divergeOk = false;
-        blockedReasons.push("Pyth vs Jupiter venue diverge outside band");
-      }
+      diverge = d.pass ? { kind: "ok" } : { kind: "blocked" };
+    } else if (!pyth.ok && pyth.reason === "pyth_api_key_missing") {
+      diverge = { kind: "pyth_missing" };
     }
-    // Missing Pyth does not invent a pass — only live diverge failures block.
-    // Unavailable Pyth is labeled on the UI; quote path may still review when wash+truth+jupiter hold.
+
+    const gateMsgs = buildAcquireGateMessages({
+      truthOk,
+      tradingHalted: Boolean(asset.ok && asset.data.isTradingHalted),
+      washOk,
+      wash: wash.ok
+        ? { kind: "pressure" }
+        : { kind: "adapter", reason: wash.reason },
+      quoteOk: jupiter.ok,
+      quoteReason: jupiter.ok ? null : jupiter.reason,
+      diverge,
+    });
 
     return {
       symbol,
@@ -225,9 +232,10 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         truthOk,
         washOk,
         quoteOk: jupiter.ok,
-        divergeOk,
-        canReview: truthOk && washOk && jupiter.ok && divergeOk,
-        blockedReasons,
+        divergeOk: gateMsgs.divergeOk,
+        canReview: gateMsgs.canReview,
+        blockedReasons: gateMsgs.blockedReasons,
+        honestyNotes: gateMsgs.honestyNotes,
       },
     };
   });

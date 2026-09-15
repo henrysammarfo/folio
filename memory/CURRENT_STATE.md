@@ -218,3 +218,10 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Unit coverage: happy path + tenant 503 fail-closed + empty memberships (46 tests green).
 - Lab approve panel: one-click copy candidate ids; settings points at `docs/KEYS_LANDING.md` / `npm run keys`.
 - Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Acquire gate honesty split + Stocklana 539/71
+- Pure `buildAcquireGateMessages`: Bitquery missing → blockedReasons names `BITQUERY_API_KEY`; Pyth missing → honestyNotes names `PYTH_API_KEY` (does not alone block review).
+- `/desk/acquire` shows Fail-closed reasons vs Honesty labels + Settings/`KEYS_LANDING` next step.
+- E2E asserts `bitquery_api_key` on acquire checks; unit 50 green; block0 e2e 14 green.
+- Stocklana live WebFetch: **539** registered / **71** submissions / **$121k**; deadline conflict SEP 25 hero vs timeline 18 Sep 16:00 ET / stocklana.fun 18 Sep 23:59 UTC.
+- Still blocked for full objective: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
