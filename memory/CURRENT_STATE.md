@@ -181,3 +181,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Stocklana live (jina): **538** registered / **69** submissions / **$121k**; deadline conflict SEP 25 hero vs timeline/stocklana.fun 18 Sep — re-check at submit.
 - Vision stub: `docs/COLOSSEUM_VISION.md` (Ghana / why / sustainability — expand after UI approve + keys).
 - Still blocked for full objective: Bitquery/Privy/Supabase keys + Henry lab id + Vercel `FOLIO_SESSION_SECRET`.
+
+## 2026-09-15 — Home approve CTAs verified live
+- Vercel READY `419ff65`: home shows **Approve desk UI** + **Approve shaders**; hint that hero won’t change without Henry.
+- `/lab/ui` candidates: `desk-density-a` · `desk-density-b` · `gate-chip`.
+- Docs: `docs/HENRY_STEPS.md` (one-step keys), expanded `docs/COLOSSEUM_VISION.md` (AMA / interview / Ghana).
+- Still waiting on Henry: lab id, Vercel FOLIO_SESSION_SECRET, Bitquery/Privy/Supabase.

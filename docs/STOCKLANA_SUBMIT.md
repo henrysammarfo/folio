@@ -52,6 +52,10 @@ npm run replay
 
 ## UI approve gate (reply with one id)
 
+Step-by-step for Henry (keys + lab): `docs/HENRY_STEPS.md` · Vision/interview: `docs/COLOSSEUM_VISION.md`
+
+Live home now shows **Approve desk UI** / **Approve shaders** CTAs.
+
 Shaders (`/lab/shaders`):
 - `ink-ledger`
 - `ledger-mist`

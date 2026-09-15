@@ -15,6 +15,8 @@ Deadline: **2026-09-18 20:00 UTC** · Network: mainnet-read + quote-only · Budg
 
 https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app
 
+Home CTAs (live): **Approve desk UI** · **Approve shaders** → `/lab/ui` · `/lab/shaders` (Henry picks id before premium merge).
+
 Verified on this preview (SSO off): `/truth` ~1.003269× · `/network` NestUSD/wash/broadcast fail-closed · `/desk/credit` NestUSD unverified (not Ready).
 
 Set `FOLIO_SESSION_SECRET` (+ `BROADCAST_PAUSED=true`) in Vercel before demos that need watch-wallet bind.
