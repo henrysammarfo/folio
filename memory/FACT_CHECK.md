@@ -140,3 +140,4 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Paper qty rows claim health Verified | REJECTED (fixed) | Verified requires wallet-read + live feeds; paper → Review | 2026-09-15 |
 | Desk chrome always-green Mainnet read / fake search | REJECTED (fixed) | Quote-only badges; search replaced with policy strip | 2026-09-15 |
 | Raydium pools live but absent from judge matrix | REJECTED (fixed) | Matrix + empire smoke + NETWORK_MATRIX.md awareness-only row | 2026-09-15 |
+| GitGuardian “secret” in jupiter-cache.test.ts | FALSE POSITIVE remediates | Public AAPLx mint string flagged as high-entropy; replaced with low-entropy fixtures in unit tests (not a credential; no rotate) | 2026-09-15 |
