@@ -279,3 +279,7 @@
 ## 2026-09-15 — Supabase user-JWT RLS path
 - Prefs/tenants prefer user-JWT (sub=Privy DID) when SUPABASE_JWT_SECRET set; service-role labeled fallback.
 - Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase(+JWT secret); broadcast paused.
+
+## 2026-09-15 — Raydium awareness on acquire
+- Acquire checks + honesty notes for Raydium pools (not route guarantee); wash “Tape clear”.
+- Goal open: Henry lab Pick + keys.

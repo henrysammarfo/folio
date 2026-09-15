@@ -19,6 +19,7 @@ import type { XStockAsset, XStockMultiplier } from "./adapters/xstocks";
 import type { PythPrice } from "./adapters/pyth";
 import type { JupiterQuote, JupiterTokenPrice } from "./adapters/jupiter";
 import type { WashVerdict } from "./adapters/wash";
+import type { PoolAwareness } from "./adapters/pools";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
 import {
@@ -85,6 +86,8 @@ export type AcquireBundle = {
   jupiterPrice: AdapterResult<JupiterTokenPrice>;
   wash: AdapterResult<WashVerdict>;
   jupiter: AdapterResult<JupiterQuote>;
+  /** Raydium pool awareness — not a route guarantee. */
+  pools: AdapterResult<PoolAwareness>;
   /**
    * From active-tenant desk prefs when a verified session exists.
    * Without session: false (public demo stays honesty-labeled for missing Pyth).
@@ -207,10 +210,13 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
     const mint = asset.ok ? asset.data.solanaMint : null;
     const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
 
-    const [pyth, jupiterPrice, wash] = await Promise.all([
+    const [pyth, jupiterPrice, wash, pools] = await Promise.all([
       fetchPythEquityPrice(underlying),
       mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
       evaluateWashGate({ symbol, mint, notionalUsd: spendUsdc }),
+      mint
+        ? fetchRaydiumPoolsForMint(mint)
+        : Promise.resolve(errResult("api-v3.raydium.io", "xstock_mint_missing")),
     ]);
 
     const jupiter: AdapterResult<JupiterQuote> = !mint
@@ -244,6 +250,12 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       diverge = { kind: "pyth_missing" };
     }
 
+    const poolsGate = !pools.ok
+      ? ({ kind: "unavailable", reason: pools.reason } as const)
+      : pools.data.raydium.length === 0
+        ? ({ kind: "empty" } as const)
+        : ({ kind: "ok", poolCount: pools.data.raydium.length } as const);
+
     const prefs = await loadStrictFailClosedPref();
     const gateMsgs = buildAcquireGateMessages({
       truthOk,
@@ -256,6 +268,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       quoteReason: jupiter.ok ? null : jupiter.reason,
       diverge,
       strictFailClosed: prefs.strictFailClosed,
+      pools: poolsGate,
     });
 
     return {
@@ -267,6 +280,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       jupiterPrice,
       wash,
       jupiter,
+      pools,
       strictFailClosed: prefs.strictFailClosed,
       prefsFromSession: prefs.prefsFromSession,
       gates: {

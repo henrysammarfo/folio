@@ -157,6 +157,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/strict prefs · no session|strict fail-closed|no session/);
     expect(body).toMatch(/bitquery_api_key/);
     expect(body).toMatch(/no pending ca|pending \d|verified live|corporate-action/);
+    expect(body).toMatch(/raydium|pool|awareness only|not a route guarantee/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 

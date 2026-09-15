@@ -93,4 +93,48 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(g.canReview).toBe(true);
   });
+
+  it("labels Raydium pool awareness without blocking review", () => {
+    const g = buildAcquireGateMessages({
+      truthOk: true,
+      tradingHalted: false,
+      washOk: true,
+      wash: { kind: "pressure" },
+      quoteOk: true,
+      quoteReason: null,
+      diverge: { kind: "ok" },
+      pools: { kind: "ok", poolCount: 5 },
+    });
+    expect(g.canReview).toBe(true);
+    expect(g.honestyNotes.join(" ")).toMatch(/Raydium.*awareness only|not a route guarantee/i);
+  });
+
+  it("labels empty/unavailable Raydium without inventing a hard block", () => {
+    const empty = buildAcquireGateMessages({
+      truthOk: true,
+      tradingHalted: false,
+      washOk: true,
+      wash: { kind: "pressure" },
+      quoteOk: true,
+      quoteReason: null,
+      diverge: { kind: "ok" },
+      pools: { kind: "empty" },
+    });
+    expect(empty.canReview).toBe(true);
+    expect(empty.honestyNotes.join(" ")).toMatch(/zero pools|awareness only/i);
+
+    const down = buildAcquireGateMessages({
+      truthOk: true,
+      tradingHalted: false,
+      washOk: true,
+      wash: { kind: "pressure" },
+      quoteOk: true,
+      quoteReason: null,
+      diverge: { kind: "ok" },
+      pools: { kind: "unavailable", reason: "raydium_http_error" },
+    });
+    expect(down.canReview).toBe(true);
+    expect(down.blockedReasons).toEqual([]);
+    expect(down.honestyNotes.join(" ")).toMatch(/Raydium pool awareness unavailable/i);
+  });
 });

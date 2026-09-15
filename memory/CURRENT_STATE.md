@@ -310,3 +310,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `mintSupabaseUserJwt` / `resolveSupabaseRestAuth`: prefer HS256 user JWT (`sub`=Privy DID) + anon for tenants/prefs; labeled service-role fallback without `SUPABASE_JWT_SECRET`.
 - Settings readiness + RLS note + keys-smoke/KEYS_LANDING/.env.example document JWT secret.
 - Vitest **84** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase (+ JWT secret) · funded broadcast.
+
+## 2026-09-15 — Raydium pool awareness on acquire
+- Acquire checks surface Raydium pool count (awareness only · not a route guarantee); honesty notes never alone block `canReview`.
+- Wash badge: “Tape clear” (not Heuristic theater). Vitest **86** green.
+- Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase (+ JWT) · funded broadcast.

@@ -1,6 +1,7 @@
 /**
  * Pure acquire-gate messaging — keep Bitquery/Pyth honesty labels out of
  * invent-a-pass theater. Missing Pyth is labeled only; it does not alone block review.
+ * Raydium pool awareness is honesty-only (not a route guarantee / not a hard gate).
  */
 
 export type AcquireGateInputs = {
@@ -24,6 +25,14 @@ export type AcquireGateInputs = {
    * missing Pyth — also block review instead of honesty-only labeling.
    */
   strictFailClosed?: boolean;
+  /**
+   * Raydium pool awareness — never alone blocks review.
+   * Jupiter quote remains the acquire path; wash still required.
+   */
+  pools?:
+    | { kind: "ok"; poolCount: number }
+    | { kind: "empty" }
+    | { kind: "unavailable"; reason: string };
 };
 
 export type AcquireGateMessages = {
@@ -80,6 +89,20 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
     divergeOk = false;
     blockedReasons.push(
       "Strict fail-closed: venue diverge unresolved · review blocked",
+    );
+  }
+
+  if (input.pools?.kind === "ok") {
+    honestyNotes.push(
+      `Raydium: ${input.pools.poolCount} pool(s) observed · awareness only · not a route guarantee · wash still required`,
+    );
+  } else if (input.pools?.kind === "empty") {
+    honestyNotes.push(
+      "Raydium: zero pools observed for mint · awareness only · Jupiter quote remains the path; wash still required",
+    );
+  } else if (input.pools?.kind === "unavailable") {
+    honestyNotes.push(
+      `Raydium pool awareness unavailable (${input.pools.reason}) · Jupiter quote remains the path; wash still required`,
     );
   }
 

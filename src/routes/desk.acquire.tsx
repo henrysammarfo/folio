@@ -156,7 +156,7 @@ function Page() {
               <span>Wash / linked flow</span>
               <StatusBadge tone={data?.gates.washOk ? "green" : "amber"}>
                 {data?.gates.washOk && data.wash.ok
-                  ? `Heuristic clear · ${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
+                  ? `Tape clear · ${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
                   : data?.wash && data.wash.ok
                     ? `${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
                     : data?.wash && !data.wash.ok
@@ -176,6 +176,24 @@ function Page() {
                 </ul>
               </div>
             ) : null}
+            <p>
+              <span>Raydium pools</span>
+              <StatusBadge
+                tone={
+                  data?.pools.ok && data.pools.data.raydium.length > 0
+                    ? "blue"
+                    : "amber"
+                }
+              >
+                {data?.pools.ok
+                  ? data.pools.data.raydium.length > 0
+                    ? `${data.pools.data.raydium.length} observed · awareness only`
+                    : "Zero pools · awareness only"
+                  : data?.pools && !data.pools.ok
+                    ? data.pools.reason
+                    : "…"}
+              </StatusBadge>
+            </p>
             <p>
               <span>Jupiter route</span>
               <StatusBadge tone={data?.gates.quoteOk ? "blue" : "amber"}>

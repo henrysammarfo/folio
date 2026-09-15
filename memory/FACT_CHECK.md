@@ -143,3 +143,5 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | GitGuardian “secret” in jupiter-cache.test.ts | FALSE POSITIVE remediates | Public AAPLx mint string flagged as high-entropy; replaced with low-entropy fixtures in unit tests (not a credential; no rotate) | 2026-09-15 |
 | Multi-tenant prefs always service-role only | SUPERSEDED | User-JWT path when SUPABASE_JWT_SECRET set; service-role remains labeled fallback | 2026-09-15 |
 | User-JWT invents RLS-ok without secret | REJECTED | mintSupabaseUserJwt fail-closes; resolveSupabaseRestAuth falls back to service-role | 2026-09-15 |
+| Raydium empty/unavailable alone blocks acquire review | REJECTED | Honesty notes only; canReview still needs truth+wash+quote+diverge | 2026-09-15 |
+| Acquire wash “Heuristic clear” when Bitquery keyed | SUPERSEDED | Label now “Tape clear” | 2026-09-15 |
