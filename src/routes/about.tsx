@@ -30,8 +30,8 @@ function Page() {
       intro="FOLIO is built for EU and APAC non-US Solana users who need economic-share truth before they acquire, borrow, or automate — and for a founder who refuses to let starting line cap ambition."
     >
       <div className="mb-4 flex flex-wrap gap-2">
-        <StatusBadge tone="green">Mainnet read</StatusBadge>
-        <StatusBadge tone="blue">Broadcast paused</StatusBadge>
+        <StatusBadge tone="blue">Mainnet read · quote-only</StatusBadge>
+        <StatusBadge tone="neutral">Broadcast paused</StatusBadge>
         <StatusBadge tone="neutral">≤~$1 demo doctrine</StatusBadge>
       </div>
 

@@ -4,7 +4,6 @@ import {
   BriefcaseBusiness,
   CircleDollarSign,
   LayoutDashboard,
-  Search,
   Settings,
   ShoppingBag,
 } from "lucide-react";
@@ -121,7 +120,7 @@ export function DeskShell({
           })}
         </nav>
         <div className="desk-sidebar-foot">
-          <StatusBadge tone="green">Mainnet read</StatusBadge>
+          <StatusBadge tone="blue">Quote-only</StatusBadge>
           <p>Broadcast disabled</p>
           <p>
             <Link to="/lab/ui">Approve lab UI</Link> ·{" "}
@@ -131,12 +130,11 @@ export function DeskShell({
       </aside>
       <div className="desk-main">
         <header className="desk-topbar">
-          <div className="desk-search">
-            <Search />
-            <input aria-label="Search positions" placeholder="Search positions, events…" />
+          <div className="desk-search desk-search-policy" aria-label="Desk policy">
+            Quote-only · broadcast off · ≤~$1
           </div>
           <div className="desk-network">
-            <span className="live-dot" /> Mainnet · read only
+            <span className="live-dot" /> Mainnet read · no broadcast
           </div>
           <DeskWalletPill />
         </header>

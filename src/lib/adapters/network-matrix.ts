@@ -31,6 +31,8 @@ export function buildNetworkMatrix(input: {
   /** Nest.credit vault awareness — must not be conflated with NestUSD borrow. */
   nestCredit: AdapterResult<unknown>;
   scaledUi: AdapterResult<unknown>;
+  /** Raydium pool awareness — mainnet-read, not a route guarantee. */
+  pools: AdapterResult<unknown>;
   bitqueryKeyPresent: boolean;
   /** Privy + Supabase + session secret all configured. */
   multiTenantKeysPresent: boolean;
@@ -81,6 +83,13 @@ export function buildNetworkMatrix(input: {
             .filter(Boolean)
             .join(" · ")
         : detailOf(input.jupiter),
+    },
+    {
+      capability: "Raydium pool awareness",
+      mode: modeOf(input.pools),
+      detail: input.pools.ok
+        ? `${input.pools.source} · awareness only · not a route guarantee · wash still required`
+        : detailOf(input.pools),
     },
     {
       capability: "Wash / linked-flow gate",

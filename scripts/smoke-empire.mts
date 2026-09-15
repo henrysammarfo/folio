@@ -87,8 +87,17 @@ async function main() {
   console.log("wash", wash.ok ? wash.data : wash);
   console.log("pyth", pyth.ok ? "ok" : pyth);
   console.log("jupiter quote", jupiter.ok ? "ok" : jupiter);
+  const pools = mint
+    ? await fetchRaydiumPoolsForMint(mint)
+    : ({
+        ok: false as const,
+        mode: "unavailable" as const,
+        asOf: new Date().toISOString(),
+        source: "api-v3.raydium.io",
+        reason: "xstock_mint_missing",
+      } as const);
   if (mint) {
-    console.log("pools", await fetchRaydiumPoolsForMint(mint));
+    console.log("pools", pools);
     console.log("scaled-ui", scaledUi.ok ? "ok" : scaledUi);
   }
 
@@ -115,6 +124,7 @@ async function main() {
     nestusd,
     nestCredit,
     scaledUi,
+    pools,
     bitqueryKeyPresent,
     multiTenantKeysPresent,
     sessionSecretPresent,
@@ -138,6 +148,17 @@ async function main() {
   );
   must(!nestusd.ok, "fetchNestUsdStatus must remain fail-closed");
   must(nestCredit.ok, "fetchNestCreditVaults must be live for Empire smoke");
+  must(pools.ok, "Raydium pool awareness must be live for Empire smoke");
+  must(
+    byCap["Raydium pool awareness"]?.mode === "mainnet-read",
+    "Raydium pool awareness must be mainnet-read when API reachable",
+  );
+  must(
+    /awareness only|not a route guarantee/i.test(
+      byCap["Raydium pool awareness"]?.detail ?? "",
+    ),
+    "Raydium row must stay awareness-only (not route guarantee)",
+  );
   must(
     byCap["Broadcast swap / borrow"]?.mode === "unavailable",
     "Broadcast must stay unavailable while unfunded",

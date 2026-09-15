@@ -12,8 +12,9 @@ import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
 import { fetchNestUsdStatus } from "./adapters/nestusd";
 import { fetchNestCreditVaults } from "./adapters/nest-credit";
 import { fetchScaledUiOnchain } from "./adapters/scaled-ui";
+import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import { resolveSolanaRpcUrl } from "./adapters/solana-rpc";
-import type { AdapterResult } from "./adapters/types";
+import { errResult, type AdapterResult } from "./adapters/types";
 import type { XStockAsset, XStockMultiplier } from "./adapters/xstocks";
 import type { PythPrice } from "./adapters/pyth";
 import type { JupiterQuote, JupiterTokenPrice } from "./adapters/jupiter";
@@ -292,7 +293,7 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
     const rpc = resolveSolanaRpcUrl();
 
-    const [pyth, jupiterPrice, wash, kamino, jupiterLend, nestusd, nestCredit, scaledUi] =
+    const [pyth, jupiterPrice, wash, kamino, jupiterLend, nestusd, nestCredit, scaledUi, pools] =
       await Promise.all([
         fetchPythEquityPrice(underlying),
         mint
@@ -312,6 +313,9 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
               source: "solana-rpc.scaled-ui",
               reason: "xstock_mint_missing",
             }),
+        mint
+          ? fetchRaydiumPoolsForMint(mint)
+          : Promise.resolve(errResult("api-v3.raydium.io", "xstock_mint_missing")),
       ]);
 
     const jupiter = mint
@@ -351,6 +355,7 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         nestusd,
         nestCredit,
         scaledUi,
+        pools,
         bitqueryKeyPresent: Boolean(process.env["BITQUERY_API_KEY"]?.trim()),
         multiTenantKeysPresent,
         sessionSecretPresent,

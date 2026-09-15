@@ -269,8 +269,19 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
       }
 
       let health: PositionRow["health"] = "Unavailable";
-      if (multiplier.ok && asset.ok && price.ok) health = "Verified";
-      else if (multiplier.ok) health = "Review";
+      // "Verified" = wallet-read qty + live multiplier/asset/price — never paper theater.
+      if (
+        qtySource === "wallet-read" &&
+        multiplier.ok &&
+        asset.ok &&
+        price.ok
+      ) {
+        health = "Verified";
+      } else if (multiplier.ok && (asset.ok || price.ok)) {
+        health = "Review"; // live marks · paper qty (or partial feeds)
+      } else if (multiplier.ok) {
+        health = "Review";
+      }
 
       rows.push({
         symbol,

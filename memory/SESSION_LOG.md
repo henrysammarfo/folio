@@ -271,3 +271,7 @@
 - E2E clicks Run paper agent → asserts `nl=` + `broadcast=false` + spine bits; never fill theater.
 - Vercel preview READY on `e1fb388` with home live AAPLx ≈1.003269×.
 - Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Desk false-greens + Raydium matrix
+- Verified≠paper; desk chrome quote-only; Raydium awareness on matrix/smoke/docs.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.

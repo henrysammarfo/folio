@@ -137,3 +137,6 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Stocklana registered **545** / submissions **72** / prize **$121,000** | CONFIRMED live (re-check) | hackathons.solana.com WebFetch; deadline hero SEP 25 vs timeline 18 Sep 16:00 ET | 2026-09-15 |
 | Vercel prefs preview home shows live AAPLx ≈1.003269× | CONFIRMED live | https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/ | 2026-09-15 |
 | Paper agent e2e invents a fill | REJECTED | Playwright asserts nl= + broadcast=false + spine; no fill theater | 2026-09-15 |
+| Paper qty rows claim health Verified | REJECTED (fixed) | Verified requires wallet-read + live feeds; paper → Review | 2026-09-15 |
+| Desk chrome always-green Mainnet read / fake search | REJECTED (fixed) | Quote-only badges; search replaced with policy strip | 2026-09-15 |
+| Raydium pools live but absent from judge matrix | REJECTED (fixed) | Matrix + empire smoke + NETWORK_MATRIX.md awareness-only row | 2026-09-15 |

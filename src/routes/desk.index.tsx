@@ -56,7 +56,8 @@ function Page() {
   });
 
   const rows = positions.data?.rows ?? [];
-  const verified = rows.filter((r) => r.health === "Verified").length;
+  const walletVerified = rows.filter((r) => r.health === "Verified").length;
+  const liveMarks = rows.filter((r) => r.health === "Review" || r.health === "Verified").length;
   const paperValue = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
   const walletRead = rows.some((r) => r.qtySource === "wallet-read");
   const creditLabel = credit.data?.paper.label === "wallet-read" ? "wallet-read" : "paper";
@@ -65,7 +66,9 @@ function Page() {
   return (
     <DeskShell eyebrow="Portfolio command" title="Prime desk">
       <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Live marks</ModeBadge>
+        <ModeBadge mode={liveMarks > 0 ? "mainnet-read" : "unavailable"}>
+          {liveMarks > 0 ? "Live marks" : "Marks unavailable"}
+        </ModeBadge>
         <ModeBadge mode={walletRead ? "mainnet-read" : "paper"}>
           {walletRead ? "Wallet-read qty" : "Paper qty"}
         </ModeBadge>
@@ -167,11 +170,15 @@ function Page() {
           <small>Mainnet marks · {walletRead ? "wallet-read qty" : "paper qty"}</small>
         </div>
         <div>
-          <span>Verified rows</span>
+          <span>Wallet-verified rows</span>
           <b>
-            {verified} / {rows.length || "—"}
+            {walletVerified} / {rows.length || "—"}
           </b>
-          <small>Fail-closed when signals missing</small>
+          <small>
+            {walletRead
+              ? "Wallet-read qty + live marks"
+              : "Paper qty → Review (not Verified)"}
+          </small>
         </div>
         <div>
           <span>Illustrative credit</span>
@@ -194,7 +201,15 @@ function Page() {
       <div className="desk-grid">
         <Panel
           title="Economic positions"
-          meta={<StatusBadge tone="green">{verified} verified</StatusBadge>}
+          meta={
+            <StatusBadge tone={walletVerified > 0 ? "green" : liveMarks > 0 ? "blue" : "amber"}>
+              {walletVerified > 0
+                ? `${walletVerified} wallet-verified`
+                : liveMarks > 0
+                  ? `${liveMarks} live marks · paper`
+                  : "Unavailable"}
+            </StatusBadge>
+          }
         >
           <div className="position-list">
             {rows.map((p) => (

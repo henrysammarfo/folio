@@ -219,13 +219,13 @@ function Page() {
       </Panel>
 
       <div className="desk-grid">
-        <Panel title="Network mode" meta={<StatusBadge tone="green">Safe default</StatusBadge>}>
+        <Panel title="Network mode" meta={<StatusBadge tone="blue">Quote-only default</StatusBadge>}>
           <div className="setting-row">
             <span>
               <b>Mainnet read</b>
               <small>Observe live market and ledger data</small>
             </span>
-            <StatusBadge tone="green">Selected</StatusBadge>
+            <StatusBadge tone="blue">Selected · read</StatusBadge>
           </div>
           <div className="setting-row">
             <span>

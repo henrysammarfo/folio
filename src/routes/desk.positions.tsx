@@ -149,8 +149,8 @@ function Page() {
       <Panel
         title="Watchlist"
         meta={
-          <StatusBadge tone={isFetching ? "blue" : "green"}>
-            {isFetching ? "Refreshing…" : "Mainnet read"}
+          <StatusBadge tone={isFetching ? "blue" : "neutral"}>
+            {isFetching ? "Refreshing…" : "Live multipliers · qty labeled"}
           </StatusBadge>
         }
       >
@@ -204,7 +204,13 @@ function Page() {
                         : "neutral"
                   }
                 >
-                  {p.health}
+                  {p.health === "Verified"
+                    ? "Wallet-verified"
+                    : p.health === "Review"
+                      ? p.qtySource === "paper"
+                        ? "Live · paper"
+                        : "Review"
+                      : "Unavailable"}
                 </StatusBadge>
                 <ArrowUpRight />
               </span>

@@ -299,3 +299,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `/` SSR-prefetches `getTruthBundle(AAPLx)` and weaves live × (or honest unavailable) into the single supporting sentence — no fixture 4×, no new hero stats strip.
 - Stocklana re-check: **545** / **72** / **$121k**; deadline conflict unchanged.
 - Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Desk false-greens + Verified≠paper + Raydium matrix
+- Position `health=Verified` only for wallet-read qty + live feeds; paper stays Review (“Live · paper”).
+- Desk chrome: Quote-only sidebar/topbar (killed fake search); overview/credit/settings/about badges conditional.
+- Network matrix + empire smoke + docs: Raydium pool awareness (not route guarantee).
+- Vitest **79** green. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

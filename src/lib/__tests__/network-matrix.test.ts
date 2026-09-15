@@ -23,6 +23,7 @@ describe("buildNetworkMatrix honesty", () => {
       nestusd: nestusdDown,
       nestCredit: live,
       scaledUi: live,
+      pools: live,
       bitqueryKeyPresent: false,
       multiTenantKeysPresent: false,
       sessionSecretPresent: true,
@@ -62,6 +63,10 @@ describe("buildNetworkMatrix honesty", () => {
     expect(byCap["Jupiter swap quote"]?.detail).toMatch(
       /quote-only|TTL 20s|stale≤120s on 429/,
     );
+    expect(byCap["Raydium pool awareness"]?.mode).toBe("mainnet-read");
+    expect(byCap["Raydium pool awareness"]?.detail).toMatch(
+      /awareness only|not a route guarantee/i,
+    );
   });
 
   it("labels wash live only when Bitquery key present and gate ok", () => {
@@ -76,6 +81,7 @@ describe("buildNetworkMatrix honesty", () => {
       nestusd: down,
       nestCredit: live,
       scaledUi: live,
+      pools: live,
       bitqueryKeyPresent: true,
       multiTenantKeysPresent: true,
       sessionSecretPresent: true,

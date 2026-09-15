@@ -222,7 +222,14 @@ function Page() {
           </div>
         </Panel>
       </div>
-      <Panel title="Kamino reserves (live)" meta={<StatusBadge tone="green">xStocks market</StatusBadge>}>
+      <Panel
+        title="Kamino reserves (live)"
+        meta={
+          <StatusBadge tone={data?.kamino.ok ? "green" : "amber"}>
+            {data?.kamino.ok ? "xStocks market" : "Kamino unavailable"}
+          </StatusBadge>
+        }
+      >
         <div className="data-table">
           <div className="table-head">
             <span>Asset</span>

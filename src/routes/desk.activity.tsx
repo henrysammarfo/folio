@@ -32,7 +32,7 @@ function Page() {
   return (
     <DeskShell eyebrow="Immutable context" title="Activity">
       <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Live-derived</ModeBadge>
+        <ModeBadge mode="quote-only">Live-derived events</ModeBadge>
         <ModeBadge mode="quote-only">No broadcast log</ModeBadge>
         <ModeBadge
           mode={data?.prefsFromSession ? "paper" : "unavailable"}
