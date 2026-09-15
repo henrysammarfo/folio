@@ -194,6 +194,16 @@ function Page() {
               </StatusBadge>
             </p>
             <p>
+              <span>Nest.credit vaults</span>
+              <StatusBadge tone={data?.nestCredit.ok ? "green" : "amber"}>
+                {data?.nestCredit.ok
+                  ? `${data.nestCredit.data.vaultCount} vaults · $${Math.round(data.nestCredit.data.totalTvlUsd).toLocaleString()} TVL · ${data.nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
+                  : data && !data.nestCredit.ok
+                    ? (data.nestCredit.detail ?? data.nestCredit.reason)
+                    : "…"}
+              </StatusBadge>
+            </p>
+            <p>
               <span>NestUSD</span>
               <StatusBadge tone="amber">
                 {data?.nestusd.ok

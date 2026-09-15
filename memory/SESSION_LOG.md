@@ -224,3 +224,7 @@
 ## 2026-09-15 — Acquire strict surface + activity CA pref honesty
 - Surface session vs public strict-fail-closed on acquire; activity labels CA alert preference without inventing a calendar feed.
 - E2E + Stocklana/docs URLs on prefs preview. Goal still open for Henry lab id + keys.
+
+## 2026-09-15 — Desk wallet honesty + Nest.credit live read
+- Killed fake `7vF…2ka` desk chip; Nest.credit vault TVL live as separate capability; NestUSD borrow remains fail-closed.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.

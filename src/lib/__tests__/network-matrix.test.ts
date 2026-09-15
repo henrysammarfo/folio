@@ -7,6 +7,11 @@ const down = errResult("test.source", "missing", "not wired");
 
 describe("buildNetworkMatrix honesty", () => {
   it("does not paint NestUSD or broadcast as live when unavailable/unfunded", () => {
+    const nestusdDown = errResult(
+      "nestusd",
+      "nestusd_endpoint_unverified",
+      "NestUSD xStock borrow capacity unverified — fail-closed.",
+    );
     const rows = buildNetworkMatrix({
       multiplier: live,
       pyth: down,
@@ -15,7 +20,8 @@ describe("buildNetworkMatrix honesty", () => {
       wash: down,
       kamino: live,
       jupiterLend: live,
-      nestusd: down,
+      nestusd: nestusdDown,
+      nestCredit: live,
       scaledUi: live,
       bitqueryKeyPresent: false,
       multiTenantKeysPresent: false,
@@ -27,7 +33,11 @@ describe("buildNetworkMatrix honesty", () => {
     const byCap = Object.fromEntries(rows.map((r) => [r.capability, r]));
 
     expect(byCap["NestUSD capacity"]?.mode).toBe("unavailable");
-    expect(byCap["NestUSD capacity"]?.detail).toMatch(/fail-closed/i);
+    expect(byCap["NestUSD capacity"]?.detail).toMatch(/fail-closed|NestUSD/i);
+    expect(byCap["Nest.credit vault awareness (read)"]?.mode).toBe("mainnet-read");
+    expect(byCap["Nest.credit vault awareness (read)"]?.detail).toMatch(
+      /not NestUSD borrow/i,
+    );
 
     expect(byCap["Broadcast swap / borrow"]?.mode).toBe("unavailable");
     expect(byCap["Broadcast swap / borrow"]?.detail).toMatch(/BROADCAST_PAUSED|quote-only/i);
@@ -57,6 +67,7 @@ describe("buildNetworkMatrix honesty", () => {
       kamino: live,
       jupiterLend: live,
       nestusd: down,
+      nestCredit: live,
       scaledUi: live,
       bitqueryKeyPresent: true,
       multiTenantKeysPresent: true,

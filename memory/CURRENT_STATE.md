@@ -253,3 +253,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Activity stream labels corporate-action alert preference honestly (live signal = xStocks multiplier; no invented CA calendar).
 - E2E covers settings Active tenant/RLS/strict/wash + activity CA + acquire strict-no-session.
 - Docs/demo URLs point at prefs preview. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Honest desk wallet + Nest.credit ≠ NestUSD
+- Removed invented desk pubkey `7vF…2ka` → **Bind wallet** / session / watch-wallet chip.
+- Live `api.nest.credit/v1/vaults` wired as Nest.credit vault awareness (mainnet-read); NestUSD borrow capacity stays fail-closed with explicit product split.
+- Empire smoke + matrix/e2e assert Nest.credit live and NestUSD unavailable. Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.

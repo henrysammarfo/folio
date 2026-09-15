@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FolioMark, StatusBadge } from "./folio-brand";
+import { DeskWalletPill } from "./desk-wallet-pill";
 import {
   isLabPreviewActive,
   readLabShaderPick,
@@ -137,9 +138,7 @@ export function DeskShell({
           <div className="desk-network">
             <span className="live-dot" /> Mainnet · read only
           </div>
-          <button className="wallet-pill" type="button">
-            7vF…2ka
-          </button>
+          <DeskWalletPill />
         </header>
         <main className="desk-content">
           <div className="desk-heading">

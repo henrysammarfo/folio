@@ -7,6 +7,7 @@ import { fetchXStockAsset, fetchXStockMultiplier } from "../src/lib/adapters/xst
 import { fetchKaminoXStocksMarket } from "../src/lib/adapters/kamino.ts";
 import { fetchJupiterLendEarn } from "../src/lib/adapters/jupiter-lend.ts";
 import { fetchNestUsdStatus } from "../src/lib/adapters/nestusd.ts";
+import { fetchNestCreditVaults } from "../src/lib/adapters/nest-credit.ts";
 import { fetchRaydiumPoolsForMint } from "../src/lib/adapters/pools.ts";
 import { fetchScaledUiOnchain } from "../src/lib/adapters/scaled-ui.ts";
 import { fetchPythEquityPrice } from "../src/lib/adapters/pyth.ts";
@@ -45,7 +46,7 @@ async function main() {
     reason: "xstock_mint_missing",
   };
 
-  const [pyth, jupiterPrice, wash, kamino, jupiterLend, nestusd, scaledUi] =
+  const [pyth, jupiterPrice, wash, kamino, jupiterLend, nestusd, nestCredit, scaledUi] =
     await Promise.all([
       fetchPythEquityPrice(underlying),
       mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice),
@@ -53,6 +54,7 @@ async function main() {
       fetchKaminoXStocksMarket(),
       fetchJupiterLendEarn(),
       fetchNestUsdStatus(),
+      fetchNestCreditVaults(),
       mint
         ? fetchScaledUiOnchain(mint)
         : Promise.resolve({
@@ -80,7 +82,8 @@ async function main() {
 
   console.log("kamino", kamino.ok ? "ok" : kamino);
   console.log("lend", jupiterLend.ok ? "ok" : jupiterLend);
-  console.log("nest", nestusd);
+  console.log("nestusd", nestusd);
+  console.log("nest.credit", nestCredit.ok ? nestCredit.data : nestCredit);
   console.log("wash", wash.ok ? wash.data : wash);
   console.log("pyth", pyth.ok ? "ok" : pyth);
   console.log("jupiter quote", jupiter.ok ? "ok" : jupiter);
@@ -110,6 +113,7 @@ async function main() {
     kamino,
     jupiterLend,
     nestusd,
+    nestCredit,
     scaledUi,
     bitqueryKeyPresent,
     multiTenantKeysPresent,
@@ -121,9 +125,19 @@ async function main() {
 
   must(byCap["NestUSD capacity"]?.mode === "unavailable", "NestUSD must stay unavailable");
   must(
-    /fail-closed|unverified|risk/i.test(byCap["NestUSD capacity"]?.detail ?? ""),
+    /fail-closed|unverified|NestUSD|Nest\.credit/i.test(byCap["NestUSD capacity"]?.detail ?? ""),
     "NestUSD detail must be risk/fail-closed",
   );
+  must(
+    byCap["Nest.credit vault awareness (read)"]?.mode === "mainnet-read",
+    "Nest.credit vault awareness must be live mainnet-read when API reachable",
+  );
+  must(
+    /not NestUSD borrow/i.test(byCap["Nest.credit vault awareness (read)"]?.detail ?? ""),
+    "Nest.credit row must not be labeled as NestUSD borrow",
+  );
+  must(!nestusd.ok, "fetchNestUsdStatus must remain fail-closed");
+  must(nestCredit.ok, "fetchNestCreditVaults must be live for Empire smoke");
   must(
     byCap["Broadcast swap / borrow"]?.mode === "unavailable",
     "Broadcast must stay unavailable while unfunded",

@@ -14,6 +14,7 @@ import { fetchScaledUiOnchain } from "./adapters/scaled-ui";
 import { fetchKaminoXStocksMarket } from "./adapters/kamino";
 import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
 import { fetchNestUsdStatus } from "./adapters/nestusd";
+import { fetchNestCreditVaults } from "./adapters/nest-credit";
 import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import {
   FOLIO_SESSION_COOKIE,
@@ -119,6 +120,8 @@ export type CreditBundle = {
   kamino: Awaited<ReturnType<typeof fetchKaminoXStocksMarket>>;
   jupiterLend: Awaited<ReturnType<typeof fetchJupiterLendEarn>>;
   nestusd: Awaited<ReturnType<typeof fetchNestUsdStatus>>;
+  /** Nest.credit vault awareness — not NestUSD borrow capacity. */
+  nestCredit: Awaited<ReturnType<typeof fetchNestCreditVaults>>;
   paper: {
     /** Qty basis for collateral math — wallet-read when bound, else paper. */
     label: "paper" | "wallet-read";
@@ -321,10 +324,11 @@ export const getCreditBundle = createServerFn({ method: "GET" })
     );
     const watch = readWatchWallet();
 
-    const [kamino, jupiterLend, nestusd] = await Promise.all([
+    const [kamino, jupiterLend, nestusd, nestCredit] = await Promise.all([
       fetchKaminoXStocksMarket(),
       fetchJupiterLendEarn(),
       fetchNestUsdStatus(),
+      fetchNestCreditVaults(),
     ]);
 
     const creditSymbols = ["AAPLx", "NVDAx"] as const;
@@ -398,6 +402,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       kamino,
       jupiterLend,
       nestusd,
+      nestCredit,
       paper: {
         label,
         collateralUsd: collateral,

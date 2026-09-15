@@ -10,6 +10,7 @@ import { buildNetworkMatrix, type MatrixRow } from "./adapters/network-matrix";
 import { fetchKaminoXStocksMarket } from "./adapters/kamino";
 import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
 import { fetchNestUsdStatus } from "./adapters/nestusd";
+import { fetchNestCreditVaults } from "./adapters/nest-credit";
 import { fetchScaledUiOnchain } from "./adapters/scaled-ui";
 import { resolveSolanaRpcUrl } from "./adapters/solana-rpc";
 import type { AdapterResult } from "./adapters/types";
@@ -291,7 +292,7 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
     const rpc = resolveSolanaRpcUrl();
 
-    const [pyth, jupiterPrice, wash, kamino, jupiterLend, nestusd, scaledUi] =
+    const [pyth, jupiterPrice, wash, kamino, jupiterLend, nestusd, nestCredit, scaledUi] =
       await Promise.all([
         fetchPythEquityPrice(underlying),
         mint
@@ -301,6 +302,7 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         fetchKaminoXStocksMarket(),
         fetchJupiterLendEarn(),
         fetchNestUsdStatus(),
+        fetchNestCreditVaults(),
         mint
           ? fetchScaledUiOnchain(mint)
           : Promise.resolve({
@@ -347,6 +349,7 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         kamino,
         jupiterLend,
         nestusd,
+        nestCredit,
         scaledUi,
         bitqueryKeyPresent: Boolean(process.env["BITQUERY_API_KEY"]?.trim()),
         multiTenantKeysPresent,

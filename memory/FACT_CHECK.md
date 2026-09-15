@@ -119,3 +119,6 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Mode badge “Local fork” as shipped CPI mode | SUPERSEDED | Label now **Unfunded CPI**; borrow remains unavailable-until-funded | 2026-09-15 |
 | Corporate-action alerts imply a separate CA calendar feed | REJECTED | Activity labels preference + live signal = xStocks multiplier only | 2026-09-15 |
 | Public acquire applies tenant strictFailClosed without session | REJECTED | `prefsFromSession=false` → strict off; honesty-only Pyth until session | 2026-09-15 |
+| Desk topbar `7vF…2ka` is a real bound wallet | REJECTED | Invented fixture — replaced with Bind wallet / session / watch chip | 2026-09-15 |
+| `api.nest.credit/v1/vaults` = NestUSD Solana xStock borrow capacity | REJECTED | Nest.credit indexed vault TVL/OFT — different product; NestUSD stays fail-closed | 2026-09-15 |
+| Nest.credit vault list reachable live | CONFIRMED | HTTP 200 vaults with Solana OFT mints + TVL; wired as mainnet-read awareness | 2026-09-15 |

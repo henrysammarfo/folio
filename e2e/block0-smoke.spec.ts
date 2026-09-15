@@ -60,6 +60,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/mainnet|quote|read|unavailable|wash|broadcast/);
     expect(body).toMatch(/broadcast paused|broadcast_paused|quote-only/);
     expect(body).toMatch(/nestusd|fail-closed|unverified/);
+    expect(body).toMatch(/nest\.credit|vault awareness|not nestusd borrow/i);
     expect(body).toMatch(/bitquery.*missing|wash.*fail-closed|fail-closed.*bitquery/);
     expect(body).not.toMatch(/unhackable|nation-state/);
   });
@@ -109,6 +110,8 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/rls|service-role|jwt sub/);
     expect(body).toMatch(/strict fail-closed/);
     expect(body).toMatch(/wash gates|acquire wash|live spine/);
+    expect(body).toMatch(/bind wallet|watch |session /i);
+    expect(body).not.toMatch(/7vf…2ka|7vf\.\.\.2ka/i);
     expect(body).not.toMatch(/unhackable|nation-state/);
   });
 
@@ -166,9 +169,11 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/paper|wallet-read|collateral|ltv/);
     expect(body).toMatch(/no borrow broadcast|unavailable|illustrative|unfunded/);
     expect(body).toMatch(/nestusd/);
+    expect(body).toMatch(/nest\.credit|vault|oft|not nestusd/i);
     expect(body).toMatch(/unverified|risk|fail-closed|unavailable/);
     // Never paint NestUSD as ready/live without a verified endpoint.
     expect(body).not.toMatch(/nestusd[\s\S]{0,40}ready/);
+    expect(body).not.toMatch(/7vf…2ka/i);
   });
 
 
@@ -191,6 +196,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/kamino/);
     expect(body).toMatch(/nestusd/);
+    expect(body).toMatch(/nest\.credit|vault|oft|not nestusd/i);
     expect(body).toMatch(/no broadcast|unavailable|off|unfunded/);
     expect(body).toMatch(/unverified|risk|fail-closed|hidden|unavailable/);
     expect(body).not.toMatch(/nestusd[\s\S]{0,40}ready/);

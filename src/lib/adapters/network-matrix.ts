@@ -28,6 +28,8 @@ export function buildNetworkMatrix(input: {
   kamino: AdapterResult<unknown>;
   jupiterLend: AdapterResult<unknown>;
   nestusd: AdapterResult<unknown>;
+  /** Nest.credit vault awareness — must not be conflated with NestUSD borrow. */
+  nestCredit: AdapterResult<unknown>;
   scaledUi: AdapterResult<unknown>;
   bitqueryKeyPresent: boolean;
   /** Privy + Supabase + session secret all configured. */
@@ -92,11 +94,20 @@ export function buildNetworkMatrix(input: {
         : detailOf(input.jupiterLend),
     },
     {
+      capability: "Nest.credit vault awareness (read)",
+      mode: modeOf(input.nestCredit),
+      detail: input.nestCredit.ok
+        ? `${input.nestCredit.source} · indexed vault TVL/OFT — not NestUSD borrow`
+        : detailOf(input.nestCredit),
+    },
+    {
       capability: "NestUSD capacity",
       mode: modeOf(input.nestusd),
       detail: input.nestusd.ok
         ? detailOf(input.nestusd)
-        : "Unverified public metrics endpoint · risk-labeled · fail-closed",
+        : input.nestusd.detail
+          ? `${input.nestusd.reason} — ${input.nestusd.detail}`
+          : "Unverified NestUSD borrow metrics · risk-labeled · fail-closed",
     },
     {
       capability: "Multi-tenant sessions (Privy + Supabase)",

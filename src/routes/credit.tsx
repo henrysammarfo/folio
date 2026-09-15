@@ -139,9 +139,24 @@ function Page() {
           <b>Earn vaults observed — not an xStock borrow path</b>
         </div>
         <div>
+          <span>Nest.credit</span>
+          <StatusBadge tone={data?.nestCredit.ok ? "green" : "amber"}>
+            {data?.nestCredit.ok
+              ? `${data.nestCredit.data.vaultCount} vaults`
+              : data && !data.nestCredit.ok
+                ? data.nestCredit.reason
+                : "…"}
+          </StatusBadge>
+          <b>
+            {data?.nestCredit.ok
+              ? `Indexed TVL ~$${Math.round(data.nestCredit.data.totalTvlUsd).toLocaleString()} · ${data.nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
+              : "Vault awareness when reachable — not NestUSD capacity"}
+          </b>
+        </div>
+        <div>
           <span>NestUSD</span>
           <StatusBadge tone="amber">{nestDetail}</StatusBadge>
-          <b>Capacity hidden until verified public metrics</b>
+          <b>Capacity hidden until verified NestUSD borrow metrics</b>
         </div>
       </div>
       <p className="mt-4 text-sm opacity-80">
