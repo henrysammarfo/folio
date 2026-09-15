@@ -90,7 +90,7 @@ function Page() {
                 {data?.nestusd.ok
                   ? "Probed · risk-labeled"
                   : data && !data.nestusd.ok
-                    ? data.nestusd.reason
+                    ? data.nestusd.detail ?? data.nestusd.reason
                     : "Risk / unverified"}
               </StatusBadge>
             </p>
