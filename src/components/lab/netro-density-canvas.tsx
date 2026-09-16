@@ -173,9 +173,9 @@ export function NetroDensityCanvas({
                 <em>:</em>
                 <span>{clock.s}</span>
               </div>
-              <button type="button" tabIndex={-1} className="netro-density-cta">
+              <Link to="/truth" className="netro-density-cta">
                 Start truth pass
-              </button>
+              </Link>
             </div>
 
             <div className="netro-density-stack">
@@ -239,7 +239,7 @@ export function NetroDensityCanvas({
                     <strong>Route</strong>
                   </div>
                   <b>USDC → AAPLx</b>
-                  <small>Jupiter TTL · stale on 429</small>
+                  <small>{gates.quoteMeta}</small>
                 </div>
                 <div
                   className="netro-density-card netro-density-card-dark netro-density-item"
@@ -339,7 +339,7 @@ export function NetroDensityCanvas({
               <strong>Quote</strong>
               <span>inspect only</span>
             </div>
-            <div className="netro-density-quote-pair">
+            <div className="netro-density-quote-pair" data-testid="netro-live-quote">
               <div>
                 <span>You pay</span>
                 <b>USDC</b>
@@ -351,15 +351,13 @@ export function NetroDensityCanvas({
               <div>
                 <span>You receive</span>
                 <b>AAPLx</b>
-                <em>live quote · TTL</em>
+                <em>{gates.quoteOut}</em>
               </div>
             </div>
-            <button type="button" tabIndex={-1} className="netro-density-quote-cta">
+            <Link to="/desk/acquire" className="netro-density-quote-cta">
               Inspect quote
-            </button>
-            <p className="netro-density-quote-foot">
-              Broadcast paused · no mainnet fill theater
-            </p>
+            </Link>
+            <p className="netro-density-quote-foot">{gates.quoteMeta}</p>
           </div>
 
           <aside

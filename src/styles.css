@@ -307,7 +307,7 @@
 .netro-density-clock em{font-style:normal;opacity:.55;padding-bottom:.15rem;animation:netro-pulse 1.2s ease-in-out infinite}
 @keyframes netro-pulse{0%,100%{opacity:.35}50%{opacity:.85}}
 @media(prefers-reduced-motion:reduce){.netro-density-clock em{animation:none;opacity:.55}}
-.netro-density-cta{width:100%;margin-top:auto;border:0;border-radius:10px;background:#f4d014;color:#1c1c1c;font-weight:600;font-size:.95rem;padding:.7rem;cursor:default}
+.netro-density-cta{display:block;text-align:center;text-decoration:none;width:100%;margin-top:auto;border:0;border-radius:10px;background:#f4d014;color:#1c1c1c;font-weight:600;font-size:.95rem;padding:.7rem;cursor:pointer}
 .netro-density-stack{display:flex;flex-direction:column;gap:.875rem;min-width:0}
 .netro-density-flow{background:#fff;border:1px solid #e5e7eb;border-radius:0;box-shadow:0 1px 5px rgba(0,0,0,.05);overflow:hidden}
 .netro-density-flow-head{background:#1c1c1c;color:#fff;padding:.85rem 1rem;display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;flex-wrap:wrap}
@@ -358,7 +358,7 @@
 .netro-density-quote-pair b{font-size:1.05rem;font-weight:600}
 .netro-density-quote-pair em{font-style:normal;font-size:.72rem;color:#a3a3a3;justify-self:end}
 .netro-density-quote-swap{align-self:center;width:2.25rem;height:2rem;margin:-.35rem 0;background:#141414;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#f4d014;font-size:.95rem;z-index:1}
-.netro-density-quote-cta{width:100%;border:0;border-radius:12px;background:#f4d014;color:#1c1c1c;font-weight:700;font-size:.95rem;padding:.85rem;cursor:default;box-shadow:0 4px 18px rgba(244,208,20,.25)}
+.netro-density-quote-cta{display:block;box-sizing:border-box;text-align:center;text-decoration:none;width:100%;border:0;border-radius:12px;background:#f4d014;color:#1c1c1c;font-weight:700;font-size:.95rem;padding:.85rem;cursor:pointer;box-shadow:0 4px 18px rgba(244,208,20,.25)}
 .netro-density-quote-foot{margin:0;font-size:.68rem;color:#77747e;border-top:1px solid rgba(255,255,255,.04);padding-top:.55rem}
 .netro-density-rail{background:#f4d014;border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.75rem;min-height:18rem;flex:1;box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid rgba(234,179,8,.45);overflow:hidden}
 .netro-density-rail-head{display:flex;align-items:center;gap:.65rem;flex-shrink:0}

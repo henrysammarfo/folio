@@ -17,6 +17,10 @@ export type NetroLiveGateLabels = {
   kaminoLtv: string | null;
   /** Paper/wallet illustrative borrow capacity label. */
   creditCapacity: string;
+  /** Live Jupiter quote-only out amount for ≤$1 USDC inspect. */
+  quoteOut: string;
+  /** Jupiter cache/TTL honesty — cached · stale · live · unavailable. */
+  quoteMeta: string;
 };
 
 export type MatrixLikeRow = {
@@ -59,6 +63,12 @@ export function buildNetroLiveGateLabels(input: {
   illustrativeBorrowUsd?: number | null;
   /** paper | wallet-read */
   creditQtyLabel?: string | null;
+  /** Live Jupiter out UI amount for $1 USDC inspect (quote-only). */
+  jupiterOutUi?: number | null;
+  /** Jupiter adapter source string when ok (may include cached/stale). */
+  jupiterSource?: string | null;
+  /** Jupiter fail reason when quote unavailable. */
+  jupiterReason?: string | null;
 }): NetroLiveGateLabels {
   const wash = findMode(input.rows, "Wash");
   const quote = findMode(input.rows, "Jupiter swap quote");
@@ -82,6 +92,23 @@ export function buildNetroLiveGateLabels(input: {
     creditCapacity = `$${Math.round(input.illustrativeBorrowUsd).toLocaleString("en-US")} · ${qty} × LTV · no broadcast`;
   }
 
+  let quoteOut = "Quote pending";
+  let quoteMeta = "quote-only · no broadcast";
+  if (
+    typeof input.jupiterOutUi === "number" &&
+    Number.isFinite(input.jupiterOutUi) &&
+    input.jupiterOutUi > 0
+  ) {
+    quoteOut = `${input.jupiterOutUi.toFixed(6)} AAPLx`;
+    const src = (input.jupiterSource ?? "").toLowerCase();
+    if (src.includes("stale")) quoteMeta = "stale-cache · TTL · no broadcast";
+    else if (src.includes("cached")) quoteMeta = "cached · TTL · no broadcast";
+    else quoteMeta = "live quote · TTL · no broadcast";
+  } else if (input.jupiterReason) {
+    quoteOut = "Unavailable";
+    quoteMeta = `${input.jupiterReason} · no broadcast`;
+  }
+
   return {
     wash: washLabel(wash),
     quote:
@@ -96,6 +123,8 @@ export function buildNetroLiveGateLabels(input: {
     multiTenant: modeLabel(multiTenant, "Unavailable"),
     kaminoLtv: ltv,
     creditCapacity,
+    quoteOut,
+    quoteMeta,
   };
 }
 
@@ -110,4 +139,6 @@ export const NETRO_LIVE_GATE_DEFAULTS: NetroLiveGateLabels = {
   multiTenant: "Unavailable",
   kaminoLtv: null,
   creditCapacity: "Illustrative · borrow off",
+  quoteOut: "Quote pending",
+  quoteMeta: "quote-only · no broadcast",
 };

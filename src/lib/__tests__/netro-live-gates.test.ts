@@ -67,6 +67,25 @@ describe("buildNetroLiveGateLabels", () => {
     expect(labels.creditCapacity).toMatch(/\$2,382/);
     expect(labels.creditCapacity).toMatch(/paper/);
     expect(labels.creditCapacity).toMatch(/no broadcast/);
+    expect(labels.quoteOut).toBe("Quote pending");
+  });
+
+  it("surfaces live Jupiter out amount without inventing a fill", () => {
+    const labels = buildNetroLiveGateLabels({
+      rows: [
+        {
+          capability: "Jupiter swap quote",
+          mode: "quote-only",
+          detail: "quote-only",
+        },
+      ],
+      broadcastPaused: true,
+      jupiterOutUi: 0.002994,
+      jupiterSource: "api.jup.ag/swap/v1/quote · cached 12s",
+    });
+    expect(labels.quoteOut).toBe("0.002994 AAPLx");
+    expect(labels.quoteMeta).toMatch(/cached/);
+    expect(labels.quoteMeta).toMatch(/no broadcast/);
   });
 
   it("labels wash Live only when mainnet-read", () => {

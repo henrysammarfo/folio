@@ -445,3 +445,6 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 ## 2026-09-16 — Netro live Kamino LTV + Stocklana 598
 - Netro credit card shows live AAPLx maxLTV + illustrative paper×LTV capacity (borrow broadcast off).
 - Stocklana live: **598** / **82** / **$121k** · deadline SEP 25. Goal open: Bitquery/Pyth/Privy/Supabase + rotate Vercel token.
+
+## 2026-09-16 — Netro live Jupiter quote-only
+- Overview Netro quote rail: live ≤$1 Jupiter out UI amount + TTL/stale honesty. Inspect quote → /desk/acquire. Goal open: Bitquery/Pyth/Privy/Supabase.

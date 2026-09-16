@@ -147,6 +147,15 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(
       page.locator("[data-testid='desk-lab-netro']").getByText(/paper × LTV · no broadcast/i),
     ).toBeVisible();
+    // Live Jupiter ≤$1 quote-only out amount (never a fill)
+    await expect(page.getByTestId("netro-live-quote")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByTestId("netro-live-quote")).toContainText(/AAPLx/i);
+    await expect(
+      page.getByTestId("netro-live-quote").getByText(/\d+\.\d+ AAPLx|Unavailable|Quote pending/i),
+    ).toBeVisible();
+    await expect(
+      page.locator("[data-testid='desk-lab-netro']").getByRole("link", { name: /inspect quote/i }),
+    ).toHaveAttribute("href", "/desk/acquire");
     // Positions stays the ledger — Netro must not replace other desk routes
     await page.goto("/desk/positions");
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();

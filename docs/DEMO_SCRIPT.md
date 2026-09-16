@@ -1,6 +1,6 @@
 # FOLIO — Stocklana demo script (≤8 seconds spoken)
 
-**Live Stocklana (2026-09-16, hackathons.solana.com):** **596** registered · **81** submissions · prize **$121,000** · hero deadline **SEP 25, 2026** (countdown ~9d). Timeline body still lists **Fri 18 Sep 2026, 16:00 ET** · stocklana.fun **18 Sep 23:59 UTC** — treat **18 Sep as conservative**; re-check hero at submit.
+**Live Stocklana (2026-09-16, hackathons.solana.com jina):** **598** registered · **82** submissions · prize **$121,000** · hero deadline **SEP 25, 2026**. Timeline body may still list **Fri 18 Sep** — treat **18 Sep as conservative**; re-check hero at submit.
 
 Network: mainnet-read + quote-only · Budget: ≤~$1 · Broadcast: paused
 
@@ -16,12 +16,14 @@ Network: mainnet-read + quote-only · Budget: ≤~$1 · Broadcast: paused
 
 https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app
 
-Home CTAs: **Lab UI** · **Lab shaders** → `/lab/ui` · `/lab/shaders` (Henry picks id before premium merge). Recommended desk pick: **`netro-density`** — Preview on desk mounts the full NetroBNB 12-col canvas with live AAPLx ×. Opt-in Plasma when a shader / cinematic pick is active — Exit anytime; not a production merge.
+Home CTAs: **Open desk** → Netro overview (Henry-approved `netro-density`) with live Empire gates + ≤$1 Jupiter inspect. Home hero stays Aionis brand-plane. Lab still at `/lab/ui` · `/lab/shaders`.
 
 Verified on this preview (SSO off):
 
-- `/truth` ~1.003× Scaled UI
-- `/lab/ui` — **21st MCP connected** · Netro 12-col · Plasma 24346 · Trade Journal 27124
+- `/` — Aionis brand-plane hero (unchanged)
+- `/desk` — Netro 12-col · live wash/Pyth/NestUSD/Kamino modes · live Kamino maxLTV · live Jupiter ≤$1 out amount (quote-only)
+- `/truth` ~1.003× Scaled UI + on-chain compare
+- `/lab/ui` — **21st MCP connected**
 - `/network` NestUSD / wash / Pyth / broadcast fail-closed until keyed
 - `/desk/settings` — **Watch-wallet secret set** · bind ready; Bitquery/Pyth/Privy/Supabase still missing
 - Watch-wallet bind live-verified (mainnet-read qty, not Privy auth)
@@ -33,11 +35,12 @@ Paste pack: `docs/STOCKLANA_SUBMISSION.md` · Keys when ready: `docs/KEYS_LANDIN
 
 ## Click path
 
-1. `/truth?symbol=AAPLx` — multiplier + economic shares
-2. `/desk/acquire` — run checks; wash blocked without Bitquery (honest)
-3. `/network` — capability matrix badges
-4. `/desk/settings` — bind watch wallet (secret already on Vercel) → `/desk/positions` qty
-5. `/lab/shaders` + `/lab/ui` — approve gate (not production)
+1. `/` — brand hero → **Open desk**
+2. `/desk` — Netro overview: live × · wash fail-closed · Kamino LTV · Jupiter ≤$1 out → **Inspect quote**
+3. `/desk/acquire` — run checks; wash blocked without Bitquery (honest)
+4. `/truth?symbol=AAPLx` — multiplier + on-chain Scaled UI
+5. `/desk/settings` — bind watch wallet → `/desk/positions` qty
+6. `/network` — capability matrix badges
 
 ## Replay
 

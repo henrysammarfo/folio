@@ -457,3 +457,7 @@
 ## 2026-09-16 — Netro live Kamino LTV + Stocklana refresh
 - Credit bundle feeds Netro credit card (maxLTV + illustrative capacity). Submission checklist: lab UI approved + GG tip clean on PR #5.
 - Stocklana 598/82/$121k (jina). Still need Empire keys paste + token rotate. Goal open.
+
+## 2026-09-16 — Netro live Jupiter ≤$1 quote
+- Netro quote widget shows live Jupiter out amount for $1 USDC inspect (quote-only · no broadcast). CTAs link to /truth and /desk/acquire.
+- Demo script refreshed to 598/82 + Netro click path. Goal open for Empire keys.
