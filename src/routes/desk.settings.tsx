@@ -313,20 +313,23 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
           ) : null}
           {data?.readiness.pythApiKeyPresent ? (
             <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
-              <b>DO NOW · Pyth entitle Equity.US + Crypto.xStock</b>
+              <b>Pyth Pro optional · free diverge path live</b>
               <p className="mt-1 opacity-80">
-                Live probe: Hermes <b>403 Not entitled</b> on both{" "}
-                <code>Equity.US.AAPL/USD</code> and <code>Crypto.AAPLX/USD</code> (Starter =
-                crypto majors only). Exact path:{" "}
+                Hermes still returns <b>403 Not entitled</b> for{" "}
+                <code>Equity.US.AAPL</code> / <code>Crypto.AAPLX</code> on Starter/unpaid trial —
+                do <b>not</b> pay ~$2.5k/mo for Stocklana. FOLIO diverge now uses free cascade:{" "}
+                <b>Pyth (if entitled) → Finnhub (optional free key) → Yahoo chart (keyless)</b> +
+                CoinGecko for xStock secondary. Sources are labeled — never claimed as Pyth.
+                Optional for Pyth bounty only: entitle Equity.US at{" "}
                 <a href="https://app.pyth.com/" target="_blank" rel="noreferrer">
                   app.pyth.com
                 </a>{" "}
-                → <b>Start free Pro trial</b> (or U.S. Equities / All Asset Classes) → in plan /
-                entitlements enable feeds matching <b>Equity.US.*</b> and{" "}
-                <b>Crypto.*X</b> (xStock) → 🔑 View API key → replace{" "}
-                <code>PYTH_API_KEY</code> on Vercel → redeploy. Prove both Hermes IDs return HTTP
-                200 (not 403). Stuck → email <code>data@dourolabs.xyz</code> subject{" "}
-                <code>Equity.US / Crypto.xStock Hermes 403 Not entitled</code>.
+                free Pro trial asset classes, or email <code>data@dourolabs.xyz</code>. Optional
+                free Finnhub key:{" "}
+                <a href="https://finnhub.io/register" target="_blank" rel="noreferrer">
+                  finnhub.io/register
+                </a>{" "}
+                → <code>FINNHUB_API_KEY</code>.
               </p>
             </div>
           ) : null}
@@ -418,54 +421,21 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
               </span>
             </div>
             <div className="settings-step">
-              <strong>2 · Pyth — entitle Equity.US + Crypto.xStock (not Starter)</strong>
+              <strong>2 · Equity reference — free path (no Pro $)</strong>
               <span>
-                FOLIO diverge needs <b>both</b> symbol families live on Hermes:
-                <br />• <code>Equity.US.AAPL/USD</code> → feed{" "}
-                <code>49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688</code>
-                <br />• <code>Crypto.AAPLX/USD</code> (xStock) → feed{" "}
-                <code>978e6cc68a119ce066aa830017318563a9ed04ec3a0a6439010fc11296a58675</code>
-                <br />
-                1) Open{" "}
-                <a href="https://app.pyth.com/" target="_blank" rel="noreferrer">
-                  app.pyth.com
+                Diverge cascade (wired): <b>Pyth Hermes</b> if Equity.US entitled → optional{" "}
+                <b>Finnhub free</b> (
+                <a href="https://finnhub.io/register" target="_blank" rel="noreferrer">
+                  finnhub.io/register
                 </a>{" "}
-                → sign in.
+                → <code>FINNHUB_API_KEY</code>) → <b>Yahoo chart</b> keyless{" "}
+                <code>query1.finance.yahoo.com/v8/finance/chart</code> (unofficial · labeled{" "}
+                <code>YAHOO:AAPL</code>). xStock secondary: CoinGecko{" "}
+                <code>apple-xstock</code> when Hermes <code>Crypto.AAPLX</code> is 403.
                 <br />
-                2) Pricing (
-                <a href="https://www.pyth.network/price-feeds" target="_blank" rel="noreferrer">
-                  pyth.network/price-feeds
-                </a>
-                ): <b>Starter $500/mo</b> = crypto majors only (your current key — BTC/ETH 200,
-                Equity.US + Crypto.AAPLX = <b>403 Not entitled</b>). Need <b>Pro free trial</b> /
-                Pro customize / <b>U.S. Equities</b> / <b>All Asset Classes</b> — not Starter.
-                <br />
-                3) Terminal → <b>Subscribe / Upgrade / Start free trial</b> → enable entitlements
-                that cover <b>Equity.US.*</b> and <b>Crypto.*X</b> (xStock tokenized equities).
-                Confirm in Terminal search: <code>Equity.US.AAPL</code> and{" "}
-                <code>Crypto.AAPLX</code> show as entitled for your key.
-                <br />
-                4) <b>🔑 View your API key</b> → replace <code>PYTH_API_KEY</code> on{" "}
-                <a
-                  href="https://vercel.com/teamtitanlink/folio/settings/environment-variables"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Vercel env
-                </a>{" "}
-                + <code>.env</code> → redeploy.
-                <br />
-                5) Prove both feeds HTTP <b>200</b> (not 403). Stuck → email{" "}
-                <code>data@dourolabs.xyz</code> subject{" "}
-                <code>Equity.US / Crypto.xStock Hermes 403 Not entitled</code>. Docs:{" "}
-                <a
-                  href="https://docs.pyth.network/price-feeds/how-pyth-works/hermes"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Hermes
-                </a>
-                .
+                Pyth Pro (~$2.5k+) is <b>optional</b> for the Stocklana Pyth bounty only — not
+                required for FOLIO ship. If trial already has equities entitled, keep{" "}
+                <code>PYTH_API_KEY</code>; otherwise skip paying.
               </span>
             </div>
             <div className="settings-step">

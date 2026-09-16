@@ -87,12 +87,21 @@ function Page() {
             ? data.pyth.data.feedSymbol?.startsWith("Equity.US.")
               ? "Pyth Equity.US"
               : "Pyth equity live"
-            : "Pyth equity unavailable"}
+            : "Pyth Equity.US off (bounty)"}
+        </ModeBadge>
+        <ModeBadge mode={data?.equityRef?.ok ? data.equityRef.mode : "unavailable"}>
+          {data?.equityRef?.ok
+            ? data.equityRef.data.provider === "pyth-hermes"
+              ? "Diverge ref · Pyth"
+              : `Diverge ref · ${data.equityRef.data.provider}`
+            : "Diverge equity ref off"}
         </ModeBadge>
         <ModeBadge mode={data?.pythXStock.ok ? data.pythXStock.mode : "unavailable"}>
           {data?.pythXStock.ok
             ? data.pythXStock.data.feedSymbol ?? "Pyth Crypto.xStock"
-            : "Pyth Crypto.xStock off"}
+            : data?.xStockRef?.ok
+              ? `CG ${data.xStockRef.data.feedSymbol}`
+              : "Pyth Crypto.xStock off"}
         </ModeBadge>
         <ModeBadge mode={data?.pythOndo?.ok ? data.pythOndo.mode : "unavailable"}>
           {data?.pythOndo?.ok
@@ -256,10 +265,27 @@ function Page() {
                   : " equity unavailable"}
               {data?.pythXStock.ok
                 ? ` · ${data.pythXStock.data.feedSymbol ?? "Crypto.xStock"} $${data.pythXStock.data.price.toFixed(2)} (secondary)`
-                : " · Crypto.xStock secondary off until keyed/mapped"}
+                : data?.xStockRef?.ok
+                  ? ` · ${data.xStockRef.data.feedSymbol} $${data.xStockRef.data.price.toFixed(2)} (CoinGecko free secondary)`
+                  : " · Crypto.xStock secondary off until keyed/mapped"}
               {data?.pythOndo?.ok
                 ? ` · ${data.pythOndo.data.feedSymbol ?? "Crypto.ONDO"} $${data.pythOndo.data.price.toFixed(2)} (tertiary Ondo)`
                 : " · Crypto.ONDO tertiary off until keyed/mapped"}
+            </span>
+          </li>
+          <li>
+            <Database />
+            <span>
+              <b>Diverge equity ref</b>
+              {data?.equityRef?.ok
+                ? ` ${data.equityRef.data.feedSymbol} $${data.equityRef.data.price.toFixed(2)} · ${data.equityRef.data.provider}${
+                    data.equityRef.data.provider === "pyth-hermes"
+                      ? ""
+                      : " (free fallback — not Pyth)"
+                  }`
+                : data?.equityRef && !data.equityRef.ok
+                  ? ` ${data.equityRef.reason}`
+                  : " unavailable"}
             </span>
           </li>
           <li>
@@ -301,7 +327,7 @@ function Page() {
               <b>Diverge gate</b>{" "}
               {data?.diverge.pass == null
                 ? data?.diverge.note ??
-                  "unavailable — no invent-a-pass (Pyth Equity.US + Jupiter venue required)"
+                  "unavailable — no invent-a-pass (equity ref + Jupiter venue required)"
                 : (data.diverge.note ?? "pending")}
             </span>
           </li>

@@ -15,6 +15,10 @@ import {
   fetchPythEquityPrice,
   fetchPythXStockUsdPrice,
 } from "../src/lib/adapters/pyth.ts";
+import {
+  fetchCoinGeckoXStockPrice,
+  fetchEquityReferencePrice,
+} from "../src/lib/adapters/equity-ref.ts";
 import { fetchJupiterQuote } from "../src/lib/adapters/jupiter.ts";
 import { evaluateWashGate } from "../src/lib/adapters/wash.ts";
 import { resolveSolanaRpcUrl } from "../src/lib/adapters/solana-rpc.ts";
@@ -29,14 +33,17 @@ import {
 
 async function main() {
   const symbol = "AAPLx";
-  const [asset, mult, kamino, nestusd, pythEquity, pythX] = await Promise.all([
-    fetchXStockAsset(symbol),
-    fetchXStockMultiplier(symbol),
-    fetchKaminoXStocksMarket(),
-    fetchNestUsdStatus(),
-    fetchPythEquityPrice("AAPL"),
-    fetchPythXStockUsdPrice(symbol),
-  ]);
+  const [asset, mult, kamino, nestusd, pythEquity, pythX, equityRef, cgX] =
+    await Promise.all([
+      fetchXStockAsset(symbol),
+      fetchXStockMultiplier(symbol),
+      fetchKaminoXStocksMarket(),
+      fetchNestUsdStatus(),
+      fetchPythEquityPrice("AAPL"),
+      fetchPythXStockUsdPrice(symbol),
+      fetchEquityReferencePrice("AAPL"),
+      fetchCoinGeckoXStockPrice(symbol),
+    ]);
 
   const mint = asset.ok ? asset.data.solanaMint : null;
   const decimals =
@@ -69,8 +76,8 @@ async function main() {
   const sessionSecret =
     (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
 
-  /** Equity.US preferred; Crypto.xStock counts as live when equity plan lacks entitlement. */
-  const pythLive = pythEquity.ok || pythX.ok;
+  /** Diverge equity ref live (Pyth entitled OR free Yahoo/Finnhub). */
+  const pythLive = equityRef.ok || pythEquity.ok || pythX.ok || cgX.ok;
   const pythFailClosed = !pythLive;
   const auth = getAuthProviderStatus();
   const readiness = await loadEmpireReadiness();
@@ -108,7 +115,11 @@ async function main() {
   console.log(
     `RPC ${rpc.publicFallback ? "public-fallback" : "dedicated"} · tip smoke`,
   );
-  if (pythKey && !pythEquity.ok && pythX.ok) {
+  if (pythKey && !pythEquity.ok && equityRef.ok) {
+    console.log(
+      `note  Pyth Equity.US not entitled — diverge free ref live via ${equityRef.data.provider} (${equityRef.data.feedSymbol})`,
+    );
+  } else if (pythKey && !pythEquity.ok && pythX.ok) {
     console.log(
       "note  Pyth Equity.US not entitled on this key — Crypto.xStock live (labeled secondary)",
     );
@@ -142,7 +153,7 @@ async function main() {
   );
   if (!summary.shipReady) {
     console.log(
-      "remaining: entitle Equity.US + Crypto.xStock at app.pyth.com · mint folio_session + Join folio-demo · rotate chat secrets — docs/HENRY_STEPS.md",
+      "remaining: mint folio_session + Join folio-demo · optional Pyth Equity.US for bounty · rotate chat secrets — docs/HENRY_STEPS.md",
     );
   }
 }

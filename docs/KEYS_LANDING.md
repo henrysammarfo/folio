@@ -8,7 +8,7 @@ Vercel env UI: https://vercel.com/teamtitanlink/folio/settings/environment-varia
 
 Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density` · `BITQUERY_API_KEY` · `PYTH_API_KEY` · `PRIVY_*` · `SUPABASE_URL` · `SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_JWT_SECRET` · `JUPITER_API_KEY`
 
-SQL ✅ (`20260915` + grants + `folio-demo` seed) · JWT ✅. Still need Henry: **entitle `Equity.US.*` + `Crypto.*X` (xStock) on Pyth Pro** (both Hermes feeds currently 403 Not entitled) · mint Privy session + Join folio-demo. **Rotate all chat-pasted secrets.**
+SQL ✅ (`20260915` + grants + `folio-demo` seed) · JWT ✅ · **free equity diverge** (Yahoo/Finnhub/CoinGecko cascade) ✅. Still need Henry: **Privy login mint + Join folio-demo** (allowlist demo origin). Pyth Pro Equity.US is **optional** (bounty only — do not pay ~$2.5k). **Rotate all chat-pasted secrets.**
 
 Stocklana live 2026-09-16 (jina): **605** registered · **84** submissions · **$121k** · SEP 25.
 
@@ -27,29 +27,23 @@ Lab MCP live-verified on branch preview `/lab/ui` (2026-09-16): **21st MCP conne
 
 Verify: `/desk/acquire` wash row leaves “key missing”; `/network` wash capability becomes live or labeled error (never silent green).
 
-### 2 — Pyth Hermes — BE SPECIFIC: `Equity.US` + `Crypto.xStock`
+### 2 — Equity reference for diverge — FREE path (no Pyth Pro $)
 
-FOLIO diverge needs **both** symbol families. Live probes on the current key:
+Hermes still returns **403 Not entitled** for `Equity.US.AAPL/USD` + `Crypto.AAPLX/USD` on Starter/unpaid trial. **Do not subscribe to Pro (~$2.5k+/mo) for Stocklana.**
 
-| Symbol | Feed id | Result |
-|--------|---------|--------|
-| `Equity.US.AAPL/USD` | `49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688` | **403 Not entitled** |
-| `Crypto.AAPLX/USD` | `978e6cc68a119ce066aa830017318563a9ed04ec3a0a6439010fc11296a58675` | **403 Not entitled** |
+FOLIO cascade (honest labels):
 
-That matches **Starter = crypto majors only**. Tokenized xStock (`Crypto.*X`) is **not** covered by Starter either.
+| Priority | Source | Cost | Notes |
+|----------|--------|------|-------|
+| 1 | Pyth Hermes Equity.US | trial/Pro | Prefer when entitled · Stocklana bounty |
+| 2 | Finnhub `/quote` | Free key | [finnhub.io/register](https://finnhub.io/register) → `FINNHUB_API_KEY` |
+| 3 | Yahoo chart v8 | Keyless | Unofficial · labeled `YAHOO:AAPL` |
+| secondary | CoinGecko `*-xstock` | Free | When Hermes Crypto.*X 403 |
+| venue | Jupiter Price v3 | Free | Already wired |
 
-1. Open **[app.pyth.com](https://app.pyth.com/)** → sign in.
-2. Pricing ([pyth.network/price-feeds](https://www.pyth.network/price-feeds)):
-   - Free = view-only Terminal (no API)
-   - **Starter $500/mo = crypto majors only** ← you are here
-   - **Pro free trial** / Pro customize / **U.S. Equities** / **All Asset Classes** = what FOLIO needs
-3. Terminal → **Subscribe / Upgrade / Start free trial** (not Starter).
-4. Enable entitlements covering **`Equity.US.*`** and **`Crypto.*X`** (xStock). Confirm Terminal search shows `Equity.US.AAPL` + `Crypto.AAPLX` entitled.
-5. **🔑 View your API key** → replace `PYTH_API_KEY` on Vercel + `.env` → redeploy.
-6. Prove **HTTP 200** on **both** feed ids above (not 403).
-7. Stuck → email **data@dourolabs.xyz** subject `Equity.US / Crypto.xStock Hermes 403 Not entitled`.
+Pyth Pro / U.S. Equities plan is **optional** for the Pyth bounty track only.
 
-Docs: [Hermes](https://docs.pyth.network/price-feeds/how-pyth-works/hermes) · [Terminal](https://docs.pyth.network/price-feeds/pro/pyth-terminal).
+Docs: [Hermes](https://docs.pyth.network/price-feeds/how-pyth-works/hermes) · [Finnhub](https://finnhub.io/docs/api) · Yahoo chart (unofficial).
 
 ### 3 — Privy (wallet identity)
 

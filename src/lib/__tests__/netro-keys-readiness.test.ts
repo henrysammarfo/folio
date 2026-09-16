@@ -48,6 +48,6 @@ describe("buildNetroKeysReadiness", () => {
       broadcastPaused: true,
     });
     expect(keys.rows.find((r) => r.id === "supabase")?.status).toMatch(/schema missing/i);
-    expect(keys.rows.find((r) => r.id === "pyth")?.status).toMatch(/entitle/i);
+    expect(keys.rows.find((r) => r.id === "pyth")?.status).toMatch(/Yahoo|Finnhub|403/i);
   });
 });

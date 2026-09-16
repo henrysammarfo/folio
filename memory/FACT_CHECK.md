@@ -323,3 +323,7 @@ EOF
 
 | Pyth Starter entitles Equity.US.AAPL + Crypto.AAPLX Hermes | REJECTED live | Both feeds HTTP 403 Not entitled with current PYTH_API_KEY; Starter=crypto majors | 2026-09-16 |
 | SUPABASE_JWT_SECRET on Vercel + schema grants | CONFIRMED | smoke:goal JWT+schemaReady; Henry paste + SQL DONE | 2026-09-16 |
+
+| Yahoo chart v8 returns AAPL USD without API key | CONFIRMED live | query1.finance.yahoo.com/v8/finance/chart/AAPL · labeled YAHOO:AAPL | 2026-09-16 |
+| CoinGecko apple-xstock free USD | CONFIRMED live | api.coingecko.com/api/v3/simple/price | 2026-09-16 |
+| Pyth Pro required for FOLIO diverge ship | REJECTED | Free Yahoo/Finnhub cascade scores diverge; Pro optional for bounty | 2026-09-16 |

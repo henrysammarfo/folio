@@ -47,7 +47,7 @@ World’s Fair still wins on **working honesty**: live multiplier + wash refuse 
 ## Keys
 
 Present in `.env` + Vercel (2026-09-16 Henry paste): Tavily, TinyFish, AgentRouter, 21st, Shaders, Solana RPC, `FOLIO_SESSION_SECRET`, `BROADCAST_PAUSED`, `FOLIO_APPROVED_LAB_UI=netro-density`, **Bitquery**, **Pyth**, **Privy**, **Supabase URL/anon/service/JWT**, **Jupiter**.
-JWT ✅ · SQL migration + grants ✅ · `folio-demo` seeded. Still blocked: **entitle `Equity.US.*` + `Crypto.*X` (xStock)** — both Hermes feeds **403 Not entitled** on Starter · Privy login mint + Join folio-demo (Allowed origins) for multi-tenant session.
+JWT ✅ · SQL ✅ · **free equity diverge** (Yahoo→Finnhub→Pyth cascade) ✅. Pyth Equity.US still 403 on trial — **do not pay Pro**. Still blocked: Privy login mint + Join folio-demo.
 **Rotate all chat-pasted keys immediately after hackathon.**
 
 ## UI / lab (approve-gated)
@@ -55,7 +55,7 @@ JWT ✅ · SQL migration + grants ✅ · `folio-demo` seeded. Still blocked: **e
 - Production `/` hero: Aionis-parity liquid stencil (`1400×550` / y=465 / horizon 55%).
 - `/lab/ui`: Aionis plane + NetroBNB density + pinned 21st Plasma 24346 + trade journal 27124.
 - `/lab/shaders`: live WebGL Plasma (glacial ink); shaders.com keyed but API gated (HTTP 500).
-- Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; **Vercel** has lab keys + Empire keys (Bitquery/Pyth/Privy/Supabase/Jupiter). Open: entitle Equity.US + Crypto.xStock at app.pyth.com (JWT+SQL done).
+- Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; **Vercel** has lab keys + Empire keys (Bitquery/Pyth/Privy/Supabase/Jupiter). Open: Privy mint + Join folio-demo (JWT+SQL+free diverge done). Pyth Pro optional for bounty only.
 - Desk opt-in lab preview mounts live WebGL Plasma for shader / cinematic picks (Exit clears; not production merge).
 - Stocklana live 2026-09-16: **605** regs · **84** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
 - Netro overview: live Empire gates + ≤$1 Jupiter quote + paper-agent + **inspect wallet** + **ownership qty strip** + **Empire keys readiness**. **SSR approvals seed**. Truth strip illustrative + live Scaled UI. Home hero preserved. Stocklana **605/84/$121k**.

@@ -22,6 +22,12 @@ function detailOf(r: AdapterResult<unknown>, okDetail?: string): string {
 export function buildNetworkMatrix(input: {
   multiplier: AdapterResult<unknown>;
   pyth: AdapterResult<unknown>;
+  /** Free cascade (Pyth → Finnhub → Yahoo) used for diverge scoring. */
+  equityRef?: AdapterResult<{
+    provider?: string;
+    feedSymbol?: string;
+    price?: number;
+  }>;
   jupiter: AdapterResult<unknown>;
   jupiterPrice: AdapterResult<unknown>;
   wash: AdapterResult<unknown>;
@@ -56,11 +62,20 @@ export function buildNetworkMatrix(input: {
         : detailOf(input.scaledUi),
     },
     {
-      capability: "Pyth Hermes equity reference",
+      capability: "Pyth Hermes Equity.US (bounty)",
       mode: modeOf(input.pyth),
       detail: input.pyth.ok
-        ? `${input.pyth.source} · Equity.US.* (+ Crypto.xStock/USD secondary on /truth)`
-        : `${detailOf(input.pyth)} (PYTH_API_KEY required since Hermes Aug 2026 auth — fail-closed)`,
+        ? `${input.pyth.source} · Equity.US.* entitled`
+        : `${detailOf(input.pyth)} · Pro Equity.US optional for bounty; free Yahoo/Finnhub covers diverge`,
+    },
+    {
+      capability: "Equity reference (diverge)",
+      mode: modeOf(input.equityRef ?? input.pyth),
+      detail: input.equityRef?.ok
+        ? `${input.equityRef.source} · ${input.equityRef.data.feedSymbol ?? "ref"} · ${input.equityRef.data.provider ?? "unknown"}`
+        : input.equityRef
+          ? detailOf(input.equityRef)
+          : detailOf(input.pyth),
     },
     {
       capability: "Jupiter Price v3 (venue + stockData)",

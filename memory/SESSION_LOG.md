@@ -530,3 +530,10 @@
 - Settings/docs/HENRY_STEPS/KEYS_LANDING: Pyth DO NOW names exact feeds `Equity.US.AAPL/USD` + `Crypto.AAPLX/USD` (both 403 Not entitled on Starter) + email subject `Equity.US / Crypto.xStock Hermes 403 Not entitled`.
 - Wired `@privy-io/react-auth` Settings **Log in with Privy → Mint httpOnly session** (public App ID only; paste-token fallback). Henry must allowlist demo origin in Privy Dashboard.
 - Goal still open: shipReady=false until Pyth entitlement + Privy mint + Join folio-demo.
+
+
+## 2026-09-16 — Free equity diverge (no Pyth Pro $)
+
+- Henry on unpaid trial — cannot pay ~$2.5k Pro. Wired free cascade: Pyth (if entitled) → Finnhub free key → Yahoo chart keyless; CoinGecko `*-xstock` secondary.
+- Diverge pass/fail scores on labeled free ref vs Jupiter venue. Never claims Pyth when fallback used.
+- Settings/HENRY_STEPS: Pro optional for bounty only. Goal Empire can go DONE without Pyth Equity.US entitlement.

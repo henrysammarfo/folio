@@ -221,18 +221,20 @@ function Page() {
                     tone={
                       data.gates.divergeOk === false
                         ? "amber"
-                        : data.pyth.ok
+                        : data.equityRef?.ok
                           ? "green"
                           : "amber"
                     }
                   >
                     {data.gates.divergeOk === false
                       ? "blocked"
-                      : data.pyth.ok
-                        ? "ok"
+                      : data.equityRef?.ok
+                        ? data.equityRef.data.provider === "pyth-hermes"
+                          ? "ok · pyth"
+                          : `ok · ${data.equityRef.data.provider}`
                         : data.pyth.reason === "pyth_feed_not_entitled"
-                          ? "not-entitled"
-                          : "key-gated"}
+                          ? "pyth-not-entitled · trying free ref"
+                          : "equity-ref off"}
                   </StatusBadge>
                 </div>
                 <div className="desk-gate-row">

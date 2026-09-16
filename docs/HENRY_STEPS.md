@@ -10,25 +10,21 @@ Demo (hard-refresh): https://folio-git-cursor-folio-netro-desk-approve-f1ec-team
 
 ---
 
-## Step 2 · Bitquery ✅ · Pyth ⚠️ DO THIS — Equity.US + Crypto.xStock
+## Step 2 · Bitquery ✅ · Equity diverge ✅ FREE (no Pro $)
 
-Wash is **live**. Current Pyth key authenticates Hermes but both Stocklana feeds return **403 Not entitled**:
+Wash is **live**. Pyth Hermes still **403 Not entitled** for `Equity.US.AAPL` + `Crypto.AAPLX` on Starter/unpaid trial — **do not pay ~$2.5k/mo**.
 
-| Symbol | Feed id | Status now |
-|--------|---------|------------|
-| `Equity.US.AAPL/USD` | `49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688` | 403 Not entitled |
-| `Crypto.AAPLX/USD` (xStock) | `978e6cc68a119ce066aa830017318563a9ed04ec3a0a6439010fc11296a58675` | 403 Not entitled |
+FOLIO diverge now uses a **free cascade** (labeled · never claimed as Pyth):
 
-Starter = crypto majors only. FOLIO diverge stays **fail-closed** until both families are entitled.
+1. **Pyth Hermes** — if Equity.US entitled on your key  
+2. **Finnhub free** (optional) — [finnhub.io/register](https://finnhub.io/register) → `FINNHUB_API_KEY`  
+3. **Yahoo chart** (keyless) — `query1.finance.yahoo.com/v8/finance/chart/AAPL` → labeled `YAHOO:AAPL`  
+4. **CoinGecko** — `apple-xstock` free secondary when Hermes Crypto.xStock is 403  
 
-### Exact clicks (be specific)
-1. Open **[app.pyth.com](https://app.pyth.com/)** → sign in  
-2. Pricing: [pyth.network/price-feeds](https://www.pyth.network/price-feeds) — **Starter $500 = crypto majors**; need **Pro free trial** / **U.S. Equities** / **All Asset Classes** (not Starter)  
-3. **Subscribe / Upgrade / Start free trial**  
-4. Enable entitlements that cover **`Equity.US.*`** and **`Crypto.*X`** (xStock). In Terminal search confirm `Equity.US.AAPL` + `Crypto.AAPLX` are entitled for your key  
-5. **🔑 View your API key** → replace `PYTH_API_KEY` on [Vercel env](https://vercel.com/teamtitanlink/folio/settings/environment-variables) → redeploy  
-6. Prove **HTTP 200** on both feed ids above (not 403)  
-7. Stuck → email **data@dourolabs.xyz** subject `Equity.US / Crypto.xStock Hermes 403 Not entitled`
+Venue side remains **Jupiter Price** (already free).
+
+### Optional only — Pyth bounty track
+If you want Stocklana Pyth bounty points: try free Pro trial asset classes at [app.pyth.com](https://app.pyth.com/) or email **data@dourolabs.xyz**. Not required for FOLIO ship.
 
 ---
 
@@ -42,15 +38,15 @@ App ID + secret on Vercel. Rotate after chat paste.
 
 | Item | Status |
 |------|--------|
-| URL / anon / service_role / JWT secret | ✅ (incl. Henry-pasted `SUPABASE_JWT_SECRET`) |
-| Tables + **service_role GRANTs** | ✅ live (`tenants` reachable) |
+| URL / anon / service_role / JWT secret | ✅ |
+| Tables + **service_role GRANTs** | ✅ live |
 | `folio-demo` tenant | ✅ seeded |
 
 ### Henry next — mint multi-tenant session
 1. Open [Settings](https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk/settings#settings-session)  
-2. Privy Dashboard → **Allowed origins** add the demo origin (and localhost if testing)  
-3. Click **Log in with Privy** → then **Mint httpOnly session from Privy login** (or paste `getAccessToken()` JWT as fallback)  
-4. If memberships empty → click **Join folio-demo as owner**  
+2. Privy Dashboard → **Allowed origins** add the demo origin  
+3. Click **Log in with Privy** → **Mint httpOnly session from Privy login**  
+4. If memberships empty → **Join folio-demo as owner**  
 5. Confirm Active tenant shows `folio-demo`
 
 **Rotate** every secret pasted in chat.
@@ -62,4 +58,4 @@ App ID + secret on Vercel. Rotate after chat paste.
 - Custom program deploy (rent ≫ $1)
 
 ## Goal matrix
-`npm run smoke:goal` — Empire PARTIAL until Equity.US + Crypto.xStock entitled; multi-tenant PARTIAL until Privy mint + Join folio-demo.
+`npm run smoke:goal` — Empire should light with free Yahoo equity ref; multi-tenant PARTIAL until Privy mint + Join.

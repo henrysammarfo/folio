@@ -51,7 +51,7 @@ export function classifyGoalRequirements(
   if (empireLiveBits >= 3 && input.nestUsdUnavailable) {
     if (input.washLive && input.pythLive) {
       empireStatus = "done";
-      empireDetail = `Live truth/quote/credit/wash/Pyth · NestUSD unavailable · ${input.multiplierLabel}`;
+      empireDetail = `Live truth/quote/credit/wash/equity-ref · NestUSD unavailable · ${input.multiplierLabel}`;
     } else {
       empireStatus = "partial";
       const waiting: string[] = [];
@@ -64,9 +64,7 @@ export function classifyGoalRequirements(
       }
       if (!input.pythLive) {
         waiting.push(
-          input.pythKey
-            ? "Pyth keyed but Equity.US + Crypto.xStock 403 Not entitled — Pro trial / U.S. Equities at app.pyth.com (not Starter)"
-            : "PYTH_API_KEY (Hermes fail-closed)",
+          "equity ref dark (Yahoo/Finnhub/Pyth all failed)",
         );
       }
       empireDetail = `Live truth/quote/Kamino/Scaled UI · waiting ${waiting.join(" · ")}`;

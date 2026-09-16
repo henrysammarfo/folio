@@ -17,7 +17,7 @@ describe("buildAcquireGateMessages", () => {
     expect(g.honestyNotes).toEqual([]);
   });
 
-  it("labels missing PYTH_API_KEY without blocking review alone", () => {
+  it("labels missing equity ref without blocking review alone", () => {
     const g = buildAcquireGateMessages({
       truthOk: true,
       tradingHalted: false,
@@ -30,10 +30,10 @@ describe("buildAcquireGateMessages", () => {
     expect(g.divergeOk).toBe(true);
     expect(g.canReview).toBe(true);
     expect(g.blockedReasons).toEqual([]);
-    expect(g.honestyNotes.join(" ")).toMatch(/PYTH_API_KEY/);
+    expect(g.honestyNotes.join(" ")).toMatch(/equity ref|Yahoo|Finnhub/i);
   });
 
-  it("blocks review on missing Pyth when strictFailClosed is on", () => {
+  it("blocks review on missing equity ref when strictFailClosed is on", () => {
     const g = buildAcquireGateMessages({
       truthOk: true,
       tradingHalted: false,
@@ -46,8 +46,8 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(g.divergeOk).toBe(false);
     expect(g.canReview).toBe(false);
-    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed.*PYTH_API_KEY/i);
-    expect(g.honestyNotes.join(" ")).toMatch(/PYTH_API_KEY/);
+    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed.*equity/i);
+    expect(g.honestyNotes.join(" ")).toMatch(/equity ref/i);
   });
 
   it("blocks unresolved diverge when strictFailClosed is on", () => {
