@@ -156,6 +156,14 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(
       page.locator("[data-testid='desk-lab-netro']").getByRole("link", { name: /inspect quote/i }),
     ).toHaveAttribute("href", "/desk/acquire");
+    // Paper agent rail — live spine · never fills
+    const agentRail = page.getByTestId("netro-paper-agent");
+    await expect(agentRail).toBeVisible();
+    await agentRail.getByRole("button", { name: /truth pass/i }).click();
+    await expect(agentRail).toContainText(/broadcast=false|nl=/i, {
+      timeout: 60_000,
+    });
+    await expect(agentRail).not.toContainText(/filled on mainnet|unhackable/i);
     // Positions stays the ledger — Netro must not replace other desk routes
     await page.goto("/desk/positions");
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();

@@ -448,3 +448,6 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 ## 2026-09-16 — Netro live Jupiter quote-only
 - Overview Netro quote rail: live ≤$1 Jupiter out UI amount + TTL/stale honesty. Inspect quote → /desk/acquire. Goal open: Bitquery/Pyth/Privy/Supabase.
+
+## 2026-09-16 — Netro live paper agent
+- Overview Netro rail: Truth pass + Quote inspect → `runDeskAgent` live spine. Never fills. Goal open for Empire keys.

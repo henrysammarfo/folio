@@ -4,9 +4,12 @@
  * Content + tokens are FOLIO stock-desk; no Binance/Netro brand clone.
  * Mounted on /desk overview only — never replaces Positions/Acquire routes.
  * Flow metrics prefer live /network matrix modes (never invent greens).
+ * Optional paper-agent rail: live Block 0 spine · never broadcasts.
  */
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
+import { runDeskAgent } from "@/lib/desk.functions";
 import {
   NETRO_LIVE_GATE_DEFAULTS,
   type NetroLiveGateLabels,
@@ -16,6 +19,8 @@ type Props = {
   multiplierLabel: string;
   /** Live Empire gate labels from /network matrix — defaults are fail-closed. */
   gates?: NetroLiveGateLabels;
+  /** Desk overview only — lab stage stays decorative. */
+  enablePaperAgent?: boolean;
 };
 
 const SHARE_TICKER = [
@@ -45,9 +50,15 @@ function delay(i: number): CSSProperties {
 export function NetroDensityCanvas({
   multiplierLabel,
   gates = NETRO_LIVE_GATE_DEFAULTS,
+  enablePaperAgent = false,
 }: Props) {
   const [clock, setClock] = useState({ h: "00", m: "00", s: "00" });
   const [railHeight, setRailHeight] = useState<number | undefined>();
+  const [agentPrompt, setAgentPrompt] = useState("truth AAPLx");
+  const [agentBusy, setAgentBusy] = useState(false);
+  const [agentReply, setAgentReply] = useState<string | null>(null);
+  const [agentMeta, setAgentMeta] = useState<string | null>(null);
+  const runAgent = useServerFn(runDeskAgent);
 
   useEffect(() => {
     const tick = () => {
@@ -97,6 +108,39 @@ export function NetroDensityCanvas({
       ro?.disconnect();
     };
   }, [multiplierLabel]);
+
+  async function submitPaperAgent(prompt: string) {
+    const trimmed = prompt.trim();
+    if (!enablePaperAgent || !trimmed || agentBusy) return;
+    setAgentBusy(true);
+    setAgentMeta(null);
+    try {
+      const res = await runAgent({ data: { prompt: trimmed } });
+      if (!res.ok) {
+        setAgentReply(
+          `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+        );
+        setAgentMeta("nl=failed · broadcast=false · spine unavailable");
+        return;
+      }
+      setAgentReply(res.data.reply);
+      const nl = res.data.nlExpansion ?? "off";
+      const note = res.data.nlExpansionNote
+        ? ` · ${res.data.nlExpansionNote}`
+        : "";
+      setAgentMeta(`nl=${nl}${note} · broadcast=false · paper spine`);
+    } catch (err) {
+      setAgentReply(err instanceof Error ? err.message : "Agent call failed");
+      setAgentMeta("nl=failed · broadcast=false");
+    } finally {
+      setAgentBusy(false);
+    }
+  }
+
+  function onAgentSubmit(e: FormEvent) {
+    e.preventDefault();
+    void submitPaperAgent(agentPrompt);
+  }
 
   const tickerLoop = [...SHARE_TICKER, ...SHARE_TICKER];
 
@@ -363,6 +407,7 @@ export function NetroDensityCanvas({
           <aside
             id="netro-ai-rail"
             className="netro-density-rail netro-density-item"
+            data-testid="netro-paper-agent"
             style={{
               ...delay(10),
               ...(railHeight
@@ -374,27 +419,80 @@ export function NetroDensityCanvas({
               <span className="netro-density-rail-avatar">F</span>
               <div>
                 <p className="netro-density-rail-title">FOLIO agent</p>
-                <p className="netro-density-rail-sub">Share truth · paper spine</p>
+                <p className="netro-density-rail-sub">
+                  {enablePaperAgent
+                    ? "Live spine · paper · no broadcast"
+                    : "Share truth · paper spine"}
+                </p>
               </div>
             </div>
             <div className="netro-density-rail-welcome">
               <p>
-                Ask about AAPLx multiplier, wash pressure, or credit LTV. Paper
-                agent keeps the live spine — never fills while broadcast is
-                paused.
+                {agentReply ??
+                  "Ask about AAPLx multiplier, wash pressure, or credit LTV. Paper agent keeps the live spine — never fills while broadcast is paused."}
               </p>
+              {agentMeta ? (
+                <small className="netro-density-rail-meta">{agentMeta}</small>
+              ) : null}
             </div>
-            <div className="netro-density-rail-actions">
-              <span>
-                Truth pass
-                <em>Wash · diverge</em>
-              </span>
-              <span>
-                24h strip
-                <em>Multiplier</em>
-              </span>
-            </div>
-            <div className="netro-density-rail-input">Ask about AAPLx…</div>
+            {enablePaperAgent ? (
+              <>
+                <div className="netro-density-rail-actions">
+                  <button
+                    type="button"
+                    disabled={agentBusy}
+                    onClick={() => {
+                      setAgentPrompt("truth AAPLx");
+                      void submitPaperAgent("truth AAPLx");
+                    }}
+                  >
+                    Truth pass
+                    <em>Live × · Scaled UI</em>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={agentBusy}
+                    onClick={() => {
+                      setAgentPrompt("quote 1 USDC AAPLx");
+                      void submitPaperAgent("quote 1 USDC AAPLx");
+                    }}
+                  >
+                    Quote inspect
+                    <em>≤$1 · no broadcast</em>
+                  </button>
+                </div>
+                <form
+                  className="netro-density-rail-form"
+                  onSubmit={onAgentSubmit}
+                >
+                  <input
+                    className="netro-density-rail-input"
+                    value={agentPrompt}
+                    onChange={(e) => setAgentPrompt(e.target.value)}
+                    placeholder="truth AAPLx · quote 1 USDC AAPLx"
+                    disabled={agentBusy}
+                    aria-label="Paper agent prompt"
+                  />
+                  <button type="submit" disabled={agentBusy || !agentPrompt.trim()}>
+                    {agentBusy ? "…" : "Run"}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <div className="netro-density-rail-actions">
+                  <span>
+                    Truth pass
+                    <em>Wash · diverge</em>
+                  </span>
+                  <span>
+                    24h strip
+                    <em>Multiplier</em>
+                  </span>
+                </div>
+                <div className="netro-density-rail-input">Ask about AAPLx…</div>
+              </>
+            )}
           </aside>
         </div>
       </div>

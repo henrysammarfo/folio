@@ -263,6 +263,7 @@ export function DeskShell({
               <NetroDensityCanvas
                 multiplierLabel={multiplierLabel}
                 gates={netroGates}
+                enablePaperAgent
               />
             </div>
           ) : (

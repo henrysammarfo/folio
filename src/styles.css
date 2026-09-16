@@ -365,12 +365,18 @@
 .netro-density-rail-avatar{width:2.15rem;height:2.15rem;border-radius:8px;background:#1c1c1c;color:#f4d014;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem}
 .netro-density-rail-title{margin:0;font-weight:700;font-size:1.05rem;line-height:1.1}
 .netro-density-rail-sub{margin:.15rem 0 0;font-size:.68rem;opacity:.7;font-weight:500}
-.netro-density-rail-welcome{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;min-height:0;padding:.35rem}
-.netro-density-rail-welcome p{margin:0;font-size:.95rem;line-height:1.35;font-weight:650;max-width:18rem}
+.netro-density-rail-welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:0;padding:.35rem;gap:.45rem;overflow:auto}
+.netro-density-rail-welcome p{margin:0;font-size:.88rem;line-height:1.35;font-weight:650;max-width:18rem}
+.netro-density-rail-meta{display:block;font-size:.62rem;opacity:.75;font-weight:500;max-width:18rem}
 .netro-density-rail-actions{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;flex-shrink:0}
-.netro-density-rail-actions span{background:#fafafa;border:1px solid #f3f4f6;border-radius:8px;padding:.65rem .7rem;font-size:.72rem;font-weight:600;display:flex;flex-direction:column;gap:.35rem;align-items:flex-start}
+.netro-density-rail-actions span,.netro-density-rail-actions button{background:#fafafa;border:1px solid #f3f4f6;border-radius:8px;padding:.65rem .7rem;font-size:.72rem;font-weight:600;display:flex;flex-direction:column;gap:.35rem;align-items:flex-start;text-align:left;cursor:pointer;color:inherit;font-family:inherit}
+.netro-density-rail-actions button:disabled{opacity:.55;cursor:wait}
 .netro-density-rail-actions em{font-style:normal;font-size:1.05rem;font-weight:600;color:#1c1c1c}
-.netro-density-rail-input{background:#fff;border-radius:10px;padding:.7rem .85rem;font-size:.8rem;color:#6b7280;flex-shrink:0}
+.netro-density-rail-form{display:flex;gap:.35rem;flex-shrink:0;align-items:stretch}
+.netro-density-rail-form .netro-density-rail-input{flex:1;min-width:0}
+.netro-density-rail-form button{border:0;border-radius:10px;background:#1c1c1c;color:#f4d014;font-weight:700;font-size:.75rem;padding:0 .85rem;cursor:pointer}
+.netro-density-rail-form button:disabled{opacity:.5;cursor:wait}
+.netro-density-rail-input{background:#fff;border-radius:10px;padding:.7rem .85rem;font-size:.8rem;color:#6b7280;flex-shrink:0;border:1px solid #f3f4f6;width:100%;box-sizing:border-box}
 .lab-21st-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin:0 0 1rem}
 .lab-21st-gallery-wide{grid-template-columns:repeat(2,1fr)}
 @media(max-width:800px){.lab-21st-gallery,.lab-21st-gallery-wide{grid-template-columns:1fr}}

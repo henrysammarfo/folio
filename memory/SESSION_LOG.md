@@ -461,3 +461,7 @@
 ## 2026-09-16 — Netro live Jupiter ≤$1 quote
 - Netro quote widget shows live Jupiter out amount for $1 USDC inspect (quote-only · no broadcast). CTAs link to /truth and /desk/acquire.
 - Demo script refreshed to 598/82 + Netro click path. Goal open for Empire keys.
+
+## 2026-09-16 — Netro paper-agent rail
+- Desk Netro yellow AI rail runs live paper-agent spine (truth / ≤$1 quote). NL optional via AgentRouter; always broadcast=false. Lab stage stays decorative.
+- Goal open: Bitquery/Pyth/Privy/Supabase + rotate Vercel token.

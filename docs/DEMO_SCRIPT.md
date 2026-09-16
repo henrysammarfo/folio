@@ -39,8 +39,9 @@ Paste pack: `docs/STOCKLANA_SUBMISSION.md` · Keys when ready: `docs/KEYS_LANDIN
 2. `/desk` — Netro overview: live × · wash fail-closed · Kamino LTV · Jupiter ≤$1 out → **Inspect quote**
 3. `/desk/acquire` — run checks; wash blocked without Bitquery (honest)
 4. `/truth?symbol=AAPLx` — multiplier + on-chain Scaled UI
-5. `/desk/settings` — bind watch wallet → `/desk/positions` qty
-6. `/network` — capability matrix badges
+5. `/desk` Netro agent rail — Truth pass (live ×) · never fills
+6. `/desk/settings` — bind watch wallet → `/desk/positions` qty
+7. `/network` — capability matrix badges
 
 ## Replay
 

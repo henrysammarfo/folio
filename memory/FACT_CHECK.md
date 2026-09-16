@@ -267,3 +267,6 @@ EOF
 
 ## 2026-09-16 — Netro Jupiter quote
 - Unit: live jupiterOutUi → `0.002994 AAPLx` + cached meta; never claims fill/broadcast.
+
+## 2026-09-16 — Netro paper agent
+- e2e: Truth pass on Netro rail surfaces `broadcast=false` / `nl=` meta; forbids fill/unhackable claims.
