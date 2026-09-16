@@ -225,3 +225,8 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 
 ## 2026-09-16 — Hermes Crypto.AAPLON/USD
 - Catalog search `hermes.pyth.network/v2/price_feeds?query=AAPLON`: id `e6734de88a83d9d2fb33072adab319004700aefd069653aba30ba9e3cac056f2`, symbol `Crypto.AAPLON/USD` (APPLE ONDO TOKENIZED STOCK).
+
+## 2026-09-16 — Netro desk surface + Vercel env recheck
+- Desk with `netro-density` preview: `deskHeading=0`, `stackedPanels=0`, `netro=1` (Playwright) — canvas replaces overview cards.
+- Home `/` hero preserved (brand stencil, no home-empire).
+- Vercel `env ls` reconfirmed lab/research keys present; Bitquery/Pyth/Privy/Supabase/Jupiter still absent (cannot invent).
