@@ -330,7 +330,7 @@ export function DeskShell({
         </nav>
         <div className="desk-sidebar-foot">
           <StatusBadge tone="blue">Quote-only</StatusBadge>
-          <p>Broadcast disabled</p>
+          <p>Broadcast paused</p>
           <p>
             <Link to="/lab/ui">
               {approvedUi ? `Lab UI (${approvedUi})` : "Approve lab UI"}
@@ -350,7 +350,7 @@ export function DeskShell({
         ) : null}
         <header className="desk-topbar">
           <div className="desk-search desk-search-policy" aria-label="Desk policy">
-            Quote-only · broadcast off · ≤~$1
+            Quote-only · broadcast paused · ≤~$1
           </div>
           <div className="desk-network">
             <span className="live-dot" /> Mainnet read · no broadcast

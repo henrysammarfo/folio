@@ -255,7 +255,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/watch wallet|watch-wallet/);
     expect(body).toMatch(/not.*privy|not privy|≠ privy|multi-tenant/);
     expect(body).toMatch(/auth fail-closed|keys missing|privy \+ supabase/);
-    expect(body).toMatch(/broadcast off|broadcast.*unavailable|broadcast disabled/);
+    expect(body).toMatch(/broadcast paused|broadcast off|broadcast.*unavailable|broadcast disabled/);
     expect(body).toMatch(
       /watch-wallet secret (set|missing)|secret (ready|missing)|folio_session_secret/,
     );

@@ -59,7 +59,7 @@ function Page() {
   return (
     <DeskShell eyebrow="Guarded acquisition" title="Build a quote">
       <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="quote-only">Broadcast disabled</ModeBadge>
+        <ModeBadge mode="quote-only">Broadcast paused</ModeBadge>
         <ModeBadge mode={data?.multiplier.ok ? data.multiplier.mode : "unavailable"}>
           {data?.multiplier.ok
             ? `Multiplier ${data.multiplier.data.currentMultiplier.toFixed(6)}×`
@@ -115,7 +115,7 @@ function Page() {
               </select>
             </label>
             <label>
-              Spend (USDC) · quote inspection ≤25 · broadcast off (≤~$1 budget)
+              Spend (USDC) · quote inspection ≤25 · broadcast paused (≤~$1 budget)
               <input
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}

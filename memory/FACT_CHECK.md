@@ -296,3 +296,6 @@ EOF
 
 ## 2026-09-16 — Netro yellow sample
 - Reference PNGs (`ref-netrobnb-desk.png`, `ref-netro-desk-final.png`) mode yellow ≈ RGB(244,208,20) = `#f4d014` (confirmed via PNG decode). Soft fills are intentional wash, not a different brand hue.
+
+## 2026-09-16 — Stocklana live 605/84/$121k
+- jina scrape https://hackathons.solana.com/hackathons/stocklana: **605** registered · **84** submissions · Prize Pool **$121,000** · deadline hero **SEP 25, 2026** · timeline submissions close Fri 18 Sep 16:00 ET (conservative).

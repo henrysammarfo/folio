@@ -1,6 +1,6 @@
 # FOLIO — Stocklana demo script (≤8 seconds spoken)
 
-**Live Stocklana (2026-09-16, hackathons.solana.com jina):** **598** registered · **82** submissions · prize **$121,000** · hero deadline **SEP 25, 2026**. Timeline body may still list **Fri 18 Sep** — treat **18 Sep as conservative**; re-check hero at submit.
+**Live Stocklana (2026-09-16, hackathons.solana.com jina):** **605** registered · **84** submissions · prize **$121,000** · hero deadline **SEP 25, 2026**. Timeline body may still list **Fri 18 Sep** — treat **18 Sep as conservative**; re-check hero at submit.
 
 Network: mainnet-read + quote-only · Budget: ≤~$1 · Broadcast: paused
 
@@ -24,7 +24,7 @@ Verified on this preview (SSO off):
 - `/desk` — Netro 12-col · live wash/Pyth/NestUSD/Kamino modes · live Kamino maxLTV · live Jupiter ≤$1 out amount (quote-only)
 - `/truth` ~1.003× Scaled UI + on-chain compare
 - `/lab/ui` — **21st MCP connected**
-- `/network` NestUSD / wash / Pyth / broadcast fail-closed until keyed
+- `/network` NestUSD / wash / Pyth fail-closed until keyed; **broadcast paused by policy** (not a missing key)
 - `/desk/settings` — **Watch-wallet secret set** · bind ready; Bitquery/Pyth/Privy/Supabase still missing
 - Watch-wallet bind live-verified (mainnet-read qty, not Privy auth)
 

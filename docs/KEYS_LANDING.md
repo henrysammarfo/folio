@@ -10,6 +10,8 @@ Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_
 
 Still need Henry paste (cannot invent): Bitquery · Pyth · Privy · Supabase · Jupiter (if gated). **Rotate any Vercel token pasted in chat.**
 
+Stocklana live 2026-09-16 (jina): **605** registered · **84** submissions · **$121k** · SEP 25.
+
 Lab MCP live-verified on branch preview `/lab/ui` (2026-09-16): **21st MCP connected**.
 
 ---

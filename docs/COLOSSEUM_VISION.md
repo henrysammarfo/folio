@@ -7,7 +7,7 @@
 FOLIO is the honest corporate-action prime desk for Solana xStocks — share counts you can trust, pools we refuse when dirty, credit without forced selling.
 
 ## Soft pitch (30 seconds)
-FOLIO buys the US stocks you want on Solana — keeps share counts honest after corporate actions, won’t route through shady pools, and lets you borrow cash without selling. Live mainnet reads. Broadcast off until we’re funded. No “unhackable” theater.
+FOLIO buys the US stocks you want on Solana — keeps share counts honest after corporate actions, won’t route through shady pools, and lets you borrow cash without selling. Live mainnet reads. Broadcast paused until we’re funded. No “unhackable” theater.
 
 ## Why we exist (problem → insight)
 | Layer | Broken today | FOLIO stance |

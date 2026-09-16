@@ -127,7 +127,7 @@ function Page() {
                   ? "Inspect (ephemeral)"
                   : "Wallet unbound"}
         </ModeBadge>
-        <ModeBadge mode="quote-only">Broadcast off</ModeBadge>
+        <ModeBadge mode="quote-only">Broadcast paused</ModeBadge>
       </div>
 
       <Panel

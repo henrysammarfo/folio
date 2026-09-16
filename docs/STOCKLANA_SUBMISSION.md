@@ -2,7 +2,7 @@
 
 Re-check live counts on https://hackathons.solana.com/hackathons/stocklana before final submit.
 
-**Live (2026-09-16, jina):** hackathons.solana.com **598** registered · **82** submissions · prize **$121,000** · hero deadline **SEP 25, 2026**. Timeline body may still list **Fri 18 Sep** — treat **18 Sep as conservative**. Demo: AAPLx ≈ **1.003269×** live · on-chain Scaled UI match · Netro desk approved.
+**Live (2026-09-16, jina):** hackathons.solana.com **605** registered · **84** submissions · prize **$121,000** · hero deadline **SEP 25, 2026**. Timeline body may still list **Fri 18 Sep** — treat **18 Sep as conservative**. Demo: AAPLx ≈ **1.003269×** live · on-chain Scaled UI match · Netro desk approved.
 
 ## Form fields (paste)
 

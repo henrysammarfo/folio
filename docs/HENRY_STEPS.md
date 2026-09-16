@@ -16,16 +16,13 @@ Demo (hard-refresh): https://folio-git-cursor-folio-netro-desk-approve-f1ec-team
    Tap **Pick** on one: `ink-ledger` · `ledger-mist` · `aurora-grid`
 3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: netro-density`) + screenshot.
 
-Until you reply in chat, premium chrome stays off production home/desk on purpose.
+**Status:** `FOLIO_APPROVED_LAB_UI=netro-density` is set on Vercel (all targets). Production `/desk` mounts Netro 12-col; home Aionis hero stays preserved. Local **Pick** remains opt-in preview only.
 
-**After your chat reply**, the agent sets Vercel env (then redeploys):
+Optional shader env (still unset):
 
 | Name | Example |
 |------|--------|
-| `FOLIO_APPROVED_LAB_UI` | `netro-density` |
-| `FOLIO_APPROVED_LAB_SHADER` | `ink-ledger` (optional) |
-
-Production `/desk` then mounts that chrome (yellow banner · Netro 12-col when UI=`netro-density`). Local **Pick** alone never merges.
+| `FOLIO_APPROVED_LAB_SHADER` | `ink-ledger` |
 
 Refs extracted: **Aionis** brand-plane (production `/` already mirrors composition) · **NetroBNB** 12-col desk density (lab + desk preview) · live **21st.dev** MCP (Plasma 24346 + Trade Journal 27124 pinned).
 
@@ -53,7 +50,7 @@ What this unlocked: watch-wallet bind on the public demo. Broadcast stays paused
 
 ## Step 2 — Bitquery (DO THIS NEXT)
 
-Stocklana live 2026-09-16: **598** regs · **82** subs · **$121k** · deadline SEP 25.
+Stocklana live 2026-09-16 (jina re-scrape): **605** regs · **84** subs · **$121k** · deadline SEP 25 (timeline still Fri 18 Sep — conservative).
 
 
 Only when I say so. Needed for live wash tape (fail-closed until then).

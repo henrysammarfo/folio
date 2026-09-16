@@ -57,8 +57,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `/lab/shaders`: live WebGL Plasma (glacial ink); shaders.com keyed but API gated (HTTP 500).
 - Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; **Vercel** now has `API_KEY_21ST`, `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY` (all targets). Still missing: Bitquery · Jupiter · Pyth · Privy · Supabase.
 - Desk opt-in lab preview mounts live WebGL Plasma for shader / cinematic picks (Exit clears; not production merge).
-- Stocklana live 2026-09-16: **598** regs · **82** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
-- Netro overview: live Empire gates + ≤$1 Jupiter quote + paper-agent + **inspect wallet** + **ownership qty strip** + **Empire keys readiness** (Bitquery/Pyth/Privy/Supabase paste CTA). **SSR approvals seed**. Truth strip illustrative + live Scaled UI. Home hero preserved. Stocklana **598/82/$121k**.
+- Stocklana live 2026-09-16: **605** regs · **84** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
+- Netro overview: live Empire gates + ≤$1 Jupiter quote + paper-agent + **inspect wallet** + **ownership qty strip** + **Empire keys readiness** (Bitquery/Pyth/Privy/Supabase paste CTA). **SSR approvals seed**. Truth strip illustrative + live Scaled UI. Home hero preserved. Stocklana **605/84/$121k**.
 - Vercel: `FOLIO_APPROVED_LAB_UI=netro-density` set. Still missing Empire keys (Bitquery/Pyth/Privy/Supabase).
 
 ## Live deltas (do not regress)
@@ -465,3 +465,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `/desk` loader now prefetches truth + network + credit + acquire + positions so Netro first paint shows live × / matrix / LTV / quote (not “live pending” defaults).
 - Broadcast Settings badge says **Paused** (not Unavailable). Lab approve panel shows Production · netro-density when env set. Settings hash scroll + session panel opens when Privy+Supabase present.
 - Empire keys still empty on Vercel — goal open.
+
+## 2026-09-16 — Stocklana 605/84 + Broadcast Paused consistency
+- Live jina scrape: **605** registered · **84** submissions · **$121k** · SEP 25.
+- Docs + desk UI: Broadcast **Paused** (policy), not “off/disabled/unavailable”. Step 0 lab approve marked done. Goal open for Empire keys.

@@ -229,7 +229,7 @@ export function NetroDensityCanvas({
 
       <header className="netro-density-title netro-density-item" style={delay(1)}>
         <h3>Share truth desk</h3>
-        <span>Mainnet-read · quote-only · broadcast off</span>
+        <span>Mainnet-read · quote-only · broadcast paused</span>
       </header>
 
       {/* Share ticker — NetroBNB CryptoTickerCard geometry, FOLIO xStocks */}

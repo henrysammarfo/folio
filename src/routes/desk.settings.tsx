@@ -134,7 +134,7 @@ function Page() {
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Mainnet read</ModeBadge>
         <ModeBadge mode={data?.networkPolicy.broadcast ? "mainnet-read" : "unavailable"}>
-          {data?.networkPolicy.broadcast ? "Broadcast armed" : "Broadcast off"}
+          {data?.networkPolicy.broadcast ? "Broadcast armed" : "Broadcast paused"}
         </ModeBadge>
         <ModeBadge
           mode={

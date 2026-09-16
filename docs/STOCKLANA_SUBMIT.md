@@ -9,8 +9,8 @@ Budget: ≤~$1 · Broadcast: paused
 
 Source: https://hackathons.solana.com/hackathons/stocklana
 
-- Registered: **596**
-- Submissions: **81**
+- Registered: **605**
+- Submissions: **84**
 - Prize pool hero: **$121,000** (Foundation main track $100k + bounty tracks)
 - Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)** — confirm which the form uses at submit
 - Bounty note: Pyth market-data track — FOLIO diverge uses Equity.US.* vs Jupiter; Crypto.xStock/USD + Crypto.AAPLON/USD (Ondo) secondary on `/truth`
@@ -56,23 +56,14 @@ See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readines
 | Optional `JUPITER_API_KEY` | If quote/price becomes gated |
 | `SOLANA_RPC_URL` — **set on Vercel** (public mainnet) | Scaled UI + wallet reads (fallback still labeled) |
 
-## UI approve gate (reply with one id)
+## UI approve gate ✅ DONE
 
-Step-by-step for Henry (keys + lab): `docs/HENRY_STEPS.md` · Vision/interview: `docs/COLOSSEUM_VISION.md`
+`FOLIO_APPROVED_LAB_UI=netro-density` is live on Vercel. Production `/desk` mounts Netro 12-col; home **Aionis hero stays preserved**. Lab `/lab/ui` · `/lab/shaders` remain for optional shader pick / local preview.
 
-Live home: brand-first FOLIO hero (footer below fold) · topbar Lab UI / Shaders.
+Step-by-step Empire keys: `docs/HENRY_STEPS.md` · Vision: `docs/COLOSSEUM_VISION.md`
 
-Shaders (`/lab/shaders`):
-- `ink-ledger`
-- `ledger-mist`
-- `aurora-grid`
-
-UI (`/lab/ui`) — extracted from NetroBNB + Aionis + live 21st.dev:
-- `netro-density`
-- `aionis-brand-plane`
-- `trade-journal-21st`
-
-Production hero + desk chrome stay frozen until Henry names an id in chat.
+Shaders (optional): `ink-ledger` · `ledger-mist` · `aurora-grid`  
+UI ids: `netro-density` (production) · `aionis-brand-plane` · `cinematic-landing-21st` · `trade-journal-21st`
 
 ## After Stocklana
 

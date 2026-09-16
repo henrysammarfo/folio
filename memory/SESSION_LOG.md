@@ -495,3 +495,6 @@
 
 ## 2026-09-16 — SSR Netro spine + honesty labels
 - Seeded desk loader with live Block 0 bundles for Netro SSR; Paused broadcast label; approve-panel production state; e2e Netro/home updates. Goal open for Empire key paste.
+
+## 2026-09-16 — Stocklana honesty pack 605/84
+- Refreshed submission/Henry/demo docs to live 605/84; Broadcast Paused label consistency across desk. Empire keys still need Henry paste. Goal open.
