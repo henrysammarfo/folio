@@ -110,12 +110,13 @@ function Page() {
     }
   }
 
-  /** After mint/clear/tenant/watch — drop stale paper positions/credit so wallet qty lights up. */
+  /** After mint/clear/tenant/watch — drop stale paper positions/credit/activity so wallet qty + CA prefs light up. */
   async function invalidateSessionScopedBundles() {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["session-bundle"] }),
       queryClient.invalidateQueries({ queryKey: ["positions-bundle"] }),
       queryClient.invalidateQueries({ queryKey: ["credit-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["activity-bundle"] }),
       queryClient.invalidateQueries({ queryKey: ["empire-readiness"] }),
     ]);
   }
