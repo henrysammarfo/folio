@@ -31,13 +31,13 @@ export const Route = createFileRoute("/lab/ui")({
       configured
         ? searchTwentyFirstComponents(
             "trade journal table market snapshot desk dashboard",
-            6,
+            8,
           )
         : Promise.resolve({ ok: false as const, reason: "API_KEY_21ST missing" }),
       configured
         ? searchTwentyFirstComponents(
-            "cinematic landing hero financial dashboard",
-            6,
+            "cinematic landing hero plasma financial",
+            8,
           )
         : Promise.resolve({ ok: false as const, reason: "API_KEY_21ST missing" }),
     ]);
@@ -81,7 +81,7 @@ export const Route = createFileRoute("/lab/ui")({
       twentyFirstNote: note,
       cinematicHero,
       tradeJournal,
-      gallery: hits.slice(0, 6),
+      gallery: hits.slice(0, 8),
       multiplierLabel,
     };
   },
@@ -93,54 +93,68 @@ function Page() {
 
   return (
     <PublicShell
-      eyebrow="Approve gate · refs extracted + 21st MCP"
-      title="UI candidates from NetroBNB + Aionis + 21st.dev."
-      intro="Real extracted chrome — not postcard fakes. Pick one desk chrome ID, then reply in Cursor chat. Production stays frozen until you approve."
+      compactIntro
+      eyebrow="Approve gate · live extracts"
+      title="Look at the stages. Then pick."
+      intro="Cloned Aionis + NetroBNB, screened side-by-side, wired to 21st MCP. Visuals first — production stays frozen until your chat reply."
     >
-      <p className="mb-4 text-sm opacity-80">
-        21st:{" "}
+      <div className="lab-status-row">
         <StatusBadge tone={data.twentyFirstConfigured ? "green" : "amber"}>
-          {data.twentyFirstConfigured ? "API_KEY_21ST · MCP connected" : "key missing"}
-        </StatusBadge>{" "}
-        · {data.twentyFirstNote}
-      </p>
+          {data.twentyFirstConfigured ? "21st MCP connected" : "API_KEY_21ST missing"}
+        </StatusBadge>
+        <span>{data.twentyFirstNote}</span>
+      </div>
 
-      <LabApprovePanel kind="ui" ids={[...LAB_UI_IDS]} />
-
-      <div className="lab-grid lab-grid-tall">
-        <article className="lab-card lab-card-span">
-          <StatusBadge tone="amber">aionis-brand-plane</StatusBadge>
-          <h3>Aionis brand plane → production `/`</h3>
-          <div className="lab-aionis-stage lab-aionis-stage-tall">
+      {/* Visual stages FIRST — not buried under approve copy */}
+      <div className="lab-stage-stack">
+        <section className="lab-stage" id="stage-aionis">
+          <header className="lab-stage-head">
+            <StatusBadge tone="amber">aionis-brand-plane</StatusBadge>
+            <h3>Aionis brand plane → production `/`</h3>
+            <p>
+              Live extract: luminous stencil owns the lower half. No headline in
+              the void. Horizon chrome at ~52% (time + scroll only).
+            </p>
+          </header>
+          <div className="lab-aionis-stage lab-aionis-stage-viewport">
             <FolioLiquidStencil />
+            <div className="lab-aionis-horizon">
+              <span>Live extract</span>
+              <span>SCROLL ↓</span>
+            </div>
           </div>
-          <p className="text-sm opacity-80">
-            Extracted from manovHacksaw/aionis-app/landing: brand stencil owns the lower
-            half (xMidYMax + y≈465), horizon chrome at bottom:55% (time + scroll only),
-            supporting copy below the fold. Production home now mirrors that — not a
-            midband stacked on the letters.
-          </p>
-        </article>
+        </section>
 
-        <article className="lab-card lab-card-span">
-          <StatusBadge tone="amber">netro-density</StatusBadge>
-          <h3>NetroBNB desk density</h3>
+        <section className="lab-stage" id="stage-netro">
+          <header className="lab-stage-head">
+            <StatusBadge tone="amber">netro-density</StatusBadge>
+            <h3>NetroBNB 12-col desk density</h3>
+            <p>
+              Extracted from AbdullahBalfaqih/NetroBNB: grey canvas, yellow
+              analysis clock, dark market strip, yellow AI rail — FOLIO truth
+              tokens only.
+            </p>
+          </header>
           <NetroDensityCanvas multiplierLabel={data.multiplierLabel} />
-          <p className="text-sm opacity-80">
-            Extracted from AbdullahBalfaqih/NetroBNB: grey #E5E7EB canvas, 12-col bento,
-            soft figma shadows, yellow analysis rail + live clock — FOLIO truth tokens
-            only (no Netro/Binance brand).
-          </p>
-        </article>
+        </section>
 
-        <article className="lab-card lab-card-span">
-          <StatusBadge tone={data.twentyFirstConfigured ? "green" : "amber"}>
-            cinematic-landing-21st
-          </StatusBadge>
-          <h3>{data.cinematicHero?.name ?? "21st cinematic landing"}</h3>
+        <section className="lab-stage" id="stage-21st-hero">
+          <header className="lab-stage-head">
+            <StatusBadge tone={data.twentyFirstConfigured ? "green" : "amber"}>
+              cinematic-landing-21st
+            </StatusBadge>
+            <h3>{data.cinematicHero?.name ?? "21st cinematic landing"}</h3>
+            <p>
+              {data.cinematicHero
+                ? `Live 21st.dev MCP · id ${data.cinematicHero.id}${
+                    data.cinematicHero.author ? ` · @${data.cinematicHero.author}` : ""
+                  }. Reference catalog — FOLIO production stays on the Aionis brand-plane extract.`
+                : "21st MCP unavailable — set API_KEY_21ST on Vercel for live previews."}
+            </p>
+          </header>
           {data.cinematicHero?.previewUrl ? (
             <img
-              className="lab-preview-frame lab-preview-frame-lg"
+              className="lab-preview-frame lab-preview-frame-hero"
               src={data.cinematicHero.previewUrl}
               alt={`${data.cinematicHero.name} preview from 21st.dev`}
               loading="lazy"
@@ -153,34 +167,28 @@ function Page() {
               </div>
             </div>
           )}
-          <p className="text-sm opacity-80">
-            {data.cinematicHero
-              ? `Live 21st.dev MCP · id ${data.cinematicHero.id}${
-                  data.cinematicHero.author ? ` · @${data.cinematicHero.author}` : ""
-                }. Reference only — FOLIO production uses the Aionis brand-plane extract, not a SaaS card hero clone.`
-              : "21st MCP unavailable — set API_KEY_21ST on Vercel for live previews."}
-          </p>
-        </article>
+        </section>
 
-        <article className="lab-card lab-card-span">
-          <StatusBadge tone="amber">trade-journal-21st</StatusBadge>
-          <h3>
-            {data.tradeJournal?.name ?? "Trade journal"} · FOLIO honesty blotter
-          </h3>
+        <section className="lab-stage" id="stage-journal">
+          <header className="lab-stage-head">
+            <StatusBadge tone="amber">trade-journal-21st</StatusBadge>
+            <h3>
+              {data.tradeJournal?.name ?? "Trade journal"} · FOLIO honesty blotter
+            </h3>
+            <p>
+              {data.tradeJournal
+                ? `Adapted from 21st.dev MCP id ${data.tradeJournal.id}${
+                    data.tradeJournal.author ? ` · @${data.tradeJournal.author}` : ""
+                  } — paper honesty rows only.`
+                : "21st MCP unavailable — blotter still shows local honesty rows."}
+            </p>
+          </header>
           <FolioTradeJournalLab />
-          {data.tradeJournal?.previewUrl ? (
-            <img
-              className="lab-preview-frame lab-preview-frame-lg"
-              src={data.tradeJournal.previewUrl}
-              alt={`${data.tradeJournal.name} upstream preview from 21st.dev`}
-              loading="lazy"
-            />
-          ) : null}
-          {data.gallery.length > 1 ? (
-            <div className="lab-21st-gallery">
+          {data.gallery.length > 0 ? (
+            <div className="lab-21st-gallery lab-21st-gallery-wide">
               {data.gallery
                 .filter((g) => g.previewUrl)
-                .slice(0, 4)
+                .slice(0, 6)
                 .map((g) => (
                   <figure key={String(g.id)}>
                     <img src={g.previewUrl!} alt="" loading="lazy" />
@@ -192,17 +200,13 @@ function Page() {
                 ))}
             </div>
           ) : null}
-          <p className="text-sm opacity-80">
-            {data.tradeJournal
-              ? `Adapted from 21st.dev MCP get_component id ${data.tradeJournal.id}${
-                  data.tradeJournal.author ? ` · @${data.tradeJournal.author}` : ""
-                } — FOLIO rows are paper honesty (Open / Blocked / Quoted), never invent fills. Merge still needs your approve.`
-              : "21st MCP unavailable — blotter still shows local honesty rows."}
-          </p>
-        </article>
+        </section>
       </div>
+
+      <LabApprovePanel kind="ui" ids={[...LAB_UI_IDS]} />
+
       <p className="mt-6 text-sm opacity-80">
-        Refs:{" "}
+        Refs screened live:{" "}
         <a href="https://github.com/AbdullahBalfaqih/NetroBNB" className="underline">
           NetroBNB
         </a>{" "}

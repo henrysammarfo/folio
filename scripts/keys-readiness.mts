@@ -36,6 +36,12 @@ const rows: Array<{ name: string; ok: boolean; note: string; required?: boolean 
     required: false,
   },
   {
+    name: "JUPITER_API_KEY",
+    ok: Boolean(process.env["JUPITER_API_KEY"]?.trim()),
+    note: "optional — reduces 429 on price/quote; public path works without it",
+    required: false,
+  },
+  {
     name: "PRIVY_APP_ID + PRIVY_APP_SECRET",
     ok: Boolean(
       process.env["PRIVY_APP_ID"]?.trim() && process.env["PRIVY_APP_SECRET"]?.trim(),

@@ -20,7 +20,15 @@ Until you reply in chat, premium chrome stays off home/desk on purpose.
 Refs extracted: **Aionis** brand-plane (production `/` already mirrors composition) · **NetroBNB** 12-col desk density · live **21st.dev** MCP previews.
 Opt-in **Preview on desk** paints stronger Netro grey/yellow chrome, Aionis dark plane, or cinematic/trade-journal desk skin (session-only · Exit anytime).
 
-For live 21st MCP on the Vercel preview, set `API_KEY_21ST` (and optional `SHADERS_API_KEY`) on the Vercel project — local `.env` already has them. **Live check 2026-09-16:** preview `/lab/ui` still shows `API_KEY_21ST missing` until that Vercel env lands.
+### Optional before Step 2 — Vercel lab keys
+Set on the Vercel project (Preview + Production) so `/lab/ui` is live on the public demo (local `.env` already has them):
+
+| Name | Why |
+|------|-----|
+| `API_KEY_21ST` | 21st.dev MCP catalog + previews on `/lab/ui` |
+| `SHADERS_API_KEY` | optional — shaders.com probe (often Clerk 500; WebGL still ships from 21st) |
+
+**Live check 2026-09-16:** preview `/lab/ui` still shows `API_KEY_21ST missing` until that Vercel env lands.
 
 ---
 

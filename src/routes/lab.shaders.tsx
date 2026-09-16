@@ -72,60 +72,59 @@ function Page() {
 
   return (
     <PublicShell
+      compactIntro
       eyebrow="Approve gate · 21st WebGL + shaders.com probe"
-      title="Shader studies — connected for real."
-      intro="Live WebGL from 21st.dev MCP (get_component id 24346, FOLIO palettes). shaders.com key is probed honestly — Clerk still gates their REST. Pick one, then reply in chat."
+      title="Look at the WebGL. Then pick."
+      intro="Live 21st.dev Plasma (id 24346) retinted to FOLIO ink. shaders.com key probed honestly — Clerk still gates REST. Visuals first."
     >
-      <p className="mb-4 text-sm opacity-80">
-        Shaders.com:{" "}
+      <div className="lab-status-row">
         <StatusBadge tone={status.keyPresent ? (status.reachable ? "green" : "amber") : "amber"}>
           {status.keyPresent
             ? status.reachable
-              ? "key + API ok"
-              : "key set · API gated"
+              ? "shaders.com ok"
+              : "shaders.com keyed · API gated"
             : "SHADERS_API_KEY missing"}
-        </StatusBadge>{" "}
-        · {status.detail}
-      </p>
-      <p className="mb-4 text-sm opacity-80">
-        21st:{" "}
+        </StatusBadge>
         <StatusBadge tone={data.twentyFirstConfigured ? "green" : "amber"}>
-          {data.twentyFirstConfigured ? "MCP + WebGL wired" : "key missing"}
-        </StatusBadge>{" "}
-        · {data.shaderNote}
-      </p>
-
-      <LabApprovePanel kind="shaders" ids={[...LAB_SHADER_IDS]} />
-
-      <div className="lab-grid">
-        {CANDIDATES.map((c) => (
-          <article key={c.id} className="lab-card">
-            <StatusBadge tone="amber">{c.id}</StatusBadge>
-            <h3>{c.title}</h3>
-            <div className="lab-swatch lab-swatch-live" aria-hidden>
-              <ShaderBackground variant={c.id} className="lab-swatch-canvas" />
-            </div>
-            <p className="text-sm opacity-80">{c.note}</p>
-          </article>
-        ))}
+          {data.twentyFirstConfigured ? "21st MCP + WebGL wired" : "API_KEY_21ST missing"}
+        </StatusBadge>
+        <span>{status.detail}</span>
+        <span>· {data.shaderNote}</span>
       </div>
 
-      {data.shaderHits.length > 0 ? (
-        <div className="lab-21st-gallery lab-21st-gallery-wide mt-8">
-          {data.shaderHits
-            .filter((h) => h.previewUrl)
-            .slice(0, 4)
-            .map((h) => (
-              <figure key={String(h.id)}>
-                <img src={h.previewUrl!} alt="" loading="lazy" />
-                <figcaption>
-                  21st · {h.name}
-                  {h.author ? ` · @${h.author}` : ""} · id {h.id}
-                </figcaption>
-              </figure>
-            ))}
+      <div className="lab-stage-stack">
+        <div className="lab-grid" style={{ marginTop: 0 }}>
+          {CANDIDATES.map((c) => (
+            <article key={c.id} className="lab-card">
+              <StatusBadge tone="amber">{c.id}</StatusBadge>
+              <h3>{c.title}</h3>
+              <div className="lab-swatch lab-swatch-live" aria-hidden>
+                <ShaderBackground variant={c.id} className="lab-swatch-canvas" />
+              </div>
+              <p className="text-sm opacity-80">{c.note}</p>
+            </article>
+          ))}
         </div>
-      ) : null}
+
+        {data.shaderHits.length > 0 ? (
+          <div className="lab-21st-gallery lab-21st-gallery-wide">
+            {data.shaderHits
+              .filter((h) => h.previewUrl)
+              .slice(0, 4)
+              .map((h) => (
+                <figure key={String(h.id)}>
+                  <img src={h.previewUrl!} alt="" loading="lazy" />
+                  <figcaption>
+                    21st · {h.name}
+                    {h.author ? ` · @${h.author}` : ""} · id {h.id}
+                  </figcaption>
+                </figure>
+              ))}
+          </div>
+        ) : null}
+      </div>
+
+      <LabApprovePanel kind="shaders" ids={[...LAB_SHADER_IDS]} />
 
       <p className="mt-6 text-sm opacity-80">
         Key present does not invent shaders.com frames — we label Clerk/API failures

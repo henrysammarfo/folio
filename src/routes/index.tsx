@@ -58,12 +58,12 @@ function Home() {
       <div className="home-noise" aria-hidden />
 
       {/*
-        Aionis landing composition (extracted):
+        Aionis landing composition (cloned + screened vs manovHacksaw/aionis-app/landing):
         1) full-bleed black plane
-        2) brand stencil owns the lower half (letters ARE the hero)
-        3) top bar = mark + primary CTA only
-        4) thin horizon chrome floats just ABOVE the letterforms (bottom:55%)
-        5) supporting copy lives below the fold — never stacked on the stencil
+        2) brand stencil IS the hero — luminous letters own the lower half
+        3) top bar = mark + primary CTA only (no competing headline in the void)
+        4) horizon chrome floats just ABOVE the letterforms (bottom:55%)
+        5) supporting copy + CTAs live below the fold
       */}
       <section className="home-viewport" aria-label="FOLIO hero">
         <FolioLiquidStencil />
@@ -80,12 +80,6 @@ function Home() {
               </Link>
             </div>
           </header>
-
-          {/* One line only — upper void, never sitting on the letterforms */}
-          <main className="home-hero-void">
-            <p className="home-hero-tagline">Own the economic truth.</p>
-            <p className="home-copy-tight">{liveLine}</p>
-          </main>
         </div>
 
         <div className="home-horizon" aria-label="Status">
@@ -101,10 +95,10 @@ function Home() {
 
       <section className="home-below" aria-label="What FOLIO does">
         <div className="home-below-copy">
-          <h2>Honest stock desk on Solana.</h2>
+          <h2>Own the economic truth.</h2>
           <p>
-            Corporate-action share truth before trade. Broadcast stays off until
-            funded. Premium chrome stays on the lab until you approve.
+            {liveLine} Corporate-action share truth before trade. Broadcast stays
+            off until funded. Premium chrome stays on the lab until you approve.
           </p>
           <div className="home-cta-row">
             <Link to="/desk" className="home-cta">

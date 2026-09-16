@@ -6,8 +6,8 @@
  * Used with SUPABASE_ANON_KEY so PostgREST RLS (auth.jwt() ->> 'sub') authorizes.
  */
 
-import { createHmac } from "node:crypto";
 import { errResult, okResult, type AdapterResult } from "../adapters/types";
+import { hmacSha256Base64Url } from "./node-hmac";
 
 export type SupabaseUserJwt = {
   token: string;
@@ -72,7 +72,7 @@ export function mintSupabaseUserJwt(
     exp,
   });
   const data = `${header}.${payload}`;
-  const sig = createHmac("sha256", secret).update(data).digest("base64url");
+  const sig = hmacSha256Base64Url(secret, data);
   return okResult("mainnet-read", source, {
     token: `${data}.${sig}`,
     expiresAt: new Date(exp * 1000).toISOString(),

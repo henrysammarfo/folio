@@ -79,7 +79,7 @@ export function LabApprovePanel({
       </div>
       <h2 className="lab-approve-title">How to approve (one minute)</h2>
       <ol className="lab-approve-steps">
-        <li>Look at the candidates below.</li>
+        <li>Look at the visual stages above.</li>
         <li>
           Tap <b>Pick</b> on <b>one</b> id
           {kind === "ui" ? " for desk chrome" : " for backdrop only"}.
@@ -128,7 +128,15 @@ export function LabApprovePanel({
             <Link
               to="/desk"
               className="lab-preview-link"
-              onClick={() => startLabPreview()}
+              onClick={() => {
+                startLabPreview();
+                if (picked && kind === "ui" && isLabUiId(picked)) {
+                  writeLabUiPick(picked);
+                }
+                if (picked && kind === "shaders" && isLabShaderId(picked)) {
+                  writeLabShaderPick(picked);
+                }
+              }}
             >
               Preview on desk (opt-in · not merged)
             </Link>

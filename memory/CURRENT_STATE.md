@@ -367,3 +367,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Prime desk SSR-prefetches `getNetworkBundle` and paints **Live Empire gates** (wash/Pyth/NestUSD/multi-tenant/broadcast) — operational honesty, not a lab chrome merge.
 - Stocklana live (jina): **590** registered / **79** submissions / **$121k**. NestUSD research still unverified (Tavily 432 / TinyFish 404).
 - Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · Vercel `API_KEY_21ST` · funded broadcast.
+
+## 2026-09-16 — Acquire gate grid + Jupiter key honesty
+- Acquire Checks step shows denser truth/wash/quote/Pyth/canReview gate grid (same honesty language as desk).
+- `JUPITER_API_KEY` optional in keys-readiness + smoke baseline. Paper agent live spine OK; AgentRouter NL WAF-skipped (honest).
+- Still blocked: Henry Pick · Empire keys · Vercel `API_KEY_21ST` · funded broadcast.

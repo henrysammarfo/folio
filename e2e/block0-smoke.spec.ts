@@ -29,22 +29,27 @@ test.describe("FOLIO Block 0 smoke", () => {
   });
 
   test("acquire stays fail-closed on wash without Bitquery", async ({ page }) => {
-    await page.goto("/desk/acquire");
+    await page.goto("/desk/acquire", { waitUntil: "networkidle" });
     await expect(page.getByText(/acquire|quote|wash|FOLIO/i).first()).toBeVisible({
       timeout: 30_000,
     });
 
     // Enter checks step — wait for named BITQUERY env (not the step-1 Wash badge)
-    const step1 = page.getByRole("button", { name: /^Continue$/i }).first();
+    const step1 = page.getByTestId("acquire-continue");
     await expect(step1).toBeEnabled({ timeout: 15_000 });
     await step1.click();
+    await expect(page.getByText(/Policy checks/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
     await expect(page.getByText(/BITQUERY_API_KEY/i).first()).toBeVisible({
       timeout: 30_000,
     });
+    await expect(page.getByText(/canReview/i).first()).toBeVisible();
 
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/wash|fail|blocked|unavailable|bitquery|quote|check/);
     expect(body).toMatch(/bitquery_api_key/);
+    expect(body).toMatch(/fail-closed|canreview|blocked/);
 
     // Under wash fail-closed, advancing to review must be blocked
     const advance = page.getByRole("button", { name: /continue|blocked|fail-closed/i }).first();
@@ -107,8 +112,18 @@ test.describe("FOLIO Block 0 smoke", () => {
 
     // Aionis brand-plane preview path
     await page.goto("/lab/ui");
-    await page.getByRole("button", { name: /pick candidate aionis-brand-plane/i }).click();
+    const pickAionis = page.getByRole("button", {
+      name: /pick candidate aionis-brand-plane/i,
+    });
+    await pickAionis.scrollIntoViewIfNeeded();
+    await pickAionis.click();
+    await expect(pickAionis).toHaveAttribute("aria-pressed", "true", {
+      timeout: 10_000,
+    });
     await page.getByRole("link", { name: /preview on desk/i }).click();
+    await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
     await expect(page.locator("[data-lab-ui='aionis-brand-plane']")).toHaveCount(1);
     await page.getByRole("button", { name: /exit preview/i }).click();
 
@@ -174,17 +189,16 @@ test.describe("FOLIO Block 0 smoke", () => {
   test("acquire surfaces strict prefs scope without inventing a session", async ({
     page,
   }) => {
-    await page.goto("/desk/acquire");
+    await page.goto("/desk/acquire", { waitUntil: "networkidle" });
     await expect(page.getByText(/acquire|quote|wash|FOLIO/i).first()).toBeVisible({
       timeout: 30_000,
     });
-    const step1 = page.getByRole("button", { name: /^Continue$/i }).first();
-    if (await step1.isEnabled().catch(() => false)) {
-      await step1.click();
-      await page.getByText(/wash|checks|policy|gate|fail-closed/i).first().waitFor({
-        timeout: 30_000,
-      });
-    }
+    const step1 = page.getByTestId("acquire-continue");
+    await expect(step1).toBeEnabled({ timeout: 15_000 });
+    await step1.click();
+    await expect(page.getByText(/Policy checks/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/strict prefs · no session|strict fail-closed|no session/);
     expect(body).toMatch(/bitquery_api_key/);

@@ -89,24 +89,28 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
 
           <div className="netro-density-market">
             <div className="netro-density-market-head">
-              <strong>AAPLx</strong>
-              <span>Share truth strip</span>
+              <strong>AAPLx / USDC</strong>
+              <span>Share truth strip · mainnet-read</span>
               <em>{multiplierLabel}</em>
             </div>
-            <div className="netro-density-chart" role="presentation">
-              <svg viewBox="0 0 640 160" preserveAspectRatio="none">
-                <polyline
-                  fill="none"
-                  stroke="#1c1c1c"
-                  strokeWidth="2"
-                  points="0,110 40,104 80,98 120,100 160,86 200,90 240,72 280,78 320,60 360,68 400,52 440,58 480,44 520,50 560,38 600,42 640,30"
-                />
+            <div className="netro-density-chart netro-density-chart-dark" role="presentation">
+              <div className="netro-density-chart-meta">
+                <b>Truth strip</b>
+                <span>15m · wash fail-closed</span>
+              </div>
+              <svg viewBox="0 0 640 180" preserveAspectRatio="none">
                 <polyline
                   fill="none"
                   stroke="#f4d014"
-                  strokeWidth="2"
+                  strokeWidth="2.2"
+                  points="0,140 40,132 80,128 120,118 160,122 200,108 240,98 280,104 320,86 360,92 400,74 440,80 480,62 520,70 560,52 600,58 640,44"
+                />
+                <polyline
+                  fill="none"
+                  stroke="rgba(255,255,255,.35)"
+                  strokeWidth="1.5"
                   strokeDasharray="4 4"
-                  points="0,120 80,118 160,116 240,114 320,112 400,110 480,108 560,106 640,104"
+                  points="0,150 80,148 160,146 240,144 320,142 400,140 480,138 560,136 640,134"
                 />
               </svg>
               <div className="netro-density-chart-foot">

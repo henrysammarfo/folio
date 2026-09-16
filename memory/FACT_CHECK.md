@@ -170,6 +170,13 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Stocklana registered **588** / submissions **79** / prize **$121,000** | SUPERSEDED by 590/79 | prior scrape | 2026-09-16 |
 | Stocklana registered **590** / submissions **79** / prize **$121,000** | CONFIRMED live | hackathons.solana.com via jina (Registered 590 · Submissions 79 · Prize Pool $121,000) | 2026-09-16 |
 | NestUSD public capacity endpoint (Tavily/TinyFish this run) | UNAVAILABLE | Tavily 432 plan limit; TinyFish search 404 path; NestUSD stays fail-closed | 2026-09-16 |
+| Paper agent live spine AAPLx ≈1.003269 | CONFIRMED | runPaperAgent truth AAPLx; nlExpansion=failed WAF/HTML | 2026-09-16 |
+| AgentRouter NL expansion from this egress | FAIL-CLOSED labeled | WAF/HTML non-JSON — spine kept | 2026-09-16 |
 | Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET** | CONFIRMED conflict — re-check at submit | same page DEADLINE strip + Timeline copy | 2026-09-16 |
 | AAPLx multiplier ≈ 1.003269 | CONFIRMED live | api.xstocks.fi .../AAPLx/multiplier?network=Solana | 2026-09-16 |
 | Tavily search for Stocklana | UNAVAILABLE this run | plan usage limit | 2026-09-16 |
+
+## 2026-09-16 UI refs
+- Aionis landing first viewport = empty upper void + luminous brand stencil lower half + horizon chrome ~55% (no headline on letters). Verified via live :3110 screenshot.
+- NetroBNB = grey #E5E7EB 12-col + yellow analysis clock + dark market strip + yellow AI rail. Verified via live :3111 screenshot.
+- Local `/lab/ui` shows `21st MCP connected` with live catalog hits when `API_KEY_21ST` in process env; Vercel preview still needs that env set.

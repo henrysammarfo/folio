@@ -329,3 +329,16 @@
 ## 2026-09-16 — Desk Empire gates panel + Stocklana 590/79
 - `/desk` shows live network-matrix gate strip (fail-closed wash/Pyth/NestUSD/auth/broadcast).
 - Stocklana jina: 590 / 79 / $121k. Goal open.
+
+## 2026-09-16 — Acquire gate grid + Jupiter optional key
+- Acquire Checks: truth/wash/quote/Pyth/canReview grid. keys-readiness lists JUPITER_API_KEY optional.
+- Paper agent: live ×1.003269 spine; AgentRouter NL failed WAF/HTML (spine kept). Goal open.
+
+## 2026-09-16 — refs screened + hero/lab honesty
+
+- Cloned/ran Aionis (:3110) + NetroBNB (:3111); Playwright-shot vs FOLIO.
+- Hero: removed competing serif void copy; raised luminous FOLIO stencil (Aionis composition); horizon ~58%.
+- Lab UI/shaders: compact intro, visual stages first; 21st MCP live locally (16 catalog hits); shaders.com keyed but Clerk-gated.
+- Fixed client `node:crypto` leak via lazy `node-hmac.ts`.
+- Acquire gate grid + e2e networkidle/hydration fixes.
+- Henry still needs Vercel `API_KEY_21ST` (+ optional `SHADERS_API_KEY`) for public preview lab.

@@ -140,6 +140,85 @@ function Page() {
                 <StatusBadge tone="amber">{String(error)}</StatusBadge>
               </p>
             ) : null}
+            {data ? (
+              <div className="desk-gate-grid acquire-gate-grid mb-4">
+                <div className="desk-gate-row">
+                  <div>
+                    <b>Truth / Scaled UI</b>
+                    <small>
+                      {data.gates.truthOk
+                        ? "Live multiplier available for review"
+                        : "Corporate-action / asset truth blocked"}
+                    </small>
+                  </div>
+                  <StatusBadge tone={data.gates.truthOk ? "green" : "amber"}>
+                    {data.gates.truthOk ? "pass" : "fail-closed"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row">
+                  <div>
+                    <b>Wash / linked flow</b>
+                    <small>
+                      {data.wash.ok
+                        ? `pressure=${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
+                        : data.wash.reason}
+                    </small>
+                  </div>
+                  <StatusBadge tone={data.gates.washOk ? "green" : "amber"}>
+                    {data.gates.washOk ? "pass" : "fail-closed"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row">
+                  <div>
+                    <b>Jupiter quote</b>
+                    <small>
+                      {data.jupiter.ok
+                        ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
+                        : data.jupiter.reason}
+                    </small>
+                  </div>
+                  <StatusBadge tone={data.gates.quoteOk ? "blue" : "amber"}>
+                    {data.gates.quoteOk ? "quote-only" : "fail-closed"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row">
+                  <div>
+                    <b>Pyth diverge</b>
+                    <small>
+                      {data.pyth.ok
+                        ? "Hermes equity live"
+                        : data.pyth.reason}
+                    </small>
+                  </div>
+                  <StatusBadge
+                    tone={
+                      data.gates.divergeOk === false
+                        ? "amber"
+                        : data.pyth.ok
+                          ? "green"
+                          : "amber"
+                    }
+                  >
+                    {data.gates.divergeOk === false
+                      ? "blocked"
+                      : data.pyth.ok
+                        ? "ok"
+                        : "key-gated"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row">
+                  <div>
+                    <b>canReview</b>
+                    <small>
+                      Continue stays locked until truth · wash · quote · diverge clear
+                    </small>
+                  </div>
+                  <StatusBadge tone={data.gates.canReview ? "green" : "amber"}>
+                    {data.gates.canReview ? "ready" : "blocked"}
+                  </StatusBadge>
+                </div>
+              </div>
+            ) : null}
             <p>
               <span>Corporate-action / asset</span>
               <StatusBadge tone={data?.gates.truthOk ? "green" : "amber"}>
@@ -349,6 +428,8 @@ function Page() {
             </Button>
           ) : null}
           <Button
+            type="button"
+            data-testid="acquire-continue"
             disabled={
               !ready ||
               (step === 2 && (isFetching || !data?.gates.canReview)) ||

@@ -18,6 +18,7 @@ export type KeySmokeEnv = {
   supabaseJwt: boolean;
   sessionSecret: boolean;
   agentRouter: boolean;
+  jupiter: boolean;
   twentyFirst: boolean;
   shaders: boolean;
   broadcastPaused: boolean;
@@ -41,6 +42,7 @@ export function readKeySmokeEnv(
       (env["SUPABASE_JWT_SECRET"]?.trim().length ?? 0) >= 16,
     sessionSecret: (env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16,
     agentRouter: Boolean(env["AGENTROUTER_API_KEY"]?.trim()),
+    jupiter: Boolean(env["JUPITER_API_KEY"]?.trim()),
     twentyFirst: Boolean(env["API_KEY_21ST"]?.trim()),
     shaders: Boolean(env["SHADERS_API_KEY"]?.trim()),
     broadcastPaused: (env["BROADCAST_PAUSED"] ?? "true").toLowerCase() !== "false",
@@ -125,6 +127,14 @@ export function classifyKeySmokeBaseline(env: KeySmokeEnv): KeySmokeRow[] {
       detail: env.agentRouter
         ? "AGENTROUTER_API_KEY present — NL optional (WAF → spine-only)"
         : "AgentRouter missing — paper agent live spine only",
+    },
+    {
+      id: "jupiter",
+      present: env.jupiter,
+      status: env.jupiter ? "ok" : "skipped",
+      detail: env.jupiter
+        ? "JUPITER_API_KEY present — quote/price auth header armed"
+        : "JUPITER_API_KEY missing — public quote/price path (429 → TTL cache / fail-closed)",
     },
     {
       id: "twentyfirst",

@@ -1,9 +1,9 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
 import { errResult, okResult, type AdapterResult } from "../adapters/types";
 import {
   isSupabaseUserJwtConfigured,
   resolveSupabaseRestAuth,
 } from "./supabase-user-jwt";
+import { hmacSha256Base64Url, timingSafeEqualUtf8 } from "./node-hmac";
 
 export type AuthProviderStatus = {
   privyConfigured: boolean;
@@ -74,14 +74,11 @@ function b64url(buf: Buffer | string): string {
 }
 
 function signPayload(payloadB64: string, secret: string): string {
-  return createHmac("sha256", secret).update(payloadB64).digest("base64url");
+  return hmacSha256Base64Url(secret, payloadB64);
 }
 
 function safeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a);
-  const bb = Buffer.from(b);
-  if (ab.length !== bb.length) return false;
-  return timingSafeEqual(ab, bb);
+  return timingSafeEqualUtf8(a, b);
 }
 
 /** Fail-closed auth readiness — never invent a wallet session from localStorage. */
