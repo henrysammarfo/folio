@@ -12,6 +12,7 @@ describe("readEmpireReadiness", () => {
     expect(r.pythApiKeyPresent).toBe(false);
     expect(r.privyConfigured).toBe(false);
     expect(r.supabaseConfigured).toBe(false);
+    expect(r.supabaseSchemaReady).toBe(false);
     expect(r.sessionSecretPresent).toBe(true);
     expect(r.broadcastPaused).toBe(true);
     expect(r.approvedLabUi).toBe("netro-density");

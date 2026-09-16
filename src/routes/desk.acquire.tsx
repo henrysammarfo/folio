@@ -230,7 +230,9 @@ function Page() {
                       ? "blocked"
                       : data.pyth.ok
                         ? "ok"
-                        : "key-gated"}
+                        : data.pyth.reason === "pyth_feed_not_entitled"
+                          ? "not-entitled"
+                          : "key-gated"}
                   </StatusBadge>
                 </div>
                 <div className="desk-gate-row">

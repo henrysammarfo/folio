@@ -6,9 +6,9 @@ Do **one key family at a time**. Paste into Vercel (Preview + Production) and lo
 Demo Settings: https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk/settings#empire-readiness  
 Vercel env UI: https://vercel.com/teamtitanlink/folio/settings/environment-variables
 
-Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density` · `BITQUERY_API_KEY` · `PYTH_API_KEY` · `PRIVY_*` · `SUPABASE_URL` · `SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY` · `JUPITER_API_KEY`
+Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density` · `BITQUERY_API_KEY` · `PYTH_API_KEY` · `PRIVY_*` · `SUPABASE_URL` · `SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_JWT_SECRET` · `JUPITER_API_KEY`
 
-Still need Henry: **Pyth Terminal equity/xStock feed entitlement** · `SUPABASE_JWT_SECRET` · run `supabase/migrations/20260915_folio_tenants.sql` · mint session + tenant_members. **Rotate all chat-pasted secrets.**
+Still need Henry: **Pyth Pro (not Starter) with Equities entitlement** · run `20260916_folio_tenants_grants.sql` (tables exist; service_role 42501) · mint session + tenant_members. **Rotate all chat-pasted secrets.**
 
 Stocklana live 2026-09-16 (jina): **605** registered · **84** submissions · **$121k** · SEP 25.
 
@@ -27,15 +27,22 @@ Lab MCP live-verified on branch preview `/lab/ui` (2026-09-16): **21st MCP conne
 
 Verify: `/desk/acquire` wash row leaves “key missing”; `/network` wash capability becomes live or labeled error (never silent green).
 
-### 2 — Pyth Hermes (equity diverge)
+### 2 — Pyth Hermes (equity diverge) — BE SPECIFIC
 
-1. Start at [pyth.network](https://pyth.network/) → [Pyth Terminal](https://app.pyth.com/) for an API key.
-2. Docs: [Hermes](https://docs.pyth.network/price-feeds/how-pyth-works/hermes) · [Core upgrade auth](https://docs.pyth.network/price-feeds/core/upgrade/preparing).
-3. Create / copy API key → set `PYTH_API_KEY` on Vercel (all targets you use).
-4. **Entitle Equity.US / Crypto.xStock feeds** on the plan — a key that only covers generic crypto (BTC/ETH) returns Hermes `403 Not entitled` for AAPL / AAPLx / AAPLON. Contact data@dourolabs.xyz if Terminal UI cannot grant equities.
-5. Redeploy.
+Your current key authenticates Hermes for **BTC/ETH** but returns **403 Not entitled** for Stocklana feeds (`Equity.US.AAPL/USD`, `Crypto.AAPLX/USD`). That matches **Starter = crypto only**.
 
-Verify: Settings **PYTH_API_KEY** readiness turns set; `/truth` / acquire diverge can score Pyth vs Jupiter when Equity (or entitled Crypto.xStock) is live. Without entitlement, keep fail-closed — never invent a green diverge.
+1. Open **[app.pyth.com](https://app.pyth.com/)** → sign in.
+2. Pricing ([pyth.network/price-feeds](https://www.pyth.network/price-feeds)):
+   - Free = view-only Terminal (no API)
+   - **Starter $500/mo = crypto API only** ← you are here
+   - **Pro from $2,500/mo** or **free Pro trial** = equities + custom asset classes
+3. Terminal → **Subscribe / Upgrade / Start free trial** → pick **Pro** (not Starter).
+4. Enable asset class **Equities**.
+5. **🔑 View your API key** → replace `PYTH_API_KEY` on Vercel + `.env` → redeploy.
+6. Verify HTTP 200 on feed `49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688` (Equity.US.AAPL).
+7. Stuck → email **data@dourolabs.xyz** subject `Equity.US.AAPL Hermes 403 Not entitled`.
+
+Docs: [Hermes](https://docs.pyth.network/price-feeds/how-pyth-works/hermes) · [Terminal](https://docs.pyth.network/price-feeds/pro/pyth-terminal).
 
 ### 3 — Privy (wallet identity)
 
@@ -54,8 +61,12 @@ Verify: Settings auth badge still fail-closed until Supabase lands (both require
    - `anon` `public` → `SUPABASE_ANON_KEY`
    - `service_role` → `SUPABASE_SERVICE_ROLE_KEY` (**server only**)
 3. **Project Settings → API → JWT Secret** (≥16) → `SUPABASE_JWT_SECRET`.
-4. Paste all four on Vercel. Apply migration `supabase/migrations/20260915_folio_tenants.sql` in the **SQL editor** (PostgREST cannot create tables — expect `PGRST205` until applied). Optional seed: `supabase/seed/demo_tenant.sql`.
-5. Redeploy.
+4. Paste all four on Vercel (`SUPABASE_JWT_SECRET` included).
+5. SQL editor — run in order:
+   1. `supabase/migrations/20260915_folio_tenants.sql` (tables + RLS)
+   2. `supabase/migrations/20260916_folio_tenants_grants.sql` (**required** — without this, service_role gets `42501` even when tables exist)
+6. Optional seed: `supabase/seed/demo_tenant.sql`.
+7. Redeploy.
 
 `SUPABASE_JWT_SECRET` arms the **user-JWT RLS path**: server mints short-lived HS256 JWTs with `sub` = Privy DID so PostgREST policies (`auth.jwt() ->> 'sub'`) authorize tenants/prefs. Without the JWT secret, FOLIO keeps a labeled **service-role** fallback (not end-user authz).
 

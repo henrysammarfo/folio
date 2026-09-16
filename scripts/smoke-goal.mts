@@ -139,7 +139,7 @@ async function main() {
   );
   if (!summary.shipReady) {
     console.log(
-      "remaining: SUPABASE_JWT_SECRET (optional elite) · mint folio_session + tenant_members · rotate chat-pasted keys — docs/HENRY_STEPS.md",
+      "remaining: Pyth Pro+Equities entitlement · run 20260916_folio_tenants_grants.sql · mint folio_session + tenant_members · rotate chat secrets — docs/HENRY_STEPS.md",
     );
   }
 }

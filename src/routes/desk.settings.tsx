@@ -212,7 +212,7 @@ function Page() {
             <span>BITQUERY_API_KEY</span>
             <b>
               {data?.readiness.bitqueryKeyPresent
-                ? "Set · wash tape live"
+                ? "Set · wash path keyed (live probe on Acquire / Network)"
                 : "Missing · wash fail-closed"}
             </b>
           </p>
@@ -220,7 +220,7 @@ function Page() {
             <span>PYTH_API_KEY</span>
             <b>
               {data?.readiness.pythApiKeyPresent
-                ? "Set · Hermes equity reference live"
+                ? "Set · Hermes keyed — Equity.US/xStock must entitle before diverge live"
                 : "Missing · Pyth diverge fail-closed"}
             </b>
           </p>
@@ -262,6 +262,17 @@ function Page() {
               {data?.readiness.supabaseConfigured
                 ? "Configured"
                 : "Missing · tenants fail-closed"}
+            </b>
+          </p>
+          <p>
+            <span>Supabase tenant schema</span>
+            <b>
+              {data?.readiness.supabaseSchemaDetail ??
+                (data?.readiness.supabaseSchemaReady
+                  ? "Ready · tenants / tenant_members reachable"
+                  : data?.readiness.supabaseConfigured
+                    ? "Missing · run migration + grants"
+                    : "Blocked · Supabase keys first")}
             </b>
           </p>
           <p>
@@ -360,13 +371,51 @@ function Page() {
               </span>
             </div>
             <div className="settings-step">
-              <strong>2 · Pyth</strong>
+              <strong>2 · Pyth (be specific — equity is NOT on Starter)</strong>
               <span>
-                Start at{" "}
-                <a href="https://pyth.network/" target="_blank" rel="noreferrer">
-                  pyth.network
+                1) Open{" "}
+                <a href="https://app.pyth.com/" target="_blank" rel="noreferrer">
+                  app.pyth.com
                 </a>{" "}
-                → Hermes / developer access → set <code>PYTH_API_KEY</code>.
+                → sign in.
+                <br />
+                2) Pricing reality (
+                <a href="https://www.pyth.network/price-feeds" target="_blank" rel="noreferrer">
+                  pyth.network/price-feeds
+                </a>
+                ): <b>Free</b> = Terminal view-only (no API). <b>Starter $500/mo</b> ={" "}
+                <b>crypto only</b> (BTC/ETH work — that is your current key).{" "}
+                <b>Pro from $2,500/mo</b> (or free Pro trial) = equities + customize asset
+                classes.
+                <br />
+                3) In Terminal → <b>Subscribe / Upgrade / Start free trial</b> → pick{" "}
+                <b>Pro</b> (not Starter) → enable asset class <b>Equities</b> (and tokenized
+                stock / RWA if listed).
+                <br />
+                4) Click <b>🔑 View your API key</b> → copy → replace{" "}
+                <code>PYTH_API_KEY</code> on{" "}
+                <a
+                  href="https://vercel.com/teamtitanlink/folio/settings/environment-variables"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Vercel env
+                </a>{" "}
+                + local <code>.env</code> → redeploy.
+                <br />
+                5) Verify these Hermes IDs return <b>HTTP 200</b> (not 403 Not entitled):
+                <code>Equity.US.AAPL/USD</code>{" "}
+                <code>49f6b65c…ad55688</code>, <code>Crypto.AAPLX/USD</code>{" "}
+                <code>978e6cc6…a58675</code>. Docs:{" "}
+                <a
+                  href="https://docs.pyth.network/price-feeds/how-pyth-works/hermes"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Hermes
+                </a>
+                . Stuck → email <code>data@dourolabs.xyz</code> with subject “Equity.US.AAPL
+                Hermes 403 Not entitled — need equities on API key”.
               </span>
             </div>
             <div className="settings-step">
@@ -386,9 +435,11 @@ function Page() {
                 <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">
                   supabase.com/dashboard
                 </a>{" "}
-                → <code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code>,{" "}
+                → <code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code> (JWT),{" "}
                 <code>SUPABASE_SERVICE_ROLE_KEY</code>, <code>SUPABASE_JWT_SECRET</code>.
-                Apply <code>supabase/migrations/20260915_folio_tenants.sql</code>.
+                SQL editor in order: (1) <code>20260915_folio_tenants.sql</code> (done) (2){" "}
+                <code>20260916_folio_tenants_grants.sql</code> — without grants, service_role
+                returns <code>42501</code> even when tables exist.
               </span>
             </div>
             <div className="settings-step">

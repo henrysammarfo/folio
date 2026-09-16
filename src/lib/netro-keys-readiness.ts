@@ -15,6 +15,7 @@ export type NetroKeysReadinessInput = {
   privyConfigured: boolean;
   supabaseConfigured: boolean;
   supabaseJwtConfigured: boolean;
+  supabaseSchemaReady?: boolean;
   sessionSecretPresent: boolean;
   broadcastPaused: boolean;
   jupiterKeyPresent?: boolean;
@@ -35,7 +36,7 @@ export function buildNetroKeysReadiness(
       id: "pyth",
       label: "Pyth Hermes",
       status: input.pythApiKeyPresent
-        ? "Keyed · equity diverge"
+        ? "Keyed · entitle Equity/xStock before diverge live"
         : "Missing · fail-closed",
       ok: input.pythApiKeyPresent,
     },
@@ -49,9 +50,11 @@ export function buildNetroKeysReadiness(
       id: "supabase",
       label: "Supabase",
       status: input.supabaseConfigured
-        ? input.supabaseJwtConfigured
-          ? "Configured · user-JWT RLS"
-          : "Configured · service-role fallback"
+        ? !input.supabaseSchemaReady
+          ? "Configured · schema missing (run migration)"
+          : input.supabaseJwtConfigured
+            ? "Configured · user-JWT RLS"
+            : "Configured · service-role fallback"
         : "Missing · tenants off",
       ok: input.supabaseConfigured,
     },

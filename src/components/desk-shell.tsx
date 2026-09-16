@@ -225,6 +225,7 @@ export function DeskShell({
         privyConfigured: readiness.privyConfigured,
         supabaseConfigured: readiness.supabaseConfigured,
         supabaseJwtConfigured: readiness.supabaseJwtConfigured,
+        supabaseSchemaReady: readiness.supabaseSchemaReady,
         sessionSecretPresent: readiness.sessionSecretPresent,
         broadcastPaused: readiness.broadcastPaused,
         jupiterKeyPresent: readiness.jupiterKeyPresent,

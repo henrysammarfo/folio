@@ -27,10 +27,27 @@ describe("buildNetroKeysReadiness", () => {
       privyConfigured: true,
       supabaseConfigured: true,
       supabaseJwtConfigured: true,
+      supabaseSchemaReady: true,
       sessionSecretPresent: true,
       broadcastPaused: true,
     });
     expect(keys.multiTenantLabel).toMatch(/armed/i);
     expect(keys.missingCount).toBe(0);
+    expect(keys.rows.find((r) => r.id === "supabase")?.status).toMatch(/user-JWT/i);
+  });
+
+  it("labels schema missing when Supabase keyed but migration not applied", () => {
+    const keys = buildNetroKeysReadiness({
+      bitqueryKeyPresent: true,
+      pythApiKeyPresent: true,
+      privyConfigured: true,
+      supabaseConfigured: true,
+      supabaseJwtConfigured: false,
+      supabaseSchemaReady: false,
+      sessionSecretPresent: true,
+      broadcastPaused: true,
+    });
+    expect(keys.rows.find((r) => r.id === "supabase")?.status).toMatch(/schema missing/i);
+    expect(keys.rows.find((r) => r.id === "pyth")?.status).toMatch(/entitle/i);
   });
 });

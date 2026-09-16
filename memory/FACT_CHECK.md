@@ -309,3 +309,9 @@ EOF
 - VERIFIED: Jupiter quote ok with `JUPITER_API_KEY` (`x-api-key` header per portal docs).
 - VERIFIED: `FOLIO_APPROVED_LAB_UI=netro-density` via applyDotEnv → premium UI DONE in smoke:goal.
 - OPEN: Pyth equity entitlement · SUPABASE_JWT_SECRET · SQL migration · session mint · rotate chat secrets.
+
+## 2026-09-16 — JWT + schema grants + Pyth plan evidence
+- VERIFIED: `SUPABASE_JWT_SECRET` set locally + Vercel CREATE 201; `isSupabaseUserJwtConfigured` true.
+- VERIFIED: PostgREST `tenants` → HTTP 403 code 42501 (`GRANT SELECT … TO service_role`) — tables exist, privileges missing.
+- VERIFIED: Pyth pricing — Free view-only; Starter crypto-only $500; Pro equities from $2500 / free trial (pyth.network/price-feeds). Current key BTC/ETH 200, Equity.US.AAPL 403 Not entitled.
+- OPEN: Henry runs `20260916_folio_tenants_grants.sql`; upgrades Pyth to Pro+Equities; rotates chat-pasted secrets.

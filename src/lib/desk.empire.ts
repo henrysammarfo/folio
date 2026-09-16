@@ -239,6 +239,13 @@ export type EmpireReadiness = {
   jupiterKeyPresent: boolean;
   /** Dedicated SOLANA_RPC_URL (false = labeled public RPC fallback · B004). */
   solanaRpcDedicated: boolean;
+  /**
+   * tenants / tenant_members / desk_preferences reachable via service-role.
+   * False when keys missing, migration not applied (PGRST205), or GRANTs missing (42501).
+   */
+  supabaseSchemaReady: boolean;
+  /** Honest probe detail for Settings (never invents ready). */
+  supabaseSchemaDetail: string;
 };
 
 export function readEmpireReadiness(
@@ -266,6 +273,93 @@ export function readEmpireReadiness(
     approvedLabShader: readApprovedLabShader(env),
     jupiterKeyPresent: Boolean(env["JUPITER_API_KEY"]?.trim()),
     solanaRpcDedicated: Boolean(env["SOLANA_RPC_URL"]?.trim()),
+    /** Sync path defaults false — enrich via loadEmpireReadiness. */
+    supabaseSchemaReady: false,
+    supabaseSchemaDetail: "Not probed",
+  };
+}
+
+/** Live PostgREST probe — never invents schema greens. */
+export async function probeSupabaseSchemaReady(
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<boolean> {
+  const url = env["SUPABASE_URL"]?.trim()?.replace(/\/$/, "");
+  const key = env["SUPABASE_SERVICE_ROLE_KEY"]?.trim();
+  if (!url || !key) return false;
+  try {
+    const res = await fetch(`${url}/rest/v1/tenants?select=id&limit=1`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(8_000),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Honest detail for Settings — distinguishes missing tables vs missing GRANTs. */
+export async function probeSupabaseSchemaDetail(
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<{ ready: boolean; detail: string }> {
+  const url = env["SUPABASE_URL"]?.trim()?.replace(/\/$/, "");
+  const key = env["SUPABASE_SERVICE_ROLE_KEY"]?.trim();
+  if (!url || !key) {
+    return { ready: false, detail: "Blocked · Supabase keys first" };
+  }
+  try {
+    const res = await fetch(`${url}/rest/v1/tenants?select=id&limit=1`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (res.ok) {
+      return { ready: true, detail: "Ready · tenants / tenant_members reachable" };
+    }
+    const body = await res.text().catch(() => "");
+    if (res.status === 404 || /PGRST205/i.test(body)) {
+      return {
+        ready: false,
+        detail: "Missing · run 20260915_folio_tenants.sql (PGRST205)",
+      };
+    }
+    if (res.status === 403 || /42501|permission denied|GRANT SELECT/i.test(body)) {
+      return {
+        ready: false,
+        detail:
+          "Tables exist · run 20260916_folio_tenants_grants.sql (service_role 42501)",
+      };
+    }
+    return {
+      ready: false,
+      detail: `Probe HTTP ${res.status} · fail-closed`,
+    };
+  } catch (e) {
+    return { ready: false, detail: `Probe failed · ${String(e).slice(0, 80)}` };
+  }
+}
+
+export async function loadEmpireReadiness(
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<EmpireReadiness> {
+  const base = readEmpireReadiness(env);
+  if (!base.supabaseConfigured) {
+    return {
+      ...base,
+      supabaseSchemaDetail: "Blocked · Supabase keys first",
+    };
+  }
+  const probe = await probeSupabaseSchemaDetail(env);
+  return {
+    ...base,
+    supabaseSchemaReady: probe.ready,
+    supabaseSchemaDetail: probe.detail,
   };
 }
 
@@ -707,7 +801,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     const userId = session.ok ? session.data.userId : null;
     const preferences = await loadDeskPreferences(activeTenantId, userId);
     const watch = readWatchWallet();
-    const readiness = readEmpireReadiness();
+    const readiness = await loadEmpireReadiness();
     return {
       auth,
       session,
@@ -729,9 +823,9 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
   },
 );
 
-/** Lightweight Empire key flags for Netro SSR — no session prefs fetch. */
+/** Empire key flags + optional Supabase schema probe — never invents greens. */
 export const getEmpireReadiness = createServerFn({ method: "GET" }).handler(
-  async (): Promise<EmpireReadiness> => readEmpireReadiness(),
+  async (): Promise<EmpireReadiness> => loadEmpireReadiness(),
 );
 
 const AgentInput = z.object({

@@ -511,3 +511,9 @@
 - Supabase tables missing (`PGRST205`) until Henry runs `supabase/migrations/20260915_folio_tenants.sql`; `SUPABASE_JWT_SECRET` still missing.
 - `applyDotEnv` overrides empty shell placeholders that shadowed `.env` (cloud BITQUERY_*='').
 - `npm run smoke:goal` matrix: done=4 partial=2 blocked=0 (Empire waiting Pyth entitlement; multi-tenant waiting mint+tables). Goal open. **Rotate chat-pasted secrets.**
+
+## 2026-09-16 — JWT secret + grants gap + specific Pyth plan
+- Wired `SUPABASE_JWT_SECRET` to Vercel + `.env` (never echoed). User-JWT RLS path armed in readiness.
+- Migration tables exist but service_role hit **42501** — added `20260916_folio_tenants_grants.sql` + GRANTs into base migration; Settings probe distinguishes PGRST205 vs grants.
+- Pyth: documented exact Terminal path — current key = crypto-only (Starter behavior); Equity needs **Pro / free Pro trial** + Equities asset class (not vague "entitle"). Honesty: Settings no longer claims Hermes equity live from key presence alone.
+- Goal still open: Pyth Pro equities · run grants SQL · mint session. Rotate chat secrets.
