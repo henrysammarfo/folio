@@ -327,3 +327,8 @@ EOF
 | Yahoo chart v8 returns AAPL USD without API key | CONFIRMED live | query1.finance.yahoo.com/v8/finance/chart/AAPL · labeled YAHOO:AAPL | 2026-09-16 |
 | CoinGecko apple-xstock free USD | CONFIRMED live | api.coingecko.com/api/v3/simple/price | 2026-09-16 |
 | Pyth Pro required for FOLIO diverge ship | REJECTED | Free Yahoo/Finnhub cascade scores diverge; Pro optional for bounty | 2026-09-16 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Ship equity diverge uses Finnhub→Yahoo (+ CoinGecko), not Pyth Hermes | CONFIRMED in-repo | equity-ref.ts · pythOffShipPath · smoke note | 2026-09-16 |
+| Bootstrap mint uses real Privy DID (never invents did:privy) | CONFIRMED in-repo | privy-users.ts + bootstrap-demo-session.ts fail-closed | 2026-09-16 |

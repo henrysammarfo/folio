@@ -37,7 +37,12 @@ App ID + secret on Vercel. Rotate after chat paste.
 | Tables + **service_role GRANTs** | ✅ live |
 | `folio-demo` tenant | ✅ seeded |
 
-### Henry next — mint multi-tenant session (LAST BLOCKER)
+### Henry next — mint multi-tenant session
+
+**Preferred (no Allowed origins):** Settings → **Bootstrap folio-demo session**  
+(real Privy DID via REST `folio-demo-bootstrap` → attach owner → mint+verify). Smoke (`npm run smoke:goal`) uses the same path.
+
+**Or browser login:**
 1. Privy Dashboard → **Configuration → App settings → Domains** → Allowed origins → paste exactly:  
    `https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app`  
    (Privy rejects `*.vercel.app` wildcards; `https://*.teamtitanlink.vercel.app` OK if you own that suffix.)
@@ -55,4 +60,4 @@ App ID + secret on Vercel. Rotate after chat paste.
 - Custom program deploy (rent ≫ $1)
 
 ## Goal matrix
-`npm run smoke:goal` — Empire DONE with live Yahoo equity ref; multi-tenant PARTIAL until Privy mint + Join.
+`npm run smoke:goal` — Empire DONE with live Yahoo equity ref; multi-tenant DONE when bootstrap mint+verify succeeds (or Privy login + Join).

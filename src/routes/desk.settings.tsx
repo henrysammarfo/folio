@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   attachDemoTenantMembership,
   bindWatchWallet,
+  bootstrapDemoDeskSession,
   clearFolioSession,
   clearWatchWallet,
   createSessionFromPrivyToken,
@@ -51,6 +52,7 @@ function Page() {
   const createSession = useServerFn(createSessionFromPrivyToken);
   const clearSession = useServerFn(clearFolioSession);
   const attachDemo = useServerFn(attachDemoTenantMembership);
+  const bootstrapDemo = useServerFn(bootstrapDemoDeskSession);
   const bindWatch = useServerFn(bindWatchWallet);
   const clearWatch = useServerFn(clearWatchWallet);
   const { data, refetch } = useQuery({
@@ -681,12 +683,51 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
         <p className="mb-3 text-sm opacity-80">
           Server keys ready (Privy + Supabase + JWT + session secret + schema). FOLIO mints an
           httpOnly <code>folio_session</code> — never localStorage auth.
-          Prefer <b>Log in with Privy</b> below; paste-token remains a fallback. After mint, if
-          tenants empty → <b>Join folio-demo as owner</b>. Do not paste the App Secret.
+          Prefer <b>Log in with Privy</b> below; paste-token remains a fallback. Stocklana demo
+          can also use <b>Bootstrap folio-demo session</b> (real Privy DID via REST — no invented
+          subject). After mint, if tenants empty → <b>Join folio-demo as owner</b>. Do not paste
+          the App Secret.
           {!sessionMintReady
             ? " Mint stays disabled until Privy + Supabase + FOLIO_SESSION_SECRET are present."
             : null}
         </p>
+        <div className="mb-4">
+          <button
+            type="button"
+            className="wallet-pill"
+            disabled={
+              sessionBusy ||
+              !sessionMintReady ||
+              !data?.readiness.supabaseSchemaReady
+            }
+            onClick={async () => {
+              setSessionBusy(true);
+              setSessionMsg("");
+              try {
+                const res = await bootstrapDemo();
+                setSessionMsg(
+                  res.ok
+                    ? res.data.note
+                    : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                );
+                await invalidateSessionScopedBundles();
+                await refetch();
+              } finally {
+                setSessionBusy(false);
+              }
+            }}
+          >
+            {sessionBusy
+              ? "Bootstrapping…"
+              : sessionMintReady
+                ? "Bootstrap folio-demo session"
+                : "Bootstrap blocked · keys missing"}
+          </button>
+          <p className="mt-2 text-sm opacity-70">
+            Labeled server path: Privy custom_auth <code>folio-demo-bootstrap</code> → attach
+            owner → mint+verify cookie. Works without Allowed origins / browser login.
+          </p>
+        </div>
         {privyClient && data?.readiness.privyAppId ? (
           <Suspense fallback={<p className="mb-3 text-sm opacity-70">Loading Privy…</p>}>
             <PrivySessionMint

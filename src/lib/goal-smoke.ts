@@ -80,14 +80,14 @@ export function classifyGoalRequirements(
       ? "partial"
       : "blocked";
   const multiTenantDetail = input.multiTenantSessionReady
-    ? "Privy + Supabase + session secret · membership path armed"
+    ? "Privy + Supabase + session secret · membership path armed (mint+verify)"
     : !input.privyKey || !input.supabaseKey
       ? "Missing PRIVY_* and/or SUPABASE_* — multi-tenant fail-closed"
       : !input.sessionSecret
         ? "Missing FOLIO_SESSION_SECRET ≥16 — cookie mint fail-closed"
         : input.supabaseSchemaReady === false
           ? "Keys+JWT present · run 20260916_folio_tenants_grants.sql (service_role 42501) then mint session"
-          : "Keys present — mint httpOnly session + tenant memberships to finish";
+          : "Keys present — bootstrap folio-demo or Privy mint + Join to finish";
 
   const uiStatus: GoalStatus =
     input.approvedLabUi === "netro-density" ? "done" : "partial";

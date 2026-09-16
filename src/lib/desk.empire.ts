@@ -36,6 +36,7 @@ import {
 import { isSupabaseUserJwtConfigured } from "./auth/supabase-user-jwt";
 import { buildSessionFromPrivyToken } from "./auth/session-from-privy";
 import { attachUserToDemoTenant } from "./auth/demo-tenant";
+import { buildBootstrapDemoSession } from "./auth/bootstrap-demo-session";
 import { resolveTenantMemberships } from "./auth/tenants";
 import {
   FOLIO_WATCH_WALLET_COOKIE,
@@ -1055,6 +1056,44 @@ export const attachDemoTenantMembership = createServerFn({ method: "POST" }).han
         ...attached.data,
         session: minted.data.session,
         note: `${attached.data.note} · cookie reminted with ${tenants.length} membership(s)`,
+      },
+    };
+  },
+);
+
+/**
+ * Labeled Stocklana bootstrap: real Privy DID (REST custom_auth) → folio-demo
+ * owner → httpOnly folio_session. No invented DID; no browser login required.
+ */
+export const bootstrapDemoDeskSession = createServerFn({ method: "POST" }).handler(
+  async () => {
+    const built = await buildBootstrapDemoSession();
+    if (!built.ok) {
+      return errResult(
+        "folio.session.bootstrap-demo",
+        built.reason,
+        built.detail,
+      );
+    }
+    setCookie(FOLIO_SESSION_COOKIE, built.data.cookieValue, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 12,
+      secure: process.env["NODE_ENV"] === "production",
+    });
+    return {
+      ok: true as const,
+      mode: "mainnet-read" as const,
+      asOf: new Date().toISOString(),
+      source: "folio.session.bootstrap-demo",
+      data: {
+        session: built.data.session,
+        userId: built.data.userId,
+        tenantId: built.data.tenantId,
+        memberships: built.data.memberships,
+        multiTenantSessionReady: built.data.multiTenantSessionReady,
+        note: built.data.note,
       },
     };
   },

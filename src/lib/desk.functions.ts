@@ -508,6 +508,7 @@ export {
   createSessionFromPrivyToken,
   clearFolioSession,
   attachDemoTenantMembership,
+  bootstrapDemoDeskSession,
   bindWatchWallet,
   clearWatchWallet,
 } from "./desk.empire";

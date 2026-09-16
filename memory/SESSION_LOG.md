@@ -551,3 +551,11 @@
 - Henry: keep free alternates; remove Pyth from ship diverge; no fake/non-live fallbacks.
 - Diverge = Finnhub→Yahoo (+ CoinGecko xStock) vs Jupiter only. Fail-closed on HTTP miss.
 - Pyth Hermes not called on truth/acquire/network ship path (`pyth_not_on_ship_path`).
+
+
+## 2026-09-16 — Bootstrap folio-demo session (real Privy DID)
+
+- Henry: keep free equity alternates; no fake/non-live fallbacks; continue ship.
+- Added `ensureBootstrapPrivyUser` + `buildBootstrapDemoSession` (Privy REST custom_auth → attach folio-demo owner → mint+verify).
+- Settings: **Bootstrap folio-demo session**; smoke:goal flips multiTenantSessionReady on live proof.
+- Pyth remains off ship diverge path (Yahoo/Finnhub/CoinGecko only).

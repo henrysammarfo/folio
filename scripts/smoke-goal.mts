@@ -21,6 +21,7 @@ import { resolveSolanaRpcUrl } from "../src/lib/adapters/solana-rpc.ts";
 import { isBroadcastPaused } from "../src/lib/broadcast.ts";
 import { readApprovedLabUi } from "../src/lib/lab-pick.ts";
 import { getAuthProviderStatus } from "../src/lib/auth/session.ts";
+import { buildBootstrapDemoSession } from "../src/lib/auth/bootstrap-demo-session.ts";
 import { loadEmpireReadiness } from "../src/lib/desk.empire.ts";
 import {
   classifyGoalRequirements,
@@ -75,6 +76,19 @@ async function main() {
   const auth = getAuthProviderStatus();
   const readiness = await loadEmpireReadiness();
 
+  /** Prove multi-tenant with real Privy DID bootstrap — never invent greens. */
+  let multiTenantSessionReady = false;
+  let bootstrapNote: string | null = null;
+  if (privyKey && supabaseKey && sessionSecret && readiness.supabaseSchemaReady) {
+    const boot = await buildBootstrapDemoSession();
+    if (boot.ok && boot.data.multiTenantSessionReady) {
+      multiTenantSessionReady = true;
+      bootstrapNote = boot.data.note;
+    } else if (!boot.ok) {
+      bootstrapNote = `bootstrap ${boot.reason}${boot.detail ? `: ${boot.detail.slice(0, 100)}` : ""}`;
+    }
+  }
+
   const rows = classifyGoalRequirements({
     approvedLabUi: readApprovedLabUi(),
     broadcastPaused: isBroadcastPaused(),
@@ -96,8 +110,7 @@ async function main() {
     privyKey,
     supabaseKey,
     sessionSecret,
-    /** Keys alone ≠ multi-tenant ready — mint + memberships still required. */
-    multiTenantSessionReady: false,
+    multiTenantSessionReady,
     supabaseSchemaReady: readiness.supabaseSchemaReady,
   });
 
@@ -122,6 +135,9 @@ async function main() {
   if (auth.ok) {
     console.log(`note  Auth keys present · ${(auth.detail ?? "").slice(0, 120)}`);
   }
+  if (bootstrapNote) {
+    console.log(`note  ${bootstrapNote.slice(0, 160)}`);
+  }
   if ((process.env["SUPABASE_JWT_SECRET"]?.trim().length ?? 0) < 16) {
     console.log(
       "note  SUPABASE_JWT_SECRET missing — prefs/tenants stay service-role fallback until JWT secret pasted",
@@ -144,7 +160,7 @@ async function main() {
   );
   if (!summary.shipReady) {
     console.log(
-      "remaining: mint folio_session + Join folio-demo · rotate chat secrets — docs/HENRY_STEPS.md",
+      "remaining: bootstrap or Privy mint + Join folio-demo · rotate chat secrets — docs/HENRY_STEPS.md",
     );
   }
 }
