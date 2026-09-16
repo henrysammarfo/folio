@@ -47,7 +47,7 @@ World’s Fair still wins on **working honesty**: live multiplier + wash refuse 
 ## Keys
 
 Present in `.env` + Vercel (2026-09-16 Henry paste): Tavily, TinyFish, AgentRouter, 21st, Shaders, Solana RPC, `FOLIO_SESSION_SECRET`, `BROADCAST_PAUSED`, `FOLIO_APPROVED_LAB_UI=netro-density`, **Bitquery**, **Pyth**, **Privy**, **Supabase URL/anon/service/JWT**, **Jupiter**.
-JWT ✅ · SQL ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; **Pyth off ship path**) ✅ · **bootstrap multi-tenant mint** (real Privy DID → folio-demo) wired. Prefer Settings **Bootstrap folio-demo session** or smoke path; browser Allowed origins still optional.
+JWT ✅ · SQL ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; **Pyth off ship path**) ✅ · **bootstrap multi-tenant** ✅ (`shipReady=true` via `npm run smoke:goal`). Settings **Bootstrap folio-demo session** or smoke path; browser Allowed origins optional.
 **Rotate all chat-pasted keys immediately after hackathon.**
 
 ## UI / lab (approve-gated)
