@@ -378,3 +378,10 @@
 - Rebuilt `NetroDensityCanvas` to true NetroBNB **12-col** (left 9 = profile 3 + stack 6 + market; right 3 = dark quote + yellow AI) with stagger enter + clock pulse.
 - Vercel env now has: `API_KEY_21ST`, `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY` (+ existing SOLANA/BROADCAST/SESSION). Still empty locally/on Vercel: Bitquery · Jupiter · Pyth · Privy · Supabase · Venice (cannot invent).
 - Henry: **rotate Vercel token** pasted in chat; Step 0 Pick · GG Skip · broadcast paused unchanged.
+
+## 2026-09-16 — Desk mounts Netro 12-col on lab preview
+
+- Branch preview verified: **21st MCP connected** · Netro 12-col live · AAPLx ≈1.003269×.
+- `DeskShell` now mounts `NetroDensityCanvas` (live multiplier) when opt-in preview is `netro-density`, and `FolioTradeJournalLab` for `trade-journal-21st` — not CSS-only.
+- stocklana.fun close banner: **18 SEP 2026 · 23:59 UTC** (conservative vs hero SEP 25).
+- Still blocked for full objective: Henry Pick · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused · rotate Vercel token.

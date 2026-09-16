@@ -453,6 +453,10 @@
   color:#1c1c1c;
   border-color:#f4d014;
 }
+.desk-lab-netro,.desk-lab-journal{margin:0 0 1rem}
+.desk-layout[data-lab-ui="netro-density"] .desk-lab-netro .netro-density{
+  margin:0;border-radius:14px
+}
 .desk-layout[data-lab-ui="aionis-brand-plane"]{
   background:#05070a;
 }

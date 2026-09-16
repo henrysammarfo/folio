@@ -1,4 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Activity,
   BriefcaseBusiness,
@@ -14,6 +16,9 @@ import {
   ShaderBackground,
   type ShaderLabVariant,
 } from "@/components/lab/shader-background";
+import { NetroDensityCanvas } from "@/components/lab/netro-density-canvas";
+import { FolioTradeJournalLab } from "@/components/lab/folio-trade-journal-lab";
+import { getTruthBundle } from "@/lib/desk.functions";
 import {
   isLabPreviewActive,
   readLabShaderPick,
@@ -57,6 +62,7 @@ export function DeskShell({
   const [labUi, setLabUi] = useState<LabUiId | null>(null);
   const [labShader, setLabShader] = useState<LabShaderId | null>(null);
   const [previewOn, setPreviewOn] = useState(false);
+  const fetchTruth = useServerFn(getTruthBundle);
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -79,6 +85,19 @@ export function DeskShell({
 
   const previewing = previewOn && (labUi != null || labShader != null);
   const liveShader = previewing ? previewShaderVariant(labShader, labUi) : null;
+  const showNetroCanvas = previewing && labUi === "netro-density";
+  const showJournal = previewing && labUi === "trade-journal-21st";
+
+  const truth = useQuery({
+    queryKey: ["truth-bundle", "desk-lab-preview", "AAPLx"],
+    queryFn: () => fetchTruth({ data: { symbol: "AAPLx" } }),
+    enabled: showNetroCanvas,
+    staleTime: 30_000,
+  });
+  const mult = truth.data?.multiplier;
+  const multiplierLabel = mult?.ok
+    ? `${mult.data.currentMultiplier.toFixed(6)}× live`
+    : "live pending";
 
   return (
     <div
@@ -171,6 +190,16 @@ export function DeskShell({
             </div>
             {actions}
           </div>
+          {showNetroCanvas ? (
+            <div className="desk-lab-netro" data-testid="desk-lab-netro">
+              <NetroDensityCanvas multiplierLabel={multiplierLabel} />
+            </div>
+          ) : null}
+          {showJournal ? (
+            <div className="desk-lab-journal" data-testid="desk-lab-journal">
+              <FolioTradeJournalLab />
+            </div>
+          ) : null}
           {children}
         </main>
       </div>

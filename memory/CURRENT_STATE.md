@@ -387,3 +387,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - NetroBNB desk density rebuilt to real 12-col (profile · flow · cards · market · quote · yellow AI).
 - Vercel keys set for 21st / shaders / AgentRouter / Tavily / TinyFish. Trading keys (Bitquery/Jupiter/Pyth/Privy/Supabase) still empty — Henry must provide.
 - **Rotate** the Vercel token that was pasted in chat.
+
+## 2026-09-16 — Desk Netro preview mounts 12-col canvas
+- Opt-in desk preview `netro-density` now embeds live `NetroDensityCanvas` (not token CSS alone); `trade-journal-21st` embeds honesty blotter.
+- Vercel `API_KEY_21ST` verified live on branch preview.
+- Goal still open: Henry Pick · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.

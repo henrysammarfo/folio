@@ -212,3 +212,8 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 ## 2026-09-16 — Vercel env (names only)
 - Confirmed via `vercel env ls`: API_KEY_21ST, SHADERS_API_KEY, AGENTROUTER_API_KEY/BASE_URL/MODEL, TAVILY_API_KEY, TINYFISH_API_KEY, SOLANA_RPC_URL, BROADCAST_PAUSED, FOLIO_SESSION_SECRET on project teamtitanlink/folio.
 - Not present (empty locally): BITQUERY_API_KEY, JUPITER_API_KEY, PYTH_API_KEY, PRIVY_*, SUPABASE_*, VENICE_API_KEY.
+
+## 2026-09-16 — Preview 21st + stocklana.fun close
+- Branch preview `/lab/ui`: badge **21st MCP connected**; note Plasma 24346 + Journal 27124 pinned · finance-filtered catalog hits present (WebFetch).
+- AAPLx multiplier on Netro canvas: **1.003269× live** (preview).
+- stocklana.fun: HACKATHON CLOSE **18 SEP 2026 · 23:59 UTC** (WebFetch). Hero SEP 25 conflict unchanged — re-check at submit.

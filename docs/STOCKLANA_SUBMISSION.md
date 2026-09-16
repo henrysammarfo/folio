@@ -2,7 +2,7 @@
 
 Re-check live counts on https://hackathons.solana.com/hackathons/stocklana before final submit.
 
-**Live (2026-09-16 hackathons.solana.com + jina):** **591** registered · **79** submissions · hero prize **$121,000** · hero deadline **SEP 25, 2026** · countdown ~9 days. Timeline body still lists **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)** — confirm which the form uses at submit; treat **18 Sep as conservative**.
+**Live (2026-09-16):** hackathons.solana.com + preview verify: hero prize **$121,000** · hero deadline **SEP 25, 2026** (re-check at submit). **stocklana.fun** shows hackathon close **18 SEP 2026 · 23:59 UTC** — treat **18 Sep as conservative**. Demo preview: 21st MCP **connected** · AAPLx ≈ **1.003269×** live.
 
 ## Form fields (paste)
 
@@ -30,7 +30,7 @@ FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after
 
 - [x] Vercel `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true` — settings shows **Watch-wallet secret set** · bind ready (live-verified)
 - [x] Vercel `SOLANA_RPC_URL` (public mainnet) for Scaled UI + wallet reads
-- [ ] Land `API_KEY_21ST` on Vercel Preview so `/lab/ui` shows live 21st MCP (local `.env` already set)
+- [x] Vercel `API_KEY_21ST` (+ `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY`) — `/lab/ui` shows **21st MCP connected** on branch preview (live-verified 2026-09-16)
 - [ ] Reply with one lab id to approve premium chrome: `netro-density` · `aionis-brand-plane` · `cinematic-landing-21st` · `trade-journal-21st` · `ink-ledger` · `ledger-mist` · `aurora-grid`
 - [ ] Land `BITQUERY_API_KEY` for live wash (fail-closed until then)
 - [ ] Land `PYTH_API_KEY` for Hermes equity diverge (fail-closed until then — public Hermes returns 401)

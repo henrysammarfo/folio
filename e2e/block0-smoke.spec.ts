@@ -105,8 +105,11 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 30_000,
     });
     await expect(page.locator("[data-lab-ui='netro-density']")).toHaveCount(1);
-    // Netro extract paints grey canvas on desk
+    // Netro extract paints grey canvas + mounts live 12-col density on desk
     await expect(page.locator(".desk-layout[data-lab-ui='netro-density']")).toBeVisible();
+    await expect(page.locator("[data-testid='desk-lab-netro'] .netro-density-grid")).toBeVisible();
+    await expect(page.locator("[data-testid='desk-lab-netro'] #netro-left-column")).toBeVisible();
+    await expect(page.locator("[data-testid='desk-lab-netro'] #netro-right-column")).toBeVisible();
     await page.getByRole("button", { name: /exit preview/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i)).toHaveCount(0);
 
