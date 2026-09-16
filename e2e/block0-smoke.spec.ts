@@ -88,10 +88,13 @@ test.describe("FOLIO Block 0 smoke", () => {
 
   test("lab routes stay approve-gated", async ({ page }) => {
     await page.goto("/lab/shaders");
-    await expect(page.getByText(/awaiting henry|approve/i).first()).toBeVisible();
+    await expect(page.getByText(/awaiting henry|approve|production ·/i).first()).toBeVisible();
     await expect(page.getByText(/ink-ledger|ledger-mist|aurora-grid/i).first()).toBeVisible();
     await page.goto("/lab/ui");
-    await expect(page.getByText(/awaiting henry|approve/i).first()).toBeVisible();
+    // netro-density may already be production-approved via FOLIO_APPROVED_LAB_UI
+    await expect(
+      page.getByText(/awaiting henry|approve|production · netro-density|production chrome live/i).first(),
+    ).toBeVisible();
     await expect(page.getByText(/netro-density/i).first()).toBeVisible();
     await expect(page.getByText(/aionis-brand-plane/i).first()).toBeVisible();
     await expect(page.getByText(/cinematic-landing-21st/i).first()).toBeVisible();
@@ -385,14 +388,20 @@ test.describe("FOLIO Block 0 smoke", () => {
 
   test("prime desk surfaces live Empire gates from network matrix", async ({ page }) => {
     await page.goto("/desk/");
-    await expect(page.getByText(/live empire gates/i).first()).toBeVisible({
-      timeout: 30_000,
-    });
+    // Production Netro paints live gates; classic overview only when Netro not approved
+    const netro = page.getByTestId("netro-live-gates");
+    const classic = page.getByText(/live empire gates/i);
+    await expect(netro.or(classic).first()).toBeVisible({ timeout: 30_000 });
+    if (await netro.count()) {
+      await expect(netro).toContainText(/wash|multiplier/i);
+      // SSR seed: not stuck on defaults forever
+      await expect(netro).toContainText(/live|fail-closed|≤\$1|inspect/i);
+    }
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/wash/);
     expect(body).toMatch(/nestusd/);
     expect(body).toMatch(/broadcast/);
-    expect(body).toMatch(/fail-closed|unavailable|quote-only|mainnet-read/);
+    expect(body).toMatch(/fail-closed|unavailable|quote-only|mainnet-read|paused/);
     expect(body).not.toMatch(/unhackable|filled on mainnet/);
   });
 
@@ -538,7 +547,11 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/own the economic truth|live|broadcast/);
     // Supporting copy + lab links sit below the brand plane — not stacked on letterforms
-    expect(body).toMatch(/lab\/ui|lab\/shaders|premium chrome|honest stock desk/);
+    expect(body).toMatch(/lab\/ui|lab\/shaders|premium chrome|honest stock desk|truth before trade/);
+    // Full landing below preserved hero — secondary Netro section is not a second hero
+    await expect(page.getByRole("heading", { name: /truth before trade/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /share truth desk/i })).toBeVisible();
+    await expect(page.locator(".home-section-netro")).toBeVisible();
     // Hero preserved — Empire readiness lives on desk/lab, not a second home hero
     await expect(page.getByRole("heading", { name: /live empire/i })).toHaveCount(0);
   });

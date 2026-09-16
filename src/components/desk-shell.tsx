@@ -97,6 +97,11 @@ export function DeskShell({
   const deskSeed = useLoaderData({ from: "/desk" });
   const approvalsSeed = deskSeed.approvals;
   const readinessSeed = deskSeed.readiness;
+  const truthSeed = deskSeed.truth;
+  const networkSeed = deskSeed.network;
+  const creditSeed = deskSeed.credit;
+  const acquireSeed = deskSeed.acquire;
+  const positionsSeed = deskSeed.positions;
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -142,12 +147,16 @@ export function DeskShell({
     queryKey: ["truth-bundle", "desk-lab-preview", "AAPLx"],
     queryFn: () => fetchTruth({ data: { symbol: "AAPLx" } }),
     enabled: showNetroCanvas,
+    initialData: showNetroCanvas ? truthSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 30_000,
   });
   const network = useQuery({
     queryKey: ["network-matrix-desk", "netro-surface"],
     queryFn: () => fetchNetwork(),
     enabled: showNetroCanvas,
+    initialData: showNetroCanvas ? networkSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 30_000,
     refetchInterval: 60_000,
   });
@@ -155,6 +164,9 @@ export function DeskShell({
     queryKey: ["credit-bundle", "netro-surface", inspectSearch ?? ""],
     queryFn: () => fetchCredit({ data: { inspectWallet: inspectSearch } }),
     enabled: showNetroCanvas,
+    initialData:
+      showNetroCanvas && !inspectSearch ? creditSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,
   });
   const positions = useQuery({
@@ -162,6 +174,9 @@ export function DeskShell({
     queryFn: () =>
       fetchPositions({ data: { inspectWallet: inspectSearch } }),
     enabled: showNetroCanvas,
+    initialData:
+      showNetroCanvas && !inspectSearch ? positionsSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
   const session = useQuery({
@@ -176,6 +191,8 @@ export function DeskShell({
     queryKey: ["acquire-bundle", "netro-surface", "AAPLx", 1],
     queryFn: () => fetchAcquire({ data: { symbol: "AAPLx", spendUsdc: 1 } }),
     enabled: showNetroCanvas,
+    initialData: showNetroCanvas ? acquireSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
   const mult = truth.data?.multiplier;
@@ -315,8 +332,10 @@ export function DeskShell({
           <StatusBadge tone="blue">Quote-only</StatusBadge>
           <p>Broadcast disabled</p>
           <p>
-            <Link to="/lab/ui">Approve lab UI</Link> ·{" "}
-            <Link to="/lab/shaders">shaders</Link>
+            <Link to="/lab/ui">
+              {approvedUi ? `Lab UI (${approvedUi})` : "Approve lab UI"}
+            </Link>{" "}
+            · <Link to="/lab/shaders">shaders</Link>
           </p>
         </div>
       </aside>

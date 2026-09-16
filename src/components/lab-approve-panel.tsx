@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { StatusBadge } from "@/components/folio-brand";
+import { getLabApprovals } from "@/lib/desk.functions";
 import {
   chatReplyForPick,
   isLabShaderId,
@@ -14,7 +16,7 @@ import {
   type LabUiId,
 } from "@/lib/lab-pick";
 
-/** Shared approve-gate instructions — premium chrome stays off until Henry replies with an id. */
+/** Shared approve-gate instructions — production merge via FOLIO_APPROVED_LAB_* after Henry reply. */
 export function LabApprovePanel({
   kind,
   ids,
@@ -29,10 +31,36 @@ export function LabApprovePanel({
   const [copied, setCopied] = useState<string | null>(null);
   const [picked, setPicked] = useState<string | null>(null);
   const [replyCopied, setReplyCopied] = useState(false);
+  const [approvedUi, setApprovedUi] = useState<string | null>(null);
+  const [approvedShader, setApprovedShader] = useState<string | null>(null);
+  const fetchApprovals = useServerFn(getLabApprovals);
 
   useEffect(() => {
     setPicked(kind === "ui" ? readLabUiPick() : readLabShaderPick());
   }, [kind]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchApprovals().then((a) => {
+      if (cancelled) return;
+      setApprovedUi(a.approvedUi);
+      setApprovedShader(a.approvedShader);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchApprovals]);
+
+  const productionApproved =
+    kind === "ui" ? approvedUi : approvedShader;
+  const productionLabel =
+    kind === "ui"
+      ? approvedUi
+        ? `Production · ${approvedUi}`
+        : null
+      : approvedShader
+        ? `Production · ${approvedShader}`
+        : null;
 
   async function copyText(text: string, mark: string) {
     try {
@@ -73,11 +101,37 @@ export function LabApprovePanel({
   return (
     <aside className="lab-approve-panel" aria-label="How to approve">
       <div className="mb-3 flex flex-wrap gap-2">
-        <StatusBadge tone="blue">Awaiting Henry</StatusBadge>
-        <StatusBadge tone="neutral">Nothing merges without your chat reply</StatusBadge>
+        {productionLabel ? (
+          <StatusBadge tone="green">{productionLabel}</StatusBadge>
+        ) : (
+          <StatusBadge tone="blue">Awaiting Henry</StatusBadge>
+        )}
+        <StatusBadge tone="neutral">
+          {productionApproved
+            ? "FOLIO_APPROVED_LAB_* set on Vercel"
+            : "Nothing merges without your chat reply"}
+        </StatusBadge>
         {picked ? <StatusBadge tone="green">Picked {picked}</StatusBadge> : null}
       </div>
-      <h2 className="lab-approve-title">How to approve (one minute)</h2>
+      <h2 className="lab-approve-title">
+        {productionApproved ? "Production chrome live" : "How to approve (one minute)"}
+      </h2>
+      {productionApproved ? (
+        <p className="lab-approve-foot" style={{ marginTop: 0 }}>
+          {kind === "ui" ? (
+            <>
+              Desk overview mounts <code>{approvedUi}</code> via{" "}
+              <code>FOLIO_APPROVED_LAB_UI</code>. Home Aionis hero stays preserved.
+              Local Pick below is still opt-in preview only.
+            </>
+          ) : (
+            <>
+              Shader <code>{approvedShader}</code> is approved via{" "}
+              <code>FOLIO_APPROVED_LAB_SHADER</code>. Local Pick remains opt-in.
+            </>
+          )}
+        </p>
+      ) : (
       <ol className="lab-approve-steps">
         <li>Look at the visual stages above.</li>
         <li>
@@ -96,6 +150,7 @@ export function LabApprovePanel({
           <code>{chatReplyForPick(kind, ids[0] ?? "…")}</code>) + a screenshot.
         </li>
       </ol>
+      )}
       <p className="lab-approve-ids">
         <span>Ids:</span>{" "}
         {ids.map((id) => (
@@ -158,8 +213,8 @@ export function LabApprovePanel({
         <Link to={other.to} className="underline">
           {other.label}
         </Link>
-        . Home topbar: Lab UI · Shaders · Open desk. Production hero stays locked until you
-        reply in chat.
+        . Home primary hero stays the Aionis brand-plane
+        {productionApproved ? " (desk chrome already approved)." : " until you reply in chat."}
       </p>
     </aside>
   );

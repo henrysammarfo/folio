@@ -115,6 +115,20 @@ function Page() {
     setLabShaderPick(readLabShaderPick());
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash.replace(/^#/, "");
+    if (!hash) return;
+    const el = document.getElementById(hash);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [data]);
+
+  const empireKeysReady = Boolean(
+    data?.readiness.privyConfigured && data?.readiness.supabaseConfigured,
+  );
+
   return (
     <DeskShell eyebrow="Server preferences" title="Settings">
       <div className="mb-3 flex flex-wrap gap-2">
@@ -268,10 +282,21 @@ function Page() {
           <p>
             <span>Lab premium UI</span>
             <b>
-              {labUiPick || labShaderPick
-                ? `Local pick ${[labUiPick, labShaderPick].filter(Boolean).join(" · ")} · awaiting chat reply — `
-                : "Awaiting Henry candidate id — "}
-              <a href="/lab/ui">/lab/ui</a> · <a href="/lab/shaders">/lab/shaders</a>
+              {data?.readiness.approvedLabUi
+                ? `Production · ${data.readiness.approvedLabUi}`
+                : labUiPick || labShaderPick
+                  ? `Local pick ${[labUiPick, labShaderPick].filter(Boolean).join(" · ")} · awaiting chat reply — `
+                  : "Awaiting Henry candidate id — "}
+              {!data?.readiness.approvedLabUi ? (
+                <>
+                  <a href="/lab/ui">/lab/ui</a> · <a href="/lab/shaders">/lab/shaders</a>
+                </>
+              ) : (
+                <>
+                  {" "}
+                  · <a href="/lab/ui">/lab/ui</a>
+                </>
+              )}
             </b>
           </p>
           <p>
@@ -391,8 +416,12 @@ function Page() {
               <b>Broadcast</b>
               <small>Requires funding and explicit enablement</small>
             </span>
-            <StatusBadge tone="neutral">
-              {data?.networkPolicy.broadcast ? "Enabled" : "Unavailable"}
+            <StatusBadge tone={data?.networkPolicy.broadcast ? "amber" : "neutral"}>
+              {data?.networkPolicy.broadcast
+                ? "Enabled"
+                : data?.readiness.broadcastPaused
+                  ? "Paused · ≤~$1 · quote-only"
+                  : "Policy off"}
             </StatusBadge>
           </div>
           <div className="setting-row">
@@ -561,7 +590,7 @@ function Page() {
         title="Bind Privy → httpOnly session"
         meta={<StatusBadge tone="amber">Fail-closed without keys</StatusBadge>}
         collapsible
-        defaultOpen={false}
+        defaultOpen={empireKeysReady}
       >
         <p className="mb-3 text-sm opacity-80">
           Paste a Privy access token only after Privy + Supabase + FOLIO_SESSION_SECRET are set.

@@ -460,3 +460,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Landing: **Aionis primary hero preserved**; below-fold honesty pillars + secondary Netro desk section + Empire key links. Not a second hero replacement.
 - Settings: rail nav + collapsible panels + step-by-step key links (`docs/KEYS_LANDING.md`). Sidebar minimize on non-Netro desk pages.
 - Vercel still missing Bitquery/Pyth/Privy/Supabase/Jupiter — cannot invent. Rotate chat-pasted Vercel token. Goal open.
+
+## 2026-09-16 — SSR Netro live spine seed
+- `/desk` loader now prefetches truth + network + credit + acquire + positions so Netro first paint shows live × / matrix / LTV / quote (not “live pending” defaults).
+- Broadcast Settings badge says **Paused** (not Unavailable). Lab approve panel shows Production · netro-density when env set. Settings hash scroll + session panel opens when Privy+Supabase present.
+- Empire keys still empty on Vercel — goal open.
