@@ -28,6 +28,26 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
 
   return (
     <div className="netro-density" aria-hidden>
+      {/* Header strip extracted from NetroBNB/components/Header.tsx */}
+      <div className="netro-density-chrome">
+        <div className="netro-density-brand">
+          <span className="netro-density-mark" aria-hidden>
+            F
+          </span>
+          <b>FOLIO</b>
+        </div>
+        <nav className="netro-density-nav" aria-hidden>
+          <span className="netro-nav-on">Truth</span>
+          <span>Acquire</span>
+          <span>Credit</span>
+          <span>Network</span>
+        </nav>
+        <div className="netro-density-chrome-actions">
+          <span className="netro-density-new">+ Truth pass</span>
+          <span className="netro-density-connect">Connect</span>
+        </div>
+      </div>
+
       <header className="netro-density-title">
         <h3>Share truth desk</h3>
         <span>Mainnet-read · quote-only · broadcast off</span>

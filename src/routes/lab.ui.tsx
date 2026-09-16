@@ -12,6 +12,10 @@ import {
   searchTwentyFirstComponents,
   type TwentyFirstHit,
 } from "@/lib/lab/twentyfirst";
+import {
+  PINNED_PLASMA,
+  PINNED_TRADE_JOURNAL,
+} from "@/lib/lab/twentyfirst-pins";
 import { getTruthBundle } from "@/lib/desk.functions";
 
 /** Prefer finance / desk / plasma — never surface random consumer-app heroes (e.g. recovery apps). */
@@ -68,18 +72,19 @@ export const Route = createFileRoute("/lab/ui")({
       }
     }
 
+    // Always attribute pinned ids — Vercel without API_KEY_21ST still shows honest labels
     const tradeJournal =
       (deskSearch.ok
         ? deskSearch.hits.find((h) => /trade journal/i.test(h.name))
         : null) ??
       hits.find((h) => /trade journal/i.test(h.name)) ??
-      null;
+      PINNED_TRADE_JOURNAL;
 
     const note = configured
       ? deskSearch.ok || shaderSearch.ok
-        ? `21st MCP live · Plasma WebGL id 24346 adapted in-lab · ${hits.length} finance-filtered catalog hits`
-        : `21st MCP error · ${"reason" in deskSearch ? deskSearch.reason : "unknown"}`
-      : "API_KEY_21ST missing — set on Vercel preview + local .env for live catalog";
+        ? `21st MCP live · Plasma ${PINNED_PLASMA.id} + Trade Journal ${PINNED_TRADE_JOURNAL.id} pinned · ${hits.length} finance-filtered catalog hits`
+        : `21st MCP error · ${"reason" in deskSearch ? deskSearch.reason : "unknown"} · pinned Plasma ${PINNED_PLASMA.id} + Journal ${PINNED_TRADE_JOURNAL.id} still adapted in-lab`
+      : `API_KEY_21ST missing on this host — pinned Plasma ${PINNED_PLASMA.id} + Trade Journal ${PINNED_TRADE_JOURNAL.id} still adapted in-lab (set key on Vercel for live catalog search)`;
 
     const mult = truth?.multiplier;
     const multiplierLabel = mult?.ok
@@ -153,17 +158,19 @@ function Page() {
             <StatusBadge tone={data.twentyFirstConfigured ? "green" : "amber"}>
               cinematic-landing-21st
             </StatusBadge>
-            <h3>21st Plasma WebGL · id 24346 (FOLIO ink)</h3>
+            <h3>
+              21st Plasma WebGL · id {PINNED_PLASMA.id} (FOLIO ink)
+            </h3>
             <p>
               Pinned 21st.dev Shader Builder Plasma — live canvas retinted to
-              ledger ice. Not a random catalog marketing preview. Production
-              hero stays on the Aionis brand-plane extract until you Pick.
+              ledger ice (works without catalog search). Production hero stays
+              on the Aionis brand-plane extract until you Pick.
             </p>
           </header>
           <div className="lab-plasma-stage" aria-hidden>
             <ShaderBackground variant="ink-ledger" className="lab-plasma-canvas" />
             <div className="lab-plasma-caption">
-              <span>21st MCP · Plasma 24346</span>
+              <span>21st · Plasma {PINNED_PLASMA.id}</span>
               <span>WebGL live · approve-gated</span>
             </div>
           </div>
@@ -173,14 +180,17 @@ function Page() {
           <header className="lab-stage-head">
             <StatusBadge tone="amber">trade-journal-21st</StatusBadge>
             <h3>
-              {data.tradeJournal?.name ?? "Trade journal"} · FOLIO honesty blotter
+              {data.tradeJournal.name} · FOLIO honesty blotter
             </h3>
             <p>
-              {data.tradeJournal
-                ? `Adapted from 21st.dev MCP id ${data.tradeJournal.id}${
-                    data.tradeJournal.author ? ` · @${data.tradeJournal.author}` : ""
-                  } — paper honesty rows only.`
-                : "21st MCP unavailable — blotter still shows local honesty rows."}
+              Adapted from 21st.dev id {data.tradeJournal.id}
+              {data.tradeJournal.author
+                ? ` · @${data.tradeJournal.author}`
+                : ""}{" "}
+              — paper honesty rows only
+              {data.twentyFirstConfigured
+                ? "."
+                : " (pinned when catalog key missing)."}
             </p>
           </header>
           <FolioTradeJournalLab />

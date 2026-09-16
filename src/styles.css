@@ -246,7 +246,22 @@
 .lab-aionis-stage-tall{height:min(62vh,36rem)}
 .lab-aionis-stage .folio-stencil{position:absolute;inset:0}
 .netro-density{margin:.75rem 0 1rem;padding:1rem;border-radius:16px;background:#e5e7eb;color:#1c1c1c}
+/* NetroBNB Header extract — yellow active pill + dark Connect */
+.netro-density-chrome{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.65rem 1rem;padding:.15rem .15rem .85rem;border-bottom:1px solid #d1d5db;margin-bottom:.55rem}
+.netro-density-brand{display:inline-flex;align-items:center;gap:.55rem}
+.netro-density-mark{display:inline-flex;align-items:center;justify-content:center;width:1.65rem;height:1.65rem;border-radius:.45rem;background:#f4d014;color:#1c1c1c;font-weight:800;font-size:.85rem}
+.netro-density-brand b{font-size:1.15rem;letter-spacing:-.02em}
+.netro-density-nav{display:inline-flex;flex-wrap:wrap;gap:.25rem;align-items:center}
+.netro-density-nav span{padding:.28rem .7rem;border-radius:.55rem;font-size:.82rem;color:#333;font-weight:500}
+.netro-density-nav .netro-nav-on{background:#f4d014;color:#1c1c1c;font-weight:650;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.netro-density-chrome-actions{display:inline-flex;gap:.45rem;align-items:center;margin-left:auto}
+.netro-density-new{background:#f4d014;color:#1c1c1c;font-weight:650;font-size:.78rem;padding:.35rem .75rem;border-radius:999px}
+.netro-density-connect{background:#1c1c1c;color:#fff;font-weight:600;font-size:.78rem;padding:.35rem .75rem;border-radius:999px}
 .netro-density-title{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem;align-items:baseline;padding:.15rem .15rem .85rem}
+/* Desk preview: Netro yellow nav pills on topbar */
+.desk-layout[data-lab-ui="netro-density"] .desk-search-policy{
+  background:#f4d014;color:#1c1c1c;border-radius:.55rem;padding:.28rem .7rem;font-weight:650;font-size:.78rem
+}
 .netro-density-title h3{margin:0;font-size:1.35rem;font-weight:650;letter-spacing:-.02em}
 .netro-density-title span{font-size:.72rem;color:#6b7280;letter-spacing:.04em}
 .netro-density-grid{display:grid;grid-template-columns:1fr;gap:.65rem}

@@ -364,3 +364,9 @@
 - Desk opt-in lab preview now mounts **live WebGL Plasma** (21st id 24346 path) for shader picks + `cinematic-landing-21st` — not CSS-only fakes; Exit clears.
 - DEMO_SCRIPT + STOCKLANA_SUBMISSION refreshed; Hermes public still **401** without `PYTH_API_KEY`.
 - Henry blockers unchanged: Step 0 Pick · Vercel `API_KEY_21ST` · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.
+
+## 2026-09-16 — Pinned 21st ids + Netro header extract
+
+- Vercel preview still lacks `API_KEY_21ST` (CLI not logged in — Henry). Lab now **pins Plasma 24346 + Trade Journal 27124** so WebGL/blotter stay attributed without catalog search.
+- NetroBNB Header extract: yellow active Truth pill + dark Connect on `/lab/ui` density stage; desk netro preview topbar picks up yellow policy pill.
+- Goal still blocked: Henry Pick · Vercel API_KEY_21ST · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.

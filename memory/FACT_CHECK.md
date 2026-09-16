@@ -202,3 +202,9 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Hero deadline SEP 25 vs timeline 18 Sep | CONFLICT labeled | Hero + countdown ~9d vs timeline “Fri 18 Sep 16:00 ET” — treat 18 Sep conservative |
 | Public Hermes without PYTH_API_KEY | FAIL-CLOSED 401 | hermes.pyth.network + pyth.dourolabs.app/hermes |
 | Desk lab preview live WebGL Plasma | CONFIRMED local | `data-lab-plasma=1` + `.desk-plasma-canvas` when shader/cinematic preview active |
+
+| 2026-09-16 pinned 21st / Netro header | Result | Source |
+|---|---|---|
+| Plasma id 24346 + Trade Journal 27124 pinned | CONFIRMED in-lab | `src/lib/lab/twentyfirst-pins.ts` · lab/ui labels without MCP key |
+| Vercel preview API_KEY_21ST | MISSING (Henry) | jina `/lab/ui` still amber · CLI login_required |
+| Netro Header yellow active pill | Extracted | `NetroBNB/components/Header.tsx` → `.netro-density-chrome` |

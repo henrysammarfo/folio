@@ -28,7 +28,7 @@ Set on the Vercel project (Preview + Production) so `/lab/ui` is live on the pub
 | `API_KEY_21ST` | 21st.dev MCP catalog + previews on `/lab/ui` |
 | `SHADERS_API_KEY` | optional — shaders.com probe (often Clerk 500; WebGL still ships from 21st) |
 
-**Live check 2026-09-16:** preview `/lab/ui` still shows `API_KEY_21ST missing` until that Vercel env lands.
+**Live check 2026-09-16:** preview `/lab/ui` still shows `API_KEY_21ST missing` until that Vercel env lands — **pinned Plasma 24346 + Trade Journal 27124 still adapt in-lab** (WebGL + blotter work without catalog search).
 
 ---
 
