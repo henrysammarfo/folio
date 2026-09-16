@@ -92,7 +92,7 @@ function Page() {
         <p className="mb-3 text-sm opacity-80">
           Mainnet-read balances for collateral math without a watch-wallet cookie or Privy
           session. Useful on Vercel before <code>FOLIO_SESSION_SECRET</code> lands. Inspect is{" "}
-          <b>not</b> multi-tenant auth — and borrow broadcast stays off.
+          <b>not</b> multi-tenant auth — and borrow broadcast stays paused.
         </p>
         <div className="form-grid">
           <label>
