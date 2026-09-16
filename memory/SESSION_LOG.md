@@ -517,3 +517,8 @@
 - Migration tables exist but service_role hit **42501** — added `20260916_folio_tenants_grants.sql` + GRANTs into base migration; Settings probe distinguishes PGRST205 vs grants.
 - Pyth: documented exact Terminal path — current key = crypto-only (Starter behavior); Equity needs **Pro / free Pro trial** + Equities asset class (not vague "entitle"). Honesty: Settings no longer claims Hermes equity live from key presence alone.
 - Goal still open: Pyth Pro equities · run grants SQL · mint session. Rotate chat secrets.
+
+## 2026-09-16 — Supabase grants live + folio-demo seed + Join button
+- Live probe: `supabaseSchemaReady=true` (service_role GRANTs applied). Seeded `folio-demo` tenant; removed placeholder `privy_did_here` membership.
+- Added Settings **Join folio-demo as owner** (`attachDemoTenantMembership`) — requires real Privy mint first; remints cookie with memberships.
+- Henry next: mint Privy session + Join folio-demo; Pyth Pro+Equities still blocks Empire DONE. Goal open. Rotate chat secrets.

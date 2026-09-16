@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
 import { Switch } from "@/components/ui/switch";
 import {
+  attachDemoTenantMembership,
   bindWatchWallet,
   clearFolioSession,
   clearWatchWallet,
@@ -43,6 +44,7 @@ function Page() {
   const switchTenant = useServerFn(setActiveTenant);
   const createSession = useServerFn(createSessionFromPrivyToken);
   const clearSession = useServerFn(clearFolioSession);
+  const attachDemo = useServerFn(attachDemoTenantMembership);
   const bindWatch = useServerFn(bindWatchWallet);
   const clearWatch = useServerFn(clearWatchWallet);
   const { data, refetch } = useQuery({
@@ -776,6 +778,31 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
               ))}
             </ul>
           )}
+          {data?.session.ok && tenants.length === 0 ? (
+            <button
+              type="button"
+              className="wallet-pill mt-3"
+              disabled={sessionBusy || !data.readiness.supabaseSchemaReady}
+              onClick={async () => {
+                setSessionBusy(true);
+                setSessionMsg("");
+                try {
+                  const res = await attachDemo();
+                  setSessionMsg(
+                    res.ok
+                      ? res.data.note
+                      : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                  );
+                  await invalidateSessionScopedBundles();
+                  await refetch();
+                } finally {
+                  setSessionBusy(false);
+                }
+              }}
+            >
+              Join folio-demo as owner
+            </button>
+          ) : null}
           <button
             type="button"
             className="wallet-pill mt-3"

@@ -495,6 +495,7 @@ export {
   setActiveTenant,
   createSessionFromPrivyToken,
   clearFolioSession,
+  attachDemoTenantMembership,
   bindWatchWallet,
   clearWatchWallet,
 } from "./desk.empire";

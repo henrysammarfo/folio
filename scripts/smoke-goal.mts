@@ -142,7 +142,7 @@ async function main() {
   );
   if (!summary.shipReady) {
     console.log(
-      "remaining: Pyth Pro+Equities entitlement · run 20260916_folio_tenants_grants.sql · mint folio_session + tenant_members · rotate chat secrets — docs/HENRY_STEPS.md",
+      "remaining: Pyth Pro+Equities at app.pyth.com · mint folio_session + Join folio-demo · rotate chat secrets — docs/HENRY_STEPS.md",
     );
   }
 }

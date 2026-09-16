@@ -315,3 +315,8 @@ EOF
 - VERIFIED: PostgREST `tenants` → HTTP 403 code 42501 (`GRANT SELECT … TO service_role`) — tables exist, privileges missing.
 - VERIFIED: Pyth pricing — Free view-only; Starter crypto-only $500; Pro equities from $2500 / free trial (pyth.network/price-feeds). Current key BTC/ETH 200, Equity.US.AAPL 403 Not entitled.
 - OPEN: Henry runs `20260916_folio_tenants_grants.sql`; upgrades Pyth to Pro+Equities; rotates chat-pasted secrets.
+
+## 2026-09-16 — Schema grants verified live
+- VERIFIED: PostgREST `tenants` SELECT via service_role → 200; `supabaseSchemaDetail` = Ready.
+- VERIFIED: `folio-demo` tenant id `29eadccb…` upserted; placeholder `privy_did_here` membership deleted.
+- OPEN: Pyth Equity.US.AAPL still 403 Not entitled; multi-tenant needs Privy access token mint + Join folio-demo.

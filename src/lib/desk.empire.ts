@@ -35,6 +35,8 @@ import {
 } from "./auth/session";
 import { isSupabaseUserJwtConfigured } from "./auth/supabase-user-jwt";
 import { buildSessionFromPrivyToken } from "./auth/session-from-privy";
+import { attachUserToDemoTenant } from "./auth/demo-tenant";
+import { resolveTenantMemberships } from "./auth/tenants";
 import {
   FOLIO_WATCH_WALLET_COOKIE,
   mintWatchWalletCookie,
@@ -986,6 +988,73 @@ export const clearFolioSession = createServerFn({ method: "POST" }).handler(
     } catch (e) {
       return errResult("folio.session.clear", "clear_failed", String(e));
     }
+  },
+);
+
+/**
+ * Attach current httpOnly session user to folio-demo as owner (service-role).
+ * Then remint cookie so tenant memberships appear on the session.
+ */
+export const attachDemoTenantMembership = createServerFn({ method: "POST" }).handler(
+  async () => {
+    const session = readVerifiedSession();
+    if (!session.ok) {
+      return errResult(
+        "folio.demo-tenant.attach",
+        "attach_requires_session",
+        "Mint httpOnly folio_session with a Privy access token first.",
+      );
+    }
+    const attached = await attachUserToDemoTenant({
+      userId: session.data.userId,
+      walletAddress: session.data.walletAddress,
+    });
+    if (!attached.ok) {
+      return errResult(
+        "folio.demo-tenant.attach",
+        attached.reason,
+        attached.detail,
+      );
+    }
+
+    const memberships = await resolveTenantMemberships({
+      userId: session.data.userId,
+    });
+    const tenants = memberships.ok ? memberships.data : session.data.tenants;
+    const remainingMs = Date.parse(session.data.expiresAt) - Date.now();
+    const ttlSec = Math.max(60, Math.floor(remainingMs / 1000));
+    const minted = mintFolioSession({
+      userId: session.data.userId,
+      walletAddress: session.data.walletAddress,
+      tenants,
+      activeTenantId: attached.data.tenantId,
+      ttlSec,
+    });
+    if (!minted.ok) {
+      return errResult(
+        "folio.demo-tenant.attach",
+        minted.reason,
+        `${attached.data.note} · remint failed: ${minted.detail ?? minted.reason}`,
+      );
+    }
+    setCookie(FOLIO_SESSION_COOKIE, minted.data.cookieValue, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: ttlSec,
+      secure: process.env["NODE_ENV"] === "production",
+    });
+    return {
+      ok: true as const,
+      mode: "mainnet-read" as const,
+      asOf: new Date().toISOString(),
+      source: "folio.demo-tenant.attach",
+      data: {
+        ...attached.data,
+        session: minted.data.session,
+        note: `${attached.data.note} · cookie reminted with ${tenants.length} membership(s)`,
+      },
+    };
   },
 );
 
