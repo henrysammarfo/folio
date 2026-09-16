@@ -6,12 +6,34 @@ import { z } from "zod";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
-import { getCreditBundle, getPositionsBundle } from "@/lib/desk.functions";
+import {
+  getCreditBundle,
+  getNetworkBundle,
+  getPositionsBundle,
+} from "@/lib/desk.functions";
+import type { IntegrationMode } from "@/lib/adapters/types";
 
 const deskSearchSchema = z.object({
   /** Ephemeral mainnet-read inspect pubkey — not auth, not persisted. */
   inspect: z.string().max(64).optional().catch(undefined),
 });
+
+const GATE_CAPS = [
+  "xStocks multiplier + asset metadata",
+  "Wash / linked-flow gate",
+  "Jupiter swap quote",
+  "Pyth Hermes equity reference",
+  "NestUSD capacity",
+  "Multi-tenant sessions (Privy + Supabase)",
+  "Broadcast swap / borrow",
+] as const;
+
+function toneFor(mode: IntegrationMode): "green" | "amber" | "blue" | "neutral" {
+  if (mode === "mainnet-read") return "green";
+  if (mode === "quote-only" || mode === "fork") return "blue";
+  if (mode === "paper") return "amber";
+  return "neutral";
+}
 
 export const Route = createFileRoute("/desk/")({
   head: () => ({
@@ -24,11 +46,12 @@ export const Route = createFileRoute("/desk/")({
   loaderDeps: ({ search }) => ({ inspect: search.inspect }),
   /** Prefetch overview bundles so qty/credit honesty paints on first load. */
   loader: async ({ deps }) => {
-    const [positions, credit] = await Promise.all([
+    const [positions, credit, network] = await Promise.all([
       getPositionsBundle({ data: { inspectWallet: deps.inspect } }),
       getCreditBundle({ data: { inspectWallet: deps.inspect } }),
+      getNetworkBundle(),
     ]);
-    return { positions, credit };
+    return { positions, credit, network };
   },
   component: Page,
 });
@@ -39,6 +62,7 @@ function Page() {
   const navigate = useNavigate({ from: Route.fullPath });
   const fetchPositions = useServerFn(getPositionsBundle);
   const fetchCredit = useServerFn(getCreditBundle);
+  const fetchNetwork = useServerFn(getNetworkBundle);
   const [inspectInput, setInspectInput] = useState(inspect ?? "");
   const positions = useQuery({
     queryKey: ["positions-bundle", inspect ?? ""],
@@ -54,23 +78,38 @@ function Page() {
     initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,
   });
+  const network = useQuery({
+    queryKey: ["network-matrix-desk"],
+    queryFn: () => fetchNetwork(),
+    initialData: initial.network,
+    initialDataUpdatedAt: Date.now(),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
 
   const rows = positions.data?.rows ?? [];
-  const verified = rows.filter((r) => r.health === "Verified").length;
+  const walletVerified = rows.filter((r) => r.health === "Verified").length;
+  const liveMarks = rows.filter((r) => r.health === "Review" || r.health === "Verified").length;
   const paperValue = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
   const walletRead = rows.some((r) => r.qtySource === "wallet-read");
   const creditLabel = credit.data?.paper.label === "wallet-read" ? "wallet-read" : "paper";
   const walletSource = positions.data?.walletSource ?? credit.data?.walletSource ?? null;
+  const gateRows = (network.data?.rows ?? []).filter((r) =>
+    (GATE_CAPS as readonly string[]).includes(r.capability),
+  );
 
   return (
     <DeskShell eyebrow="Portfolio command" title="Prime desk">
       <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Live marks</ModeBadge>
+        <ModeBadge mode={liveMarks > 0 ? "mainnet-read" : "unavailable"}>
+          {liveMarks > 0 ? "Live marks" : "Marks unavailable"}
+        </ModeBadge>
         <ModeBadge mode={walletRead ? "mainnet-read" : "paper"}>
           {walletRead ? "Wallet-read qty" : "Paper qty"}
         </ModeBadge>
         <ModeBadge
           mode={
+            walletSource === "membership" ||
             walletSource === "session" ||
             walletSource === "watch-wallet" ||
             walletSource === "inspect"
@@ -78,16 +117,47 @@ function Page() {
               : "unavailable"
           }
         >
-          {walletSource === "session"
-            ? "Session bound"
-            : walletSource === "watch-wallet"
-              ? "Watch-wallet bound"
-              : walletSource === "inspect"
-                ? "Inspect (ephemeral)"
-                : "Wallet unbound"}
+          {walletSource === "membership"
+            ? "Membership wallet"
+            : walletSource === "session"
+              ? "Session bound"
+              : walletSource === "watch-wallet"
+                ? "Watch-wallet bound"
+                : walletSource === "inspect"
+                  ? "Inspect (ephemeral)"
+                  : "Wallet unbound"}
         </ModeBadge>
         <ModeBadge mode="quote-only">Broadcast off</ModeBadge>
       </div>
+
+      <Panel
+        title="Live Empire gates"
+        meta={
+          <StatusBadge tone="blue">
+            {network.data?.broadcastPaused !== false ? "Broadcast paused" : "Broadcast armed"}
+          </StatusBadge>
+        }
+      >
+        <p className="mb-3 text-sm opacity-80">
+          Same matrix as{" "}
+          <Link to="/network" className="underline">
+            /network
+          </Link>
+          — missing Bitquery / Pyth / Privy / Supabase stay fail-closed. Operational honesty for
+          Stocklana (not a lab chrome merge).
+        </p>
+        <div className="desk-gate-grid">
+          {gateRows.map((row) => (
+            <div key={row.capability} className="desk-gate-row">
+              <div>
+                <b>{row.capability.replace(/ \(.*\)$/, "")}</b>
+                <small>{row.detail}</small>
+              </div>
+              <StatusBadge tone={toneFor(row.mode)}>{row.mode}</StatusBadge>
+            </div>
+          ))}
+        </div>
+      </Panel>
 
       <Panel
         title="Inspect wallet (ephemeral)"
@@ -99,8 +169,12 @@ function Page() {
       >
         <p className="mb-3 text-sm opacity-80">
           Mainnet-read overview qty + illustrative credit for a pubkey without a watch-wallet
-          cookie or Privy session. Useful on Vercel before <code>FOLIO_SESSION_SECRET</code>{" "}
-          lands. Inspect is <b>not</b> multi-tenant auth — and broadcast stays off.
+          cookie or Privy session. Prefer{" "}
+          <Link to="/desk/settings" className="underline">
+            Settings → bind watch wallet
+          </Link>{" "}
+          when you want a cookie. Inspect is <b>not</b> multi-tenant auth — and broadcast stays
+          off.
         </p>
         <div className="form-grid">
           <label>
@@ -167,11 +241,15 @@ function Page() {
           <small>Mainnet marks · {walletRead ? "wallet-read qty" : "paper qty"}</small>
         </div>
         <div>
-          <span>Verified rows</span>
+          <span>Wallet-verified rows</span>
           <b>
-            {verified} / {rows.length || "—"}
+            {walletVerified} / {rows.length || "—"}
           </b>
-          <small>Fail-closed when signals missing</small>
+          <small>
+            {walletRead
+              ? "Wallet-read qty + live marks"
+              : "Paper qty → Review (not Verified)"}
+          </small>
         </div>
         <div>
           <span>Illustrative credit</span>
@@ -194,11 +272,24 @@ function Page() {
       <div className="desk-grid">
         <Panel
           title="Economic positions"
-          meta={<StatusBadge tone="green">{verified} verified</StatusBadge>}
+          meta={
+            <StatusBadge tone={walletVerified > 0 ? "green" : liveMarks > 0 ? "blue" : "amber"}>
+              {walletVerified > 0
+                ? `${walletVerified} wallet-verified`
+                : liveMarks > 0
+                  ? `${liveMarks} live marks · paper`
+                  : "Unavailable"}
+            </StatusBadge>
+          }
         >
           <div className="position-list">
             {rows.map((p) => (
-              <Link key={p.symbol} to="/desk/positions/$symbol" params={{ symbol: p.symbol }}>
+              <Link
+                key={p.symbol}
+                to="/desk/positions/$symbol"
+                params={{ symbol: p.symbol }}
+                search={inspect ? { inspect } : {}}
+              >
                 <span className="asset-icon">{p.symbol[0]}</span>
                 <p>
                   <b>{p.symbol}</b>
@@ -224,11 +315,32 @@ function Page() {
           <div className="policy-list">
             <p>
               <span>Corporate actions</span>
-              <b>{verified > 0 ? "Live API" : "Pending"}</b>
+              <b>
+                {(() => {
+                  const aapl = rows.find((r) => r.symbol === "AAPLx") ?? rows[0];
+                  if (!aapl || aapl.multiplier == null) return "Multiplier unavailable";
+                  if (aapl.pendingMultiplier != null) {
+                    return `Pending ${aapl.pendingMultiplier.toFixed(6)}×`;
+                  }
+                  return "Live · no pending";
+                })()}
+              </b>
             </p>
             <p>
               <span>Kamino market</span>
               <b>{credit.data?.kamino.ok ? "Mainnet read" : "Unavailable"}</b>
+            </p>
+            <p>
+              <span>Nest.credit</span>
+              <b>
+                {credit.data?.nestCredit.ok
+                  ? `${credit.data.nestCredit.data.vaultCount} vaults · not NestUSD`
+                  : "Unavailable"}
+              </b>
+            </p>
+            <p>
+              <span>NestUSD borrow</span>
+              <b>Fail-closed</b>
             </p>
             <p>
               <span>Wash pressure</span>

@@ -16,6 +16,7 @@
     "test:e2e:install": "playwright install chromium",
     "replay": "npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build",
     "smoke": "npx tsx scripts/smoke-empire.mts",
+    "smoke:keys": "npx tsx scripts/smoke-keys.mts",
     "keys": "npx tsx scripts/keys-readiness.mts"
   },
   "overrides": {

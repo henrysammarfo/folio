@@ -5,16 +5,21 @@ import {
   chatReplyForPick,
   isLabShaderId,
   isLabUiId,
+  readApprovedLabShader,
+  readApprovedLabUi,
 } from "../lab-pick";
 
 describe("lab-pick", () => {
   it("accepts only known UI candidate ids", () => {
-    expect(isLabUiId("desk-density-a")).toBe(true);
-    expect(isLabUiId("desk-density-b")).toBe(true);
-    expect(isLabUiId("gate-chip")).toBe(true);
-    expect(isLabUiId("desk-density-z")).toBe(false);
+    expect(isLabUiId("netro-density")).toBe(true);
+    expect(isLabUiId("aionis-brand-plane")).toBe(true);
+    expect(isLabUiId("cinematic-landing-21st")).toBe(true);
+    expect(isLabUiId("trade-journal-21st")).toBe(true);
+    expect(isLabUiId("desk-density-a")).toBe(false);
     expect(isLabUiId("")).toBe(false);
-    expect(LAB_UI_IDS).toHaveLength(3);
+    expect(LAB_UI_IDS).toHaveLength(4);
+    // Stocklana desk recommend: Netro 12-col leads the pick list
+    expect(LAB_UI_IDS[0]).toBe("netro-density");
   });
 
   it("accepts only known shader candidate ids", () => {
@@ -26,11 +31,25 @@ describe("lab-pick", () => {
   });
 
   it("builds chat reply lines Henry can paste", () => {
-    expect(chatReplyForPick("ui", "desk-density-a")).toBe(
-      "Approve lab UI: desk-density-a",
+    expect(chatReplyForPick("ui", "netro-density")).toBe(
+      "Approve lab UI: netro-density",
     );
     expect(chatReplyForPick("shaders", "ink-ledger")).toBe(
       "Approve lab shader: ink-ledger",
     );
+  });
+
+  it("reads Henry-approved production chrome only from known env ids", () => {
+    expect(readApprovedLabUi({})).toBeNull();
+    expect(readApprovedLabUi({ FOLIO_APPROVED_LAB_UI: "netro-density" })).toBe(
+      "netro-density",
+    );
+    expect(readApprovedLabUi({ FOLIO_APPROVED_LAB_UI: "desk-density-a" })).toBeNull();
+    expect(
+      readApprovedLabShader({ FOLIO_APPROVED_LAB_SHADER: "ink-ledger" }),
+    ).toBe("ink-ledger");
+    expect(
+      readApprovedLabShader({ FOLIO_APPROVED_LAB_SHADER: "not-a-shader" }),
+    ).toBeNull();
   });
 });

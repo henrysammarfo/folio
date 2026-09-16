@@ -68,6 +68,21 @@ function Page() {
         <ModeBadge mode={data?.wash.ok ? data.wash.mode : "unavailable"}>
           {data?.wash.ok && data.wash.data.pass ? "Wash clear" : "Wash fail-closed"}
         </ModeBadge>
+        <ModeBadge
+          mode={
+            data?.prefsFromSession && data.strictFailClosed
+              ? "mainnet-read"
+              : data?.prefsFromSession
+                ? "paper"
+                : "unavailable"
+          }
+        >
+          {data?.prefsFromSession
+            ? data.strictFailClosed
+              ? "Strict fail-closed · session prefs"
+              : "Strict off · session prefs"
+            : "Strict prefs · no session"}
+        </ModeBadge>
       </div>
 
       <div className="stepper">
@@ -125,17 +140,129 @@ function Page() {
                 <StatusBadge tone="amber">{String(error)}</StatusBadge>
               </p>
             ) : null}
+            {data ? (
+              <div className="desk-gate-grid acquire-gate-grid mb-4">
+                <div className="desk-gate-row">
+                  <div>
+                    <b>Truth (API)</b>
+                    <small>
+                      {data.gates.truthOk
+                        ? data.multiplier.ok
+                          ? `API ${data.multiplier.data.currentMultiplier.toFixed(6)}×`
+                          : "Live multiplier available for review"
+                        : "Corporate-action / asset truth blocked"}
+                    </small>
+                  </div>
+                  <StatusBadge tone={data.gates.truthOk ? "green" : "amber"}>
+                    {data.gates.truthOk ? "pass" : "fail-closed"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row" data-testid="acquire-scaled-ui-gate">
+                  <div>
+                    <b>On-chain Scaled UI</b>
+                    <small>
+                      {data.scaledUi.ok
+                        ? `${data.scaledUi.data.effectiveMultiplier.toFixed(6)}× · ${data.scaledUiCompare.note}`
+                        : data.scaledUi.reason}
+                    </small>
+                  </div>
+                  <StatusBadge
+                    tone={
+                      data.scaledUiCompare.status === "match"
+                        ? "green"
+                        : data.scaledUiCompare.status === "mismatch"
+                          ? "amber"
+                          : "amber"
+                    }
+                  >
+                    {data.scaledUiCompare.status === "match"
+                      ? "match"
+                      : data.scaledUiCompare.status === "mismatch"
+                        ? "mismatch"
+                        : "off"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row">
+                  <div>
+                    <b>Wash / linked flow</b>
+                    <small>
+                      {data.wash.ok
+                        ? `pressure=${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
+                        : data.wash.reason}
+                    </small>
+                  </div>
+                  <StatusBadge tone={data.gates.washOk ? "green" : "amber"}>
+                    {data.gates.washOk ? "pass" : "fail-closed"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row">
+                  <div>
+                    <b>Jupiter quote</b>
+                    <small>
+                      {data.jupiter.ok
+                        ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
+                        : data.jupiter.reason}
+                    </small>
+                  </div>
+                  <StatusBadge tone={data.gates.quoteOk ? "blue" : "amber"}>
+                    {data.gates.quoteOk ? "quote-only" : "fail-closed"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row">
+                  <div>
+                    <b>Pyth diverge</b>
+                    <small>
+                      {data.pyth.ok
+                        ? "Hermes equity live"
+                        : data.pyth.reason}
+                    </small>
+                  </div>
+                  <StatusBadge
+                    tone={
+                      data.gates.divergeOk === false
+                        ? "amber"
+                        : data.pyth.ok
+                          ? "green"
+                          : "amber"
+                    }
+                  >
+                    {data.gates.divergeOk === false
+                      ? "blocked"
+                      : data.pyth.ok
+                        ? "ok"
+                        : "key-gated"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row">
+                  <div>
+                    <b>canReview</b>
+                    <small>
+                      Continue stays locked until truth · wash · quote · diverge clear
+                    </small>
+                  </div>
+                  <StatusBadge tone={data.gates.canReview ? "green" : "amber"}>
+                    {data.gates.canReview ? "ready" : "blocked"}
+                  </StatusBadge>
+                </div>
+              </div>
+            ) : null}
             <p>
               <span>Corporate-action / asset</span>
               <StatusBadge tone={data?.gates.truthOk ? "green" : "amber"}>
-                {data?.gates.truthOk ? "Verified live" : data ? "Blocked" : "…"}
+                {data?.gates.truthOk
+                  ? data.multiplier.ok && data.multiplier.data.pendingMultiplier != null
+                    ? `Live · pending ${data.multiplier.data.pendingMultiplier.toFixed(6)}×`
+                    : "Verified live · no pending CA"
+                  : data
+                    ? "Blocked"
+                    : "…"}
               </StatusBadge>
             </p>
             <p>
               <span>Wash / linked flow</span>
               <StatusBadge tone={data?.gates.washOk ? "green" : "amber"}>
                 {data?.gates.washOk && data.wash.ok
-                  ? `Heuristic clear · ${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
+                  ? `Tape clear · ${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
                   : data?.wash && data.wash.ok
                     ? `${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
                     : data?.wash && !data.wash.ok
@@ -156,10 +283,34 @@ function Page() {
               </div>
             ) : null}
             <p>
+              <span>Raydium pools</span>
+              <StatusBadge
+                tone={
+                  data?.pools.ok && data.pools.data.raydium.length > 0
+                    ? "blue"
+                    : "amber"
+                }
+              >
+                {data?.pools.ok
+                  ? data.pools.data.raydium.length > 0
+                    ? `${data.pools.data.raydium.length} observed · awareness only`
+                    : "Zero pools · awareness only"
+                  : data?.pools && !data.pools.ok
+                    ? data.pools.reason
+                    : "…"}
+              </StatusBadge>
+            </p>
+            <p>
               <span>Jupiter route</span>
               <StatusBadge tone={data?.gates.quoteOk ? "blue" : "amber"}>
                 {data?.gates.quoteOk && data.jupiter.ok
-                  ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
+                  ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol} · ${
+                      data.jupiter.source.includes("stale")
+                        ? "stale-cache"
+                        : data.jupiter.source.includes("cached")
+                          ? "cached"
+                          : "live"
+                    }`
                   : data?.jupiter && !data.jupiter.ok
                     ? data.jupiter.reason
                     : "…"}
@@ -202,7 +353,9 @@ function Page() {
                 <p>
                   <b>Honesty labels</b>
                   <span className="ml-2 text-sm opacity-70">
-                    (do not invent a pass · do not alone block review)
+                    {data.strictFailClosed
+                      ? "(strict fail-closed on · unresolved required signals also block review)"
+                      : "(do not invent a pass · do not alone block review unless Strict is on)"}
                   </span>
                 </p>
                 <ul>
@@ -211,6 +364,12 @@ function Page() {
                   ))}
                 </ul>
               </div>
+            ) : null}
+            {data && !data.prefsFromSession ? (
+              <p className="mt-3 text-sm opacity-80">
+                Strict fail-closed prefs apply after Privy + Supabase mint an httpOnly session
+                (active tenant). Public demo stays honesty-labeled for missing Pyth until then.
+              </p>
             ) : null}
             {data &&
             (data.gates.blockedReasons.some((r) => /BITQUERY_API_KEY|PYTH_API_KEY/.test(r)) ||
@@ -247,6 +406,15 @@ function Page() {
                   ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
                   : "Unavailable"}
               </b>
+              {data?.jupiter.ok ? (
+                <small>
+                  {data.jupiter.source.includes("stale")
+                    ? "Stale-cache after 429 · not invented"
+                    : data.jupiter.source.includes("cached")
+                      ? "Short TTL cache hit · quote-only"
+                      : "Fresh Jupiter quote · quote-only"}
+                </small>
+              ) : null}
             </div>
             <div>
               <span>Multiplier</span>
@@ -255,6 +423,13 @@ function Page() {
                   ? `${data.multiplier.data.currentMultiplier.toFixed(6)}×`
                   : "—"}
               </b>
+              {data?.multiplier.ok ? (
+                <small>
+                  {data.multiplier.data.pendingMultiplier != null
+                    ? `Pending CA ${data.multiplier.data.pendingMultiplier.toFixed(6)}×`
+                    : "No pending newMultiplier on live feed"}
+                </small>
+              ) : null}
             </div>
             <div>
               <span>Wash</span>
@@ -280,6 +455,8 @@ function Page() {
             </Button>
           ) : null}
           <Button
+            type="button"
+            data-testid="acquire-continue"
             disabled={
               !ready ||
               (step === 2 && (isFetching || !data?.gates.canReview)) ||

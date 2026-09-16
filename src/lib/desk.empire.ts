@@ -10,19 +10,25 @@ import {
   type JupiterTokenPrice,
 } from "./adapters/jupiter";
 import { evaluateWashGate } from "./adapters/wash";
-import { fetchScaledUiOnchain } from "./adapters/scaled-ui";
+import { fetchScaledUiOnchain, compareApiOnchainMultiplier } from "./adapters/scaled-ui";
 import { fetchKaminoXStocksMarket } from "./adapters/kamino";
 import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
 import { fetchNestUsdStatus } from "./adapters/nestusd";
+import { fetchNestCreditVaults } from "./adapters/nest-credit";
 import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import {
   FOLIO_SESSION_COOKIE,
   getAuthProviderStatus,
   loadDeskPreferences,
+  mintFolioSession,
   parseFolioSessionCookie,
+  resolveActiveTenantId,
+  saveDeskPreferences,
+  deskRlsHonestyNote,
   verifyFolioSessionCookieValue,
   type FolioSession,
 } from "./auth/session";
+import { isSupabaseUserJwtConfigured } from "./auth/supabase-user-jwt";
 import { buildSessionFromPrivyToken } from "./auth/session-from-privy";
 import {
   FOLIO_WATCH_WALLET_COOKIE,
@@ -38,9 +44,14 @@ import {
   type WalletBindingSource,
 } from "./wallet-binding";
 export type { WalletBindingSource } from "./wallet-binding";
+import {
+  activeMembership,
+  prefsWriteBlockedReason,
+} from "./auth/role-gates";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
+import { readApprovedLabShader, readApprovedLabUi } from "./lab-pick";
 
 const WATCHLIST = ["AAPLx", "NVDAx", "TSLAx"] as const;
 
@@ -77,11 +88,28 @@ function resolveDisplayWallet(
   inspectWallet?: string | null,
 ): { wallet: string | null; source: WalletBindingSource } {
   const watch = readWatchWallet();
+  const membership = session.ok ? activeMembership(session.data) : null;
   return resolveWalletBinding({
+    membershipWallet: membership?.walletAddress ?? null,
     sessionWallet: session.ok ? session.data.walletAddress : null,
     watchWallet: watch.ok ? watch.data.wallet : null,
     inspectWallet: inspectWallet ?? null,
   });
+}
+
+function walletSourceHonestyTag(source: WalletBindingSource): string {
+  switch (source) {
+    case "membership":
+      return "Active-tenant membership wallet (tenant-scoped)";
+    case "session":
+      return "Privy session wallet";
+    case "watch-wallet":
+      return "Watch-wallet ≠ Privy multi-tenant auth";
+    case "inspect":
+      return "Ephemeral inspect (not auth / not multi-tenant)";
+    default:
+      return "No wallet bound";
+  }
 }
 
 export type PositionRow = {
@@ -93,6 +121,8 @@ export type PositionRow = {
   paperRaw: number;
   qtySource: "wallet-read" | "paper";
   multiplier: number | null;
+  /** Live xStocks newMultiplier when a CA is pending — null means none on feed. */
+  pendingMultiplier: number | null;
   onchainEffectiveMultiplier: number | null;
   economicShares: number | null;
   usdPrice: number | null;
@@ -116,6 +146,8 @@ export type CreditBundle = {
   kamino: Awaited<ReturnType<typeof fetchKaminoXStocksMarket>>;
   jupiterLend: Awaited<ReturnType<typeof fetchJupiterLendEarn>>;
   nestusd: Awaited<ReturnType<typeof fetchNestUsdStatus>>;
+  /** Nest.credit vault awareness — not NestUSD borrow capacity. */
+  nestCredit: Awaited<ReturnType<typeof fetchNestCreditVaults>>;
   paper: {
     /** Qty basis for collateral math — wallet-read when bound, else paper. */
     label: "paper" | "wallet-read";
@@ -128,7 +160,8 @@ export type CreditBundle = {
   /** Ephemeral inspect pubkey when no session/watch-wallet bound. */
   inspectWallet: string | null;
   walletSource: WalletBindingSource;
-  borrowExecution: "local-fork-or-unavailable";
+  /** Honest label — no local fork harness shipped; borrow stays off until funded. */
+  borrowExecution: "unavailable-until-funded";
 };
 
 export type ActivityEvent = {
@@ -142,11 +175,19 @@ export type ActivityEvent = {
 export type ActivityBundle = {
   events: ActivityEvent[];
   note: string;
+  /**
+   * Corporate-action alert preference from active-tenant prefs when session exists.
+   * Live CA signal today = xStocks multiplier — no separate calendar feed yet.
+   */
+  corporateActionAlerts: boolean | null;
+  prefsFromSession: boolean;
 };
 
 export type SessionBundle = {
   auth: ReturnType<typeof getAuthProviderStatus>;
   session: AdapterResult<FolioSession>;
+  /** Membership-validated active tenant — null when session missing/empty. */
+  activeTenantId: string | null;
   preferences: Awaited<ReturnType<typeof loadDeskPreferences>>;
   networkPolicy: {
     mainnetRead: true;
@@ -157,6 +198,13 @@ export type SessionBundle = {
   watchWallet: string | null;
   /** FOLIO_SESSION_SECRET ≥16 — watch-wallet bind + cookie signing (not Privy). */
   sessionSecretPresent: boolean;
+  /** AGENTROUTER_API_KEY present — NL expansion optional; live spine always runs. */
+  agentRouterKeyPresent: boolean;
+  /**
+   * RLS honesty: user-JWT (sub=Privy DID) when SUPABASE_JWT_SECRET set;
+   * otherwise labeled service-role fallback (anon policies not live authz).
+   */
+  rlsNote: string;
   /** Production readiness flags — fail-closed honesty for Henry / Stocklana ops. */
   readiness: {
     bitqueryKeyPresent: boolean;
@@ -164,7 +212,22 @@ export type SessionBundle = {
     supabaseConfigured: boolean;
     sessionSecretPresent: boolean;
     pythApiKeyPresent: boolean;
+    agentRouterKeyPresent: boolean;
+    /** SUPABASE_JWT_SECRET + anon + URL — user-JWT RLS path armed. */
+    supabaseJwtConfigured: boolean;
     broadcastPaused: boolean;
+    /** Lab only — 21st.dev MCP catalog (approve gate). */
+    twentyFirstKeyPresent: boolean;
+    /** Lab only — shaders.com probe (often Clerk-gated). */
+    shadersKeyPresent: boolean;
+    /** Production desk chrome after Henry chat approve (FOLIO_APPROVED_LAB_UI). */
+    approvedLabUi: string | null;
+    /** Production desk shader after Henry chat approve (FOLIO_APPROVED_LAB_SHADER). */
+    approvedLabShader: string | null;
+    /** Optional Jupiter auth header — public path works without it. */
+    jupiterKeyPresent: boolean;
+    /** Dedicated SOLANA_RPC_URL (false = labeled public RPC fallback · B004). */
+    solanaRpcDedicated: boolean;
   };
 };
 
@@ -238,14 +301,26 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
       ];
       if (onchain.ok) labels.push("onchain-scaled-ui");
       if (!displayWallet) labels.push("wallet-unbound");
+      if (walletSource === "membership") labels.push("membership-wallet");
       if (walletSource === "inspect") labels.push("inspect-ephemeral");
       if (displayWallet && walletBalances && !walletBalances.ok) {
         labels.push("wallet-read-unavailable");
       }
 
       let health: PositionRow["health"] = "Unavailable";
-      if (multiplier.ok && asset.ok && price.ok) health = "Verified";
-      else if (multiplier.ok) health = "Review";
+      // "Verified" = wallet-read qty + live multiplier/asset/price — never paper theater.
+      if (
+        qtySource === "wallet-read" &&
+        multiplier.ok &&
+        asset.ok &&
+        price.ok
+      ) {
+        health = "Verified";
+      } else if (multiplier.ok && (asset.ok || price.ok)) {
+        health = "Review"; // live marks · paper qty (or partial feeds)
+      } else if (multiplier.ok) {
+        health = "Review";
+      }
 
       rows.push({
         symbol,
@@ -255,6 +330,9 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
         paperRaw,
         qtySource,
         multiplier: mult,
+        pendingMultiplier: multiplier.ok
+          ? multiplier.data.pendingMultiplier
+          : null,
         onchainEffectiveMultiplier: onchainEff,
         economicShares,
         usdPrice,
@@ -269,15 +347,9 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
     let note: string;
     if (!displayWallet) {
       note =
-        "Quantities are paper labels until Privy session wallet, watch-wallet bind, or ephemeral inspect. Multipliers/prices are live mainnet reads.";
+        "Quantities are paper labels until membership wallet, Privy session wallet, watch-wallet bind, or ephemeral inspect. Multipliers/prices are live mainnet reads.";
     } else if (walletBalances?.ok) {
-      const tag =
-        walletSource === "inspect"
-          ? "Ephemeral inspect (not auth / not multi-tenant)"
-          : walletSource === "watch-wallet"
-            ? "Watch-wallet ≠ Privy multi-tenant auth"
-            : "Privy session wallet";
-      note = `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). Multipliers/prices live. ${tag}.`;
+      note = `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). Multipliers/prices live. ${walletSourceHonestyTag(walletSource)}.`;
     } else {
       note = `Wallet selected for read but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing paper qty. Multipliers/prices live.`;
     }
@@ -304,10 +376,11 @@ export const getCreditBundle = createServerFn({ method: "GET" })
     );
     const watch = readWatchWallet();
 
-    const [kamino, jupiterLend, nestusd] = await Promise.all([
+    const [kamino, jupiterLend, nestusd, nestCredit] = await Promise.all([
       fetchKaminoXStocksMarket(),
       fetchJupiterLendEarn(),
       fetchNestUsdStatus(),
+      fetchNestCreditVaults(),
     ]);
 
     const creditSymbols = ["AAPLx", "NVDAx"] as const;
@@ -367,10 +440,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
     const inspectActive = walletSource === "inspect" ? displayWallet : null;
     let note: string;
     if (usedWalletQty) {
-      note =
-        walletSource === "inspect"
-          ? "Illustrative — ephemeral inspect wallet-read qty × live Kamino maxLtv. No borrow broadcast. Inspect ≠ Privy multi-tenant auth."
-          : "Illustrative — wallet-read qty × live Kamino maxLtv. No borrow broadcast. Watch-wallet ≠ Privy multi-tenant auth.";
+      note = `Illustrative — wallet-read qty × live Kamino maxLtv. No borrow broadcast. ${walletSourceHonestyTag(walletSource)}.`;
     } else if (displayWallet && walletBalances && !walletBalances.ok) {
       note = `Wallet selected but balances unavailable (${walletBalances.reason}) — paper qty × live Kamino maxLtv. No borrow broadcast.`;
     } else {
@@ -381,6 +451,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       kamino,
       jupiterLend,
       nestusd,
+      nestCredit,
       paper: {
         label,
         collateralUsd: collateral,
@@ -388,7 +459,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
         illustrativeBorrowUsd,
         note,
       },
-      borrowExecution: "local-fork-or-unavailable",
+      borrowExecution: "unavailable-until-funded",
       watchWallet: watch.ok ? watch.data.wallet : null,
       inspectWallet: inspectActive,
       walletSource,
@@ -399,6 +470,18 @@ export const getCreditBundle = createServerFn({ method: "GET" })
 export const getActivityBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<ActivityBundle> => {
     const symbol = "AAPLx";
+    const session = readVerifiedSession();
+    const activeTenantId = session.ok
+      ? resolveActiveTenantId(session.data)
+      : null;
+    const prefs = session.ok
+      ? await loadDeskPreferences(activeTenantId, session.data.userId)
+      : null;
+    const prefsFromSession = Boolean(prefs?.ok);
+    const corporateActionAlerts = prefs?.ok
+      ? prefs.data.corporateActionAlerts
+      : null;
+
     const [multiplier, asset] = await Promise.all([
       fetchXStockMultiplier(symbol),
       fetchXStockAsset(symbol),
@@ -407,7 +490,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
     const decimals =
       asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
 
-    const [wash, jupiterQuote, pools, kamino] = await Promise.all([
+    const [wash, jupiterQuote, pools, kamino, nestCredit, nestusd, scaledUi] = await Promise.all([
       evaluateWashGate({ symbol, mint, notionalUsd: 1 }),
       mint
         ? fetchJupiterQuote({
@@ -420,7 +503,20 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         ? fetchRaydiumPoolsForMint(mint)
         : Promise.resolve(errResult("api-v3.raydium.io", "mint_missing")),
       fetchKaminoXStocksMarket(),
+      fetchNestCreditVaults(),
+      fetchNestUsdStatus(),
+      mint
+        ? fetchScaledUiOnchain(mint)
+        : Promise.resolve(errResult("solana-rpc.scaled-ui", "mint_missing")),
     ]);
+
+    const jupiterCacheLabel = jupiterQuote.ok
+      ? jupiterQuote.source.includes("stale")
+        ? "stale-cache"
+        : jupiterQuote.source.includes("cached")
+          ? "cached"
+          : "live"
+      : null;
 
     const now = new Date().toISOString();
     const events: ActivityEvent[] = [
@@ -433,13 +529,71 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         tone: multiplier.ok ? "green" : "amber",
         mode: multiplier.ok ? multiplier.mode : "unavailable",
       },
+      (() => {
+        const compare = compareApiOnchainMultiplier(
+          multiplier.ok ? multiplier.data.currentMultiplier : null,
+          scaledUi.ok ? scaledUi.data.effectiveMultiplier : null,
+        );
+        return {
+          at: now,
+          title:
+            compare.status === "match"
+              ? `On-chain Scaled UI match · ${compare.onchainEffective?.toFixed(6)}×`
+              : compare.status === "mismatch"
+                ? `On-chain Scaled UI mismatch · ${compare.deltaBps?.toFixed(1)} bps`
+                : "On-chain Scaled UI unavailable",
+          detail: compare.note,
+          tone:
+            compare.status === "match"
+              ? ("green" as const)
+              : compare.status === "mismatch"
+                ? ("amber" as const)
+                : ("neutral" as const),
+          mode: scaledUi.ok ? scaledUi.mode : ("unavailable" as const),
+        };
+      })(),
+      {
+        at: now,
+        title:
+          multiplier.ok && multiplier.data.pendingMultiplier != null
+            ? `Corporate action pending · ${multiplier.data.pendingMultiplier.toFixed(6)}×`
+            : multiplier.ok
+              ? "Corporate action · no pending multiplier"
+              : "Corporate action · multiplier unavailable",
+        detail: multiplier.ok
+          ? multiplier.data.pendingMultiplier != null
+            ? `Live xStocks pending · activation ${
+                multiplier.data.activationDateTime
+                  ? new Date(multiplier.data.activationDateTime * 1000).toISOString()
+                  : "n/a"
+              } · reason ${multiplier.data.reason ?? "none"}`
+            : `Current ${multiplier.data.currentMultiplier.toFixed(6)}× · reason ${multiplier.data.reason ?? "none"} · no separate CA calendar feed`
+          : "Cannot label CA pending without live multiplier",
+        tone:
+          multiplier.ok && multiplier.data.pendingMultiplier != null ? "amber" : "neutral",
+        mode: multiplier.ok ? multiplier.mode : "unavailable",
+      },
+      {
+        at: now,
+        title: prefsFromSession
+          ? corporateActionAlerts
+            ? "Corporate-action alerts · on"
+            : "Corporate-action alerts · off"
+          : "Corporate-action alerts · no session prefs",
+        detail: prefsFromSession
+          ? "Preference only — live CA signal = xStocks multiplier pending/current (above)."
+          : "Mint httpOnly session (Privy + Supabase) to persist CA alert preference per active tenant.",
+        tone: prefsFromSession && corporateActionAlerts ? "blue" : "neutral",
+        /** Pref ≠ mainnet feed — paper until session prefs backed by live CA calendar (none). */
+        mode: prefsFromSession ? "paper" : "unavailable",
+      },
       {
         at: now,
         title: jupiterQuote.ok
-          ? "Jupiter route inspected"
+          ? `Jupiter route inspected · ${jupiterCacheLabel}`
           : "Jupiter quote unavailable",
         detail: jupiterQuote.ok
-          ? `out ${jupiterQuote.data.outUiAmount.toFixed(6)} · quote-only · $1 USDC`
+          ? `out ${jupiterQuote.data.outUiAmount.toFixed(6)} · quote-only · $1 USDC · ${jupiterCacheLabel}`
           : jupiterQuote.reason,
         tone: jupiterQuote.ok ? "blue" : "amber",
         mode: jupiterQuote.ok ? jupiterQuote.mode : "unavailable",
@@ -459,10 +613,30 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           ? "Kamino xStocks market read"
           : "Kamino read unavailable",
         detail: kamino.ok
-          ? `${kamino.data.reserves.length} reserves · borrow CPI not broadcast`
+          ? `${kamino.data.reserves.length} reserves · borrow CPI unavailable (no broadcast)`
           : kamino.reason,
         tone: kamino.ok ? "blue" : "amber",
         mode: kamino.ok ? kamino.mode : "unavailable",
+      },
+      {
+        at: now,
+        title: nestCredit.ok
+          ? "Nest.credit vault awareness"
+          : "Nest.credit unavailable",
+        detail: nestCredit.ok
+          ? `${nestCredit.data.vaultCount} vaults · ${nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
+          : nestCredit.reason,
+        tone: nestCredit.ok ? "blue" : "amber",
+        mode: nestCredit.ok ? nestCredit.mode : "unavailable",
+      },
+      {
+        at: now,
+        title: "NestUSD borrow capacity",
+        detail: nestusd.ok
+          ? "Unexpected NestUSD ok — still risk-labeled"
+          : `${nestusd.reason} — fail-closed (≠ Nest.credit)`,
+        tone: "amber",
+        mode: "unavailable",
       },
       {
         at: now,
@@ -480,6 +654,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
     return {
       events,
       note: "Live-derived activity — not a fabricated ledger. Broadcast remains disabled.",
+      corporateActionAlerts,
+      prefsFromSession,
     };
   },
 );
@@ -488,11 +664,11 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<SessionBundle> => {
     const session = readVerifiedSession();
     const auth = getAuthProviderStatus(session.ok ? session : null);
-    const tenantId = session.ok
-      ? (session.data.tenants[0]?.tenantId ?? null)
+    const activeTenantId = session.ok
+      ? resolveActiveTenantId(session.data)
       : null;
     const userId = session.ok ? session.data.userId : null;
-    const preferences = await loadDeskPreferences(tenantId, userId);
+    const preferences = await loadDeskPreferences(activeTenantId, userId);
     const watch = readWatchWallet();
     const sessionSecretPresent =
       (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
@@ -509,9 +685,19 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim(),
     );
     const pythApiKeyPresent = Boolean(process.env["PYTH_API_KEY"]?.trim());
+    const agentRouterKeyPresent = Boolean(
+      process.env["AGENTROUTER_API_KEY"]?.trim(),
+    );
+    const twentyFirstKeyPresent = Boolean(process.env["API_KEY_21ST"]?.trim());
+    const shadersKeyPresent = Boolean(process.env["SHADERS_API_KEY"]?.trim());
+    const approvedLabUi = readApprovedLabUi();
+    const approvedLabShader = readApprovedLabShader();
+    const jupiterKeyPresent = Boolean(process.env["JUPITER_API_KEY"]?.trim());
+    const solanaRpcDedicated = Boolean(process.env["SOLANA_RPC_URL"]?.trim());
     return {
       auth,
       session,
+      activeTenantId,
       preferences,
       networkPolicy: {
         mainnetRead: true,
@@ -522,13 +708,23 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
       },
       watchWallet: watch.ok ? watch.data.wallet : null,
       sessionSecretPresent,
+      agentRouterKeyPresent,
+      rlsNote: deskRlsHonestyNote(),
       readiness: {
         bitqueryKeyPresent,
         privyConfigured,
         supabaseConfigured,
         sessionSecretPresent,
         pythApiKeyPresent,
+        agentRouterKeyPresent,
+        supabaseJwtConfigured: isSupabaseUserJwtConfigured(),
         broadcastPaused: isBroadcastPaused(),
+        twentyFirstKeyPresent,
+        shadersKeyPresent,
+        approvedLabUi,
+        approvedLabShader,
+        jupiterKeyPresent,
+        solanaRpcDedicated,
       },
     };
   },
@@ -541,6 +737,100 @@ const AgentInput = z.object({
 export const runDeskAgent = createServerFn({ method: "POST" })
   .validator(AgentInput)
   .handler(async ({ data }) => runPaperAgent(data.prompt));
+
+const PrefsInput = z.object({
+  corporateActionAlerts: z.boolean(),
+  strictFailClosed: z.boolean(),
+});
+
+/** Persist desk prefs for the active tenant — owner/trader only; viewers fail-closed. */
+export const updateDeskPreferences = createServerFn({ method: "POST" })
+  .validator(PrefsInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSession();
+    if (!session.ok) {
+      return errResult(
+        "folio.prefs.save",
+        "prefs_require_session",
+        session.detail ?? session.reason,
+      );
+    }
+    const membership = activeMembership(session.data);
+    const roleBlock = prefsWriteBlockedReason(membership);
+    if (roleBlock) {
+      return errResult("folio.prefs.save", "prefs_role_denied", roleBlock);
+    }
+    const tenantId = resolveActiveTenantId(session.data);
+    return saveDeskPreferences(tenantId, session.data.userId, {
+      corporateActionAlerts: data.corporateActionAlerts,
+      strictFailClosed: data.strictFailClosed,
+    });
+  });
+
+const ActiveTenantInput = z.object({
+  tenantId: z.string().uuid(),
+});
+
+/**
+ * Switch active tenant on the httpOnly folio_session — membership-validated.
+ * Remints the signed cookie; never invents a tenant outside session.tenants.
+ */
+export const setActiveTenant = createServerFn({ method: "POST" })
+  .validator(ActiveTenantInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSession();
+    if (!session.ok) {
+      return errResult(
+        "folio.session.active_tenant",
+        "active_tenant_requires_session",
+        session.detail ?? session.reason,
+      );
+    }
+    const membership = session.data.tenants.find(
+      (t) => t.tenantId === data.tenantId,
+    );
+    if (!membership) {
+      return errResult(
+        "folio.session.active_tenant",
+        "active_tenant_not_member",
+        "Tenant id is not on this session — refusing invent-a-membership switch.",
+      );
+    }
+    const remainingMs = Date.parse(session.data.expiresAt) - Date.now();
+    const ttlSec = Math.max(60, Math.floor(remainingMs / 1000));
+    const minted = mintFolioSession({
+      userId: session.data.userId,
+      walletAddress: session.data.walletAddress,
+      tenants: session.data.tenants,
+      activeTenantId: data.tenantId,
+      ttlSec,
+    });
+    if (!minted.ok) {
+      return errResult(
+        "folio.session.active_tenant",
+        minted.reason,
+        minted.detail,
+      );
+    }
+    setCookie(FOLIO_SESSION_COOKIE, minted.data.cookieValue, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: ttlSec,
+      secure: process.env["NODE_ENV"] === "production",
+    });
+    return {
+      ok: true as const,
+      mode: "mainnet-read" as const,
+      asOf: new Date().toISOString(),
+      source: "folio.session.active_tenant",
+      data: {
+        activeTenantId: data.tenantId,
+        session: minted.data.session,
+        note: `Active tenant set to ${membership.slug ?? membership.displayName ?? data.tenantId.slice(0, 8)}…`,
+      },
+    };
+  });
 
 const PrivySessionInput = z.object({
   accessToken: z.string().min(1).max(8_192),

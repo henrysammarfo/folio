@@ -56,11 +56,48 @@ function Page() {
         <ModeBadge mode={mult?.ok ? mult.mode : "unavailable"}>
           {mult?.ok ? "xStocks live" : "Multiplier unavailable"}
         </ModeBadge>
+        <ModeBadge
+          mode={
+            data?.scaledUi?.ok
+              ? data.scaledUi.mode
+              : data?.scaledUiCompare?.status === "mismatch"
+                ? "unavailable"
+                : "unavailable"
+          }
+        >
+          {data?.scaledUi?.ok
+            ? data.scaledUiCompare?.status === "mismatch"
+              ? "On-chain Scaled UI mismatch"
+              : data.scaledUiCompare?.status === "match"
+                ? "On-chain Scaled UI match"
+                : "On-chain Scaled UI live"
+            : "On-chain Scaled UI off"}
+        </ModeBadge>
         <ModeBadge mode={data?.jupiterPrice.ok ? data.jupiterPrice.mode : "unavailable"}>
-          {data?.jupiterPrice.ok ? "Jupiter price live" : "Jupiter price unavailable"}
+          {!data?.jupiterPrice.ok
+            ? "Jupiter price unavailable"
+            : data.jupiterPrice.source.includes("stale")
+              ? "Jupiter price stale-cache"
+              : data.jupiterPrice.source.includes("cached")
+                ? "Jupiter price cached"
+                : "Jupiter price live"}
         </ModeBadge>
         <ModeBadge mode={data?.pyth.ok ? data.pyth.mode : "unavailable"}>
-          {data?.pyth.ok ? "Pyth live" : "Pyth unavailable"}
+          {data?.pyth.ok
+            ? data.pyth.data.feedSymbol?.startsWith("Equity.US.")
+              ? "Pyth Equity.US"
+              : "Pyth equity live"
+            : "Pyth equity unavailable"}
+        </ModeBadge>
+        <ModeBadge mode={data?.pythXStock.ok ? data.pythXStock.mode : "unavailable"}>
+          {data?.pythXStock.ok
+            ? data.pythXStock.data.feedSymbol ?? "Pyth Crypto.xStock"
+            : "Pyth Crypto.xStock off"}
+        </ModeBadge>
+        <ModeBadge mode={data?.pythOndo?.ok ? data.pythOndo.mode : "unavailable"}>
+          {data?.pythOndo?.ok
+            ? data.pythOndo.data.feedSymbol ?? "Pyth Crypto.ONDO"
+            : "Pyth Crypto.ONDO off"}
         </ModeBadge>
       </div>
 
@@ -84,9 +121,45 @@ function Page() {
           }
         />
         <Metric
+          label="On-chain Scaled UI"
+          value={
+            data?.scaledUi?.ok
+              ? `${data.scaledUi.data.effectiveMultiplier.toFixed(6)}×`
+              : isLoading
+                ? "…"
+                : "—"
+          }
+          detail={
+            data?.scaledUi?.ok
+              ? `${data.scaledUiCompare?.note ?? "Token-2022"} · ${data.scaledUi.source.includes("public") ? "public RPC" : "dedicated RPC"}`
+              : data?.scaledUi && !data.scaledUi.ok
+                ? data.scaledUi.reason
+                : "Awaiting mint + RPC"
+          }
+        />
+        <Metric
           label="Economic shares"
           value={economic != null ? economic.toFixed(4) : isLoading ? "…" : "—"}
           detail="raw × live multiplier"
+        />
+        <Metric
+          label="Pending corporate action"
+          value={
+            mult?.ok && mult.data.pendingMultiplier != null
+              ? `${mult.data.pendingMultiplier.toFixed(6)}×`
+              : mult?.ok
+                ? "None"
+                : isLoading
+                  ? "…"
+                  : "—"
+          }
+          detail={
+            mult?.ok && mult.data.pendingMultiplier != null
+              ? `xStocks pending · reason ${mult.data.reason ?? "n/a"}`
+              : mult?.ok
+                ? "No pending newMultiplier on live feed"
+                : "Awaiting live multiplier"
+          }
         />
       </div>
 
@@ -145,18 +218,91 @@ function Page() {
             </span>
           </li>
           <li>
+            {data?.scaledUiCompare?.status === "mismatch" ? (
+              <AlertTriangle />
+            ) : data?.scaledUi?.ok ? (
+              <CheckCircle2 />
+            ) : (
+              <Database />
+            )}
+            <span>
+              <b>On-chain Scaled UI</b>
+              {data?.scaledUi?.ok
+                ? ` ${data.scaledUi.data.effectiveMultiplier.toFixed(6)}× Token-2022 · ${data.scaledUiCompare?.note ?? "read"}`
+                : data?.scaledUi && !data.scaledUi.ok
+                  ? ` ${data.scaledUi.reason} — no invented on-chain ×`
+                  : " pending mint + RPC"}
+            </span>
+          </li>
+          <li>
+            <FileClock />
+            <span>
+              <b>Corporate-action pending</b>
+              {mult?.ok && mult.data.pendingMultiplier != null
+                ? ` newMultiplier ${mult.data.pendingMultiplier.toFixed(6)}× · reason ${mult.data.reason ?? "n/a"}`
+                : mult?.ok
+                  ? " none on live feed (no invented calendar)"
+                  : " unavailable"}
+            </span>
+          </li>
+          <li>
+            <Database />
+            <span>
+              <b>Pyth references</b>
+              {data?.pyth.ok
+                ? ` ${data.pyth.data.feedSymbol ?? "Equity.US"} $${data.pyth.data.price.toFixed(2)}`
+                : data?.pyth && !data.pyth.ok
+                  ? ` equity ${data.pyth.reason}`
+                  : " equity unavailable"}
+              {data?.pythXStock.ok
+                ? ` · ${data.pythXStock.data.feedSymbol ?? "Crypto.xStock"} $${data.pythXStock.data.price.toFixed(2)} (secondary)`
+                : " · Crypto.xStock secondary off until keyed/mapped"}
+              {data?.pythOndo?.ok
+                ? ` · ${data.pythOndo.data.feedSymbol ?? "Crypto.ONDO"} $${data.pythOndo.data.price.toFixed(2)} (tertiary Ondo)`
+                : " · Crypto.ONDO tertiary off until keyed/mapped"}
+            </span>
+          </li>
+          <li>
+            <Database />
+            <span>
+              <b>Pyth bounty feeds</b>{" "}
+              {[
+                data?.pythBountyFeeds?.equityUs,
+                data?.pythBountyFeeds?.cryptoXStock,
+                data?.pythBountyFeeds?.cryptoOndo,
+              ]
+                .filter(Boolean)
+                .join(" · ") || "unmapped for this symbol"}
+              {data?.pyth && !data.pyth.ok && data.pyth.reason === "pyth_api_key_missing"
+                ? " — mapped · prices fail-closed until PYTH_API_KEY"
+                : ""}
+            </span>
+          </li>
+          <li>
             <Database />
             <span>
               <b>Venue check</b>
               {data?.jupiterPrice.ok
-                ? " Jupiter Price v3 mainnet"
-                : " Jupiter price unavailable"}
+                ? ` Jupiter Price v3 · ${data.jupiterPrice.source.includes("cached") ? "cached/stale-aware" : "live"}`
+                : data?.jupiterPrice && !data.jupiterPrice.ok
+                  ? ` ${data.jupiterPrice.reason}`
+                  : " Jupiter price unavailable"}
             </span>
           </li>
-          <li>
-            {data?.diverge.pass === false ? <AlertTriangle /> : <CheckCircle2 />}
+          <li data-testid="truth-diverge-gate" data-diverge-pass={String(data?.diverge.pass ?? "null")}>
+            {data?.diverge.pass === false ? (
+              <AlertTriangle />
+            ) : data?.diverge.pass === true ? (
+              <CheckCircle2 />
+            ) : (
+              <FileClock />
+            )}
             <span>
-              <b>Diverge gate</b> {data?.diverge.note ?? "pending"}
+              <b>Diverge gate</b>{" "}
+              {data?.diverge.pass == null
+                ? data?.diverge.note ??
+                  "unavailable — no invent-a-pass (Pyth Equity.US + Jupiter venue required)"
+                : (data.diverge.note ?? "pending")}
             </span>
           </li>
         </ol>

@@ -87,12 +87,12 @@ function Page() {
         <article>
           <Waves />
           <StatusBadge tone={wash?.mode === "mainnet-read" ? "green" : "amber"}>
-            {wash?.mode === "mainnet-read" ? "Keyed" : "Heuristic"}
+            {wash?.mode === "mainnet-read" ? "Keyed" : "Fail-closed"}
           </StatusBadge>
           <h2>Wash pressure</h2>
           <p>
             {wash?.detail ??
-              "Linked-flow heuristics from Bitquery when keyed. Missing key or dirty sample fail-closes size — never a silent green tape."}
+              "Linked-flow heuristics from Bitquery when keyed. Missing key or dirty sample fail-closes size — never a silent green tape or Heuristic-as-green theater."}
           </p>
         </article>
         <article>

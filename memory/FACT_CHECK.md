@@ -100,7 +100,8 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 |---|---|---|---|
 | Watch-wallet bind works on Vercel preview with session secret | CONFIRMED | Playwright bind Tokenkeg… → success note + Currently Toke…Q5DA | 2026-09-15 |
 | Stocklana registered **538** / submissions **69** / prize **$121,000** / deadline hero **SEP 25, 2026** | SUPERSEDED by 539/71 | prior jina snapshot | 2026-09-15 |
-| Stocklana registered **539** / submissions **71** / prize **$121,000** / deadline hero **SEP 25, 2026** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana WebFetch (Registered 539 · Submissions 71 · Prize Pool $121,000) | 2026-09-15 |
+| Stocklana registered **539** / submissions **71** / prize **$121,000** / deadline hero **SEP 25, 2026** | SUPERSEDED by 545/72 | prior WebFetch | 2026-09-15 |
+| Stocklana registered **545** / submissions **72** / prize **$121,000** / deadline hero **SEP 25, 2026** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana WebFetch (Registered 545 · Submissions 72 · Prize Pool $121,000); timeline still Fri 18 Sep 16:00 ET | 2026-09-15 |
 | Timeline Fri 18 Sep 2026 16:00 ET; stocklana.fun HACKATHON CLOSE 18 Sep 2026 23:59 UTC | CONFLICT vs hero SEP 25 — re-check at submit | hackathons page timeline + stocklana.fun | 2026-09-15 |
 
 ## Hermes auth (2026-09-15)
@@ -110,3 +111,141 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Hermes `/v2/updates/price/latest` returns 401 without API key from this egress | CONFIRMED | curl 401 unauthorized; price_feeds still 200 | 2026-09-15 |
 | FOLIO fail-closes Pyth without `PYTH_API_KEY` (no invented price) | CONFIRMED | unit test + adapter early return `pyth_api_key_missing` | 2026-09-15 |
 | `SOLANA_RPC_URL` set on Vercel folio project | CONFIRMED | Vercel env API create encrypted all targets | 2026-09-15 |
+
+| Borrow CPI “local fork” shipped | REJECTED as theater | No fork harness in repo — labeled unavailable-until-funded | 2026-09-15 |
+| Paper agent live spine (truth/quote) | CONFIRMED in code | `fetchPaperAgentSpine` → xStocks + Jupiter quote-only; caps.broadcast=false | 2026-09-15 |
+| Paper agent quote path shares wash/acquire gates | CONFIRMED unit | wash missing key / dirty tape → gates.canReview=false; never fill | 2026-09-15 |
+| Active tenant switch invents foreign membership | REJECTED | `setActiveTenant` / mint validate against session.tenants only | 2026-09-15 |
+| Strict fail-closed blocks missing Pyth on acquire | CONFIRMED unit | `buildAcquireGateMessages` + prefs load in `getAcquireBundle` | 2026-09-15 |
+| Mode badge “Local fork” as shipped CPI mode | SUPERSEDED | Label now **Unfunded CPI**; borrow remains unavailable-until-funded | 2026-09-15 |
+| Corporate-action alerts imply a separate CA calendar feed | REJECTED | Activity labels preference + live signal = xStocks multiplier only | 2026-09-15 |
+| Public acquire applies tenant strictFailClosed without session | REJECTED | `prefsFromSession=false` → strict off; honesty-only Pyth until session | 2026-09-15 |
+| Desk topbar `7vF…2ka` is a real bound wallet | REJECTED | Invented fixture — replaced with Bind wallet / session / watch chip | 2026-09-15 |
+| `api.nest.credit/v1/vaults` = NestUSD Solana xStock borrow capacity | REJECTED | Nest.credit indexed vault TVL/OFT — different product; NestUSD stays fail-closed | 2026-09-15 |
+| Nest.credit vault list reachable live | CONFIRMED | HTTP 200 vaults with Solana OFT mints + TVL; wired as mainnet-read awareness | 2026-09-15 |
+| Jupiter invents quote/price on HTTP 429 | REJECTED | Fail-closed `jupiter_rate_limited` unless prior live ok within 120s stale window; source labeled cached/stale-cache | 2026-09-15 |
+| Corporate-action pending invents a calendar event | REJECTED | Truth/activity only surface live xStocks pendingMultiplier / none | 2026-09-15 |
+| Paper agent invents pending CA or fill | REJECTED | Truth spine labels pending/none from live multiplier; quote never a fill; wash gates shared | 2026-09-15 |
+| AgentRouter WAF fails whole paper agent turn | REJECTED (fixed) | Live spine reply returns with nlExpansion=failed; NL skipped and labeled | 2026-09-15 |
+| `smoke:keys` invents wash clear / multi-tenant ok without keys | REJECTED | Baseline skips missing; multi_tenant fail-closed; empty Privy token must fail-closed | 2026-09-15 |
+| Blocking keys present in local smoke env | MISSING | smoke:keys → still need bitquery, pyth, privy, supabase | 2026-09-15 |
+| Position detail drops ?inspect= wallet-read mid-click | REJECTED (fixed) | Detail loaderDeps + search.inspect; list/overview links pass inspect | 2026-09-15 |
+| Truth diverge CheckCircle when pass===null | REJECTED (fixed) | Clock icon + unavailable note until scored | 2026-09-15 |
+| Execution wash “Heuristic” when Bitquery missing | REJECTED (fixed) | Badge = Fail-closed | 2026-09-15 |
+| Activity CA prefs ModeBadge = mainnet-read | REJECTED (fixed) | Preference → paper mode; Nest.credit ≠ NestUSD events added | 2026-09-15 |
+| Home hero invents fixture 4× share count | REJECTED | SSR live AAPLx multiplier woven into copy (or honest unavailable) | 2026-09-15 |
+| Stocklana registered **545** / submissions **72** / prize **$121,000** | CONFIRMED live (re-check) | hackathons.solana.com WebFetch; deadline hero SEP 25 vs timeline 18 Sep 16:00 ET | 2026-09-15 |
+| Vercel prefs preview home shows live AAPLx ≈1.003269× | CONFIRMED live | https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/ | 2026-09-15 |
+| Paper agent e2e invents a fill | REJECTED | Playwright asserts nl= + broadcast=false + spine; no fill theater | 2026-09-15 |
+| Paper qty rows claim health Verified | REJECTED (fixed) | Verified requires wallet-read + live feeds; paper → Review | 2026-09-15 |
+| Desk chrome always-green Mainnet read / fake search | REJECTED (fixed) | Quote-only badges; search replaced with policy strip | 2026-09-15 |
+| Raydium pools live but absent from judge matrix | REJECTED (fixed) | Matrix + empire smoke + NETWORK_MATRIX.md awareness-only row | 2026-09-15 |
+| GitGuardian “secret” in jupiter-cache.test.ts | FALSE POSITIVE remediates | Public AAPLx mint string flagged as high-entropy; replaced with low-entropy fixtures in unit tests (not a credential; no rotate). Tip clean; GG PR check still fails on historical commit `300e676` until Henry **Skip: false positive** (no Lovable history rewrite) | 2026-09-15 |
+| Multi-tenant prefs always service-role only | SUPERSEDED | User-JWT path when SUPABASE_JWT_SECRET set; service-role remains labeled fallback | 2026-09-15 |
+| User-JWT invents RLS-ok without secret | REJECTED | mintSupabaseUserJwt fail-closes; resolveSupabaseRestAuth falls back to service-role | 2026-09-15 |
+| Raydium empty/unavailable alone blocks acquire review | REJECTED | Honesty notes only; canReview still needs truth+wash+quote+diverge | 2026-09-15 |
+| Acquire wash “Heuristic clear” when Bitquery keyed | SUPERSEDED | Label now “Tape clear” | 2026-09-15 |
+| Viewer can save desk prefs | REJECTED | prefsWriteBlockedReason + updateDeskPreferences prefs_role_denied; settings switches disabled | 2026-09-15 |
+| Qty binding invents foreign pubkey over membership wallet | REJECTED | resolveWalletBinding: membership → session → watch → inspect | 2026-09-15 |
+| Stocklana registered **546** / submissions **72** / prize **$121,000** | CONFIRMED live (re-check) | hackathons.solana.com WebFetch; deadline hero SEP 25 vs timeline 18 Sep 16:00 ET | 2026-09-15 |
+| Pyth diverge uses Equity.US.* vs Jupiter; Crypto.xStock/USD secondary | CONFIRMED (code) | `equityUsFeedId` + `fetchPythXStockUsdPrice`; gate still equity↔venue | 2026-09-15 |
+| Viewer can upsert desk_preferences via user-JWT RLS alone | REJECTED | desk_prefs_writer_* policies require owner/trader membership | 2026-09-15 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| 21st.dev MCP search works with API_KEY_21ST | CONFIRMED | tools/list + search → 12 catalog hits on /lab/ui | 2026-09-16 |
+| 21st get_component Plasma id 24346 retrieved | CONFIRMED | free tier 1/2 remaining after fetch; wired as ShaderBackground | 2026-09-16 |
+| shaders.com REST accepts SHADERS_API_KEY | FAIL-CLOSED | HTTP 500 Clerk on /api/v1/me | 2026-09-16 |
+| Home brand plane matches Aionis stencil pattern | CONFIRMED (pattern) | black void + SVG mask + liquid light; FOLIO tokens | 2026-09-16 |
+| FOLIO stencil luminance too low vs Aionis gold | FIXED | side-by-side shots; ice core #fff + soft floor + larger blob | 2026-09-16 |
+| smoke:keys probes 21st MCP when API_KEY_21ST set | CONFIRMED | twentyfirst_live · Trade Journal Table hits | 2026-09-16 |
+| smoke:keys probes shaders.com | FAIL-CLOSED labeled | shaders_live HTTP 500 Clerk | 2026-09-16 |
+| Vercel preview has API_KEY_21ST | MISSING | /lab/ui amber on preview; local green | 2026-09-16 |
+| 21st get_component Trade Journal Table id 27124 | CONFIRMED | free retrieval spent; adapted as FolioTradeJournalLab | 2026-09-16 |
+
+## Live Stocklana re-check (2026-09-16)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Stocklana registered **588** / submissions **79** / prize **$121,000** | SUPERSEDED by 590/79 | prior scrape | 2026-09-16 |
+| Stocklana registered **590** / submissions **79** / prize **$121,000** | CONFIRMED live | hackathons.solana.com via jina (Registered 590 · Submissions 79 · Prize Pool $121,000) | 2026-09-16 |
+| NestUSD public capacity endpoint (Tavily/TinyFish this run) | UNAVAILABLE | Tavily 432 plan limit; TinyFish search 404 path; NestUSD stays fail-closed | 2026-09-16 |
+| Paper agent live spine AAPLx ≈1.003269 | CONFIRMED | runPaperAgent truth AAPLx; nlExpansion=failed WAF/HTML | 2026-09-16 |
+| AgentRouter NL expansion from this egress | FAIL-CLOSED labeled | WAF/HTML non-JSON — spine kept | 2026-09-16 |
+| Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET** | CONFIRMED conflict — re-check at submit | same page DEADLINE strip + Timeline copy | 2026-09-16 |
+| AAPLx multiplier ≈ 1.003269 | CONFIRMED live | api.xstocks.fi .../AAPLx/multiplier?network=Solana | 2026-09-16 |
+| Tavily search for Stocklana | UNAVAILABLE this run | plan usage limit | 2026-09-16 |
+
+## 2026-09-16 UI refs
+- Aionis landing first viewport = empty upper void + luminous brand stencil lower half + horizon chrome ~55% (no headline on letters). Verified via live :3110 screenshot.
+- NetroBNB = grey #E5E7EB 12-col + yellow analysis clock + dark market strip + yellow AI rail. Verified via live :3111 screenshot.
+- Local `/lab/ui` shows `21st MCP connected` with live catalog hits when `API_KEY_21ST` in process env; Vercel preview still needs that env set.
+
+## 2026-09-16 node-hmac
+| Claim | Status | Evidence |
+|---|---|---|
+| Session/JWT HMAC works under Vitest ESM without static node:crypto | CONFIRMED | `process.getBuiltinModule("crypto")` + 101 vitest green | 2026-09-16 |
+| Stocklana registered **590** / submissions **79** / prize **$121,000** | CONFIRMED live (re-check) | jina hackathons.solana.com/stocklana | 2026-09-16 |
+
+| 2026-09-16 UI / MCP | Result | Source |
+|---|---|---|
+| Aionis landing stencil geometry | CONFIRMED live | clone `manovHacksaw/aionis-app/landing` @ :3110 — viewBox 1400×550, text y=465, footer-above-stencil bottom:55% |
+| NetroBNB 12-col desk | CONFIRMED live | clone `AbdullahBalfaqih/NetroBNB` @ :3111 — grey canvas + yellow profile/AI rail |
+| 21st.dev MCP search | CONFIRMED local | `API_KEY_21ST` → `https://21st.dev/api/mcp` tools/call search |
+| 21st Plasma id 24346 adapted in-lab | CONFIRMED | `ShaderBackground` WebGL path on `/lab/shaders` + `/lab/ui` |
+| shaders.com REST frames | FAIL-CLOSED labeled | key present; probe HTTP 500 / Clerk gate — no invented frames |
+| FOLIO hero buried-footer feel | REMEDIATED (parity pass) | stencil raised to Aionis geometry + hotter ledger-ice floor; e2e 22/22 |
+
+| 2026-09-16 Stocklana / desk Plasma | Result | Source |
+|---|---|---|
+| Registered / submissions / prize | CONFIRMED live **591** / **79** / **$121,000** | hackathons.solana.com/hackathons/stocklana (+ jina 590) |
+| Hero deadline SEP 25 vs timeline 18 Sep | CONFLICT labeled | Hero + countdown ~9d vs timeline “Fri 18 Sep 16:00 ET” — treat 18 Sep conservative |
+| Public Hermes without PYTH_API_KEY | FAIL-CLOSED 401 | hermes.pyth.network + pyth.dourolabs.app/hermes |
+| Desk lab preview live WebGL Plasma | CONFIRMED local | `data-lab-plasma=1` + `.desk-plasma-canvas` when shader/cinematic preview active |
+
+| 2026-09-16 pinned 21st / Netro header | Result | Source |
+|---|---|---|
+| Plasma id 24346 + Trade Journal 27124 pinned | CONFIRMED in-lab | `src/lib/lab/twentyfirst-pins.ts` · lab/ui labels without MCP key |
+| Vercel preview API_KEY_21ST | MISSING (Henry) | jina `/lab/ui` still amber · CLI login_required |
+| Netro Header yellow active pill | Extracted | `NetroBNB/components/Header.tsx` → `.netro-density-chrome` |
+
+## 2026-09-16 — Vercel env (names only)
+- Confirmed via `vercel env ls`: API_KEY_21ST, SHADERS_API_KEY, AGENTROUTER_API_KEY/BASE_URL/MODEL, TAVILY_API_KEY, TINYFISH_API_KEY, SOLANA_RPC_URL, BROADCAST_PAUSED, FOLIO_SESSION_SECRET on project teamtitanlink/folio.
+- Not present (empty locally): BITQUERY_API_KEY, JUPITER_API_KEY, PYTH_API_KEY, PRIVY_*, SUPABASE_*, VENICE_API_KEY.
+
+## 2026-09-16 — Preview 21st + stocklana.fun close
+- Branch preview `/lab/ui`: badge **21st MCP connected**; note Plasma 24346 + Journal 27124 pinned · finance-filtered catalog hits present (WebFetch).
+- AAPLx multiplier on Netro canvas: **1.003269× live** (preview).
+- stocklana.fun: HACKATHON CLOSE **18 SEP 2026 · 23:59 UTC** (WebFetch). Hero SEP 25 conflict unchanged — re-check at submit.
+
+## 2026-09-16 — Stocklana counts (hackathons.solana.com WebFetch)
+- Registered **593** · Submissions **80** · Prize pool **$121,000** · Deadline hero **SEP 25, 2026** · countdown ~9 days.
+- Timeline: submissions close Friday 18 September, 4:00pm ET.
+- stocklana.fun close banner earlier: 18 SEP 2026 · 23:59 UTC.
+
+## 2026-09-16 — Hermes Crypto.AAPLON/USD
+- Catalog search `hermes.pyth.network/v2/price_feeds?query=AAPLON`: id `e6734de88a83d9d2fb33072adab319004700aefd069653aba30ba9e3cac056f2`, symbol `Crypto.AAPLON/USD` (APPLE ONDO TOKENIZED STOCK).
+
+## 2026-09-16 — Netro desk surface + Vercel env recheck
+- Desk with `netro-density` preview: `deskHeading=0`, `stackedPanels=0`, `netro=1` (Playwright) — canvas replaces overview cards.
+- Home `/` hero preserved (brand stencil, no home-empire).
+- Vercel `env ls` reconfirmed lab/research keys present; Bitquery/Pyth/Privy/Supabase/Jupiter still absent (cannot invent).
+
+## 2026-09-16 — Stocklana counts + matrix honesty
+- Live hackathons.solana.com: Registered **596** · Submissions **81** · Prize **$121,000** · Deadline hero **SEP 25, 2026** · countdown ~9 days · timeline Fri 18 Sep 16:00 ET.
+- Membership / role-gated network-matrix rows: unavailable without multi-tenant keys (unit-tested).
+EOF
+
+## 2026-09-16 — Stocklana counts + matrix honesty
+- Live hackathons.solana.com: Registered **596** · Submissions **81** · Prize **$121,000** · Deadline hero **SEP 25, 2026** · countdown ~9 days · timeline Fri 18 Sep 16:00 ET.
+- Membership / role-gated network-matrix rows: unavailable without multi-tenant keys (unit-tested).
+
+## 2026-09-16 — Truth on-chain Scaled UI
+- `/truth` shows On-chain Scaled UI metric + timeline; diverge `data-diverge-pass=null` without PYTH_API_KEY (e2e).
+- compareApiOnchainMultiplier never invents match when either side missing (unit).
+
+## 2026-09-16 — Acquire Scaled UI gate
+- Desk acquire Checks shows On-chain Scaled UI match/mismatch/off (e2e `acquire-scaled-ui-gate`).
+
+## 2026-09-16 — Paper agent + activity Scaled UI
+- Paper agent + activity show API↔on-chain Scaled UI (not API-only). Goal open.

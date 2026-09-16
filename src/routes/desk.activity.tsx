@@ -32,8 +32,17 @@ function Page() {
   return (
     <DeskShell eyebrow="Immutable context" title="Activity">
       <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Live-derived</ModeBadge>
+        <ModeBadge mode="quote-only">Live-derived events</ModeBadge>
         <ModeBadge mode="quote-only">No broadcast log</ModeBadge>
+        <ModeBadge
+          mode={data?.prefsFromSession ? "paper" : "unavailable"}
+        >
+          {data?.prefsFromSession
+            ? data.corporateActionAlerts
+              ? "CA alerts · on (pref)"
+              : "CA alerts · off (pref)"
+            : "CA alerts · no session"}
+        </ModeBadge>
       </div>
       <Panel
         title="Event stream"

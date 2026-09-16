@@ -79,10 +79,17 @@ export function LabApprovePanel({
       </div>
       <h2 className="lab-approve-title">How to approve (one minute)</h2>
       <ol className="lab-approve-steps">
-        <li>Look at the candidates below.</li>
+        <li>Look at the visual stages above.</li>
         <li>
           Tap <b>Pick</b> on <b>one</b> id
           {kind === "ui" ? " for desk chrome" : " for backdrop only"}.
+          {kind === "ui" ? (
+            <>
+              {" "}
+              Recommended for Stocklana desk: <code>netro-density</code> (full
+              12-col mounts on Preview on desk).
+            </>
+          ) : null}
         </li>
         <li>
           Reply in Cursor chat with the copied line (example:{" "}
@@ -100,6 +107,9 @@ export function LabApprovePanel({
               aria-label={`Copy candidate id ${id}`}
             >
               <code>{id}</code>
+              {kind === "ui" && id === "netro-density" ? (
+                <span className="lab-id-rec">rec</span>
+              ) : null}
               <span className="lab-id-copy-hint">
                 {copied === id || copied === `pick:${id}` ? "copied" : "copy"}
               </span>
@@ -128,7 +138,15 @@ export function LabApprovePanel({
             <Link
               to="/desk"
               className="lab-preview-link"
-              onClick={() => startLabPreview()}
+              onClick={() => {
+                startLabPreview();
+                if (picked && kind === "ui" && isLabUiId(picked)) {
+                  writeLabUiPick(picked);
+                }
+                if (picked && kind === "shaders" && isLabShaderId(picked)) {
+                  writeLabShaderPick(picked);
+                }
+              }}
             >
               Preview on desk (opt-in · not merged)
             </Link>
@@ -140,7 +158,7 @@ export function LabApprovePanel({
         <Link to={other.to} className="underline">
           {other.label}
         </Link>
-        . Home CTAs: Approve desk UI · Approve shaders. Production hero stays locked until you
+        . Home topbar: Lab UI · Shaders · Open desk. Production hero stays locked until you
         reply in chat.
       </p>
     </aside>

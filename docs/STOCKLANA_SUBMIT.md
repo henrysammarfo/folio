@@ -5,21 +5,22 @@ Deadline conflict — **re-check live at submit**:
 - Timeline copy: **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)**
 Budget: ≤~$1 · Broadcast: paused
 
-## Live counts (2026-09-15, official page WebFetch)
+## Live counts (2026-09-16, official page scrape)
 
 Source: https://hackathons.solana.com/hackathons/stocklana
 
-- Registered: **539**
-- Submissions: **71**
+- Registered: **596**
+- Submissions: **81**
 - Prize pool hero: **$121,000** (Foundation main track $100k + bounty tracks)
-- Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)** · stocklana.fun also shows **18 Sep 2026 · 23:59 UTC** — confirm which the form uses at submit
+- Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)** — confirm which the form uses at submit
+- Bounty note: Pyth market-data track — FOLIO diverge uses Equity.US.* vs Jupiter; Crypto.xStock/USD + Crypto.AAPLON/USD (Ondo) secondary on `/truth`
 
 Do not invent newer counts — refresh the page before the submission form.
 Paste pack: `docs/STOCKLANA_SUBMISSION.md`
 
 ## Before submit
 
-- [x] Demo URL reachable (Block 0 spine) — https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app (SSO off). Set `FOLIO_SESSION_SECRET` (+ optional `SOLANA_RPC_URL`) in Vercel env for watch-wallet; public RPC fallback covers Scaled UI reads when RPC unset. `BROADCAST_PAUSED=true` recommended in Vercel.
+- [x] Demo URL reachable (Block 0 spine) — https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app (SSO off). Set `FOLIO_SESSION_SECRET` (+ optional `SOLANA_RPC_URL`) in Vercel env for watch-wallet; public RPC fallback covers Scaled UI reads when RPC unset. `BROADCAST_PAUSED=true` recommended in Vercel.
 - [x] Ephemeral `?inspect=` wallet-read on positions + credit (no Vercel secret required; labeled not-auth)
 - [x] Vercel env: `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true` (live settings: secret set · bind ready)
 
@@ -41,7 +42,7 @@ npm run replay
 
 ## Keys to land (Henry)
 
-See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readiness (no values).
+See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readiness (no values) · `npm run smoke:keys` live-probes when keys present.
 
 | Key | Unlocks |
 |---|---|
@@ -49,7 +50,9 @@ See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readines
 | `PYTH_API_KEY` | Hermes equity diverge (fail-closed until set; Aug 2026 auth) |
 | `PRIVY_APP_ID` + `PRIVY_APP_SECRET` | Wallet identity |
 | `SUPABASE_URL` + `SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` + migration | Tenant memberships / prefs |
+| `SUPABASE_JWT_SECRET` (≥16) | User-JWT RLS path (`sub` = Privy DID); without it service-role is labeled fallback |
 | `FOLIO_SESSION_SECRET` (≥16) — **set on Vercel** | httpOnly `folio_session` + watch-wallet cookie |
+| Optional `AGENTROUTER_API_KEY` | Paper agent NL (WAF → spine-only; live spine always) |
 | Optional `JUPITER_API_KEY` | If quote/price becomes gated |
 | `SOLANA_RPC_URL` — **set on Vercel** (public mainnet) | Scaled UI + wallet reads (fallback still labeled) |
 
@@ -57,17 +60,17 @@ See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readines
 
 Step-by-step for Henry (keys + lab): `docs/HENRY_STEPS.md` · Vision/interview: `docs/COLOSSEUM_VISION.md`
 
-Live home now shows **Approve desk UI** / **Approve shaders** CTAs.
+Live home: brand-first FOLIO hero (footer below fold) · topbar Lab UI / Shaders.
 
 Shaders (`/lab/shaders`):
 - `ink-ledger`
 - `ledger-mist`
 - `aurora-grid`
 
-UI (`/lab/ui`):
-- `desk-density-a`
-- `desk-density-b`
-- `gate-chip`
+UI (`/lab/ui`) — extracted from NetroBNB + Aionis + live 21st.dev:
+- `netro-density`
+- `aionis-brand-plane`
+- `trade-journal-21st`
 
 Production hero + desk chrome stay frozen until Henry names an id in chat.
 

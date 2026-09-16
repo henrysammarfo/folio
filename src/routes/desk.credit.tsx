@@ -49,12 +49,13 @@ function Page() {
     <DeskShell eyebrow="Collateral workspace" title="Credit">
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Market reads</ModeBadge>
-        <ModeBadge mode="fork">Borrow CPI = fork</ModeBadge>
+        <ModeBadge mode="unavailable">Borrow CPI = off</ModeBadge>
         <ModeBadge mode={walletRead ? "mainnet-read" : "paper"}>
           {walletRead ? "Wallet-read capacity" : "Paper capacity"}
         </ModeBadge>
         <ModeBadge
           mode={
+            data?.walletSource === "membership" ||
             data?.walletSource === "session" ||
             data?.walletSource === "watch-wallet" ||
             data?.walletSource === "inspect"
@@ -62,13 +63,15 @@ function Page() {
               : "unavailable"
           }
         >
-          {data?.walletSource === "session"
-            ? "Session bound"
-            : data?.walletSource === "watch-wallet"
-              ? "Watch-wallet bound"
-              : data?.walletSource === "inspect"
-                ? "Inspect (ephemeral)"
-                : "Wallet unbound"}
+          {data?.walletSource === "membership"
+            ? "Membership wallet"
+            : data?.walletSource === "session"
+              ? "Session bound"
+              : data?.walletSource === "watch-wallet"
+                ? "Watch-wallet bound"
+                : data?.walletSource === "inspect"
+                  ? "Inspect (ephemeral)"
+                  : "Wallet unbound"}
         </ModeBadge>
       </div>
 
@@ -194,6 +197,16 @@ function Page() {
               </StatusBadge>
             </p>
             <p>
+              <span>Nest.credit vaults</span>
+              <StatusBadge tone={data?.nestCredit.ok ? "green" : "amber"}>
+                {data?.nestCredit.ok
+                  ? `${data.nestCredit.data.vaultCount} vaults · $${Math.round(data.nestCredit.data.totalTvlUsd).toLocaleString()} TVL · ${data.nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
+                  : data && !data.nestCredit.ok
+                    ? (data.nestCredit.detail ?? data.nestCredit.reason)
+                    : "…"}
+              </StatusBadge>
+            </p>
+            <p>
               <span>NestUSD</span>
               <StatusBadge tone="amber">
                 {data?.nestusd.ok
@@ -206,13 +219,20 @@ function Page() {
             <p>
               <span>Borrow execution</span>
               <StatusBadge tone="neutral">
-                {data?.borrowExecution ?? "local-fork-or-unavailable"}
+                {data?.borrowExecution ?? "unavailable-until-funded"}
               </StatusBadge>
             </p>
           </div>
         </Panel>
       </div>
-      <Panel title="Kamino reserves (live)" meta={<StatusBadge tone="green">xStocks market</StatusBadge>}>
+      <Panel
+        title="Kamino reserves (live)"
+        meta={
+          <StatusBadge tone={data?.kamino.ok ? "green" : "amber"}>
+            {data?.kamino.ok ? "xStocks market" : "Kamino unavailable"}
+          </StatusBadge>
+        }
+      >
         <div className="data-table">
           <div className="table-head">
             <span>Asset</span>

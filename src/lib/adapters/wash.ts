@@ -153,7 +153,7 @@ export async function evaluateWashGate(params: {
     return errResult(
       source,
       "bitquery_key_missing",
-      "Wash tape unavailable — size blocked until BITQUERY_API_KEY is set (fail-closed).",
+      "Wash tape unavailable — size blocked until BITQUERY_API_KEY is set (fail-closed). When keyed: Bitquery DEXTrades → self-trade / fee-payer-self / thin-tape heuristics (never invent a green tape).",
     );
   }
 

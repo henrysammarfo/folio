@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowRight, Github, Linkedin } from "lucide-react";
 import { FolioMark } from "@/components/folio-brand";
+import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
+import { getTruthBundle } from "@/lib/desk.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,68 +20,104 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      {
-        property: "og:image",
-        content:
-          "https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/693205bf-8048-456a-879e-4e0a1b85a098.webp",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/693205bf-8048-456a-879e-4e0a1b85a098.webp",
-      },
     ],
   }),
+  loader: async () => getTruthBundle({ data: { symbol: "AAPLx" } }),
   component: Home,
 });
 
+function LocalTime() {
+  const [label, setLabel] = useState("");
+  useEffect(() => {
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const city = zone.split("/").pop()?.replace(/_/g, " ") ?? zone;
+    const tick = () => {
+      const t = new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }).format(new Date());
+      setLabel(`${t} ${city}`);
+    };
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return <span>{label || "—"}</span>;
+}
+
 function Home() {
+  const truth = Route.useLoaderData();
+  const mult = truth?.multiplier;
+  const liveLine = mult?.ok
+    ? `AAPLx live ${mult.data.currentMultiplier.toFixed(6)}× — not fixture theater.`
+    : "Live share-count truth on Solana — never fixture 4×.";
+
   return (
     <div className="cinematic-home">
-      <div className="home-media">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/693205bf-8048-456a-879e-4e0a1b85a098.webp"
-          aria-label="Painted alpine panorama: a lone hiker with a pink backpack faces a snow-capped peak above a sea of clouds"
-        >
-          <source
-            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260826_123836_11a3c5e0-713f-4bef-a8e9-7dd93bdea3b0.mp4"
-            type="video/mp4"
-          />
-        </video>
-      </div>
-      <div className="home-scrim" />
-      <main className="home-hero">
-        <div className="home-brand-hero">
-          <FolioMark className="size-10" />
-          <span>FOLIO</span>
+      <div className="home-noise" aria-hidden />
+
+      {/*
+        Aionis landing composition (cloned + screened vs manovHacksaw/aionis-app/landing):
+        1) full-bleed black plane
+        2) brand stencil IS the hero — luminous letters own the lower half
+        3) top bar = mark + primary CTA only (no competing headline in the void)
+        4) horizon chrome floats just ABOVE the letterforms (bottom:55% — Aionis parity)
+        5) supporting copy + CTAs live below the fold
+      */}
+      <section className="home-viewport" aria-label="FOLIO hero">
+        <FolioLiquidStencil />
+
+        <div className="home-safe">
+          <header className="home-topbar">
+            <div className="home-brand-hero">
+              <FolioMark className="size-8" />
+              <span>FOLIO</span>
+            </div>
+            <div className="home-topbar-actions">
+              <Link to="/desk" className="home-top-cta">
+                Open desk
+              </Link>
+            </div>
+          </header>
         </div>
-        <p className="home-eyebrow">Corporate-action prime desk</p>
-        <h1>Own the economic truth.</h1>
-        <div className="home-copy">
-          FOLIO keeps your Solana stock share count honest, refuses shady pools,
-          and opens credit without forcing a sale. Premium chrome stays in lab
-          until Henry approves a look.
+
+        <div className="home-horizon" aria-label="Status">
+          <div className="home-horizon-left">
+            <span className="home-live-asterisk" aria-hidden>
+              ✦
+            </span>
+            <LocalTime />
+          </div>
+          <p className="home-scroll-hint">
+            Scroll to explore <span aria-hidden>↓</span>
+          </p>
         </div>
-        <div className="home-cta-row">
-          <Link to="/desk" className="home-cta">
-            Open the desk <ArrowRight />
-          </Link>
-          <Link to="/lab/ui" className="home-cta-secondary">
-            Approve desk UI
-          </Link>
-          <Link to="/lab/shaders" className="home-cta-secondary">
-            Approve shaders
-          </Link>
+      </section>
+
+      <section className="home-below" aria-label="What FOLIO does">
+        <div className="home-below-copy">
+          <h2>Own the economic truth.</h2>
+          <p>
+            {liveLine} Corporate-action share truth before trade. Broadcast stays
+            off until funded. Premium chrome stays on the lab until you approve.
+          </p>
+          <div className="home-cta-row">
+            <Link to="/desk" className="home-cta">
+              Open the desk <ArrowRight />
+            </Link>
+            <Link to="/truth" className="home-cta-secondary">
+              See live truth
+            </Link>
+          </div>
         </div>
-        <p className="home-approve-hint">
-          Open lab → pick one id → reply in chat. This hero does not change
-          without your approve.
-        </p>
-      </main>
+        <div className="home-below-links">
+          <Link to="/lab/ui">Lab UI</Link>
+          <Link to="/lab/shaders">Lab shaders</Link>
+          <Link to="/network">Network</Link>
+        </div>
+      </section>
+
       <footer className="home-footer">
         <div className="home-brand">
           <div className="brand-lockup text-primary-foreground">
@@ -86,6 +125,11 @@ function Home() {
             <span>FOLIO</span>
           </div>
           <p>Truth before trade. Credit without compromise.</p>
+          <p className="home-footer-lab">
+            Premium chrome: pick on{" "}
+            <Link to="/lab/ui">/lab/ui</Link> · <Link to="/lab/shaders">/lab/shaders</Link> then
+            reply in chat.
+          </p>
         </div>
         <nav className="home-nav">
           <div>

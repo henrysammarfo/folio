@@ -12,13 +12,65 @@ export type ScaledUiOnchain = {
   authority: string | null;
 };
 
-function effectiveMultiplier(
+export type ScaledUiApiCompare = {
+  status: "match" | "mismatch" | "unavailable";
+  apiMultiplier: number | null;
+  onchainEffective: number | null;
+  /** Absolute relative delta in basis points when both sides live. */
+  deltaBps: number | null;
+  note: string;
+};
+
+/** Token-2022 ScaledUiAmount effective multiplier at a unix second. */
+export function effectiveScaledUiMultiplier(
   multiplier: number,
   newMultiplier: number,
   effectiveTs: number,
   nowUnix: number,
 ): number {
   return nowUnix >= effectiveTs ? newMultiplier : multiplier;
+}
+
+/**
+ * Compare xStocks API currentMultiplier vs on-chain effective Scaled UI.
+ * Never invents a match when either side is missing.
+ */
+export function compareApiOnchainMultiplier(
+  apiMultiplier: number | null | undefined,
+  onchainEffective: number | null | undefined,
+  /** Match band in relative bps (default 1 bps ≈ 0.01%). */
+  bandBps = 1,
+): ScaledUiApiCompare {
+  if (
+    apiMultiplier == null ||
+    !(apiMultiplier > 0) ||
+    onchainEffective == null ||
+    !(onchainEffective > 0)
+  ) {
+    return {
+      status: "unavailable",
+      apiMultiplier: apiMultiplier != null && apiMultiplier > 0 ? apiMultiplier : null,
+      onchainEffective:
+        onchainEffective != null && onchainEffective > 0 ? onchainEffective : null,
+      deltaBps: null,
+      note:
+        apiMultiplier == null || !(apiMultiplier > 0)
+          ? "API multiplier unavailable — cannot score on-chain match"
+          : "On-chain Scaled UI unavailable — cannot score API match",
+    };
+  }
+  const mid = (apiMultiplier + onchainEffective) / 2;
+  const deltaBps = (Math.abs(apiMultiplier - onchainEffective) / mid) * 10_000;
+  const match = deltaBps <= bandBps;
+  return {
+    status: match ? "match" : "mismatch",
+    apiMultiplier,
+    onchainEffective,
+    deltaBps,
+    note: match
+      ? `API ↔ on-chain Scaled UI within ${bandBps} bps`
+      : `API ↔ on-chain Scaled UI diverge ${deltaBps.toFixed(2)} bps (band ${bandBps})`,
+  };
 }
 
 /**
@@ -86,7 +138,12 @@ export async function fetchScaledUiOnchain(
       multiplier,
       newMultiplier,
       newMultiplierEffectiveTimestamp: effectiveTs,
-      effectiveMultiplier: effectiveMultiplier(multiplier, newMultiplier, effectiveTs, nowUnix),
+      effectiveMultiplier: effectiveScaledUiMultiplier(
+        multiplier,
+        newMultiplier,
+        effectiveTs,
+        nowUnix,
+      ),
       authority: ext.state.authority ?? null,
     });
   } catch (e) {

@@ -13,8 +13,11 @@ import {
   createSessionFromPrivyToken,
   getSessionBundle,
   runDeskAgent,
+  setActiveTenant,
+  updateDeskPreferences,
 } from "@/lib/desk.functions";
 import { readLabShaderPick, readLabUiPick } from "@/lib/lab-pick";
+import { canWriteDeskPrefs } from "@/lib/auth/role-gates";
 
 export const Route = createFileRoute("/desk/settings")({
   head: () => ({
@@ -36,6 +39,8 @@ function Page() {
   const queryClient = useQueryClient();
   const fetchSession = useServerFn(getSessionBundle);
   const runAgent = useServerFn(runDeskAgent);
+  const savePrefs = useServerFn(updateDeskPreferences);
+  const switchTenant = useServerFn(setActiveTenant);
   const createSession = useServerFn(createSessionFromPrivyToken);
   const clearSession = useServerFn(clearFolioSession);
   const bindWatch = useServerFn(bindWatchWallet);
@@ -58,7 +63,52 @@ function Page() {
   const [watchBusy, setWatchBusy] = useState(false);
   const [labUiPick, setLabUiPick] = useState<string | null>(null);
   const [labShaderPick, setLabShaderPick] = useState<string | null>(null);
+  const [prefsBusy, setPrefsBusy] = useState(false);
+  const [prefsMsg, setPrefsMsg] = useState("");
+  const [tenantBusy, setTenantBusy] = useState(false);
+  const [tenantMsg, setTenantMsg] = useState("");
   const tenants = data?.session.ok ? data.session.data.tenants : [];
+  const activeTenantId = data?.activeTenantId ?? null;
+  const prefsTenant =
+    tenants.find((t) => t.tenantId === activeTenantId) ?? tenants[0] ?? null;
+  const prefsRoleWritable = canWriteDeskPrefs(prefsTenant?.role);
+  const prefsEditable = Boolean(
+    data?.session.ok && prefsTenant && data?.auth.ok && prefsRoleWritable,
+  );
+  const prefsReadOnlyReason = !data?.session.ok
+    ? null
+    : !prefsTenant
+      ? "No active tenant membership — prefs write refused."
+      : !prefsRoleWritable
+        ? `Role ${prefsTenant.role} is read-only — owner/trader required to save desk prefs.`
+        : null;
+  const corporateAlerts = data?.preferences.ok
+    ? data.preferences.data.corporateActionAlerts
+    : true;
+  const strictFailClosed = data?.preferences.ok
+    ? data.preferences.data.strictFailClosed
+    : true;
+
+  async function persistPrefs(next: {
+    corporateActionAlerts: boolean;
+    strictFailClosed: boolean;
+  }) {
+    if (!prefsEditable) return;
+    setPrefsBusy(true);
+    setPrefsMsg("");
+    try {
+      const res = await savePrefs({ data: next });
+      if (res.ok) {
+        setPrefsMsg("Saved to Supabase desk_preferences.");
+        await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+        await refetch();
+      } else {
+        setPrefsMsg(`${res.reason}${res.detail ? ` — ${res.detail}` : ""}`);
+      }
+    } finally {
+      setPrefsBusy(false);
+    }
+  }
 
   useEffect(() => {
     setLabUiPick(readLabUiPick());
@@ -72,8 +122,20 @@ function Page() {
         <ModeBadge mode={data?.networkPolicy.broadcast ? "mainnet-read" : "unavailable"}>
           {data?.networkPolicy.broadcast ? "Broadcast armed" : "Broadcast off"}
         </ModeBadge>
-        <ModeBadge mode={data?.auth.ok ? "mainnet-read" : "unavailable"}>
-          {data?.auth.ok ? "Auth keys present" : "Auth fail-closed"}
+        <ModeBadge
+          mode={
+            data?.auth.ok && data.auth.data.sessionReady
+              ? "mainnet-read"
+              : data?.auth.ok
+                ? "paper"
+                : "unavailable"
+          }
+        >
+          {data?.auth.ok && data.auth.data.sessionReady
+            ? "Session ready"
+            : data?.auth.ok
+              ? "Auth keys · no session"
+              : "Auth fail-closed"}
         </ModeBadge>
         <ModeBadge mode={data?.sessionSecretPresent ? "mainnet-read" : "unavailable"}>
           {data?.sessionSecretPresent
@@ -117,6 +179,30 @@ function Page() {
             </b>
           </p>
           <p>
+            <span>JUPITER_API_KEY (optional)</span>
+            <b>
+              {data?.readiness.jupiterKeyPresent
+                ? "Set · quote/price auth header armed"
+                : "Missing · public quote/price (429 → TTL cache / fail-closed)"}
+            </b>
+          </p>
+          <p>
+            <span>SOLANA_RPC_URL</span>
+            <b>
+              {data?.readiness.solanaRpcDedicated
+                ? "Dedicated · Scaled UI + wallet reads"
+                : "Public fallback · rate-limit risk (B004)"}
+            </b>
+          </p>
+          <p>
+            <span>AGENTROUTER_API_KEY</span>
+            <b>
+              {data?.readiness.agentRouterKeyPresent
+                ? "Set · NL optional (spine always; WAF → spine-only)"
+                : "Missing · live spine only"}
+            </b>
+          </p>
+          <p>
             <span>Privy (PRIVY_APP_ID / SECRET)</span>
             <b>
               {data?.readiness.privyConfigured
@@ -133,6 +219,14 @@ function Page() {
             </b>
           </p>
           <p>
+            <span>SUPABASE_JWT_SECRET (RLS user path)</span>
+            <b>
+              {data?.readiness.supabaseJwtConfigured
+                ? "Set · user-JWT RLS armed (sub=Privy DID)"
+                : "Missing · service-role labeled fallback"}
+            </b>
+          </p>
+          <p>
             <span>Broadcast</span>
             <b>
               {data?.readiness.broadcastPaused
@@ -141,29 +235,62 @@ function Page() {
             </b>
           </p>
           <p>
+            <span>API_KEY_21ST (lab MCP)</span>
+            <b>
+              {data?.readiness.twentyFirstKeyPresent
+                ? "Set · /lab/ui catalog live"
+                : "Missing · lab falls back without 21st previews"}
+            </b>
+          </p>
+          <p>
+            <span>SHADERS_API_KEY (lab probe)</span>
+            <b>
+              {data?.readiness.shadersKeyPresent
+                ? "Set · probed (Clerk may still gate REST)"
+                : "Missing · 21st WebGL studies still run locally"}
+            </b>
+          </p>
+          <p>
             <span>Lab premium UI</span>
             <b>
               {labUiPick || labShaderPick
-                ? `Picked ${[labUiPick, labShaderPick].filter(Boolean).join(" · ")} · awaiting chat reply to merge — `
+                ? `Local pick ${[labUiPick, labShaderPick].filter(Boolean).join(" · ")} · awaiting chat reply — `
                 : "Awaiting Henry candidate id — "}
               <a href="/lab/ui">/lab/ui</a> · <a href="/lab/shaders">/lab/shaders</a>
             </b>
           </p>
+          <p>
+            <span>FOLIO_APPROVED_LAB_UI (production)</span>
+            <b>
+              {data?.readiness.approvedLabUi
+                ? `Set · desk chrome ${data.readiness.approvedLabUi}`
+                : "Unset · production desk stays default until Henry chat approve + env"}
+            </b>
+          </p>
+          <p>
+            <span>FOLIO_APPROVED_LAB_SHADER (production)</span>
+            <b>
+              {data?.readiness.approvedLabShader
+                ? `Set · ${data.readiness.approvedLabShader}`
+                : "Unset"}
+            </b>
+          </p>
           <p className="mt-3 text-sm opacity-80">
             Key paste order (Bitquery → Pyth → Privy → Supabase):{" "}
-            <code>docs/KEYS_LANDING.md</code> · <code>npm run keys</code>
+            <code>docs/KEYS_LANDING.md</code> · <code>npm run keys</code> ·{" "}
+            <code>npm run smoke:keys</code>
           </p>
         </div>
       </Panel>
 
       <div className="desk-grid">
-        <Panel title="Network mode" meta={<StatusBadge tone="green">Safe default</StatusBadge>}>
+        <Panel title="Network mode" meta={<StatusBadge tone="blue">Quote-only default</StatusBadge>}>
           <div className="setting-row">
             <span>
               <b>Mainnet read</b>
               <small>Observe live market and ledger data</small>
             </span>
-            <StatusBadge tone="green">Selected</StatusBadge>
+            <StatusBadge tone="blue">Selected · read</StatusBadge>
           </div>
           <div className="setting-row">
             <span>
@@ -210,32 +337,126 @@ function Page() {
             <span>
               <b>Corporate-action alerts</b>
               <small>
-                {data?.preferences.ok
-                  ? "Server-persisted"
-                  : data && !data.preferences.ok
-                    ? data.preferences.reason
-                    : "Server prefs unavailable — not using localStorage"}
+                {prefsEditable
+                  ? data?.preferences.ok
+                    ? `Server-persisted · active tenant ${prefsTenant?.slug ?? prefsTenant?.tenantId.slice(0, 8) ?? "—"} · role ${prefsTenant?.role} · live signal = xStocks multiplier (no separate CA calendar yet)`
+                    : "Session ready · save will upsert prefs for active tenant"
+                  : prefsReadOnlyReason
+                    ? prefsReadOnlyReason
+                    : data && !data.preferences.ok
+                      ? data.preferences.reason
+                      : "Server prefs unavailable — not using localStorage"}
               </small>
             </span>
             <Switch
-              checked={
-                data?.preferences.ok ? data.preferences.data.corporateActionAlerts : true
-              }
-              disabled
+              checked={corporateAlerts}
+              disabled={!prefsEditable || prefsBusy}
+              onCheckedChange={(checked) => {
+                void persistPrefs({
+                  corporateActionAlerts: checked,
+                  strictFailClosed,
+                });
+              }}
             />
           </label>
           <label className="setting-row">
             <span>
               <b>Strict fail-closed mode</b>
-              <small>Stop when any required signal is unresolved</small>
+              <small>
+                When on, unresolved required signals (including missing Pyth) block acquire
+                review — not honesty-only labels.
+                {prefsReadOnlyReason && !prefsEditable
+                  ? ` ${prefsReadOnlyReason}`
+                  : ""}
+              </small>
             </span>
             <Switch
-              checked={data?.preferences.ok ? data.preferences.data.strictFailClosed : true}
-              disabled
+              checked={strictFailClosed}
+              disabled={!prefsEditable || prefsBusy}
+              onCheckedChange={(checked) => {
+                void persistPrefs({
+                  corporateActionAlerts: corporateAlerts,
+                  strictFailClosed: checked,
+                });
+              }}
             />
           </label>
+          {prefsMsg ? <p className="mt-2 text-sm opacity-80">{prefsMsg}</p> : null}
         </Panel>
       </div>
+
+      <Panel
+        title="Active tenant"
+        meta={
+          <StatusBadge tone={prefsTenant ? "green" : "amber"}>
+            {prefsTenant ? "Scoped" : "No membership"}
+          </StatusBadge>
+        }
+      >
+        <p className="mb-3 text-sm opacity-80">
+          Prefs and desk scope follow the membership-validated active tenant on the httpOnly
+          session. Switching remints the signed cookie — never invents a tenant outside
+          memberships.
+        </p>
+        {tenants.length === 0 ? (
+          <p className="text-sm opacity-80">
+            No tenants on session — fail-closed until Privy + Supabase memberships land.
+          </p>
+        ) : (
+          <ul className="space-y-2 text-sm">
+            {tenants.map((t) => {
+              const isActive = t.tenantId === activeTenantId;
+              return (
+                <li key={t.tenantId} className="setting-row">
+                  <span>
+                    <b>{t.displayName ?? t.slug ?? t.tenantId.slice(0, 8)}</b>
+                    <small>
+                      {t.slug ? `${t.slug} · ` : ""}
+                      {t.role}
+                      {isActive ? " · active" : ""}
+                    </small>
+                  </span>
+                  <button
+                    type="button"
+                    className="wallet-pill"
+                    disabled={tenantBusy || isActive || !data?.session.ok}
+                    onClick={async () => {
+                      setTenantBusy(true);
+                      setTenantMsg("");
+                      try {
+                        const res = await switchTenant({
+                          data: { tenantId: t.tenantId },
+                        });
+                        if (res.ok) {
+                          setTenantMsg(res.data.note);
+                          await queryClient.invalidateQueries({
+                            queryKey: ["session-bundle"],
+                          });
+                          await refetch();
+                        } else {
+                          setTenantMsg(
+                            `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                          );
+                        }
+                      } finally {
+                        setTenantBusy(false);
+                      }
+                    }}
+                  >
+                    {isActive ? "Active" : tenantBusy ? "Switching…" : "Make active"}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        {tenantMsg ? <p className="mt-3 text-sm">{tenantMsg}</p> : null}
+        {data?.rlsNote ? (
+          <p className="mt-3 text-sm opacity-80">
+            RLS: {data.rlsNote}
+          </p>
+        ) : null}
+      </Panel>
 
       <Panel
         title="Bind Privy → httpOnly session"
@@ -298,7 +519,25 @@ function Page() {
             <ul className="mt-2 space-y-1 text-sm">
               {tenants.map((t) => (
                 <li key={`${t.tenantId}:${t.userId}`}>
-                  <code>{t.tenantId.slice(0, 8)}…</code> · {t.role}
+                  <b>{t.displayName ?? t.slug ?? t.tenantId.slice(0, 8)}</b>
+                  {t.slug ? (
+                    <>
+                      {" "}
+                      · <code>{t.slug}</code>
+                    </>
+                  ) : null}{" "}
+                  · {t.role}
+                  {t.walletAddress ? (
+                    <>
+                      {" "}
+                      · wallet{" "}
+                      <code>
+                        {t.walletAddress.slice(0, 4)}…{t.walletAddress.slice(-4)}
+                      </code>
+                    </>
+                  ) : (
+                    " · no membership wallet"
+                  )}
                 </li>
               ))}
             </ul>
@@ -412,7 +651,14 @@ function Page() {
         {watchMsg ? <p className="mt-3 text-sm">{watchMsg}</p> : null}
       </Panel>
 
-      <Panel title="Paper agent" meta={<StatusBadge tone="blue">Caps · no broadcast</StatusBadge>}>
+      <Panel title="Paper agent" meta={<StatusBadge tone="blue">Live spine · no broadcast</StatusBadge>}>
+        <p className="mb-3 text-sm opacity-80">
+          Runs live xStocks multiplier / Jupiter quote-only reads and the same acquire wash
+          gates on quote intents. Never broadcasts. AgentRouter expands NL only when keyed —
+          if AgentRouter returns WAF/HTML or errors, the live spine reply still returns
+          (NL skipped, labeled). Truth spine labels pending corporate-action multiplier (or
+          none); quotes label Jupiter live/cached/stale.
+        </p>
         <div className="form-grid">
           <label>
             Prompt
@@ -426,10 +672,40 @@ function Page() {
               setBusy(true);
               try {
                 const res = await runAgent({ data: { prompt } });
+                if (!res.ok) {
+                  setAgentOut(
+                    `${res.reason}${res.detail ? ` — ${res.detail}` : ""}\n[nl=failed · broadcast=false · live spine unavailable]`,
+                  );
+                  return;
+                }
+                const spineBits = [
+                  res.data.spine.truth
+                    ? `truth ×${res.data.spine.truth.multiplier?.toFixed(6) ?? "—"} · pending ${
+                        res.data.spine.truth.pendingMultiplier != null
+                          ? `${res.data.spine.truth.pendingMultiplier.toFixed(6)}×`
+                          : "none"
+                      }`
+                    : null,
+                  res.data.spine.quote
+                    ? `quote ${res.data.spine.quote.cacheLabel} out=${
+                        res.data.spine.quote.outUiAmount?.toFixed(6) ?? "—"
+                      }`
+                    : null,
+                  res.data.spine.gates
+                    ? `gates canReview=${res.data.spine.gates.canReview}`
+                    : null,
+                  `nl=${res.data.nlExpansion}`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ");
                 setAgentOut(
-                  res.ok
-                    ? `${res.data.reply} (metered ~$${res.data.meteredCostUsd.toFixed(6)})`
-                    : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                  `${res.data.reply}\n[${spineBits}; metered ~$${res.data.meteredCostUsd.toFixed(6)}; broadcast=${res.data.caps.broadcast}${
+                    res.data.nlExpansionNote ? `; ${res.data.nlExpansionNote}` : ""
+                  }]`,
+                );
+              } catch (err) {
+                setAgentOut(
+                  `paper_agent_client_error — ${err instanceof Error ? err.message : String(err)}\n[nl=failed · broadcast=false]`,
                 );
               } finally {
                 setBusy(false);
@@ -439,7 +715,9 @@ function Page() {
             {busy ? "Running…" : "Run paper agent"}
           </button>
         </div>
-        {agentOut ? <p className="mt-3 text-sm">{agentOut}</p> : null}
+        {agentOut ? (
+          <pre className="mt-3 whitespace-pre-wrap text-sm opacity-90">{agentOut}</pre>
+        ) : null}
       </Panel>
     </DeskShell>
   );

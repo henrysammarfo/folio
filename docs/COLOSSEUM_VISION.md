@@ -44,7 +44,7 @@ FOLIO buys the US stocks you want on Solana — keeps share counts honest after 
 6. **What’s hard?** NestUSD endpoint unverified (we hide capacity); Pyth may 401 on some egress (we say so); keys not in yet (fail-closed).
 
 ## Demo URL (judges)
-https://folio-git-cursor-folio-wallet-read-f1ec-teamtitanlink.vercel.app  
+https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app  
 
 Beats: `/truth` live multiplier · `/network` fail-closed wash/NestUSD/broadcast · `/desk/credit` NestUSD never Ready · home **Approve desk UI / Approve shaders**.
 

@@ -10,7 +10,7 @@ FOLIO buys the US stocks you want on Solana — keeps your share count honest, w
 
 - **Mainnet READ** for xStocks / Jupiter price / pool & credit reads  
 - **Quote-only** Jupiter swaps (labeled; no silent broadcast)  
-- **Local mainnet-fork** for borrow CPI proofs when unfunded  
+- **Borrow CPI unavailable** until funded (no fork harness theater on ≤~$1)  
 - **No custom mainnet program deploy** on a ≤~$1 test budget  
 - See [`memory/NETWORK_POLICY.md`](memory/NETWORK_POLICY.md)
 

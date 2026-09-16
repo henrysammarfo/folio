@@ -1,9 +1,10 @@
 /** Lab approve-gate helpers. Picks stay local until Henry replies in chat — never auto-merge. */
 
 export const LAB_UI_IDS = [
-  "desk-density-a",
-  "desk-density-b",
-  "gate-chip",
+  "netro-density",
+  "aionis-brand-plane",
+  "cinematic-landing-21st",
+  "trade-journal-21st",
 ] as const;
 
 export const LAB_SHADER_IDS = [
@@ -20,6 +21,10 @@ export const LAB_SHADER_STORAGE_KEY = "folio.lab.shaderPick";
 /** Session-only: opt-in desk preview of a lab pick. Cleared on Exit / tab close. */
 export const LAB_PREVIEW_SESSION_KEY = "folio.lab.previewActive";
 
+/** Production merge after Henry chat approve — set on Vercel, never auto from local Pick. */
+export const APPROVED_LAB_UI_ENV = "FOLIO_APPROVED_LAB_UI";
+export const APPROVED_LAB_SHADER_ENV = "FOLIO_APPROVED_LAB_SHADER";
+
 export function isLabUiId(value: string | null | undefined): value is LabUiId {
   return !!value && (LAB_UI_IDS as readonly string[]).includes(value);
 }
@@ -34,6 +39,21 @@ export function chatReplyForPick(kind: "ui" | "shaders", id: string): string {
   return kind === "ui"
     ? `Approve lab UI: ${id}`
     : `Approve lab shader: ${id}`;
+}
+
+/** Server-only: Henry-approved production desk chrome (env after chat reply). */
+export function readApprovedLabUi(
+  env: NodeJS.ProcessEnv = process.env,
+): LabUiId | null {
+  const raw = env[APPROVED_LAB_UI_ENV]?.trim();
+  return isLabUiId(raw) ? raw : null;
+}
+
+export function readApprovedLabShader(
+  env: NodeJS.ProcessEnv = process.env,
+): LabShaderId | null {
+  const raw = env[APPROVED_LAB_SHADER_ENV]?.trim();
+  return isLabShaderId(raw) ? raw : null;
 }
 
 export function readLabUiPick(): LabUiId | null {

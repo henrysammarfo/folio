@@ -30,8 +30,8 @@ function Page() {
       intro="FOLIO is built for EU and APAC non-US Solana users who need economic-share truth before they acquire, borrow, or automate — and for a founder who refuses to let starting line cap ambition."
     >
       <div className="mb-4 flex flex-wrap gap-2">
-        <StatusBadge tone="green">Mainnet read</StatusBadge>
-        <StatusBadge tone="blue">Broadcast paused</StatusBadge>
+        <StatusBadge tone="blue">Mainnet read · quote-only</StatusBadge>
+        <StatusBadge tone="neutral">Broadcast paused</StatusBadge>
         <StatusBadge tone="neutral">≤~$1 demo doctrine</StatusBadge>
       </div>
 
@@ -41,10 +41,10 @@ function Page() {
         </blockquote>
         <div>
           <p>
-            FOLIO never fabricates equity mints, fills, or user traction. It separates live reads
-            from fork simulations and keeps every refusal legible — wash without Bitquery stays
-            fail-closed; NestUSD stays hidden until the endpoint is verified; broadcast stays off
-            until funded.
+            FOLIO never fabricates equity mints, fills, or user traction. It separates live mainnet
+            reads from unfunded borrow CPI (no fork harness theater) and keeps every refusal
+            legible — wash without Bitquery stays fail-closed; NestUSD stays hidden until the
+            endpoint is verified; broadcast stays off until funded.
           </p>
           <p>
             <b>Henry Sam Marfo</b>
@@ -85,11 +85,11 @@ function Page() {
         <p className="mt-4 text-sm opacity-80">
           Premium look is gated on purpose.{" "}
           <Link to="/lab/ui" className="underline">
-            Approve desk UI
+            Lab UI
           </Link>{" "}
           ·{" "}
           <Link to="/lab/shaders" className="underline">
-            Approve shaders
+            Lab shaders
           </Link>{" "}
           ·{" "}
           <Link to="/network" className="underline">

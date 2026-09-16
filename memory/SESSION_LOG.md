@@ -207,3 +207,231 @@
 - Lab approve panel: Pick → localStorage + chat reply copy; Preview on desk is session-only (not a merge).
 - DeskShell banner + density/shader data attrs; settings shows picked ids; e2e covers pick→preview→exit.
 - Goal still open — Henry must reply with lab id in chat before premium merge; keys still missing.
+
+## 2026-09-15 — Prefs write + tenant enrich + paper spine + borrow honesty
+- Softened borrow CPI honesty: unavailable until funded (no fork harness theater).
+- Multi-tenant: `saveDeskPreferences` upsert; settings switches when session+tenant; membership shows slug/display/wallet.
+- Paper agent always runs live Block 0 truth/quote spine with `broadcast=false`; AgentRouter optional.
+- Still waiting on Henry: lab id · Bitquery · Pyth · Privy · Supabase · funded broadcast.
+
+## 2026-09-15 — Active tenant + strict prefs + paper wash gates
+- `activeTenantId` on folio_session (membership-validated); settings switch remints cookie via `setActiveTenant`.
+- Acquire loads `strictFailClosed` from active-tenant prefs — missing/unresolved Pyth blocks review when strict.
+- Paper agent quote path shares wash + acquire gates; RLS honesty note on SessionBundle.
+- Softened remaining fork theater (mode badge / about). Vitest 65 green.
+- Goal open: Henry lab Pick reply + Bitquery/Pyth/Privy/Supabase; broadcast stays paused.
+
+## 2026-09-15 — Acquire strict surface + activity CA pref honesty
+- Surface session vs public strict-fail-closed on acquire; activity labels CA alert preference without inventing a calendar feed.
+- E2E + Stocklana/docs URLs on prefs preview. Goal still open for Henry lab id + keys.
+
+## 2026-09-15 — Desk wallet honesty + Nest.credit live read
+- Killed fake `7vF…2ka` desk chip; Nest.credit vault TVL live as separate capability; NestUSD borrow remains fail-closed.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Jupiter short TTL + CA pending honesty
+- Shipping short TTL cache with honest labels, plus live CA surface from xStocks.
+- Quote 20s / price 30s; 429 → stale ≤120s or fail-closed `jupiter_rate_limited`.
+- Truth metric + activity event for pendingMultiplier; preference row no longer pretends a calendar feed.
+- Preview verified: Pending CA **None**; activity “Corporate action · no pending multiplier”; Jupiter price source labeled cached.
+- Network matrix details include TTL/stale-429 policy.
+- Goal open: Henry lab Pick reply + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Desk policy CA + acquire Jupiter source + Stocklana refresh
+- Desk overview policy: Live · no pending CA, Nest.credit vaults, NestUSD fail-closed.
+- Acquire surfaces Jupiter live/cached/stale + pending CA on checks/review.
+- Stocklana → **545** registered / **72** submissions / **$121k**.
+- Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Guarded paper agent CA/Jupiter honesty
+- Agent truth facts include pending CA or none; quote facts include cacheLabel.
+- Position detail Pending corporate action row; settings copy updated.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — AgentRouter WAF → spine-only (B002)
+- Paper agent never drops live spine when AgentRouter returns WAF HTML / bad JSON.
+- Settings readiness + structured agent output include nlExpansion.
+- Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Post-key smoke harness
+- Shipped `src/lib/keys-smoke.ts` + `scripts/smoke-keys.mts` + unit tests; `npm run smoke:keys`.
+- Live run (no Bitquery/Pyth/Privy/Supabase): SKIP probes · FC multi_tenant · OK broadcast/session/agentrouter.
+- Tenant migration user_id indexes; KEYS_LANDING / STOCKLANA_SUBMIT updated.
+- Vitest 76 green. Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Inspect continuity + badge honesty
+- Detail route + list/overview links carry `?inspect=`; truth diverge no checkmark on null; Jupiter cache labels; execution Fail-closed; activity Nest.credit≠NestUSD + Jupiter cache.
+- Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Home live × in hero copy
+- SSR truth bundle → AAPLx live multiplier in home supporting sentence (not fixture 4×); Stocklana still 545/72/$121k.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Paper agent e2e lock-in
+- E2E clicks Run paper agent → asserts `nl=` + `broadcast=false` + spine bits; never fill theater.
+- Vercel preview READY on `e1fb388` with home live AAPLx ≈1.003269×.
+- Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Desk false-greens + Raydium matrix
+- Verified≠paper; desk chrome quote-only; Raydium awareness on matrix/smoke/docs.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase; broadcast paused.
+
+## 2026-09-15 — Supabase user-JWT RLS path
+- Prefs/tenants prefer user-JWT (sub=Privy DID) when SUPABASE_JWT_SECRET set; service-role labeled fallback.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase(+JWT secret); broadcast paused.
+
+## 2026-09-15 — Raydium awareness on acquire
+- Acquire checks + honesty notes for Raydium pools (not route guarantee); wash “Tape clear”.
+- Goal open: Henry lab Pick + keys.
+
+## 2026-09-15 — Role-gated prefs + membership wallet
+- Viewer cannot save desk prefs (server + settings UI); membership wallet preferred for qty binding.
+- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase(+JWT); broadcast paused.
+
+## 2026-09-15 — Network matrix membership + role-gate honesty
+- Matrix rows for membership wallet priority + role-gated prefs.
+- Goal open: Henry lab Pick + keys.
+
+## 2026-09-16 — UI refs + hero fix
+- Cloned NetroBNB + Aionis; 21st MCP live on lab; shaders key probed (Clerk fail-closed labeled).
+- Home footer unburied (was min-height 40vh on first viewport). New lab ids from real refs.
+- Goal open: Henry Pick + keys.
+
+## 2026-09-16 — Real Aionis/NetroBNB extract + 21st WebGL
+- User called prior lab approve fakes + buried hero; re-analyzed live shots vs clones.
+- Extracted Aionis SVG liquid stencil → production `/`; NetroBNB 12-col density → lab; 21st Plasma WebGL (24346) → shader lab.
+- shaders.com REST still Clerk 500; labeled. Tip `cfc0cc2`. Henry Pick still required.
+
+## 2026-09-16 — Desk preview extract + Stocklana 588/79
+- Strengthened opt-in desk preview CSS for netro-density / aionis-brand-plane / trade-journal-21st.
+- Stocklana official page: 588 / 79 / $121k; AAPLx × still ~1.003269. Goal open: Henry Pick + keys.
+
+## 2026-09-16 — Lab readiness + e2e extract locks
+- Settings readiness: API_KEY_21ST + SHADERS_API_KEY. E2E locks stencil home + Netro/Aionis desk preview + WebGL swatches.
+- Vercel preview READY on prior tip; Empire keys still empty. Goal open: Henry Pick + keys.
+
+## 2026-09-16 — Preview verify + e2e green + keys-readiness lab rows
+- Live Vercel preview: home stencil + live ×1.003269 OK; `/lab/ui` shows API_KEY_21ST missing on Vercel (local has it).
+- keys-readiness lists optional API_KEY_21ST / SHADERS. Full Playwright **21/21** green.
+- Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · Vercel lab keys · funded broadcast.
+
+## 2026-09-16 — Analyze refs + fix buried/dim hero
+- Ran Aionis + NetroBNB + FOLIO; screenshots under `/opt/cursor/artifacts/screenshots/`.
+- Aionis gold stencil is the hero; FOLIO ice stencil was too dark → bumped luminance + soft floor + Aionis horizon CSS.
+- Removed midband stack; supporting copy below fold. 21st MCP confirmed live locally; shaders REST still 500.
+- smoke:keys + unit tests updated. Goal open: Henry Pick + Empire keys + Vercel `API_KEY_21ST`.
+
+## 2026-09-16 — Netro extract rebuild + Trade Journal 27124
+- Netro lab canvas now mirrors 12-col density (market strip + yellow rail).
+- get_component Trade Journal Table → FOLIO honesty blotter on `/lab/ui`.
+- Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · Vercel `API_KEY_21ST` · funded broadcast.
+
+## 2026-09-16 — Desk Empire gates panel + Stocklana 590/79
+- `/desk` shows live network-matrix gate strip (fail-closed wash/Pyth/NestUSD/auth/broadcast).
+- Stocklana jina: 590 / 79 / $121k. Goal open.
+
+## 2026-09-16 — Acquire gate grid + Jupiter optional key
+- Acquire Checks: truth/wash/quote/Pyth/canReview grid. keys-readiness lists JUPITER_API_KEY optional.
+- Paper agent: live ×1.003269 spine; AgentRouter NL failed WAF/HTML (spine kept). Goal open.
+
+## 2026-09-16 — refs screened + hero/lab honesty
+
+- Cloned/ran Aionis (:3110) + NetroBNB (:3111); Playwright-shot vs FOLIO.
+- Hero: removed competing serif void copy; raised luminous FOLIO stencil (Aionis composition); horizon ~58%.
+- Lab UI/shaders: compact intro, visual stages first; 21st MCP live locally (16 catalog hits); shaders.com keyed but Clerk-gated.
+- Fixed client `node:crypto` leak via lazy `node-hmac.ts`.
+- Acquire gate grid + e2e networkidle/hydration fixes.
+- Henry still needs Vercel `API_KEY_21ST` (+ optional `SHADERS_API_KEY`) for public preview lab.
+
+## 2026-09-16 — node-hmac Vitest ESM fix (multi-tenant path)
+
+- `process.getBuiltinModule("crypto")` replaces `eval(require)` so session/JWT unit tests pass under Vitest ESM while client graphs still avoid static `node:crypto` imports.
+- Vitest **101/101** green; smoke-empire honesty ok; Stocklana still **590**/79/$121k (jina).
+- Henry blockers unchanged: lab Pick, Vercel API_KEY_21ST, Bitquery→Pyth→Privy→Supabase, GG Skip, broadcast paused.
+
+## 2026-09-16 — UI ref screen + 21st/shaders honesty
+
+- Cloned refs live: Aionis `:3110`, NetroBNB `:3111`; screened side-by-side vs FOLIO `:3000`.
+- Hero: matched Aionis stencil geometry (`1400×550`, baseline `y=465`, horizon `bottom:55%`); brighter ledger-ice punch so brand mass no longer reads as buried footer strip.
+- Lab UI: removed junk 21st catalog heroes (consumer/recovery apps); pinned live Plasma WebGL **id 24346** as cinematic candidate; finance-filtered gallery.
+- Lab shaders: WebGL Plasma retinted glacial (hue=0, no purple); `preserveDrawingBuffer`; shaders.com still HTTP 500 / Clerk-gated (labeled).
+- Paper agent e2e: scrollIntoView + fail `nl=` labels — **22/22** Playwright green locally.
+- Henry blockers unchanged (Pick, keys, Vercel API_KEY_21ST, GG Skip, broadcast paused).
+
+## 2026-09-16 — Desk live Plasma preview + Stocklana fact refresh
+
+- Stocklana live: **591** registered · **79** submissions · **$121k** · hero deadline **SEP 25** (timeline body still lists **18 Sep 16:00 ET** — conservative).
+- Desk opt-in lab preview now mounts **live WebGL Plasma** (21st id 24346 path) for shader picks + `cinematic-landing-21st` — not CSS-only fakes; Exit clears.
+- DEMO_SCRIPT + STOCKLANA_SUBMISSION refreshed; Hermes public still **401** without `PYTH_API_KEY`.
+- Henry blockers unchanged: Step 0 Pick · Vercel `API_KEY_21ST` · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.
+
+## 2026-09-16 — Pinned 21st ids + Netro header extract
+
+- Vercel preview still lacks `API_KEY_21ST` (CLI not logged in — Henry). Lab now **pins Plasma 24346 + Trade Journal 27124** so WebGL/blotter stay attributed without catalog search.
+- NetroBNB Header extract: yellow active Truth pill + dark Connect on `/lab/ui` density stage; desk netro preview topbar picks up yellow policy pill.
+- Goal still blocked: Henry Pick · Vercel API_KEY_21ST · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.
+
+## 2026-09-16 — Preserve hero + Netro 12-col rebuild + Vercel keys
+
+- User: do **not** change former home hero; NetroBNB desk cards were out of place; set Vercel keys now (rotate token after).
+- Restored/kept former hero (no home-empire section). Stripped leftover `.home-empire*` CSS + e2e home Empire heading assert.
+- Rebuilt `NetroDensityCanvas` to true NetroBNB **12-col** (left 9 = profile 3 + stack 6 + market; right 3 = dark quote + yellow AI) with stagger enter + clock pulse.
+- Vercel env now has: `API_KEY_21ST`, `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY` (+ existing SOLANA/BROADCAST/SESSION). Still empty locally/on Vercel: Bitquery · Jupiter · Pyth · Privy · Supabase · Venice (cannot invent).
+- Henry: **rotate Vercel token** pasted in chat; Step 0 Pick · GG Skip · broadcast paused unchanged.
+
+## 2026-09-16 — Desk mounts Netro 12-col on lab preview
+
+- Branch preview verified: **21st MCP connected** · Netro 12-col live · AAPLx ≈1.003269×.
+- `DeskShell` now mounts `NetroDensityCanvas` (live multiplier) when opt-in preview is `netro-density`, and `FolioTradeJournalLab` for `trade-journal-21st` — not CSS-only.
+- stocklana.fun close banner: **18 SEP 2026 · 23:59 UTC** (conservative vs hero SEP 25).
+- Still blocked for full objective: Henry Pick · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused · rotate Vercel token.
+
+## 2026-09-16 — Stocklana 593/80 + netro recommended Pick
+
+- Live hackathons.solana.com: **593** registered · **80** submissions · **$121k** · hero SEP 25 · timeline 18 Sep 16:00 ET.
+- HENRY_STEPS: Vercel lab keys marked DONE; Step 0 recommends `netro-density` (desk preview mounts 12-col).
+- Lab approve panel marks netro as rec; LAB_UI_IDS order leads with netro-density.
+- Still blocked: Henry Pick reply · Bitquery · Pyth · Privy · Supabase · GG Skip · rotate token · broadcast paused.
+
+## 2026-09-16 — Pyth bounty triad (Equity + xStock + Ondo)
+
+- Mapped Hermes `Crypto.AAPLON/USD` (Ondo) feed id from live catalog; wired `fetchPythOndoUsdPrice` + `/truth` bounty feed list.
+- `/truth` shows Equity.US.AAPL/USD · Crypto.AAPLX/USD · Crypto.AAPLON/USD even when `PYTH_API_KEY` missing (prices still fail-closed).
+- Vitest **105+** path extended; goal still needs Henry Pick + Bitquery/Pyth/Privy/Supabase keys.
+
+## 2026-09-16 — FOLIO_APPROVED_LAB_* production merge path
+
+- Wired `FOLIO_APPROVED_LAB_UI` / `FOLIO_APPROVED_LAB_SHADER` (set on Vercel only after Henry chat reply).
+- DeskShell applies approved chrome without opt-in preview; Settings shows approved rows; local Pick still never merges.
+- Goal still needs Henry Pick reply before env can be set; then Bitquery/Pyth/Privy/Supabase.
+
+## 2026-09-16 — Netro layout parity (cards/animations)
+
+- DeskShell: when `netro-density` is effective UI, Netro **replaces** overview children (was stacking → cards looked out of place).
+- Stagger delays via `--netro-delay` (nth-child was broken across nested parents).
+- Yellow AI rail height-synced to left column baseline; share ticker marquee; dual spinning profile gears; taller cards.
+- Home hero preserved. Confirmed Vercel already has 21st/shaders/AgentRouter/Tavily/TinyFish; trading keys still empty (cannot invent). Rotate Vercel token.
+
+## 2026-09-16 — Matrix/settings honesty + Stocklana 596/81
+
+- Network matrix: Membership wallet + Role-gated prefs → `unavailable` until multi-tenant keys (was false mainnet-read).
+- Settings readiness: `JUPITER_API_KEY` optional + `SOLANA_RPC_URL` dedicated vs public fallback (B004).
+- E2E: Netro preview asserts zero stacked `.desk-heading`/`.panel`; settings asserts approved-lab + Jupiter + RPC rows.
+- Live scrape: **596** registered · **81** submissions · **$121k**. Still blocked: Henry Pick · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.
+
+## 2026-09-16 — /truth on-chain Scaled UI + no invent-pass
+
+- `getTruthBundle` fetches Token-2022 Scaled UI via RPC; API↔on-chain compare (match/mismatch/unavailable).
+- Diverge pass/fail only when Pyth Equity.US + Jupiter venue live; Jupiter stockData vs venue is informational (`pass: null`).
+- Unit + e2e green. Goal still needs Henry Pick + Bitquery/Pyth/Privy/Supabase.
+
+## 2026-09-16 — Acquire on-chain Scaled UI gate
+
+- `getAcquireBundle` fetches Token-2022 Scaled UI + API↔chain compare (same as /truth).
+- Checks UI splits Truth (API) vs On-chain Scaled UI (match/mismatch/off) — no API-only green invent.
+- Honesty notes; strictFailClosed blocks on mismatch/off. Unit + e2e green. Goal open.
+
+## 2026-09-16 — Paper agent + activity Scaled UI spine
+
+- Paper agent truth/quote spines include on-chain Scaled UI compare (match/mismatch/off).
+- Activity feed emits On-chain Scaled UI event. Unit + e2e green. Goal open.

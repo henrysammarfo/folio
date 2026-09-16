@@ -2,7 +2,7 @@
  * Print fail-closed key readiness for FOLIO (no secrets printed).
  * Usage: npx tsx scripts/keys-readiness.mts
  */
-const rows: Array<{ name: string; ok: boolean; note: string }> = [
+const rows: Array<{ name: string; ok: boolean; note: string; required?: boolean }> = [
   {
     name: "FOLIO_SESSION_SECRET",
     ok: (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16,
@@ -17,6 +17,7 @@ const rows: Array<{ name: string; ok: boolean; note: string }> = [
     name: "SOLANA_RPC_URL",
     ok: Boolean(process.env["SOLANA_RPC_URL"]?.trim()),
     note: "optional — public mainnet fallback if unset",
+    required: false,
   },
   {
     name: "BITQUERY_API_KEY",
@@ -27,6 +28,18 @@ const rows: Array<{ name: string; ok: boolean; note: string }> = [
     name: "PYTH_API_KEY",
     ok: Boolean(process.env["PYTH_API_KEY"]?.trim()),
     note: "Hermes equity diverge — fail-closed when missing",
+  },
+  {
+    name: "AGENTROUTER_API_KEY",
+    ok: Boolean(process.env["AGENTROUTER_API_KEY"]?.trim()),
+    note: "optional NL for paper agent — live spine always; WAF → spine-only",
+    required: false,
+  },
+  {
+    name: "JUPITER_API_KEY",
+    ok: Boolean(process.env["JUPITER_API_KEY"]?.trim()),
+    note: "optional — reduces 429 on price/quote; public path works without it",
+    required: false,
   },
   {
     name: "PRIVY_APP_ID + PRIVY_APP_SECRET",
@@ -44,12 +57,29 @@ const rows: Array<{ name: string; ok: boolean; note: string }> = [
     ),
     note: "tenant_members + desk_preferences",
   },
+  {
+    name: "SUPABASE_JWT_SECRET",
+    ok: (process.env["SUPABASE_JWT_SECRET"]?.trim().length ?? 0) >= 16,
+    note: "user-JWT RLS path (sub=Privy DID); service-role labeled fallback when missing",
+  },
+  {
+    name: "API_KEY_21ST",
+    ok: Boolean(process.env["API_KEY_21ST"]?.trim()),
+    note: "optional lab — 21st.dev MCP catalog on /lab/ui",
+    required: false,
+  },
+  {
+    name: "SHADERS_API_KEY",
+    ok: Boolean(process.env["SHADERS_API_KEY"]?.trim()),
+    note: "optional lab — shaders.com probe (Clerk may still gate REST)",
+    required: false,
+  },
 ];
 
 let missing = 0;
 for (const r of rows) {
   const mark = r.ok ? "SET " : "MISS";
-  if (!r.ok) missing += 1;
+  if (!r.ok && r.required !== false) missing += 1;
   console.log(`${mark}  ${r.name} — ${r.note}`);
 }
 

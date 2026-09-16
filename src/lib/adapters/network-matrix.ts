@@ -28,7 +28,11 @@ export function buildNetworkMatrix(input: {
   kamino: AdapterResult<unknown>;
   jupiterLend: AdapterResult<unknown>;
   nestusd: AdapterResult<unknown>;
+  /** Nest.credit vault awareness — must not be conflated with NestUSD borrow. */
+  nestCredit: AdapterResult<unknown>;
   scaledUi: AdapterResult<unknown>;
+  /** Raydium pool awareness — mainnet-read, not a route guarantee. */
+  pools: AdapterResult<unknown>;
   bitqueryKeyPresent: boolean;
   /** Privy + Supabase + session secret all configured. */
   multiTenantKeysPresent: boolean;
@@ -55,18 +59,37 @@ export function buildNetworkMatrix(input: {
       capability: "Pyth Hermes equity reference",
       mode: modeOf(input.pyth),
       detail: input.pyth.ok
-        ? input.pyth.source
+        ? `${input.pyth.source} · Equity.US.* (+ Crypto.xStock/USD secondary on /truth)`
         : `${detailOf(input.pyth)} (PYTH_API_KEY required since Hermes Aug 2026 auth — fail-closed)`,
     },
     {
       capability: "Jupiter Price v3 (venue + stockData)",
       mode: modeOf(input.jupiterPrice),
-      detail: detailOf(input.jupiterPrice),
+      detail: input.jupiterPrice.ok
+        ? `${input.jupiterPrice.source} · TTL 30s · stale≤120s on 429`
+        : detailOf(input.jupiterPrice),
     },
     {
       capability: "Jupiter swap quote",
       mode: modeOf(input.jupiter),
-      detail: input.jupiter.ok ? "quote-only · no broadcast" : detailOf(input.jupiter),
+      detail: input.jupiter.ok
+        ? [
+            input.jupiter.source.includes("cached") ||
+            input.jupiter.source.includes("stale")
+              ? input.jupiter.source
+              : null,
+            "quote-only · no broadcast · TTL 20s · stale≤120s on 429",
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        : detailOf(input.jupiter),
+    },
+    {
+      capability: "Raydium pool awareness",
+      mode: modeOf(input.pools),
+      detail: input.pools.ok
+        ? `${input.pools.source} · awareness only · not a route guarantee · wash still required`
+        : detailOf(input.pools),
     },
     {
       capability: "Wash / linked-flow gate",
@@ -81,7 +104,7 @@ export function buildNetworkMatrix(input: {
       capability: "Kamino xStocks market (read)",
       mode: modeOf(input.kamino),
       detail: input.kamino.ok
-        ? `${input.kamino.source} · borrow CPI = local fork until funded`
+        ? `${input.kamino.source} · borrow CPI unavailable until funded (no fork harness)`
         : detailOf(input.kamino),
     },
     {
@@ -92,11 +115,20 @@ export function buildNetworkMatrix(input: {
         : detailOf(input.jupiterLend),
     },
     {
+      capability: "Nest.credit vault awareness (read)",
+      mode: modeOf(input.nestCredit),
+      detail: input.nestCredit.ok
+        ? `${input.nestCredit.source} · indexed vault TVL/OFT — not NestUSD borrow`
+        : detailOf(input.nestCredit),
+    },
+    {
       capability: "NestUSD capacity",
       mode: modeOf(input.nestusd),
       detail: input.nestusd.ok
         ? detailOf(input.nestusd)
-        : "Unverified public metrics endpoint · risk-labeled · fail-closed",
+        : input.nestusd.detail
+          ? `${input.nestusd.reason} — ${input.nestusd.detail}`
+          : "Unverified NestUSD borrow metrics · risk-labeled · fail-closed",
     },
     {
       capability: "Multi-tenant sessions (Privy + Supabase)",
@@ -104,6 +136,20 @@ export function buildNetworkMatrix(input: {
       detail: input.multiTenantKeysPresent
         ? "Keys present · httpOnly folio_session path armed"
         : "PRIVY_* / SUPABASE_* missing · fail-closed (desk prefs non-authoritative)",
+    },
+    {
+      capability: "Membership wallet qty binding",
+      mode: input.multiTenantKeysPresent ? "mainnet-read" : "unavailable",
+      detail: input.multiTenantKeysPresent
+        ? "Priority: active-tenant membership wallet → session → watch-wallet → ?inspect= · never invent a foreign pubkey"
+        : "Requires Privy + Supabase memberships · until then watch-wallet / ?inspect= only",
+    },
+    {
+      capability: "Role-gated desk prefs",
+      mode: input.multiTenantKeysPresent ? "mainnet-read" : "unavailable",
+      detail: input.multiTenantKeysPresent
+        ? "owner/trader may write · viewer fail-closed (prefs_role_denied) · settings switches disabled"
+        : "Tenant roles inactive until multi-tenant keys land · prefs non-authoritative",
     },
     {
       capability: "Watch-wallet mainnet-read qty",
@@ -116,7 +162,7 @@ export function buildNetworkMatrix(input: {
       capability: "Ephemeral wallet inspect",
       mode: "mainnet-read",
       detail:
-        "Always on · ?inspect=<pubkey> on /desk + /desk/positions + /desk/credit · not auth · no FOLIO_SESSION_SECRET required",
+        "Always on · ?inspect=<pubkey> on /desk · /desk/positions · /desk/positions/$symbol · /desk/credit · not auth · no FOLIO_SESSION_SECRET required",
     },
     {
       capability: "Broadcast swap / borrow",

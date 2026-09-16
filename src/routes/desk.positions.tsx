@@ -69,22 +69,25 @@ function Page() {
         </ModeBadge>
         <ModeBadge
           mode={
-            data?.walletSource === "session" || data?.walletSource === "watch-wallet"
+            data?.walletSource === "membership" ||
+            data?.walletSource === "session" ||
+            data?.walletSource === "watch-wallet" ||
+            data?.walletSource === "inspect"
               ? "mainnet-read"
-              : data?.walletSource === "inspect"
-                ? "mainnet-read"
-                : "unavailable"
+              : "unavailable"
           }
         >
-          {data?.walletSource === "session"
-            ? "Session bound"
-            : data?.walletSource === "watch-wallet"
-              ? "Watch-wallet bound"
-              : data?.walletSource === "inspect"
-                ? "Inspect (ephemeral)"
-                : data?.auth.ok
-                  ? "Keys present · no session"
-                  : "Wallet unbound"}
+          {data?.walletSource === "membership"
+            ? "Membership wallet"
+            : data?.walletSource === "session"
+              ? "Session bound"
+              : data?.walletSource === "watch-wallet"
+                ? "Watch-wallet bound"
+                : data?.walletSource === "inspect"
+                  ? "Inspect (ephemeral)"
+                  : data?.auth.ok
+                    ? "Keys present · no session"
+                    : "Wallet unbound"}
         </ModeBadge>
       </div>
 
@@ -149,8 +152,8 @@ function Page() {
       <Panel
         title="Watchlist"
         meta={
-          <StatusBadge tone={isFetching ? "blue" : "green"}>
-            {isFetching ? "Refreshing…" : "Mainnet read"}
+          <StatusBadge tone={isFetching ? "blue" : "neutral"}>
+            {isFetching ? "Refreshing…" : "Live multipliers · qty labeled"}
           </StatusBadge>
         }
       >
@@ -170,6 +173,7 @@ function Page() {
               key={p.symbol}
               to="/desk/positions/$symbol"
               params={{ symbol: p.symbol }}
+              search={inspect ? { inspect } : {}}
             >
               <span>
                 <b>{p.symbol}</b>
@@ -203,7 +207,13 @@ function Page() {
                         : "neutral"
                   }
                 >
-                  {p.health}
+                  {p.health === "Verified"
+                    ? "Wallet-verified"
+                    : p.health === "Review"
+                      ? p.qtySource === "paper"
+                        ? "Live · paper"
+                        : "Review"
+                      : "Unavailable"}
                 </StatusBadge>
                 <ArrowUpRight />
               </span>

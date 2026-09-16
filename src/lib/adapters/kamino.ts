@@ -23,7 +23,7 @@ export type KaminoMarketSnapshot = {
 
 /**
  * Mainnet-read Kamino xStocks market reserves (LTV / APY / TVL).
- * Borrow CPI remains local-fork / unavailable until funded — this is READ only.
+ * Borrow CPI remains unavailable until funded — this is READ only (no fork harness shipped).
  */
 export async function fetchKaminoXStocksMarket(): Promise<AdapterResult<KaminoMarketSnapshot>> {
   const source = "api.kamino.finance/kamino-market/reserves/metrics";

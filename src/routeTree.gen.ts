@@ -24,7 +24,7 @@ import { Route as DeskPositionsRouteImport } from './routes/desk.positions'
 import { Route as DeskSettingsRouteImport } from './routes/desk.settings'
 import { Route as LabShadersRouteImport } from './routes/lab.shaders'
 import { Route as LabUiRouteImport } from './routes/lab.ui'
-import { Route as DeskPositionsSymbolRouteImport } from './routes/desk.positions.$symbol'
+import { Route as DeskPositionsSymbolRouteImport } from './routes/desk.positions_.$symbol'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -102,9 +102,9 @@ const LabUiRoute = LabUiRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeskPositionsSymbolRoute = DeskPositionsSymbolRouteImport.update({
-  id: '/$symbol',
-  path: '/$symbol',
-  getParentRoute: () => DeskPositionsRoute,
+  id: '/positions_/$symbol',
+  path: '/positions/$symbol',
+  getParentRoute: () => DeskRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -118,7 +118,7 @@ export interface FileRoutesByFullPath {
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
   '/desk/credit': typeof DeskCreditRoute
-  '/desk/positions': typeof DeskPositionsRouteWithChildren
+  '/desk/positions': typeof DeskPositionsRoute
   '/desk/settings': typeof DeskSettingsRoute
   '/lab/shaders': typeof LabShadersRoute
   '/lab/ui': typeof LabUiRoute
@@ -135,7 +135,7 @@ export interface FileRoutesByTo {
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
   '/desk/credit': typeof DeskCreditRoute
-  '/desk/positions': typeof DeskPositionsRouteWithChildren
+  '/desk/positions': typeof DeskPositionsRoute
   '/desk/settings': typeof DeskSettingsRoute
   '/lab/shaders': typeof LabShadersRoute
   '/lab/ui': typeof LabUiRoute
@@ -154,12 +154,12 @@ export interface FileRoutesById {
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
   '/desk/credit': typeof DeskCreditRoute
-  '/desk/positions': typeof DeskPositionsRouteWithChildren
+  '/desk/positions': typeof DeskPositionsRoute
   '/desk/settings': typeof DeskSettingsRoute
   '/lab/shaders': typeof LabShadersRoute
   '/lab/ui': typeof LabUiRoute
   '/desk/': typeof DeskIndexRoute
-  '/desk/positions/$symbol': typeof DeskPositionsSymbolRoute
+  '/desk/positions_/$symbol': typeof DeskPositionsSymbolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -214,7 +214,7 @@ export interface FileRouteTypes {
     | '/lab/shaders'
     | '/lab/ui'
     | '/desk/'
-    | '/desk/positions/$symbol'
+    | '/desk/positions_/$symbol'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -336,44 +336,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LabUiRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/desk/positions/$symbol': {
-      id: '/desk/positions/$symbol'
-      path: '/$symbol'
+    '/desk/positions_/$symbol': {
+      id: '/desk/positions_/$symbol'
+      path: '/positions/$symbol'
       fullPath: '/desk/positions/$symbol'
       preLoaderRoute: typeof DeskPositionsSymbolRouteImport
-      parentRoute: typeof DeskPositionsRoute
+      parentRoute: typeof DeskRoute
     }
   }
 }
-
-interface DeskPositionsRouteChildren {
-  DeskPositionsSymbolRoute: typeof DeskPositionsSymbolRoute
-}
-
-const DeskPositionsRouteChildren: DeskPositionsRouteChildren = {
-  DeskPositionsSymbolRoute: DeskPositionsSymbolRoute,
-}
-
-const DeskPositionsRouteWithChildren = DeskPositionsRoute._addFileChildren(
-  DeskPositionsRouteChildren,
-)
 
 interface DeskRouteChildren {
   DeskAcquireRoute: typeof DeskAcquireRoute
   DeskActivityRoute: typeof DeskActivityRoute
   DeskCreditRoute: typeof DeskCreditRoute
-  DeskPositionsRoute: typeof DeskPositionsRouteWithChildren
+  DeskPositionsRoute: typeof DeskPositionsRoute
   DeskSettingsRoute: typeof DeskSettingsRoute
   DeskIndexRoute: typeof DeskIndexRoute
+  DeskPositionsSymbolRoute: typeof DeskPositionsSymbolRoute
 }
 
 const DeskRouteChildren: DeskRouteChildren = {
   DeskAcquireRoute: DeskAcquireRoute,
   DeskActivityRoute: DeskActivityRoute,
   DeskCreditRoute: DeskCreditRoute,
-  DeskPositionsRoute: DeskPositionsRouteWithChildren,
+  DeskPositionsRoute: DeskPositionsRoute,
   DeskSettingsRoute: DeskSettingsRoute,
   DeskIndexRoute: DeskIndexRoute,
+  DeskPositionsSymbolRoute: DeskPositionsSymbolRoute,
 }
 
 const DeskRouteWithChildren = DeskRoute._addFileChildren(DeskRouteChildren)
