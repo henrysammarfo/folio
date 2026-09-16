@@ -110,6 +110,11 @@ function Page() {
           <div className="lab-21st-gallery lab-21st-gallery-wide">
             {data.shaderHits
               .filter((h) => h.previewUrl)
+              .filter((h) => {
+                const blob = `${h.name} ${h.description ?? ""}`.toLowerCase();
+                // Keep approve board clean — no purple-neon AI-slop thumbs
+                return !/purple|neon|violet|glow line/i.test(blob);
+              })
               .slice(0, 4)
               .map((h) => (
                 <figure key={String(h.id)}>
