@@ -14,11 +14,16 @@ import {
   NETRO_LIVE_GATE_DEFAULTS,
   type NetroLiveGateLabels,
 } from "@/lib/netro-live-gates";
+import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 
 type Props = {
   multiplierLabel: string;
   /** Live Empire gate labels from /network matrix — defaults are fail-closed. */
   gates?: NetroLiveGateLabels;
+  /** Live positions honesty — paper vs wallet-read / inspect. */
+  ownership?: NetroOwnershipSummary | null;
+  /** Prefill from `/desk?inspect=` deep-link. */
+  initialInspect?: string | undefined;
   /** Desk overview only — lab stage stays decorative. */
   enablePaperAgent?: boolean;
 };
@@ -50,6 +55,8 @@ function delay(i: number): CSSProperties {
 export function NetroDensityCanvas({
   multiplierLabel,
   gates = NETRO_LIVE_GATE_DEFAULTS,
+  ownership = null,
+  initialInspect = "",
   enablePaperAgent = false,
 }: Props) {
   const [clock, setClock] = useState({ h: "00", m: "00", s: "00" });
@@ -58,9 +65,13 @@ export function NetroDensityCanvas({
   const [agentBusy, setAgentBusy] = useState(false);
   const [agentReply, setAgentReply] = useState<string | null>(null);
   const [agentMeta, setAgentMeta] = useState<string | null>(null);
-  const [inspectInput, setInspectInput] = useState("");
+  const [inspectInput, setInspectInput] = useState(initialInspect ?? "");
   const runAgent = useServerFn(runDeskAgent);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setInspectInput(initialInspect ?? "");
+  }, [initialInspect]);
 
   useEffect(() => {
     const tick = () => {
@@ -148,9 +159,18 @@ export function NetroDensityCanvas({
     e.preventDefault();
     const next = inspectInput.trim();
     if (!next) return;
+    // Stay on Netro overview with ?inspect= so ownership qty paints live
     void navigate({
-      to: "/desk/positions",
+      to: "/desk",
       search: { inspect: next },
+    });
+  }
+
+  function onInspectClear() {
+    setInspectInput("");
+    void navigate({
+      to: "/desk",
+      search: {},
     });
   }
 
@@ -225,10 +245,65 @@ export function NetroDensityCanvas({
           <button type="submit" disabled={!inspectInput.trim()}>
             Inspect qty
           </button>
-          <Link to="/desk/settings" className="netro-density-inspect-bind">
-            Or bind watch-wallet
-          </Link>
+          {initialInspect ? (
+            <button
+              type="button"
+              className="netro-density-inspect-clear"
+              onClick={onInspectClear}
+            >
+              Clear
+            </button>
+          ) : (
+            <Link to="/desk/settings" className="netro-density-inspect-bind">
+              Or bind watch-wallet
+            </Link>
+          )}
+          {initialInspect ? (
+            <Link
+              to="/desk/positions"
+              search={{ inspect: initialInspect }}
+              className="netro-density-inspect-bind"
+            >
+              Open positions ledger
+            </Link>
+          ) : null}
         </form>
+      ) : null}
+
+      {enablePaperAgent && ownership ? (
+        <section
+          className="netro-density-ownership netro-density-item"
+          style={delay(2.5)}
+          data-testid="netro-ownership"
+          aria-label="Ownership honesty"
+        >
+          <div className="netro-density-ownership-head">
+            <div>
+              <strong>Ownership</strong>
+              <span>{ownership.note}</span>
+            </div>
+            <div className="netro-density-ownership-pills">
+              <em>{ownership.walletSourceLabel}</em>
+              <em>{ownership.qtyLabel}</em>
+              <em>{ownership.verifiedLabel}</em>
+            </div>
+          </div>
+          <div className="netro-density-ownership-metrics">
+            <div>
+              <span>Economic value</span>
+              <b>{ownership.economicValueLabel}</b>
+            </div>
+            {ownership.rows.map((row) => (
+              <div key={row.symbol}>
+                <span>
+                  {row.symbol} · {row.health}
+                </span>
+                <b>{row.qtyLabel}</b>
+                <small>{row.valueLabel}</small>
+              </div>
+            ))}
+          </div>
+        </section>
       ) : null}
 
       {/* Main Desktop Grid: 9 left / 3 right — NetroBNB app/page.tsx */}

@@ -275,3 +275,7 @@ EOF
 - VERIFIED: `/` keeps Aionis brand-plane hero (no second hero). Netro is `/desk` overview only.
 - VERIFIED: `FOLIO_APPROVED_LAB_UI=netro-density` present on Vercel Development/Preview/Production.
 - OPEN: Bitquery / Pyth / Privy / Supabase / Jupiter keys — fail-closed until Henry pastes. Rotate chat-pasted Vercel token.
+
+## 2026-09-16 — Netro ownership strip
+- VERIFIED unit: paper default / inspect+wallet-read labels; never invents Verified count.
+- OPEN: Empire keys still empty — wash/Pyth/multi-tenant fail-closed.

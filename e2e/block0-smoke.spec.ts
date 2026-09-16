@@ -164,19 +164,25 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 60_000,
     });
     await expect(agentRail).not.toContainText(/filled on mainnet|unhackable/i);
-    // Netro inspect wallet restores overview → Positions ephemeral path
+    // Netro inspect wallet restores overview ownership with ?inspect=
     const inspectForm = page.getByTestId("netro-inspect-wallet");
     await expect(inspectForm).toBeVisible();
     const inspectPk = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
     await inspectForm.getByLabel(/inspect wallet pubkey/i).fill(inspectPk);
     await inspectForm.getByRole("button", { name: /inspect qty/i }).click();
-    await expect(page).toHaveURL(new RegExp(`/desk/positions\\?inspect=${inspectPk}`), {
+    await expect(page).toHaveURL(new RegExp(`/desk\\?inspect=${inspectPk}`), {
       timeout: 15_000,
     });
-    await expect(page.getByRole("heading", { name: /positions/i }).first()).toBeVisible({
-      timeout: 30_000,
+    await expect(page.getByTestId("desk-lab-netro")).toBeVisible();
+    await expect(page.getByTestId("netro-ownership")).toBeVisible({
+      timeout: 20_000,
     });
-    await expect(page.getByText(/inspect active|ephemeral|mainnet/i).first()).toBeVisible();
+    await expect(page.getByTestId("netro-ownership")).toContainText(
+      /inspect|paper qty|wallet-read|economic/i,
+    );
+    await expect(
+      page.getByRole("link", { name: /open positions ledger/i }),
+    ).toHaveAttribute("href", `/desk/positions?inspect=${inspectPk}`);
     // Positions stays the ledger — Netro must not replace other desk routes
     await page.goto("/desk/positions");
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();
@@ -302,6 +308,12 @@ test.describe("FOLIO Block 0 smoke", () => {
     const netro = page.getByTestId("desk-lab-netro");
     if ((await netro.count()) > 0) {
       await expect(page.getByTestId("netro-inspect-wallet")).toBeVisible();
+      await expect(page.getByTestId("netro-ownership")).toBeVisible({
+        timeout: 20_000,
+      });
+      await expect(page.getByTestId("netro-ownership")).toContainText(
+        /inspect|paper qty|wallet-read|economic/i,
+      );
       await expect(page.locator("body")).toContainText(/ephemeral mainnet-read|not auth|no cookie/i);
       await expect(page.locator("body")).not.toContainText(/unhackable|filled on mainnet/i);
       return;

@@ -18,7 +18,14 @@ import {
 } from "@/components/lab/shader-background";
 import { NetroDensityCanvas } from "@/components/lab/netro-density-canvas";
 import { FolioTradeJournalLab } from "@/components/lab/folio-trade-journal-lab";
-import { getAcquireBundle, getCreditBundle, getLabApprovals, getNetworkBundle, getTruthBundle } from "@/lib/desk.functions";
+import {
+  getAcquireBundle,
+  getCreditBundle,
+  getLabApprovals,
+  getNetworkBundle,
+  getPositionsBundle,
+  getTruthBundle,
+} from "@/lib/desk.functions";
 import {
   isLabPreviewActive,
   readLabShaderPick,
@@ -28,6 +35,8 @@ import {
   type LabUiId,
 } from "@/lib/lab-pick";
 import { buildNetroLiveGateLabels } from "@/lib/netro-live-gates";
+import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
+import { buildNetroOwnershipSummary } from "@/lib/netro-ownership";
 
 const links = [
   ["Overview", "/desk", LayoutDashboard],
@@ -60,6 +69,14 @@ export function DeskShell({
   actions?: React.ReactNode;
 }) {
   const path = useRouterState({ select: (state) => state.location.pathname });
+  const inspectSearch = useRouterState({
+    select: (state) => {
+      const raw = state.location.search as { inspect?: unknown };
+      return typeof raw.inspect === "string" && raw.inspect.trim()
+        ? raw.inspect.trim().slice(0, 64)
+        : undefined;
+    },
+  });
   const [labUi, setLabUi] = useState<LabUiId | null>(null);
   const [labShader, setLabShader] = useState<LabShaderId | null>(null);
   const [previewOn, setPreviewOn] = useState(false);
@@ -68,6 +85,7 @@ export function DeskShell({
   const fetchNetwork = useServerFn(getNetworkBundle);
   const fetchCredit = useServerFn(getCreditBundle);
   const fetchAcquire = useServerFn(getAcquireBundle);
+  const fetchPositions = useServerFn(getPositionsBundle);
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -121,10 +139,17 @@ export function DeskShell({
     refetchInterval: 60_000,
   });
   const credit = useQuery({
-    queryKey: ["credit-bundle", "netro-surface"],
-    queryFn: () => fetchCredit({ data: {} }),
+    queryKey: ["credit-bundle", "netro-surface", inspectSearch ?? ""],
+    queryFn: () => fetchCredit({ data: { inspectWallet: inspectSearch } }),
     enabled: showNetroCanvas,
     staleTime: 20_000,
+  });
+  const positions = useQuery({
+    queryKey: ["positions-bundle", "netro-surface", inspectSearch ?? ""],
+    queryFn: () =>
+      fetchPositions({ data: { inspectWallet: inspectSearch } }),
+    enabled: showNetroCanvas,
+    staleTime: 15_000,
   });
   const acquire = useQuery({
     queryKey: ["acquire-bundle", "netro-surface", "AAPLx", 1],
@@ -146,6 +171,11 @@ export function DeskShell({
     jupiterOutUi: jup?.ok ? jup.data.outUiAmount : null,
     jupiterSource: jup?.ok ? jup.source : null,
     jupiterReason: jup && !jup.ok ? jup.reason : null,
+  });
+  const ownership: NetroOwnershipSummary = buildNetroOwnershipSummary({
+    walletSource: positions.data?.walletSource ?? null,
+    note: positions.data?.note ?? null,
+    rows: positions.data?.rows ?? [],
   });
 
   return (
@@ -263,6 +293,8 @@ export function DeskShell({
               <NetroDensityCanvas
                 multiplierLabel={multiplierLabel}
                 gates={netroGates}
+                ownership={ownership}
+                initialInspect={inspectSearch}
                 enablePaperAgent
               />
             </div>

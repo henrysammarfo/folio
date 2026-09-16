@@ -471,3 +471,8 @@
 - Grid/card CSS: minmax containment, rounded flow card, gentler stagger (cards no longer clip/jump).
 - Home hero untouched; below-fold mission points to `/desk` Netro surface.
 - Submission paste pack + KEYS_LANDING demo URL on PR #5. Empire keys still need Henry paste. Goal open.
+
+## 2026-09-16 — Netro ownership qty honesty
+- Netro overview lost economic positions when it replaced classic panels — restored live Ownership strip (paper vs wallet-read / inspect).
+- Inspect stays on `/desk?inspect=` so qty + credit LTV rebind; Positions ledger link preserved.
+- Unit + e2e updated. Empire keys still need Henry paste. Goal open.
