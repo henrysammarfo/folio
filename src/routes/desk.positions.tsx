@@ -8,6 +8,10 @@ import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
 import { getPositionsBundle } from "@/lib/desk.functions";
+import {
+  positionStatusLabel,
+  scaledUiHealthLabel,
+} from "@/lib/position-health";
 
 const positionsSearchSchema = z.object({
   /** Ephemeral mainnet-read inspect pubkey — not auth, not persisted. */
@@ -64,6 +68,7 @@ function Page() {
     <DeskShell eyebrow="Ownership ledger" title="Positions">
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Live multipliers</ModeBadge>
+        <ModeBadge mode="mainnet-read">API ↔ on-chain Scaled UI</ModeBadge>
         <ModeBadge mode={hasWalletRead ? "mainnet-read" : "paper"}>
           {hasWalletRead ? "Wallet-read qty" : "Paper quantities"}
         </ModeBadge>
@@ -183,8 +188,14 @@ function Page() {
                 {p.qty.toFixed(4)}
                 <small>{p.qtySource === "wallet-read" ? "wallet" : "paper"}</small>
               </span>
-              <span>
+              <span data-testid={`positions-scaled-ui-${p.symbol}`}>
                 {p.multiplier != null ? `${p.multiplier.toFixed(6)}×` : "—"}
+                <small>
+                  {scaledUiHealthLabel(p.scaledUiCompare.status)}
+                  {p.onchainEffectiveMultiplier != null
+                    ? ` · ${p.onchainEffectiveMultiplier.toFixed(6)}×`
+                    : ""}
+                </small>
               </span>
               <span>
                 {p.economicShares != null ? p.economicShares.toFixed(4) : "—"}
@@ -207,13 +218,11 @@ function Page() {
                         : "neutral"
                   }
                 >
-                  {p.health === "Verified"
-                    ? "Wallet-verified"
-                    : p.health === "Review"
-                      ? p.qtySource === "paper"
-                        ? "Live · paper"
-                        : "Review"
-                      : "Unavailable"}
+                  {positionStatusLabel({
+                    health: p.health,
+                    qtySource: p.qtySource,
+                    scaledUiStatus: p.scaledUiCompare.status,
+                  })}
                 </StatusBadge>
                 <ArrowUpRight />
               </span>

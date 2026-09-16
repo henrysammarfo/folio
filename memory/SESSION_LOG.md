@@ -435,3 +435,9 @@
 
 - Paper agent truth/quote spines include on-chain Scaled UI compare (match/mismatch/off).
 - Activity feed emits On-chain Scaled UI event. Unit + e2e green. Goal open.
+
+## 2026-09-16 — Positions Scaled UI list honesty
+
+- Highest remaining unblocked honesty gap: positions fetched on-chain Scaled UI but list showed API multiplier only; Wallet-verified ignored chain.
+- Shared `positionHealth` — Verified requires wallet-read + live feeds + API↔on-chain match.
+- List + detail surface chain match/mismatch/off. Unit + e2e updated. Goal open.

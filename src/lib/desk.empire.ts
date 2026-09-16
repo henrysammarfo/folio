@@ -10,7 +10,12 @@ import {
   type JupiterTokenPrice,
 } from "./adapters/jupiter";
 import { evaluateWashGate } from "./adapters/wash";
-import { fetchScaledUiOnchain, compareApiOnchainMultiplier } from "./adapters/scaled-ui";
+import {
+  fetchScaledUiOnchain,
+  compareApiOnchainMultiplier,
+  type ScaledUiApiCompare,
+} from "./adapters/scaled-ui";
+import { positionHealth } from "./position-health";
 import { fetchKaminoXStocksMarket } from "./adapters/kamino";
 import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
 import { fetchNestUsdStatus } from "./adapters/nestusd";
@@ -124,6 +129,8 @@ export type PositionRow = {
   /** Live xStocks newMultiplier when a CA is pending — null means none on feed. */
   pendingMultiplier: number | null;
   onchainEffectiveMultiplier: number | null;
+  /** API ↔ on-chain Scaled UI — never invents a match when either side is off. */
+  scaledUiCompare: ScaledUiApiCompare;
   economicShares: number | null;
   usdPrice: number | null;
   paperValueUsd: number | null;
@@ -288,6 +295,7 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
 
       const mult = multiplier.ok ? multiplier.data.currentMultiplier : null;
       const onchainEff = onchain.ok ? onchain.data.effectiveMultiplier : null;
+      const scaledUiCompare = compareApiOnchainMultiplier(mult, onchainEff);
       const economicShares = mult != null ? qty * mult : null;
       const usdPrice = price.ok ? price.data.usdPrice : null;
       const paperValueUsd =
@@ -299,7 +307,10 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
         qtySource === "wallet-read" ? "wallet-read-qty" : "paper-qty",
         "mainnet-read-multiplier",
       ];
-      if (onchain.ok) labels.push("onchain-scaled-ui");
+      if (scaledUiCompare.status === "match") labels.push("onchain-scaled-ui-match");
+      else if (scaledUiCompare.status === "mismatch")
+        labels.push("onchain-scaled-ui-mismatch");
+      else labels.push("onchain-scaled-ui-off");
       if (!displayWallet) labels.push("wallet-unbound");
       if (walletSource === "membership") labels.push("membership-wallet");
       if (walletSource === "inspect") labels.push("inspect-ephemeral");
@@ -307,20 +318,14 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
         labels.push("wallet-read-unavailable");
       }
 
-      let health: PositionRow["health"] = "Unavailable";
-      // "Verified" = wallet-read qty + live multiplier/asset/price — never paper theater.
-      if (
-        qtySource === "wallet-read" &&
-        multiplier.ok &&
-        asset.ok &&
-        price.ok
-      ) {
-        health = "Verified";
-      } else if (multiplier.ok && (asset.ok || price.ok)) {
-        health = "Review"; // live marks · paper qty (or partial feeds)
-      } else if (multiplier.ok) {
-        health = "Review";
-      }
+      // Verified = wallet-read + live feeds + API↔on-chain Scaled UI match.
+      const health = positionHealth({
+        qtySource,
+        multiplierOk: multiplier.ok,
+        assetOk: asset.ok,
+        priceOk: price.ok,
+        scaledUiStatus: scaledUiCompare.status,
+      });
 
       rows.push({
         symbol,
@@ -334,6 +339,7 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
           ? multiplier.data.pendingMultiplier
           : null,
         onchainEffectiveMultiplier: onchainEff,
+        scaledUiCompare,
         economicShares,
         usdPrice,
         paperValueUsd,
@@ -347,11 +353,11 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
     let note: string;
     if (!displayWallet) {
       note =
-        "Quantities are paper labels until membership wallet, Privy session wallet, watch-wallet bind, or ephemeral inspect. Multipliers/prices are live mainnet reads.";
+        "Quantities are paper labels until membership wallet, Privy session wallet, watch-wallet bind, or ephemeral inspect. Multipliers are live API reads compared to on-chain Scaled UI — Wallet-verified requires a match.";
     } else if (walletBalances?.ok) {
-      note = `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). Multipliers/prices live. ${walletSourceHonestyTag(walletSource)}.`;
+      note = `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). API ↔ on-chain Scaled UI labeled per row. ${walletSourceHonestyTag(walletSource)}.`;
     } else {
-      note = `Wallet selected for read but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing paper qty. Multipliers/prices live.`;
+      note = `Wallet selected for read but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing paper qty. API ↔ on-chain Scaled UI still labeled.`;
     }
 
     return {
