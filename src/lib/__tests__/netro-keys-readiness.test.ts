@@ -13,7 +13,7 @@ describe("buildNetroKeysReadiness", () => {
       broadcastPaused: true,
       jupiterKeyPresent: false,
     });
-    expect(keys.missingCount).toBeGreaterThanOrEqual(4);
+    expect(keys.missingCount).toBeGreaterThanOrEqual(3);
     expect(keys.multiTenantLabel).toMatch(/fail-closed/i);
     expect(keys.rows.find((r) => r.id === "bitquery")?.ok).toBe(false);
     expect(keys.rows.find((r) => r.id === "broadcast")?.ok).toBe(true);
@@ -48,6 +48,7 @@ describe("buildNetroKeysReadiness", () => {
       broadcastPaused: true,
     });
     expect(keys.rows.find((r) => r.id === "supabase")?.status).toMatch(/schema missing/i);
-    expect(keys.rows.find((r) => r.id === "pyth")?.status).toMatch(/Yahoo|Finnhub|403/i);
+    expect(keys.rows.find((r) => r.id === "pyth")?.status).toMatch(/Yahoo|Finnhub/i);
+    expect(keys.rows.find((r) => r.id === "pyth")?.ok).toBe(true);
   });
 });

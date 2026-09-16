@@ -1,24 +1,20 @@
 import { errResult, okResult, type AdapterResult } from "./types";
-import { fetchPythEquityPrice, type PythPrice } from "./pyth";
 
 /**
- * Free / OSS equity reference cascade for Stocklana diverge when Pyth Pro
- * Equity.US is not entitled (Starter / unpaid trial).
+ * Live free equity reference for Stocklana diverge — no Pyth Pro paywall.
  *
- * Priority:
- * 1. Pyth Hermes Equity.US (bounty primary — when entitled)
- * 2. Finnhub quote (free API key — https://finnhub.io/register)
- * 3. Yahoo chart v8 (keyless · unofficial · labeled — OSS-friendly demo path)
+ * Priority (all live HTTP probes — never invent prices):
+ * 1. Finnhub quote when FINNHUB_API_KEY set (free tier)
+ * 2. Yahoo chart v8 (keyless · unofficial · labeled YAHOO:*)
  *
- * Never claims Pyth when using a fallback. Fail-closed if all miss.
+ * Fail-closed if both miss. No mocks, fixtures, or hardcoded tick prices.
  */
 
-export type EquityRefProvider = "pyth-hermes" | "finnhub" | "yahoo-chart";
+export type EquityRefProvider = "finnhub" | "yahoo-chart";
 
 export type EquityRefPrice = {
   underlying: string;
   price: number;
-  /** Honest symbol label — never invent Equity.US.* unless Pyth. */
   feedSymbol: string;
   provider: EquityRefProvider;
   publishTime: number;
@@ -28,7 +24,7 @@ export type EquityRefPrice = {
 const YAHOO_CHART = "https://query1.finance.yahoo.com/v8/finance/chart";
 const FINNHUB_QUOTE = "https://finnhub.io/api/v1/quote";
 
-/** CoinGecko simple ids for Backed xStocks — free secondary when Hermes Crypto.*X 403. */
+/** CoinGecko simple ids for Backed xStocks — live secondary when Hermes Crypto.*X off. */
 const COINGECKO_XSTOCK_IDS: Record<string, string> = {
   AAPLX: "apple-xstock",
   NVDAX: "nvidia-xstock",
@@ -39,20 +35,9 @@ export type XStockRefPrice = {
   xSymbol: string;
   price: number;
   feedSymbol: string;
-  provider: "pyth-hermes" | "coingecko";
+  provider: "coingecko";
   publishTime: number;
 };
-
-function asEquityRefFromPyth(p: PythPrice): EquityRefPrice {
-  return {
-    underlying: p.underlying,
-    price: p.price,
-    feedSymbol: p.feedSymbol ?? `Equity.US.${p.underlying}/USD`,
-    provider: "pyth-hermes",
-    publishTime: p.publishTime,
-    conf: p.conf,
-  };
-}
 
 async function fetchYahooChartEquity(
   underlying: string,
@@ -63,7 +48,7 @@ async function fetchYahooChartEquity(
     const res = await fetch(url, {
       headers: {
         Accept: "application/json",
-        "User-Agent": "FOLIO-desk/1.0 (Stocklana demo; equity-ref fallback)",
+        "User-Agent": "FOLIO-desk/1.0 (Stocklana; live equity-ref)",
       },
       signal: AbortSignal.timeout(10_000),
     });
@@ -84,7 +69,6 @@ async function fetchYahooChartEquity(
             symbol?: string;
           };
         }>;
-        error?: unknown;
       };
     };
     const meta = json.chart?.result?.[0]?.meta;
@@ -146,34 +130,32 @@ async function fetchFinnhubEquity(
 }
 
 /**
- * Equity reference for diverge scoring.
- * Prefer Pyth when entitled; else free Finnhub / Yahoo — never invent a green.
+ * Live free equity reference for diverge — Finnhub → Yahoo. No Pyth. No invented prices.
  */
 export async function fetchEquityReferencePrice(
   underlying: string,
 ): Promise<AdapterResult<EquityRefPrice>> {
-  const pyth = await fetchPythEquityPrice(underlying);
-  if (pyth.ok) {
-    return okResult(pyth.mode, pyth.source, asEquityRefFromPyth(pyth.data));
-  }
-
   const finnhubKey = process.env["FINNHUB_API_KEY"]?.trim();
+  const errors: string[] = [];
+
   if (finnhubKey) {
     const fh = await fetchFinnhubEquity(underlying, finnhubKey);
     if (fh.ok) return fh;
+    errors.push(`Finnhub: ${fh.reason}`);
   }
 
   const yahoo = await fetchYahooChartEquity(underlying);
   if (yahoo.ok) return yahoo;
+  errors.push(`Yahoo: ${yahoo.reason}`);
 
   return errResult(
     "equity-ref",
     "equity_ref_unavailable",
-    `Pyth: ${pyth.reason}${pyth.detail ? ` (${pyth.detail})` : ""}; Yahoo/Finnhub also failed`,
+    errors.join(" · ") || "Finnhub/Yahoo both unavailable",
   );
 }
 
-/** Free CoinGecko xStock USD when Hermes Crypto.*X is not entitled. */
+/** Live CoinGecko xStock USD — fail-closed when unmapped or HTTP fails. */
 export async function fetchCoinGeckoXStockPrice(
   xSymbol: string,
 ): Promise<AdapterResult<XStockRefPrice>> {

@@ -311,28 +311,19 @@ grant select on public.tenant_members to anon, authenticated;
 grant select, insert, update, delete on public.desk_preferences to anon, authenticated;`}</pre>
             </div>
           ) : null}
-          {data?.readiness.pythApiKeyPresent ? (
-            <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
-              <b>Pyth Pro optional · free diverge path live</b>
-              <p className="mt-1 opacity-80">
-                Hermes still returns <b>403 Not entitled</b> for{" "}
-                <code>Equity.US.AAPL</code> / <code>Crypto.AAPLX</code> on Starter/unpaid trial —
-                do <b>not</b> pay ~$2.5k/mo for Stocklana. FOLIO diverge now uses free cascade:{" "}
-                <b>Pyth (if entitled) → Finnhub (optional free key) → Yahoo chart (keyless)</b> +
-                CoinGecko for xStock secondary. Sources are labeled — never claimed as Pyth.
-                Optional for Pyth bounty only: entitle Equity.US at{" "}
-                <a href="https://app.pyth.com/" target="_blank" rel="noreferrer">
-                  app.pyth.com
-                </a>{" "}
-                free Pro trial asset classes, or email <code>data@dourolabs.xyz</code>. Optional
-                free Finnhub key:{" "}
-                <a href="https://finnhub.io/register" target="_blank" rel="noreferrer">
-                  finnhub.io/register
-                </a>{" "}
-                → <code>FINNHUB_API_KEY</code>.
-              </p>
-            </div>
-          ) : null}
+          <div className="mt-3 rounded-lg border border-ledger/40 bg-ink/30 p-3 text-sm">
+            <b>Diverge · live free equity ref (Pyth off ship path)</b>
+            <p className="mt-1 opacity-80">
+              Ship path does <b>not</b> call Pyth Hermes. Diverge scores live{" "}
+              <b>Finnhub</b> (optional <code>FINNHUB_API_KEY</code>) → <b>Yahoo chart</b> keyless
+              + CoinGecko xStock secondary vs Jupiter venue. Fail-closed when those HTTP probes
+              miss — no invented prices. Optional Finnhub:{" "}
+              <a href="https://finnhub.io/register" target="_blank" rel="noreferrer">
+                finnhub.io/register
+              </a>
+              .
+            </p>
+          </div>
           {sessionMintReady && !data?.session.ok ? (
             <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
               <b>DO NOW · Multi-tenant (last Stocklana blocker)</b>
@@ -439,21 +430,15 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
               </span>
             </div>
             <div className="settings-step">
-              <strong>2 · Equity reference — free path (no Pro $)</strong>
+              <strong>2 · Equity reference — live free (Pyth off ship path)</strong>
               <span>
-                Diverge cascade (wired): <b>Pyth Hermes</b> if Equity.US entitled → optional{" "}
-                <b>Finnhub free</b> (
+                Diverge: <b>Finnhub</b> (
                 <a href="https://finnhub.io/register" target="_blank" rel="noreferrer">
                   finnhub.io/register
                 </a>{" "}
-                → <code>FINNHUB_API_KEY</code>) → <b>Yahoo chart</b> keyless{" "}
-                <code>query1.finance.yahoo.com/v8/finance/chart</code> (unofficial · labeled{" "}
-                <code>YAHOO:AAPL</code>). xStock secondary: CoinGecko{" "}
-                <code>apple-xstock</code> when Hermes <code>Crypto.AAPLX</code> is 403.
-                <br />
-                Pyth Pro (~$2.5k+) is <b>optional</b> for the Stocklana Pyth bounty only — not
-                required for FOLIO ship. If trial already has equities entitled, keep{" "}
-                <code>PYTH_API_KEY</code>; otherwise skip paying.
+                → <code>FINNHUB_API_KEY</code>) → <b>Yahoo chart</b> keyless → CoinGecko{" "}
+                <code>*-xstock</code> secondary vs Jupiter venue. No Pyth Pro. Fail-closed on
+                HTTP miss — no mocks.
               </span>
             </div>
             <div className="settings-step">

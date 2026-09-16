@@ -4,16 +4,15 @@ import {
   fetchEquityReferencePrice,
 } from "../adapters/equity-ref";
 
-const ENV_KEYS = ["PYTH_API_KEY", "FINNHUB_API_KEY"] as const;
+const ENV_KEYS = ["FINNHUB_API_KEY"] as const;
 
 afterEach(() => {
   vi.unstubAllGlobals();
   for (const k of ENV_KEYS) delete process.env[k];
 });
 
-describe("fetchEquityReferencePrice free cascade", () => {
-  it("falls back to Yahoo chart when Pyth is not entitled", async () => {
-    delete process.env["PYTH_API_KEY"];
+describe("fetchEquityReferencePrice live free path (no Pyth)", () => {
+  it("uses Yahoo chart when Finnhub key absent", async () => {
     delete process.env["FINNHUB_API_KEY"];
     vi.stubGlobal(
       "fetch",
@@ -38,7 +37,7 @@ describe("fetchEquityReferencePrice free cascade", () => {
             }),
           };
         }
-        return { ok: false, status: 403, text: async () => "Not entitled" };
+        throw new Error(`unexpected fetch ${url}`);
       }),
     );
 
@@ -48,23 +47,14 @@ describe("fetchEquityReferencePrice free cascade", () => {
     expect(res.data.provider).toBe("yahoo-chart");
     expect(res.data.feedSymbol).toBe("YAHOO:AAPL");
     expect(res.data.price).toBe(200.5);
-    expect(res.source).toMatch(/yahoo/i);
   });
 
-  it("prefers Finnhub when free key present and Pyth fails", async () => {
-    process.env["PYTH_API_KEY"] = "test-pyth";
+  it("prefers Finnhub when free key present", async () => {
     process.env["FINNHUB_API_KEY"] = "test-finnhub";
     vi.stubGlobal(
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
-        if (url.includes("pyth") || url.includes("hermes") || url.includes("dourolabs")) {
-          return {
-            ok: false,
-            status: 403,
-            text: async () => "Not entitled",
-          };
-        }
         if (url.includes("finnhub.io")) {
           return {
             ok: true,
@@ -81,6 +71,21 @@ describe("fetchEquityReferencePrice free cascade", () => {
     expect(res.data.provider).toBe("finnhub");
     expect(res.data.feedSymbol).toBe("FINNHUB:AAPL");
     expect(res.data.price).toBe(201.25);
+  });
+
+  it("fail-closes when Yahoo returns no price", async () => {
+    delete process.env["FINNHUB_API_KEY"];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => ({ chart: { result: [{ meta: {} }] } }),
+      })),
+    );
+    const res = await fetchEquityReferencePrice("AAPL");
+    expect(res.ok).toBe(false);
+    if (res.ok) return;
+    expect(res.reason).toBe("equity_ref_unavailable");
   });
 });
 

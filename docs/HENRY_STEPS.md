@@ -10,21 +10,16 @@ Demo (hard-refresh): https://folio-git-cursor-folio-netro-desk-approve-f1ec-team
 
 ---
 
-## Step 2 · Bitquery ✅ · Equity diverge ✅ FREE (no Pro $)
+## Step 2 · Bitquery ✅ · Equity diverge ✅ LIVE FREE (Pyth off ship path)
 
-Wash is **live**. Pyth Hermes still **403 Not entitled** for `Equity.US.AAPL` + `Crypto.AAPLX` on Starter/unpaid trial — **do not pay ~$2.5k/mo**.
+Wash is **live**. Ship diverge does **not** call Pyth Hermes (no Pro $).
 
-FOLIO diverge now uses a **free cascade** (labeled · never claimed as Pyth):
+Live cascade (fail-closed on HTTP miss — no invented prices):
 
-1. **Pyth Hermes** — if Equity.US entitled on your key  
-2. **Finnhub free** (optional) — [finnhub.io/register](https://finnhub.io/register) → `FINNHUB_API_KEY`  
-3. **Yahoo chart** (keyless) — `query1.finance.yahoo.com/v8/finance/chart/AAPL` → labeled `YAHOO:AAPL`  
-4. **CoinGecko** — `apple-xstock` free secondary when Hermes Crypto.xStock is 403  
-
-Venue side remains **Jupiter Price** (already free).
-
-### Optional only — Pyth bounty track
-If you want Stocklana Pyth bounty points: try free Pro trial asset classes at [app.pyth.com](https://app.pyth.com/) or email **data@dourolabs.xyz**. Not required for FOLIO ship.
+1. **Finnhub** (optional) — [finnhub.io/register](https://finnhub.io/register) → `FINNHUB_API_KEY`
+2. **Yahoo chart** (keyless) — labeled `YAHOO:AAPL`
+3. **CoinGecko** `apple-xstock` secondary
+4. Venue = **Jupiter Price** (already free)
 
 ---
 
@@ -60,4 +55,4 @@ App ID + secret on Vercel. Rotate after chat paste.
 - Custom program deploy (rent ≫ $1)
 
 ## Goal matrix
-`npm run smoke:goal` — Empire should light with free Yahoo equity ref; multi-tenant PARTIAL until Privy mint + Join.
+`npm run smoke:goal` — Empire DONE with live Yahoo equity ref; multi-tenant PARTIAL until Privy mint + Join.

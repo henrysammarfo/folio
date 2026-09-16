@@ -229,12 +229,8 @@ function Page() {
                     {data.gates.divergeOk === false
                       ? "blocked"
                       : data.equityRef?.ok
-                        ? data.equityRef.data.provider === "pyth-hermes"
-                          ? "ok · pyth"
-                          : `ok · ${data.equityRef.data.provider}`
-                        : data.pyth.reason === "pyth_feed_not_entitled"
-                          ? "pyth-not-entitled · trying free ref"
-                          : "equity-ref off"}
+                        ? `ok · ${data.equityRef.data.provider}`
+                        : "equity-ref off"}
                   </StatusBadge>
                 </div>
                 <div className="desk-gate-row">

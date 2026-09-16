@@ -12,10 +12,6 @@ import { fetchKaminoXStocksMarket } from "../src/lib/adapters/kamino.ts";
 import { fetchNestUsdStatus } from "../src/lib/adapters/nestusd.ts";
 import { fetchScaledUiOnchain } from "../src/lib/adapters/scaled-ui.ts";
 import {
-  fetchPythEquityPrice,
-  fetchPythXStockUsdPrice,
-} from "../src/lib/adapters/pyth.ts";
-import {
   fetchCoinGeckoXStockPrice,
   fetchEquityReferencePrice,
 } from "../src/lib/adapters/equity-ref.ts";
@@ -33,17 +29,14 @@ import {
 
 async function main() {
   const symbol = "AAPLx";
-  const [asset, mult, kamino, nestusd, pythEquity, pythX, equityRef, cgX] =
-    await Promise.all([
-      fetchXStockAsset(symbol),
-      fetchXStockMultiplier(symbol),
-      fetchKaminoXStocksMarket(),
-      fetchNestUsdStatus(),
-      fetchPythEquityPrice("AAPL"),
-      fetchPythXStockUsdPrice(symbol),
-      fetchEquityReferencePrice("AAPL"),
-      fetchCoinGeckoXStockPrice(symbol),
-    ]);
+  const [asset, mult, kamino, nestusd, equityRef, cgX] = await Promise.all([
+    fetchXStockAsset(symbol),
+    fetchXStockMultiplier(symbol),
+    fetchKaminoXStocksMarket(),
+    fetchNestUsdStatus(),
+    fetchEquityReferencePrice("AAPL"),
+    fetchCoinGeckoXStockPrice(symbol),
+  ]);
 
   const mint = asset.ok ? asset.data.solanaMint : null;
   const decimals =
@@ -64,7 +57,7 @@ async function main() {
   ]);
 
   const bitqueryKey = Boolean(process.env["BITQUERY_API_KEY"]?.trim());
-  const pythKey = Boolean(process.env["PYTH_API_KEY"]?.trim());
+  const pythKey = false; // Pyth off ship path
   const privyKey = Boolean(
     process.env["PRIVY_APP_ID"]?.trim() && process.env["PRIVY_APP_SECRET"]?.trim(),
   );
@@ -76,8 +69,8 @@ async function main() {
   const sessionSecret =
     (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
 
-  /** Diverge equity ref live (Pyth entitled OR free Yahoo/Finnhub). */
-  const pythLive = equityRef.ok || pythEquity.ok || pythX.ok || cgX.ok;
+  /** Live free equity ref (Yahoo/Finnhub) and/or CoinGecko xStock. */
+  const pythLive = equityRef.ok || cgX.ok;
   const pythFailClosed = !pythLive;
   const auth = getAuthProviderStatus();
   const readiness = await loadEmpireReadiness();
@@ -115,18 +108,16 @@ async function main() {
   console.log(
     `RPC ${rpc.publicFallback ? "public-fallback" : "dedicated"} · tip smoke`,
   );
-  if (pythKey && !pythEquity.ok && equityRef.ok) {
+  if (equityRef.ok) {
     console.log(
-      `note  Pyth Equity.US not entitled — diverge free ref live via ${equityRef.data.provider} (${equityRef.data.feedSymbol})`,
+      `note  Pyth off ship path — diverge live via ${equityRef.data.provider} (${equityRef.data.feedSymbol})`,
     );
-  } else if (pythKey && !pythEquity.ok && pythX.ok) {
+  } else if (cgX.ok) {
     console.log(
-      "note  Pyth Equity.US not entitled on this key — Crypto.xStock live (labeled secondary)",
+      `note  Equity Yahoo/Finnhub miss — CoinGecko xStock live (${cgX.data.feedSymbol})`,
     );
-  } else if (pythKey && !pythLive) {
-    console.log(
-      `note  Pyth keyed but Hermes not live — ${(pythEquity.detail ?? pythX.detail ?? "").slice(0, 100)}`,
-    );
+  } else {
+    console.log("note  Free equity ref dark — diverge fail-closed");
   }
   if (auth.ok) {
     console.log(`note  Auth keys present · ${(auth.detail ?? "").slice(0, 120)}`);
@@ -153,7 +144,7 @@ async function main() {
   );
   if (!summary.shipReady) {
     console.log(
-      "remaining: mint folio_session + Join folio-demo · optional Pyth Equity.US for bounty · rotate chat secrets — docs/HENRY_STEPS.md",
+      "remaining: mint folio_session + Join folio-demo · rotate chat secrets — docs/HENRY_STEPS.md",
     );
   }
 }

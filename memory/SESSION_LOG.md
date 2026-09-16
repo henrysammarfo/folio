@@ -544,3 +544,10 @@
 - Tip live: Yahoo diverge green · Empire DONE · multi-tenant still PARTIAL.
 - PrivySessionMint auto-mints httpOnly folio_session after login; Settings DO NOW lists exact origin (Privy rejects *.vercel.app).
 - Goal open until Henry allowlists origin + Log in + Join folio-demo.
+
+
+## 2026-09-16 — Pyth off ship path · live Yahoo/Finnhub diverge only
+
+- Henry: keep free alternates; remove Pyth from ship diverge; no fake/non-live fallbacks.
+- Diverge = Finnhub→Yahoo (+ CoinGecko xStock) vs Jupiter only. Fail-closed on HTTP miss.
+- Pyth Hermes not called on truth/acquire/network ship path (`pyth_not_on_ship_path`).

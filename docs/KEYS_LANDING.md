@@ -8,7 +8,7 @@ Vercel env UI: https://vercel.com/teamtitanlink/folio/settings/environment-varia
 
 Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density` · `BITQUERY_API_KEY` · `PYTH_API_KEY` · `PRIVY_*` · `SUPABASE_URL` · `SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_JWT_SECRET` · `JUPITER_API_KEY`
 
-SQL ✅ (`20260915` + grants + `folio-demo` seed) · JWT ✅ · **free equity diverge** (Yahoo/Finnhub/CoinGecko cascade) ✅. Still need Henry: **Privy login mint + Join folio-demo** (allowlist demo origin). Pyth Pro Equity.US is **optional** (bounty only — do not pay ~$2.5k). **Rotate all chat-pasted secrets.**
+SQL ✅ · JWT ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; Pyth off ship path) ✅. Still need Henry: **Privy login mint + Join folio-demo**. **Rotate all chat-pasted secrets.**
 
 Stocklana live 2026-09-16 (jina): **605** registered · **84** submissions · **$121k** · SEP 25.
 
@@ -27,23 +27,16 @@ Lab MCP live-verified on branch preview `/lab/ui` (2026-09-16): **21st MCP conne
 
 Verify: `/desk/acquire` wash row leaves “key missing”; `/network` wash capability becomes live or labeled error (never silent green).
 
-### 2 — Equity reference for diverge — FREE path (no Pyth Pro $)
+### 2 — Equity reference for diverge — LIVE FREE (Pyth off ship path)
 
-Hermes still returns **403 Not entitled** for `Equity.US.AAPL/USD` + `Crypto.AAPLX/USD` on Starter/unpaid trial. **Do not subscribe to Pro (~$2.5k+/mo) for Stocklana.**
+Ship diverge does **not** call Pyth Hermes. Live probes only — fail-closed if HTTP misses (no mocks/fixtures):
 
-FOLIO cascade (honest labels):
-
-| Priority | Source | Cost | Notes |
-|----------|--------|------|-------|
-| 1 | Pyth Hermes Equity.US | trial/Pro | Prefer when entitled · Stocklana bounty |
-| 2 | Finnhub `/quote` | Free key | [finnhub.io/register](https://finnhub.io/register) → `FINNHUB_API_KEY` |
-| 3 | Yahoo chart v8 | Keyless | Unofficial · labeled `YAHOO:AAPL` |
-| secondary | CoinGecko `*-xstock` | Free | When Hermes Crypto.*X 403 |
-| venue | Jupiter Price v3 | Free | Already wired |
-
-Pyth Pro / U.S. Equities plan is **optional** for the Pyth bounty track only.
-
-Docs: [Hermes](https://docs.pyth.network/price-feeds/how-pyth-works/hermes) · [Finnhub](https://finnhub.io/docs/api) · Yahoo chart (unofficial).
+| Priority | Source | Cost |
+|----------|--------|------|
+| 1 | Finnhub `/quote` | Free key — [finnhub.io/register](https://finnhub.io/register) → `FINNHUB_API_KEY` |
+| 2 | Yahoo chart v8 | Keyless · labeled `YAHOO:AAPL` |
+| secondary | CoinGecko `*-xstock` | Free |
+| venue | Jupiter Price v3 | Free (already wired) |
 
 ### 3 — Privy (wallet identity)
 

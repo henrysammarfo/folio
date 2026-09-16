@@ -47,7 +47,7 @@ describe("buildAcquireGateMessages", () => {
     expect(g.divergeOk).toBe(false);
     expect(g.canReview).toBe(false);
     expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed.*equity/i);
-    expect(g.honestyNotes.join(" ")).toMatch(/equity ref/i);
+    expect(g.honestyNotes.join(" ")).toMatch(/equity ref|Yahoo|Finnhub/i);
   });
 
   it("blocks unresolved diverge when strictFailClosed is on", () => {

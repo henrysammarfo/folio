@@ -62,11 +62,11 @@ export function buildNetworkMatrix(input: {
         : detailOf(input.scaledUi),
     },
     {
-      capability: "Pyth Hermes Equity.US (bounty)",
+      capability: "Pyth Hermes (optional bounty)",
       mode: modeOf(input.pyth),
       detail: input.pyth.ok
         ? `${input.pyth.source} · Equity.US.* entitled`
-        : `${detailOf(input.pyth)} · Pro Equity.US optional for bounty; free Yahoo/Finnhub covers diverge`,
+        : `${detailOf(input.pyth)} · ship path uses live Yahoo/Finnhub instead`,
     },
     {
       capability: "Equity reference (diverge)",

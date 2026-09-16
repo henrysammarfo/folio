@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
-import { divergeBps, fetchPythEquityPrice, fetchPythOndoUsdPrice, fetchPythXStockUsdPrice, pythBountyFeedSymbols } from "./adapters/pyth";
+import { divergeBps, pythBountyFeedSymbols, type PythPrice } from "./adapters/pyth";
 import {
   fetchCoinGeckoXStockPrice,
   fetchEquityReferencePrice,
@@ -27,7 +27,6 @@ import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import { resolveSolanaRpcUrl } from "./adapters/solana-rpc";
 import { errResult, type AdapterResult } from "./adapters/types";
 import type { XStockAsset, XStockMultiplier } from "./adapters/xstocks";
-import type { PythPrice } from "./adapters/pyth";
 import type { JupiterQuote, JupiterTokenPrice } from "./adapters/jupiter";
 import type { WashVerdict } from "./adapters/wash";
 import type { PoolAwareness } from "./adapters/pools";
@@ -81,20 +80,20 @@ export type TruthBundle = {
   symbol: string;
   asset: AdapterResult<XStockAsset>;
   multiplier: AdapterResult<XStockMultiplier>;
-  /** Equity.US.* Hermes reference (Stocklana Pyth bounty primary). */
-  pyth: AdapterResult<PythPrice>;
   /**
-   * Diverge equity reference — Pyth when entitled, else free Finnhub/Yahoo.
-   * Never invents Pyth when fallback is used.
+   * Pyth Hermes — intentionally off ship path (Pro paywall).
+   * Diverge uses live free equityRef (Yahoo/Finnhub) instead.
    */
+  pyth: AdapterResult<PythPrice>;
+  /** Live free equity reference for diverge — Finnhub → Yahoo. Never invents prices. */
   equityRef: AdapterResult<EquityRefPrice>;
-  /** Crypto.{SYM}X/USD Hermes reference — labeled secondary; not a solo gate. */
+  /** Pyth Crypto.xStock — off ship path; see xStockRef. */
   pythXStock: AdapterResult<PythPrice>;
-  /** Free CoinGecko xStock when Hermes Crypto.*X not entitled. */
+  /** Live CoinGecko xStock secondary. */
   xStockRef: AdapterResult<XStockRefPrice>;
-  /** Crypto.{SYM}ON/USD Ondo — labeled tertiary (Stocklana Pyth bounty). */
+  /** Pyth Ondo — off ship path. */
   pythOndo: AdapterResult<PythPrice>;
-  /** Mapped bounty feed symbols (honest even when PYTH_API_KEY missing). */
+  /** Mapped bounty feed symbols (catalog only — prices not fetched on ship path). */
   pythBountyFeeds: {
     equityUs: string | null;
     cryptoXStock: string | null;
@@ -168,6 +167,14 @@ function unavailablePrice(reason: string): AdapterResult<JupiterTokenPrice> {
   };
 }
 
+function pythOffShipPath(): AdapterResult<PythPrice> {
+  return errResult(
+    "hermes.pyth.network",
+    "pyth_not_on_ship_path",
+    "Ship diverge uses live Yahoo/Finnhub (+ CoinGecko xStock) — Pyth Pro not required.",
+  );
+}
+
 export const getTruthBundle = createServerFn({ method: "GET" })
   .validator(SymbolInput)
   .handler(async ({ data }): Promise<TruthBundle> => {
@@ -181,82 +188,58 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       "AAPL";
     const mint = asset.ok ? asset.data.solanaMint : null;
     const bountyFeeds = pythBountyFeedSymbols(symbol);
-    const [pyth, equityRef, pythXStock, xStockRef, pythOndo, jupiterPrice, scaledUi] =
-      await Promise.all([
-        fetchPythEquityPrice(underlying),
-        fetchEquityReferencePrice(underlying),
-        fetchPythXStockUsdPrice(symbol),
-        fetchCoinGeckoXStockPrice(symbol),
-        fetchPythOndoUsdPrice(underlying),
-        mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
-        mint
-          ? fetchScaledUiOnchain(mint)
-          : Promise.resolve(
-              errResult(
-                "solana-rpc.scaled-ui",
-                "xstock_mint_missing",
-                "No Solana mint — cannot read Scaled UI",
-              ),
+    const pyth = pythOffShipPath();
+    const pythXStock = pythOffShipPath();
+    const pythOndo = pythOffShipPath();
+    const [equityRef, xStockRef, jupiterPrice, scaledUi] = await Promise.all([
+      fetchEquityReferencePrice(underlying),
+      fetchCoinGeckoXStockPrice(symbol),
+      mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
+      mint
+        ? fetchScaledUiOnchain(mint)
+        : Promise.resolve(
+            errResult(
+              "solana-rpc.scaled-ui",
+              "xstock_mint_missing",
+              "No Solana mint — cannot read Scaled UI",
             ),
-      ]);
+          ),
+    ]);
 
     let diverge: TruthBundle["diverge"] = {
       pass: null,
       divergeBps: null,
       bandBps: 75,
-      note: "Need equity reference + Jupiter venue to score pass/fail",
+      note: "Need live free equity ref (Yahoo/Finnhub) + Jupiter venue to score pass/fail",
     };
 
-    const secondaryNotes = [
-      pythXStock.ok
-        ? `${pythXStock.data.feedSymbol ?? "Crypto.xStock/USD"} live (Pyth secondary)`
-        : xStockRef.ok
-          ? `${xStockRef.data.feedSymbol} live (CoinGecko free secondary)`
-          : null,
-      pythOndo.ok
-        ? `${pythOndo.data.feedSymbol ?? "Crypto.ONDO/USD"} live (tertiary)`
-        : null,
-    ]
-      .filter(Boolean)
-      .join(" · ");
+    const secondaryNotes = xStockRef.ok
+      ? `${xStockRef.data.feedSymbol} live (CoinGecko)`
+      : null;
     const xStockNote = secondaryNotes ? ` · ${secondaryNotes}` : "";
 
-    // Pass/fail when labeled equity ref (Pyth → Finnhub → Yahoo) + Jupiter venue live.
-    // Never invents Pyth when fallback is used. Jupiter stockData alone stays informational.
+    // Pass/fail only on live free equity ref + Jupiter venue — no invented prices.
     if (equityRef.ok && jupiterPrice.ok) {
       const d = divergeBps(equityRef.data.price, jupiterPrice.data.usdPrice, 75);
-      const srcLabel =
-        equityRef.data.provider === "pyth-hermes"
-          ? (equityRef.data.feedSymbol ?? `Pyth ${underlying}`)
-          : `${equityRef.data.feedSymbol} (${equityRef.data.provider} free fallback)`;
       diverge = {
         pass: d.pass,
         divergeBps: d.divergeBps,
         bandBps: d.bandBps,
-        note: `${srcLabel} vs Jupiter venue${xStockNote}`,
-      };
-    } else if (
-      jupiterPrice.ok &&
-      jupiterPrice.data.stockRefPrice != null &&
-      jupiterPrice.data.stockRefPrice > 0
-    ) {
-      const d = divergeBps(
-        jupiterPrice.data.stockRefPrice,
-        jupiterPrice.data.usdPrice,
-        75,
-      );
-      diverge = {
-        pass: null,
-        divergeBps: d.divergeBps,
-        bandBps: d.bandBps,
-        note: `Jupiter stockData vs venue ${d.divergeBps.toFixed(1)} bps · informational only · equity ref required for pass/fail${xStockNote}`,
+        note: `${equityRef.data.feedSymbol} (${equityRef.data.provider}) vs Jupiter venue${xStockNote}`,
       };
     } else if (!equityRef.ok) {
       diverge = {
         pass: null,
         divergeBps: null,
         bandBps: 75,
-        note: `Equity ref unavailable: ${equityRef.reason}${xStockNote}`,
+        note: `Equity ref unavailable: ${equityRef.reason}${equityRef.detail ? ` — ${equityRef.detail}` : ""}${xStockNote}`,
+      };
+    } else if (!jupiterPrice.ok) {
+      diverge = {
+        pass: null,
+        divergeBps: null,
+        bandBps: 75,
+        note: `Jupiter venue unavailable: ${jupiterPrice.reason}${xStockNote}`,
       };
     }
 
@@ -303,8 +286,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
     const mint = asset.ok ? asset.data.solanaMint : null;
     const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
 
-    const [pyth, equityRef, jupiterPrice, wash, pools, scaledUi] = await Promise.all([
-      fetchPythEquityPrice(underlying),
+    const [equityRef, jupiterPrice, wash, pools, scaledUi] = await Promise.all([
       fetchEquityReferencePrice(underlying),
       mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
       evaluateWashGate({ symbol, mint, notionalUsd: spendUsdc }),
@@ -321,6 +303,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
             ),
           ),
     ]);
+    const pyth = pythOffShipPath();
 
     const jupiter: AdapterResult<JupiterQuote> = !mint
       ? {
@@ -360,12 +343,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
     if (equityRef.ok && jupiterPrice.ok) {
       const d = divergeBps(equityRef.data.price, jupiterPrice.data.usdPrice, 75);
       diverge = d.pass ? { kind: "ok" } : { kind: "blocked" };
-    } else if (
-      !equityRef.ok &&
-      (equityRef.reason === "equity_ref_unavailable" ||
-        pyth.reason === "pyth_api_key_missing")
-    ) {
-      // Keep pyth_missing honesty path when no free ref either (strict mode still gates).
+    } else if (!equityRef.ok) {
       diverge = { kind: "pyth_missing" };
     }
 
@@ -431,9 +409,8 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
     const rpc = resolveSolanaRpcUrl();
 
-    const [pyth, equityRef, jupiterPrice, wash, kamino, jupiterLend, nestusd, nestCredit, scaledUi, pools] =
+    const [equityRef, jupiterPrice, wash, kamino, jupiterLend, nestusd, nestCredit, scaledUi, pools] =
       await Promise.all([
-        fetchPythEquityPrice(underlying),
         fetchEquityReferencePrice(underlying),
         mint
           ? fetchJupiterTokenPrice(mint)
@@ -456,6 +433,7 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
           ? fetchRaydiumPoolsForMint(mint)
           : Promise.resolve(errResult("api-v3.raydium.io", "xstock_mint_missing")),
       ]);
+    const pyth = pythOffShipPath();
 
     const jupiter = mint
       ? await fetchJupiterQuote({

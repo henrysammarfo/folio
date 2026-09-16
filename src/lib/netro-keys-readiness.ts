@@ -34,11 +34,9 @@ export function buildNetroKeysReadiness(
     },
     {
       id: "pyth",
-      label: "Pyth Hermes",
-      status: input.pythApiKeyPresent
-        ? "Keyed · Equity.US may 403 · free Yahoo/Finnhub diverge live"
-        : "Missing · fail-closed",
-      ok: input.pythApiKeyPresent,
+      label: "Equity diverge",
+      status: "Live Yahoo/Finnhub · Pyth off ship path",
+      ok: true,
     },
     {
       id: "privy",
