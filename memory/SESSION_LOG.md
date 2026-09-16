@@ -398,3 +398,9 @@
 - Mapped Hermes `Crypto.AAPLON/USD` (Ondo) feed id from live catalog; wired `fetchPythOndoUsdPrice` + `/truth` bounty feed list.
 - `/truth` shows Equity.US.AAPL/USD · Crypto.AAPLX/USD · Crypto.AAPLON/USD even when `PYTH_API_KEY` missing (prices still fail-closed).
 - Vitest **105+** path extended; goal still needs Henry Pick + Bitquery/Pyth/Privy/Supabase keys.
+
+## 2026-09-16 — FOLIO_APPROVED_LAB_* production merge path
+
+- Wired `FOLIO_APPROVED_LAB_UI` / `FOLIO_APPROVED_LAB_SHADER` (set on Vercel only after Henry chat reply).
+- DeskShell applies approved chrome without opt-in preview; Settings shows approved rows; local Pick still never merges.
+- Goal still needs Henry Pick reply before env can be set; then Bitquery/Pyth/Privy/Supabase.

@@ -401,3 +401,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 ## 2026-09-16 — Pyth bounty triad on /truth
 - Equity.US.AAPL/USD · Crypto.AAPLX/USD · Crypto.AAPLON/USD (Ondo) mapped; prices fail-closed until PYTH_API_KEY.
 - Goal still open: Henry Pick · Bitquery · Pyth key · Privy · Supabase · GG Skip · broadcast paused.
+
+## 2026-09-16 — Approved lab env merge path
+- Production desk chrome gated by `FOLIO_APPROVED_LAB_UI` / `FOLIO_APPROVED_LAB_SHADER` after Henry chat approve.
+- Unset today — desk stays default. Goal open.

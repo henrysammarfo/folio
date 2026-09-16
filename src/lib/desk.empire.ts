@@ -51,6 +51,7 @@ import {
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
+import { readApprovedLabShader, readApprovedLabUi } from "./lab-pick";
 
 const WATCHLIST = ["AAPLx", "NVDAx", "TSLAx"] as const;
 
@@ -219,6 +220,10 @@ export type SessionBundle = {
     twentyFirstKeyPresent: boolean;
     /** Lab only — shaders.com probe (often Clerk-gated). */
     shadersKeyPresent: boolean;
+    /** Production desk chrome after Henry chat approve (FOLIO_APPROVED_LAB_UI). */
+    approvedLabUi: string | null;
+    /** Production desk shader after Henry chat approve (FOLIO_APPROVED_LAB_SHADER). */
+    approvedLabShader: string | null;
   };
 };
 
@@ -655,6 +660,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     );
     const twentyFirstKeyPresent = Boolean(process.env["API_KEY_21ST"]?.trim());
     const shadersKeyPresent = Boolean(process.env["SHADERS_API_KEY"]?.trim());
+    const approvedLabUi = readApprovedLabUi();
+    const approvedLabShader = readApprovedLabShader();
     return {
       auth,
       session,
@@ -682,6 +689,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         broadcastPaused: isBroadcastPaused(),
         twentyFirstKeyPresent,
         shadersKeyPresent,
+        approvedLabUi,
+        approvedLabShader,
       },
     };
   },

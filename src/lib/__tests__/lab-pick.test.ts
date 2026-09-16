@@ -5,6 +5,8 @@ import {
   chatReplyForPick,
   isLabShaderId,
   isLabUiId,
+  readApprovedLabShader,
+  readApprovedLabUi,
 } from "../lab-pick";
 
 describe("lab-pick", () => {
@@ -35,5 +37,19 @@ describe("lab-pick", () => {
     expect(chatReplyForPick("shaders", "ink-ledger")).toBe(
       "Approve lab shader: ink-ledger",
     );
+  });
+
+  it("reads Henry-approved production chrome only from known env ids", () => {
+    expect(readApprovedLabUi({})).toBeNull();
+    expect(readApprovedLabUi({ FOLIO_APPROVED_LAB_UI: "netro-density" })).toBe(
+      "netro-density",
+    );
+    expect(readApprovedLabUi({ FOLIO_APPROVED_LAB_UI: "desk-density-a" })).toBeNull();
+    expect(
+      readApprovedLabShader({ FOLIO_APPROVED_LAB_SHADER: "ink-ledger" }),
+    ).toBe("ink-ledger");
+    expect(
+      readApprovedLabShader({ FOLIO_APPROVED_LAB_SHADER: "not-a-shader" }),
+    ).toBeNull();
   });
 });

@@ -23,6 +23,12 @@ import type { PoolAwareness } from "./adapters/pools";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
 import {
+  readApprovedLabShader,
+  readApprovedLabUi,
+  type LabShaderId,
+  type LabUiId,
+} from "./lab-pick";
+import {
   FOLIO_SESSION_COOKIE,
   loadDeskPreferences,
   resolveActiveTenantId,
@@ -409,6 +415,18 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     };
   },
 );
+
+/** Henry-approved production lab chrome (FOLIO_APPROVED_LAB_* env after chat reply). */
+export const getLabApprovals = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{
+    approvedUi: LabUiId | null;
+    approvedShader: LabShaderId | null;
+  }> => ({
+    approvedUi: readApprovedLabUi(),
+    approvedShader: readApprovedLabShader(),
+  }),
+);
+
 export {
   getPositionsBundle,
   getCreditBundle,

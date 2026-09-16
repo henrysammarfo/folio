@@ -18,7 +18,7 @@ import {
 } from "@/components/lab/shader-background";
 import { NetroDensityCanvas } from "@/components/lab/netro-density-canvas";
 import { FolioTradeJournalLab } from "@/components/lab/folio-trade-journal-lab";
-import { getTruthBundle } from "@/lib/desk.functions";
+import { getLabApprovals, getTruthBundle } from "@/lib/desk.functions";
 import {
   isLabPreviewActive,
   readLabShaderPick,
@@ -63,6 +63,7 @@ export function DeskShell({
   const [labShader, setLabShader] = useState<LabShaderId | null>(null);
   const [previewOn, setPreviewOn] = useState(false);
   const fetchTruth = useServerFn(getTruthBundle);
+  const fetchApprovals = useServerFn(getLabApprovals);
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -83,10 +84,22 @@ export function DeskShell({
     setLabShader(null);
   }
 
+  const approvals = useQuery({
+    queryKey: ["lab-approvals"],
+    queryFn: () => fetchApprovals(),
+    staleTime: 60_000,
+  });
+  const approvedUi = approvals.data?.approvedUi ?? null;
+  const approvedShader = approvals.data?.approvedShader ?? null;
+
   const previewing = previewOn && (labUi != null || labShader != null);
-  const liveShader = previewing ? previewShaderVariant(labShader, labUi) : null;
-  const showNetroCanvas = previewing && labUi === "netro-density";
-  const showJournal = previewing && labUi === "trade-journal-21st";
+  // Opt-in preview wins while active; else Henry-approved production chrome via env
+  const effectiveUi = previewing ? labUi : approvedUi;
+  const effectiveShader = previewing ? labShader : approvedShader;
+  const liveShader = previewShaderVariant(effectiveShader, effectiveUi);
+  const showNetroCanvas = effectiveUi === "netro-density";
+  const showJournal = effectiveUi === "trade-journal-21st";
+  const productionChrome = !previewing && (approvedUi != null || approvedShader != null);
 
   const truth = useQuery({
     queryKey: ["truth-bundle", "desk-lab-preview", "AAPLx"],
@@ -102,9 +115,10 @@ export function DeskShell({
   return (
     <div
       className="desk-layout"
-      data-lab-ui={previewing && labUi ? labUi : undefined}
-      data-lab-shader={previewing && labShader ? labShader : undefined}
+      data-lab-ui={effectiveUi ?? undefined}
+      data-lab-shader={effectiveShader ?? undefined}
       data-lab-plasma={liveShader ? "1" : undefined}
+      data-lab-approved={productionChrome ? "1" : undefined}
     >
       {previewing ? (
         <div className="lab-preview-banner" role="status">
@@ -133,6 +147,29 @@ export function DeskShell({
               Exit preview
             </button>
           </span>
+        </div>
+      ) : null}
+      {productionChrome ? (
+        <div className="lab-approved-banner" role="status">
+          <span>
+            Production lab chrome (Henry-approved)
+            {approvedUi ? (
+              <>
+                {" "}
+                · UI <code>{approvedUi}</code>
+              </>
+            ) : null}
+            {approvedShader ? (
+              <>
+                {" "}
+                · shader <code>{approvedShader}</code>
+              </>
+            ) : null}
+            . Via <code>FOLIO_APPROVED_LAB_*</code>.
+          </span>
+          <Link to="/lab/ui" className="underline">
+            Lab UI
+          </Link>
         </div>
       ) : null}
       <aside className="desk-sidebar">

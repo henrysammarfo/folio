@@ -18,6 +18,15 @@ Demo (hard-refresh): https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-tea
 
 Until you reply in chat, premium chrome stays off production home/desk on purpose.
 
+**After your chat reply**, the agent sets Vercel env (then redeploys):
+
+| Name | Example |
+|------|--------|
+| `FOLIO_APPROVED_LAB_UI` | `netro-density` |
+| `FOLIO_APPROVED_LAB_SHADER` | `ink-ledger` (optional) |
+
+Production `/desk` then mounts that chrome (yellow banner · Netro 12-col when UI=`netro-density`). Local **Pick** alone never merges.
+
 Refs extracted: **Aionis** brand-plane (production `/` already mirrors composition) · **NetroBNB** 12-col desk density (lab + desk preview) · live **21st.dev** MCP (Plasma 24346 + Trade Journal 27124 pinned).
 
 ### Optional before Step 2 — Vercel lab keys ✅ DONE

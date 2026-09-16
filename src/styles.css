@@ -424,6 +424,9 @@
 .lab-preview-banner-actions{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}
 .lab-preview-banner-actions a{color:inherit}
 .lab-preview-banner-actions button{border:1px solid color-mix(in oklab,var(--primary-foreground) 45%,transparent);background:transparent;color:inherit;padding:.25rem .65rem;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;border-radius:var(--radius)}
+.lab-approved-banner{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:.75rem 1.25rem;align-items:center;padding:.7rem 1rem;background:#f4d014;color:#1c1c1c;font-size:.78rem;line-height:1.45;border-bottom:1px solid #e5c30f}
+.lab-approved-banner code{font-size:.75rem;padding:.05rem .35rem;border:1px solid #1c1c1c44;background:#fff8}
+.lab-approved-banner a{color:inherit;font-weight:600}
 .desk-layout[data-lab-ui="netro-density"]{
   background:#e5e7eb;
 }

@@ -73,6 +73,15 @@ Verify: Settings → paste Privy access token → mint httpOnly `folio_session` 
 
 Verify: Settings readiness rows for lab keys; `/lab/ui` shows MCP connected when `API_KEY_21ST` set; `/lab/shaders` probes shaders.com (Clerk may still 500 — WebGL Plasma from 21st still runs). Never auto-merge lab picks without Henry chat reply.
 
+After Henry replies `Approve lab UI: …` in chat, set on Vercel (Preview + Production) then redeploy:
+
+| Name | Example |
+|------|--------|
+| `FOLIO_APPROVED_LAB_UI` | `netro-density` |
+| `FOLIO_APPROVED_LAB_SHADER` | `ink-ledger` (optional) |
+
+Production `/desk` then shows a yellow **Henry-approved** banner and mounts that chrome. Local Pick / Preview alone never sets these.
+
 ---
 
 ## F — After keys: redeploy + checklist

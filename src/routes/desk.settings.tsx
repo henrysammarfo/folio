@@ -238,9 +238,25 @@ function Page() {
             <span>Lab premium UI</span>
             <b>
               {labUiPick || labShaderPick
-                ? `Picked ${[labUiPick, labShaderPick].filter(Boolean).join(" · ")} · awaiting chat reply to merge — `
+                ? `Local pick ${[labUiPick, labShaderPick].filter(Boolean).join(" · ")} · awaiting chat reply — `
                 : "Awaiting Henry candidate id — "}
               <a href="/lab/ui">/lab/ui</a> · <a href="/lab/shaders">/lab/shaders</a>
+            </b>
+          </p>
+          <p>
+            <span>FOLIO_APPROVED_LAB_UI (production)</span>
+            <b>
+              {data?.readiness.approvedLabUi
+                ? `Set · desk chrome ${data.readiness.approvedLabUi}`
+                : "Unset · production desk stays default until Henry chat approve + env"}
+            </b>
+          </p>
+          <p>
+            <span>FOLIO_APPROVED_LAB_SHADER (production)</span>
+            <b>
+              {data?.readiness.approvedLabShader
+                ? `Set · ${data.readiness.approvedLabShader}`
+                : "Unset"}
             </b>
           </p>
           <p className="mt-3 text-sm opacity-80">
