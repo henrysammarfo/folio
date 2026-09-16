@@ -249,3 +249,7 @@ EOF
 
 ## 2026-09-16 — Paper agent + activity Scaled UI
 - Paper agent + activity show API↔on-chain Scaled UI (not API-only). Goal open.
+
+## 2026-09-16 — Positions Scaled UI honesty
+- Positions list + detail surface API↔on-chain Scaled UI (match/mismatch/off).
+- Wallet-verified requires chain match — no API-only green.

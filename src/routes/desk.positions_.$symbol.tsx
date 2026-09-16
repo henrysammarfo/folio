@@ -6,6 +6,7 @@ import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
 import { getPositionsBundle } from "@/lib/desk.functions";
+import { scaledUiHealthLabel } from "@/lib/position-health";
 
 const detailSearchSchema = z.object({
   /** Ephemeral mainnet-read inspect pubkey — not auth, not persisted. */
@@ -124,13 +125,24 @@ function Page() {
                     : "unavailable"}
               </b>
             </p>
-            <p>
-              <span>On-chain effective</span>
+            <p data-testid="position-scaled-ui-compare">
+              <span>On-chain Scaled UI</span>
               <b>
                 {row.onchainEffectiveMultiplier != null
                   ? `${row.onchainEffectiveMultiplier.toFixed(6)}×`
-                  : "unavailable"}
+                  : "unavailable"}{" "}
+                <small>
+                  ({scaledUiHealthLabel(row.scaledUiCompare.status)}
+                  {row.scaledUiCompare.deltaBps != null
+                    ? ` · ${row.scaledUiCompare.deltaBps.toFixed(1)} bps`
+                    : ""}
+                  )
+                </small>
               </b>
+            </p>
+            <p>
+              <span>API ↔ chain</span>
+              <b>{row.scaledUiCompare.note}</b>
             </p>
             <p>
               <span>Economic shares</span>

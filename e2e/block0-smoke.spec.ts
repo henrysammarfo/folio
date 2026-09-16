@@ -270,6 +270,12 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/paper|wallet-read|wallet/);
     expect(body).toMatch(/qty|quantity|multiplier|aapl/);
+    // API ↔ on-chain Scaled UI must be visible on the list (not API-only).
+    await expect(page.getByTestId("positions-scaled-ui-AAPLx")).toBeVisible();
+    await expect(page.getByTestId("positions-scaled-ui-AAPLx")).toContainText(
+      /chain match|chain mismatch|chain off/i,
+    );
+    expect(body).toMatch(/chain match|chain mismatch|chain off/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
@@ -294,7 +300,12 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/pending corporate action/);
     expect(body).toMatch(/none on live feed|pending|\d+\.\d+×/);
-    expect(body).toMatch(/api multiplier|on-chain effective/);
+    expect(body).toMatch(/api multiplier|on-chain scaled ui/);
+    await expect(page.getByTestId("position-scaled-ui-compare")).toBeVisible();
+    await expect(page.getByTestId("position-scaled-ui-compare")).toContainText(
+      /chain match|chain mismatch|chain off/i,
+    );
+    expect(body).toMatch(/api ↔ chain|api ↔ on-chain|within|diverge|unavailable/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet|4\.0000/);
   });
 
