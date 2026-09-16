@@ -17,6 +17,7 @@
     "replay": "npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build",
     "smoke": "npx tsx scripts/smoke-empire.mts",
     "smoke:keys": "npx tsx scripts/smoke-keys.mts",
+    "smoke:goal": "npx tsx --env-file=.env scripts/smoke-goal.mts",
     "keys": "npx tsx scripts/keys-readiness.mts"
   },
   "overrides": {

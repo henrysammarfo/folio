@@ -503,3 +503,11 @@
 
 ## 2026-09-16 — Inspect label + activity invalidate
 - Fixed false **No cookie** on inspect panels when a bound wallet exists; activity-bundle joins session invalidate; Policy state wash/broadcast from live matrix. Empire keys still need Henry paste.
+
+## 2026-09-16 — Empire keys landed (Henry paste) + Bitquery V2 + smoke:goal
+- Wired Bitquery · Pyth · Privy · Supabase (URL/anon/service) · Jupiter to Vercel (all targets) + local `.env` (never committed; never echoed).
+- Docs-fix: Bitquery wash now prefers Streaming V2 `https://streaming.bitquery.io/graphql` with EAP fallback; Bearer `ory_at_…` per Bitquery auth docs.
+- Live probes: wash **ok** (pass, n=50); Jupiter quote ok; Privy+Supabase keys present; Pyth Hermes BTC/ETH **200** but Equity.US.AAPL / Crypto.AAPLX / Crypto.AAPLON **403 Not entitled**.
+- Supabase tables missing (`PGRST205`) until Henry runs `supabase/migrations/20260915_folio_tenants.sql`; `SUPABASE_JWT_SECRET` still missing.
+- `applyDotEnv` overrides empty shell placeholders that shadowed `.env` (cloud BITQUERY_*='').
+- `npm run smoke:goal` matrix: done=4 partial=2 blocked=0 (Empire waiting Pyth entitlement; multi-tenant waiting mint+tables). Goal open. **Rotate chat-pasted secrets.**

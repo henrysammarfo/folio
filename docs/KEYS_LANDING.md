@@ -6,9 +6,9 @@ Do **one key family at a time**. Paste into Vercel (Preview + Production) and lo
 Demo Settings: https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk/settings#empire-readiness  
 Vercel env UI: https://vercel.com/teamtitanlink/folio/settings/environment-variables
 
-Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density`
+Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density` · `BITQUERY_API_KEY` · `PYTH_API_KEY` · `PRIVY_*` · `SUPABASE_URL` · `SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY` · `JUPITER_API_KEY`
 
-Still need Henry paste (cannot invent): Bitquery · Pyth · Privy · Supabase · Jupiter (if gated). **Rotate any Vercel token pasted in chat.**
+Still need Henry: **Pyth Terminal equity/xStock feed entitlement** · `SUPABASE_JWT_SECRET` · run `supabase/migrations/20260915_folio_tenants.sql` · mint session + tenant_members. **Rotate all chat-pasted secrets.**
 
 Stocklana live 2026-09-16 (jina): **605** registered · **84** submissions · **$121k** · SEP 25.
 
@@ -29,12 +29,13 @@ Verify: `/desk/acquire` wash row leaves “key missing”; `/network` wash capab
 
 ### 2 — Pyth Hermes (equity diverge)
 
-1. Start at [pyth.network](https://pyth.network/) → developer / Hermes access.
-2. Docs entry: [Hermes documentation](https://docs.pyth.network/price-feeds/how-pyth-works/hermes).
+1. Start at [pyth.network](https://pyth.network/) → [Pyth Terminal](https://app.pyth.com/) for an API key.
+2. Docs: [Hermes](https://docs.pyth.network/price-feeds/how-pyth-works/hermes) · [Core upgrade auth](https://docs.pyth.network/price-feeds/core/upgrade/preparing).
 3. Create / copy API key → set `PYTH_API_KEY` on Vercel (all targets you use).
-4. Redeploy.
+4. **Entitle Equity.US / Crypto.xStock feeds** on the plan — a key that only covers generic crypto (BTC/ETH) returns Hermes `403 Not entitled` for AAPL / AAPLx / AAPLON. Contact data@dourolabs.xyz if Terminal UI cannot grant equities.
+5. Redeploy.
 
-Verify: Settings **PYTH_API_KEY** readiness turns set; `/truth` / acquire diverge can score Pyth vs Jupiter when both live. Without the key, Hermes price updates stay fail-closed.
+Verify: Settings **PYTH_API_KEY** readiness turns set; `/truth` / acquire diverge can score Pyth vs Jupiter when Equity (or entitled Crypto.xStock) is live. Without entitlement, keep fail-closed — never invent a green diverge.
 
 ### 3 — Privy (wallet identity)
 
@@ -53,7 +54,7 @@ Verify: Settings auth badge still fail-closed until Supabase lands (both require
    - `anon` `public` → `SUPABASE_ANON_KEY`
    - `service_role` → `SUPABASE_SERVICE_ROLE_KEY` (**server only**)
 3. **Project Settings → API → JWT Secret** (≥16) → `SUPABASE_JWT_SECRET`.
-4. Paste all four on Vercel. Apply migration `supabase/migrations/20260915_folio_tenants.sql` (SQL editor). Optional seed: `supabase/seed/demo_tenant.sql`.
+4. Paste all four on Vercel. Apply migration `supabase/migrations/20260915_folio_tenants.sql` in the **SQL editor** (PostgREST cannot create tables — expect `PGRST205` until applied). Optional seed: `supabase/seed/demo_tenant.sql`.
 5. Redeploy.
 
 `SUPABASE_JWT_SECRET` arms the **user-JWT RLS path**: server mints short-lived HS256 JWTs with `sub` = Privy DID so PostgREST policies (`auth.jwt() ->> 'sub'`) authorize tenants/prefs. Without the JWT secret, FOLIO keeps a labeled **service-role** fallback (not end-user authz).
@@ -78,6 +79,7 @@ Verify: Settings → paste Privy access token → mint httpOnly `folio_session` 
 ```bash
 npm run keys        # presence only (no secret values)
 npm run smoke:keys  # live probes when keys present; fail-closed skips when missing
+npm run smoke:goal  # Stocklana requirement matrix (loads .env — premium UI DONE when FOLIO_APPROVED_LAB_UI=netro-density)
 npm run replay      # unit + e2e + empire smoke + build
 ```
 

@@ -48,42 +48,56 @@ What this unlocked: watch-wallet bind on the public demo. Broadcast stays paused
 
 ---
 
-## Step 2 — Bitquery (DO THIS NEXT)
+## Step 2 — Bitquery ✅ KEYED (live wash) · Pyth ⚠️ keyed but not entitled
 
 Stocklana live 2026-09-16 (jina re-scrape): **605** regs · **84** subs · **$121k** · deadline SEP 25 (timeline still Fri 18 Sep — conservative).
 
-
-Only when I say so. Needed for live wash tape (fail-closed until then).
-
-| Name | Where |
+| Name | Status |
 |------|--------|
-| `BITQUERY_API_KEY` | Bitquery dashboard → API key → paste into Vercel + local `.env` |
+| `BITQUERY_API_KEY` | ✅ on Vercel + `.env` — live wash probe **ok** (V2 `/graphql`, sample n=50) |
+| `PYTH_API_KEY` | ⚠️ on Vercel + `.env` — Hermes auth works (BTC/ETH 200) but **403 Not entitled** for Equity.US.AAPL / Crypto.AAPLX / Crypto.AAPLON |
 
-Optional same sitting (unlocks Pyth diverge vs Jupiter — Pyth bounty):
+**Henry next for Pyth:** [Pyth Terminal](https://app.pyth.com/) → entitle equity / tokenized-stock feeds (or email data@dourolabs.xyz). Do not claim diverge green until entitled.
 
-| Name | Where |
+| Name | Where (click → copy key → paste Vercel + `.env`) |
 |------|--------|
-| `PYTH_API_KEY` | [Pyth Terminal](https://pyth.network/) → API key → Vercel + `.env` (Hermes auth required since Aug 2026) |
+| `BITQUERY_API_KEY` | [Bitquery account](https://account.bitquery.io/) → API key |
+| `PYTH_API_KEY` | [pyth.network](https://pyth.network/) → [Pyth Terminal](https://app.pyth.com/) / [Hermes docs](https://docs.pyth.network/price-feeds/how-pyth-works/hermes) → API key |
+
+Paste targets: [folio Environment Variables](https://vercel.com/teamtitanlink/folio/settings/environment-variables) (Preview + Production) + local `.env`. Redeploy preview after paste.
+
+After paste + redeploy, verify:
+
+```bash
+npm run smoke:goal   # requirement matrix — Empire leaves PARTIAL when wash live + Pyth entitled
+npm run smoke:keys   # live probes for present keys
+```
+
+Full step-by-step with every provider link: `docs/KEYS_LANDING.md`.
 
 ---
 
-## Step 3 — Privy (after Step 2)
+## Step 3 — Privy ✅ KEYED (verify path armed)
 
-| Name | Where |
+| Name | Status / Where |
 |------|--------|
-| `PRIVY_APP_ID` | Privy dashboard → App |
-| `PRIVY_APP_SECRET` | Privy dashboard → App |
+| `PRIVY_APP_ID` | ✅ on Vercel + `.env` — [Privy Dashboard](https://dashboard.privy.io/) |
+| `PRIVY_APP_SECRET` | ✅ on Vercel + `.env` — rotate after chat paste |
 
 ---
 
-## Step 4 — Supabase (after Step 3)
+## Step 4 — Supabase ⚠️ KEYS SET · schema + JWT still needed
 
-| Name | Where |
+| Name | Status / Where |
 |------|--------|
-| `SUPABASE_URL` | Project settings → API |
-| `SUPABASE_ANON_KEY` | Project settings → API |
-| `SUPABASE_SERVICE_ROLE_KEY` | Project settings → API (server only — never expose to browser) |
-| `SUPABASE_JWT_SECRET` | Project settings → API → **JWT Secret** (≥16) |
+| `SUPABASE_URL` | ✅ on Vercel + `.env` |
+| `SUPABASE_ANON_KEY` | ✅ JWT anon on Vercel + `.env` (prefer JWT over `sb_publishable_*` alone) |
+| `SUPABASE_SERVICE_ROLE_KEY` | ✅ on Vercel + `.env` (server only) |
+| `SUPABASE_JWT_SECRET` | ❌ still missing — Project Settings → API → **JWT Secret** |
+
+**Henry next:** (1) paste `SUPABASE_JWT_SECRET` (2) run `supabase/migrations/20260915_folio_tenants.sql` in SQL editor — tables currently missing (`PGRST205`) (3) optional seed `supabase/seed/demo_tenant.sql` (4) mint httpOnly `folio_session` from Settings with a real Privy access token.
+
+**Rotate** every secret pasted in Cursor chat (Bitquery · Pyth · Privy · Supabase · Jupiter · any Vercel token).
 
 Full checklist: `docs/KEYS_LANDING.md`.
 

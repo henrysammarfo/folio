@@ -165,7 +165,11 @@ async function fetchHermesLatest(
       const body = await res.text().catch(() => "");
       lastDetail = `HTTP ${res.status} ${body.slice(0, 120)}`;
       if (res.status === 401 || res.status === 403) {
-        return errResult(source, "pyth_hermes_unauthorized", lastDetail);
+        const entitled =
+          /not entitled|no grant/i.test(body)
+            ? "pyth_feed_not_entitled"
+            : "pyth_hermes_unauthorized";
+        return errResult(source, entitled, lastDetail);
       }
       continue;
     }

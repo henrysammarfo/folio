@@ -2,6 +2,9 @@
  * Print fail-closed key readiness for FOLIO (no secrets printed).
  * Usage: npx tsx scripts/keys-readiness.mts
  */
+import { applyDotEnv } from "./load-dotenv.ts";
+applyDotEnv();
+
 const rows: Array<{ name: string; ok: boolean; note: string; required?: boolean }> = [
   {
     name: "FOLIO_SESSION_SECRET",

@@ -3,6 +3,9 @@
  * honesty matrix paints NestUSD / wash-without-Bitquery / multi-tenant /
  * broadcast as live when keys/funding are missing.
  */
+import { applyDotEnv } from "./load-dotenv.ts";
+applyDotEnv();
+
 import { fetchXStockAsset, fetchXStockMultiplier } from "../src/lib/adapters/xstocks.ts";
 import { fetchKaminoXStocksMarket } from "../src/lib/adapters/kamino.ts";
 import { fetchJupiterLendEarn } from "../src/lib/adapters/jupiter-lend.ts";

@@ -299,3 +299,13 @@ EOF
 
 ## 2026-09-16 — Stocklana live 605/84/$121k
 - jina scrape https://hackathons.solana.com/hackathons/stocklana: **605** registered · **84** submissions · Prize Pool **$121,000** · deadline hero **SEP 25, 2026** · timeline submissions close Fri 18 Sep 16:00 ET (conservative).
+
+## 2026-09-16 — Empire key paste live evidence
+- VERIFIED: Bitquery wash live via V2 `/graphql` (Authorization Bearer) — sampleSize 50, pressure low on AAPLx mint probe.
+- VERIFIED: Pyth API key authenticates Hermes (BTC + ETH price latest HTTP 200 on upgraded + legacy hosts).
+- VERIFIED: same Pyth key returns HTTP 403 "Not entitled" for Equity.US.AAPL, Crypto.AAPLX, Crypto.AAPLON — plan entitlement gap, not adapter bug.
+- VERIFIED: Privy+Supabase env present → `getAuthProviderStatus` keys-present; `SUPABASE_JWT_SECRET` absent → service-role fallback labeled.
+- VERIFIED: PostgREST `tenants` / `tenant_members` / `desk_preferences` → PGRST205 (migration not applied).
+- VERIFIED: Jupiter quote ok with `JUPITER_API_KEY` (`x-api-key` header per portal docs).
+- VERIFIED: `FOLIO_APPROVED_LAB_UI=netro-density` via applyDotEnv → premium UI DONE in smoke:goal.
+- OPEN: Pyth equity entitlement · SUPABASE_JWT_SECRET · SQL migration · session mint · rotate chat secrets.
