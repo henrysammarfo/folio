@@ -239,3 +239,7 @@ EOF
 ## 2026-09-16 — Stocklana counts + matrix honesty
 - Live hackathons.solana.com: Registered **596** · Submissions **81** · Prize **$121,000** · Deadline hero **SEP 25, 2026** · countdown ~9 days · timeline Fri 18 Sep 16:00 ET.
 - Membership / role-gated network-matrix rows: unavailable without multi-tenant keys (unit-tested).
+
+## 2026-09-16 — Truth on-chain Scaled UI
+- `/truth` shows On-chain Scaled UI metric + timeline; diverge `data-diverge-pass=null` without PYTH_API_KEY (e2e).
+- compareApiOnchainMultiplier never invents match when either side missing (unit).

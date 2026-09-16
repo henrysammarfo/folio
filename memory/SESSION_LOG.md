@@ -418,3 +418,9 @@
 - Settings readiness: `JUPITER_API_KEY` optional + `SOLANA_RPC_URL` dedicated vs public fallback (B004).
 - E2E: Netro preview asserts zero stacked `.desk-heading`/`.panel`; settings asserts approved-lab + Jupiter + RPC rows.
 - Live scrape: **596** registered · **81** submissions · **$121k**. Still blocked: Henry Pick · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.
+
+## 2026-09-16 — /truth on-chain Scaled UI + no invent-pass
+
+- `getTruthBundle` fetches Token-2022 Scaled UI via RPC; API↔on-chain compare (match/mismatch/unavailable).
+- Diverge pass/fail only when Pyth Equity.US + Jupiter venue live; Jupiter stockData vs venue is informational (`pass: null`).
+- Unit + e2e green. Goal still needs Henry Pick + Bitquery/Pyth/Privy/Supabase.

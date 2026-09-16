@@ -11,7 +11,12 @@ import { fetchKaminoXStocksMarket } from "./adapters/kamino";
 import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
 import { fetchNestUsdStatus } from "./adapters/nestusd";
 import { fetchNestCreditVaults } from "./adapters/nest-credit";
-import { fetchScaledUiOnchain } from "./adapters/scaled-ui";
+import {
+  compareApiOnchainMultiplier,
+  fetchScaledUiOnchain,
+  type ScaledUiApiCompare,
+  type ScaledUiOnchain,
+} from "./adapters/scaled-ui";
 import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import { resolveSolanaRpcUrl } from "./adapters/solana-rpc";
 import { errResult, type AdapterResult } from "./adapters/types";
@@ -83,6 +88,10 @@ export type TruthBundle = {
     cryptoOndo: string | null;
   };
   jupiterPrice: AdapterResult<JupiterTokenPrice>;
+  /** On-chain Token-2022 Scaled UI — Solana mainnet-read when RPC works. */
+  scaledUi: AdapterResult<ScaledUiOnchain>;
+  /** API currentMultiplier ↔ on-chain effective — never invents a match. */
+  scaledUiCompare: ScaledUiApiCompare;
   diverge: {
     pass: boolean | null;
     divergeBps: number | null;
@@ -152,18 +161,27 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       "AAPL";
     const mint = asset.ok ? asset.data.solanaMint : null;
     const bountyFeeds = pythBountyFeedSymbols(symbol);
-    const [pyth, pythXStock, pythOndo, jupiterPrice] = await Promise.all([
+    const [pyth, pythXStock, pythOndo, jupiterPrice, scaledUi] = await Promise.all([
       fetchPythEquityPrice(underlying),
       fetchPythXStockUsdPrice(symbol),
       fetchPythOndoUsdPrice(underlying),
       mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
+      mint
+        ? fetchScaledUiOnchain(mint)
+        : Promise.resolve(
+            errResult(
+              "solana-rpc.scaled-ui",
+              "xstock_mint_missing",
+              "No Solana mint — cannot read Scaled UI",
+            ),
+          ),
     ]);
 
     let diverge: TruthBundle["diverge"] = {
       pass: null,
       divergeBps: null,
       bandBps: 75,
-      note: "Need two live references to score diverge",
+      note: "Need Pyth Equity.US + Jupiter venue to score pass/fail",
     };
 
     const secondaryNotes = [
@@ -178,6 +196,8 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       .join(" · ");
     const xStockNote = secondaryNotes ? ` · ${secondaryNotes}` : "";
 
+    // Pass/fail only when Pyth Equity.US + Jupiter venue are both live.
+    // Jupiter stockData vs venue is informational only — never invent-a-pass.
     if (pyth.ok && jupiterPrice.ok) {
       const d = divergeBps(pyth.data.price, jupiterPrice.data.usdPrice, 75);
       diverge = {
@@ -197,10 +217,10 @@ export const getTruthBundle = createServerFn({ method: "GET" })
         75,
       );
       diverge = {
-        pass: d.pass,
+        pass: null,
         divergeBps: d.divergeBps,
         bandBps: d.bandBps,
-        note: `Jupiter stockData vs Jupiter venue (Pyth Hermes price updates unavailable on this egress)${xStockNote}`,
+        note: `Jupiter stockData vs venue ${d.divergeBps.toFixed(1)} bps · informational only · Pyth required for pass/fail${xStockNote}`,
       };
     } else if (!pyth.ok) {
       diverge = {
@@ -210,6 +230,11 @@ export const getTruthBundle = createServerFn({ method: "GET" })
         note: `Pyth unavailable: ${pyth.reason}${xStockNote}`,
       };
     }
+
+    const scaledUiCompare = compareApiOnchainMultiplier(
+      multiplier.ok ? multiplier.data.currentMultiplier : null,
+      scaledUi.ok ? scaledUi.data.effectiveMultiplier : null,
+    );
 
     const paperRaw = paperRawFor(symbol);
     const economicShares = multiplier.ok
@@ -225,6 +250,8 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       pythOndo,
       pythBountyFeeds: bountyFeeds,
       jupiterPrice,
+      scaledUi,
+      scaledUiCompare,
       diverge,
       paperRaw,
       economicShares,

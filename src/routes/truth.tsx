@@ -56,6 +56,23 @@ function Page() {
         <ModeBadge mode={mult?.ok ? mult.mode : "unavailable"}>
           {mult?.ok ? "xStocks live" : "Multiplier unavailable"}
         </ModeBadge>
+        <ModeBadge
+          mode={
+            data?.scaledUi?.ok
+              ? data.scaledUi.mode
+              : data?.scaledUiCompare?.status === "mismatch"
+                ? "unavailable"
+                : "unavailable"
+          }
+        >
+          {data?.scaledUi?.ok
+            ? data.scaledUiCompare?.status === "mismatch"
+              ? "On-chain Scaled UI mismatch"
+              : data.scaledUiCompare?.status === "match"
+                ? "On-chain Scaled UI match"
+                : "On-chain Scaled UI live"
+            : "On-chain Scaled UI off"}
+        </ModeBadge>
         <ModeBadge mode={data?.jupiterPrice.ok ? data.jupiterPrice.mode : "unavailable"}>
           {!data?.jupiterPrice.ok
             ? "Jupiter price unavailable"
@@ -101,6 +118,23 @@ function Page() {
               : mult
                 ? mult.reason
                 : "Loading…"
+          }
+        />
+        <Metric
+          label="On-chain Scaled UI"
+          value={
+            data?.scaledUi?.ok
+              ? `${data.scaledUi.data.effectiveMultiplier.toFixed(6)}×`
+              : isLoading
+                ? "…"
+                : "—"
+          }
+          detail={
+            data?.scaledUi?.ok
+              ? `${data.scaledUiCompare?.note ?? "Token-2022"} · ${data.scaledUi.source.includes("public") ? "public RPC" : "dedicated RPC"}`
+              : data?.scaledUi && !data.scaledUi.ok
+                ? data.scaledUi.reason
+                : "Awaiting mint + RPC"
           }
         />
         <Metric
@@ -184,6 +218,23 @@ function Page() {
             </span>
           </li>
           <li>
+            {data?.scaledUiCompare?.status === "mismatch" ? (
+              <AlertTriangle />
+            ) : data?.scaledUi?.ok ? (
+              <CheckCircle2 />
+            ) : (
+              <Database />
+            )}
+            <span>
+              <b>On-chain Scaled UI</b>
+              {data?.scaledUi?.ok
+                ? ` ${data.scaledUi.data.effectiveMultiplier.toFixed(6)}× Token-2022 · ${data.scaledUiCompare?.note ?? "read"}`
+                : data?.scaledUi && !data.scaledUi.ok
+                  ? ` ${data.scaledUi.reason} — no invented on-chain ×`
+                  : " pending mint + RPC"}
+            </span>
+          </li>
+          <li>
             <FileClock />
             <span>
               <b>Corporate-action pending</b>
@@ -238,7 +289,7 @@ function Page() {
                   : " Jupiter price unavailable"}
             </span>
           </li>
-          <li>
+          <li data-testid="truth-diverge-gate" data-diverge-pass={String(data?.diverge.pass ?? "null")}>
             {data?.diverge.pass === false ? (
               <AlertTriangle />
             ) : data?.diverge.pass === true ? (
@@ -250,7 +301,7 @@ function Page() {
               <b>Diverge gate</b>{" "}
               {data?.diverge.pass == null
                 ? data?.diverge.note ??
-                  "unavailable — no invent-a-pass (Pyth and venue both required)"
+                  "unavailable — no invent-a-pass (Pyth Equity.US + Jupiter venue required)"
                 : (data.diverge.note ?? "pending")}
             </span>
           </li>

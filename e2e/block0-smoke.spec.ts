@@ -356,13 +356,19 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/diverge gate/);
     // Without Pyth key, diverge must stay labeled unavailable — not silent pass theater
-    expect(body).toMatch(/pyth unavailable|unavailable|no invent|diverge/);
+    expect(body).toMatch(/pyth unavailable|informational only|pyth required for pass|no invent/);
+    expect(body).toMatch(/on-chain scaled ui/);
     expect(body).toMatch(/jupiter price (live|cached|stale-cache|unavailable)/);
     // Stocklana Pyth bounty triad mapped even when key missing
     expect(body).toMatch(/equity\.us\.aapl\/usd/);
     expect(body).toMatch(/crypto\.aaplx\/usd/);
     expect(body).toMatch(/crypto\.aaplon\/usd/);
     expect(body).toMatch(/pyth_api_key|fail-closed until pyth_api_key|mapped/);
+    // Diverge must not invent pass=true without Pyth Equity.US
+    await expect(page.locator('[data-testid="truth-diverge-gate"]')).toHaveAttribute(
+      "data-diverge-pass",
+      "null",
+    );
     expect(body).not.toMatch(/unhackable|nation-state|4\.0000/);
   });
 

@@ -416,3 +416,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Settings readiness lists `JUPITER_API_KEY` + `SOLANA_RPC_URL` (B004).
 - E2E locks Netro replace-children + approved-lab readiness rows.
 - Live Stocklana: **596** regs · **81** subs · **$121k**. Goal open (Henry Pick + Empire keys).
+
+## 2026-09-16 — /truth on-chain Scaled UI honesty
+- Truth bundle reads Token-2022 Scaled UI on-chain; API↔chain compare labeled.
+- Diverge invent-pass removed (Jupiter stockData alone → informational). Goal open.
