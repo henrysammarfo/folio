@@ -438,3 +438,6 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Home **hero preserved** (Aionis brand-plane). NetroBNB 12-col is **/desk overview only** — does not replace Positions/Acquire/Credit.
 - `FOLIO_APPROVED_LAB_UI=netro-density` set on Vercel (prod/preview/dev). Overview hides FOLIO sidebar so Netro chrome owns the surface; nav links are real routes.
 - Empire keys still empty (Bitquery/Pyth/Privy/Supabase/Jupiter) — cannot invent; paste per KEYS_LANDING. Rotate chat-pasted Vercel token. Goal open.
+
+## 2026-09-16 — Netro live Empire gates on overview
+- Approved Netro surface paints live matrix modes (not static theater). Overview-only; hero untouched. Goal open: Bitquery/Pyth/Privy/Supabase + GG Skip.

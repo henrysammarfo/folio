@@ -258,3 +258,6 @@ EOF
 - `FOLIO_APPROVED_LAB_UI=netro-density` on Vercel — CONFIRMED via `vercel env ls` (value hidden).
 - Home hero unchanged (Aionis brand-plane) — CONFIRMED screenshot home-hero-now.png.
 - Empire keys Bitquery/Pyth/Privy/Supabase/Jupiter — still EMPTY locally and unset on Vercel.
+
+## 2026-09-16 — Netro live gates
+- `buildNetroLiveGateLabels` unit: empty → fail-closed defaults; live Kamino/Scaled UI → Mainnet-read; wash unavailable → Fail-closed.

@@ -449,3 +449,7 @@
 - Preserved home hero. NetroBNB desk is overview-only (`data-netro-surface`); Positions/Acquire keep ledger chrome.
 - Set `FOLIO_APPROVED_LAB_UI=netro-density` on Vercel all targets. Empire trading keys still need Henry paste (cannot invent).
 - Rotate Vercel token pasted in chat. Goal open.
+
+## 2026-09-16 — Netro live Empire gates
+- Netro overview flow strip + empire strip map live `/network` modes (wash fail-closed, Pyth/NestUSD/multi-tenant unavailable, Scaled UI/Kamino mainnet-read when live). No invent greens.
+- Demo URLs → netro desk preview. Goal open for Empire keys + GG Skip.

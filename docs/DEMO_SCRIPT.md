@@ -14,7 +14,7 @@ Network: mainnet-read + quote-only · Budget: ≤~$1 · Broadcast: paused
 
 ## Live demo URL
 
-https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app
+https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app
 
 Home CTAs: **Lab UI** · **Lab shaders** → `/lab/ui` · `/lab/shaders` (Henry picks id before premium merge). Recommended desk pick: **`netro-density`** — Preview on desk mounts the full NetroBNB 12-col canvas with live AAPLx ×. Opt-in Plasma when a shader / cinematic pick is active — Exit anytime; not a production merge.
 

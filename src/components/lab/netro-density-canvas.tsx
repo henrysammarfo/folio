@@ -3,12 +3,19 @@
  * (12-col: left 9 = profile 3 + stack 6 + full market; right 3 = quote + yellow AI).
  * Content + tokens are FOLIO stock-desk; no Binance/Netro brand clone.
  * Mounted on /desk overview only — never replaces Positions/Acquire routes.
+ * Flow metrics prefer live /network matrix modes (never invent greens).
  */
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type CSSProperties } from "react";
+import {
+  NETRO_LIVE_GATE_DEFAULTS,
+  type NetroLiveGateLabels,
+} from "@/lib/netro-live-gates";
 
 type Props = {
   multiplierLabel: string;
+  /** Live Empire gate labels from /network matrix — defaults are fail-closed. */
+  gates?: NetroLiveGateLabels;
 };
 
 const SHARE_TICKER = [
@@ -35,7 +42,10 @@ function delay(i: number): CSSProperties {
   return { ["--netro-delay" as string]: `${0.05 + i * 0.06}s` };
 }
 
-export function NetroDensityCanvas({ multiplierLabel }: Props) {
+export function NetroDensityCanvas({
+  multiplierLabel,
+  gates = NETRO_LIVE_GATE_DEFAULTS,
+}: Props) {
   const [clock, setClock] = useState({ h: "00", m: "00", s: "00" });
   const [railHeight, setRailHeight] = useState<number | undefined>();
 
@@ -181,27 +191,41 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
                   </div>
                   <span className="netro-density-flow-pill">AAPLx | USDC</span>
                 </div>
-                <div className="netro-density-metrics">
+                <div className="netro-density-metrics" data-testid="netro-live-gates">
                   <div>
                     <span>Multiplier</span>
                     <b>{multiplierLabel}</b>
                   </div>
                   <div>
                     <span>Wash</span>
-                    <b>Fail-closed</b>
+                    <b>{gates.wash}</b>
                   </div>
                   <div>
                     <span>Quote</span>
-                    <b>≤$1 inspect</b>
+                    <b>{gates.quote}</b>
                   </div>
                   <div>
                     <span>Broadcast</span>
-                    <b>Paused</b>
+                    <b>{gates.broadcast}</b>
                   </div>
                   <div>
                     <span>NestUSD</span>
-                    <b>Unavailable</b>
+                    <b>{gates.nestUsd}</b>
                   </div>
+                </div>
+                <div className="netro-density-gate-strip" data-testid="netro-empire-strip">
+                  <span>
+                    Pyth <b>{gates.pyth}</b>
+                  </span>
+                  <span>
+                    Scaled UI <b>{gates.scaledUi}</b>
+                  </span>
+                  <span>
+                    Kamino <b>{gates.kamino}</b>
+                  </span>
+                  <span>
+                    Multi-tenant <b>{gates.multiTenant}</b>
+                  </span>
                 </div>
               </div>
 
@@ -243,7 +267,7 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
                     <span className="netro-pill">Holding</span>
                     <span className="netro-pill">Liquidity</span>
                   </div>
-                  <b>Kamino 0.40</b>
+                  <b>Kamino {gates.kamino === "Mainnet-read" ? "live LTV" : gates.kamino}</b>
                   <small>Borrow CPI unavailable until funded</small>
                 </div>
                 <div
@@ -291,9 +315,9 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
                 />
               </svg>
               <div className="netro-density-chart-foot">
-                <span>Wash · fail-closed</span>
-                <span>Pyth diverge · key gated</span>
-                <span>Broadcast · paused</span>
+                <span>Wash · {gates.wash}</span>
+                <span>Pyth diverge · {gates.pyth}</span>
+                <span>Broadcast · {gates.broadcast}</span>
               </div>
             </div>
           </div>

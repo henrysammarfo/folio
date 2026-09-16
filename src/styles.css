@@ -321,6 +321,8 @@
 @media(max-width:639px){.netro-density-metrics>div{border-right:0;border-bottom:1px solid #e5e7eb}.netro-density-metrics>div:nth-last-child(-n+2){border-bottom:0}}
 .netro-density-metrics span{display:block;font-size:.68rem;color:#6b7280;margin-bottom:.25rem}
 .netro-density-metrics b{display:block;font-size:.95rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1;color:#1c1c1c}
+.netro-density-gate-strip{display:flex;flex-wrap:wrap;gap:.45rem .85rem;padding:.45rem .85rem .7rem;border-top:1px solid #e5e7eb;background:#fafafa;font-size:.68rem;color:#6b7280}
+.netro-density-gate-strip b{color:#1c1c1c;font-weight:650;margin-left:.2rem}
 .netro-density-row{display:grid;grid-template-columns:1fr;gap:.875rem}
 @media(min-width:768px){.netro-density-row{grid-template-columns:1fr 1fr}}
 .netro-density-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:.95rem 1.05rem;box-shadow:0 1px 5px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.4rem;min-height:8.25rem;justify-content:space-between}

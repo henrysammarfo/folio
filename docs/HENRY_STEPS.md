@@ -2,17 +2,17 @@
 
 Do **one step**, screenshot, reply in chat. Do not skip ahead. I will give the next step after each reply.
 
-Demo (hard-refresh): https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app
+Demo (hard-refresh): https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app
 
 ---
 
 ## Step 0 — Approve lab look ✅ DONE (netro-density)
 
-1. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/ui  
+1. Open https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/lab/ui  
    Tap **Pick** on one id (recommended for Stocklana desk: **`netro-density`** — Preview on desk mounts the full NetroBNB **12-col** canvas with live AAPLx ×).  
    Other ids: `aionis-brand-plane` (already mirrors production `/` hero) · `cinematic-landing-21st` · `trade-journal-21st`  
    (optional) **Preview on desk** — opt-in only; Exit preview anytime; not a production merge.
-2. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/shaders  
+2. Open https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/lab/shaders  
    Tap **Pick** on one: `ink-ledger` · `ledger-mist` · `aurora-grid`
 3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: netro-density`) + screenshot.
 

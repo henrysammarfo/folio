@@ -18,7 +18,7 @@ import {
 } from "@/components/lab/shader-background";
 import { NetroDensityCanvas } from "@/components/lab/netro-density-canvas";
 import { FolioTradeJournalLab } from "@/components/lab/folio-trade-journal-lab";
-import { getLabApprovals, getTruthBundle } from "@/lib/desk.functions";
+import { getLabApprovals, getNetworkBundle, getTruthBundle } from "@/lib/desk.functions";
 import {
   isLabPreviewActive,
   readLabShaderPick,
@@ -27,6 +27,7 @@ import {
   type LabShaderId,
   type LabUiId,
 } from "@/lib/lab-pick";
+import { buildNetroLiveGateLabels } from "@/lib/netro-live-gates";
 
 const links = [
   ["Overview", "/desk", LayoutDashboard],
@@ -64,6 +65,7 @@ export function DeskShell({
   const [previewOn, setPreviewOn] = useState(false);
   const fetchTruth = useServerFn(getTruthBundle);
   const fetchApprovals = useServerFn(getLabApprovals);
+  const fetchNetwork = useServerFn(getNetworkBundle);
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -109,10 +111,21 @@ export function DeskShell({
     enabled: showNetroCanvas,
     staleTime: 30_000,
   });
+  const network = useQuery({
+    queryKey: ["network-matrix-desk", "netro-surface"],
+    queryFn: () => fetchNetwork(),
+    enabled: showNetroCanvas,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
   const mult = truth.data?.multiplier;
   const multiplierLabel = mult?.ok
     ? `${mult.data.currentMultiplier.toFixed(6)}× live`
     : "live pending";
+  const netroGates = buildNetroLiveGateLabels({
+    rows: network.data?.rows ?? [],
+    broadcastPaused: network.data?.broadcastPaused !== false,
+  });
 
   return (
     <div
@@ -226,7 +239,10 @@ export function DeskShell({
           {showNetroCanvas ? (
             /* Netro 12-col IS the desk surface — do not stack overview cards under it */
             <div className="desk-lab-netro" data-testid="desk-lab-netro">
-              <NetroDensityCanvas multiplierLabel={multiplierLabel} />
+              <NetroDensityCanvas
+                multiplierLabel={multiplierLabel}
+                gates={netroGates}
+              />
             </div>
           ) : (
             <>

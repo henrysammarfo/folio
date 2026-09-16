@@ -125,6 +125,21 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(page.locator(".desk-content > .panel")).toHaveCount(0);
     await expect(page.locator(".netro-density-ticker")).toBeVisible();
     await expect(page.locator("[data-netro-surface='1']")).toHaveCount(1);
+    // Live Empire gates must still paint on Netro surface (not static theater only)
+    await expect(page.getByTestId("netro-live-gates")).toBeVisible();
+    await expect(page.getByTestId("netro-empire-strip")).toBeVisible();
+    const gateText = (
+      await page.getByTestId("netro-live-gates").innerText()
+    ).toLowerCase();
+    expect(gateText).toMatch(/wash/);
+    expect(gateText).toMatch(/fail-closed|live/);
+    expect(gateText).toMatch(/nestusd/);
+    const strip = (
+      await page.getByTestId("netro-empire-strip").innerText()
+    ).toLowerCase();
+    expect(strip).toMatch(/pyth/);
+    expect(strip).toMatch(/scaled ui/);
+    expect(strip).toMatch(/multi-tenant/);
     // Positions stays the ledger — Netro must not replace other desk routes
     await page.goto("/desk/positions");
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();
@@ -187,7 +202,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/supabase_jwt_secret|user-jwt|service-role labeled|rls/);
     expect(body).toMatch(/api_key_21st|21st.*lab|lab mcp/);
     expect(body).toMatch(/shaders_api_key|shaders.*lab|clerk may still gate/);
-    expect(body).toMatch(/folio_approved_lab_ui|production desk stays default|henry chat approve/);
+    expect(body).toMatch(/folio_approved_lab_ui|production desk stays default|henry chat approve|desk chrome netro-density/);
     expect(body).toMatch(/folio_approved_lab_shader/);
     expect(body).toMatch(/jupiter_api_key|public quote\/price|ttl cache/);
     expect(body).toMatch(/solana_rpc_url|public fallback|dedicated/);

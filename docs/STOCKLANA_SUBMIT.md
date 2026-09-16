@@ -20,7 +20,7 @@ Paste pack: `docs/STOCKLANA_SUBMISSION.md`
 
 ## Before submit
 
-- [x] Demo URL reachable (Block 0 spine) — https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app (SSO off). Set `FOLIO_SESSION_SECRET` (+ optional `SOLANA_RPC_URL`) in Vercel env for watch-wallet; public RPC fallback covers Scaled UI reads when RPC unset. `BROADCAST_PAUSED=true` recommended in Vercel.
+- [x] Demo URL reachable (Block 0 spine) — https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app (SSO off). Set `FOLIO_SESSION_SECRET` (+ optional `SOLANA_RPC_URL`) in Vercel env for watch-wallet; public RPC fallback covers Scaled UI reads when RPC unset. `BROADCAST_PAUSED=true` recommended in Vercel.
 - [x] Ephemeral `?inspect=` wallet-read on positions + credit (no Vercel secret required; labeled not-auth)
 - [x] Vercel env: `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true` (live settings: secret set · bind ready)
 
