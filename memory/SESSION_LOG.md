@@ -559,3 +559,11 @@
 - Added `ensureBootstrapPrivyUser` + `buildBootstrapDemoSession` (Privy REST custom_auth → attach folio-demo owner → mint+verify).
 - Settings: **Bootstrap folio-demo session**; smoke:goal flips multiTenantSessionReady on live proof.
 - Pyth remains off ship diverge path (Yahoo/Finnhub/CoinGecko only).
+
+
+## 2026-09-16 — Ship audit · Vercel preview bootstrap proven
+
+- `npm run smoke:goal` → shipReady=true (6/6).
+- Preview READY: folio-git-cursor-folio-bootstrap-demo-sess-78e877-teamtitanlink.vercel.app
+- Truth: live AAPLx 1.003269× · Yahoo diverge · Pyth off ship path.
+- Settings Bootstrap → folio-demo owner active (Playwright + serverFn).

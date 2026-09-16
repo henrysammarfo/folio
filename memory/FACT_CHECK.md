@@ -332,3 +332,8 @@ EOF
 |---|---|---|---|
 | Ship equity diverge uses Finnhub→Yahoo (+ CoinGecko), not Pyth Hermes | CONFIRMED in-repo | equity-ref.ts · pythOffShipPath · smoke note | 2026-09-16 |
 | Bootstrap mint uses real Privy DID (never invents did:privy) | CONFIRMED in-repo | privy-users.ts + bootstrap-demo-session.ts fail-closed | 2026-09-16 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Vercel preview bootstrap mints folio_session with folio-demo owner | CONFIRMED live | Playwright click + Set-Cookie + Active tenant UI | 2026-09-16 |
+| shipReady=true on tip smoke | CONFIRMED | `npm run smoke:goal` done=6 | 2026-09-16 |
