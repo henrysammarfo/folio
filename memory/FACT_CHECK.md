@@ -208,3 +208,7 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | Plasma id 24346 + Trade Journal 27124 pinned | CONFIRMED in-lab | `src/lib/lab/twentyfirst-pins.ts` · lab/ui labels without MCP key |
 | Vercel preview API_KEY_21ST | MISSING (Henry) | jina `/lab/ui` still amber · CLI login_required |
 | Netro Header yellow active pill | Extracted | `NetroBNB/components/Header.tsx` → `.netro-density-chrome` |
+
+## 2026-09-16 — Vercel env (names only)
+- Confirmed via `vercel env ls`: API_KEY_21ST, SHADERS_API_KEY, AGENTROUTER_API_KEY/BASE_URL/MODEL, TAVILY_API_KEY, TINYFISH_API_KEY, SOLANA_RPC_URL, BROADCAST_PAUSED, FOLIO_SESSION_SECRET on project teamtitanlink/folio.
+- Not present (empty locally): BITQUERY_API_KEY, JUPITER_API_KEY, PYTH_API_KEY, PRIVY_*, SUPABASE_*, VENICE_API_KEY.

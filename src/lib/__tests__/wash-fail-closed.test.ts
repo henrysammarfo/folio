@@ -15,6 +15,9 @@ describe("wash gate", () => {
     });
     expect(wash.ok).toBe(false);
     expect(washAllowsSize(wash)).toBe(false);
+    if (!wash.ok) {
+      expect(wash.detail).toMatch(/self-trade|thin-tape|fail-closed/i);
+    }
     if (prev != null) process.env["BITQUERY_API_KEY"] = prev;
   });
 });

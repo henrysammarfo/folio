@@ -55,7 +55,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Production `/` hero: Aionis-parity liquid stencil (`1400×550` / y=465 / horizon 55%).
 - `/lab/ui`: Aionis plane + NetroBNB density + pinned 21st Plasma 24346 + trade journal 27124.
 - `/lab/shaders`: live WebGL Plasma (glacial ink); shaders.com keyed but API gated (HTTP 500).
-- Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; Vercel preview still needs `API_KEY_21ST`.
+- Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; **Vercel** now has `API_KEY_21ST`, `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY` (all targets). Still missing: Bitquery · Jupiter · Pyth · Privy · Supabase.
 - Desk opt-in lab preview mounts live WebGL Plasma for shader / cinematic picks (Exit clears; not production merge).
 - Stocklana live 2026-09-16: **591** regs · **79** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
 
@@ -381,3 +381,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Acquire Checks step shows denser truth/wash/quote/Pyth/canReview gate grid (same honesty language as desk).
 - `JUPITER_API_KEY` optional in keys-readiness + smoke baseline. Paper agent live spine OK; AgentRouter NL WAF-skipped (honest).
 - Still blocked: Henry Pick · Empire keys · Vercel `API_KEY_21ST` · funded broadcast.
+
+## 2026-09-16 — Preserve hero + Netro 12-col + Vercel keys
+- Home hero **unchanged** (user instruction); no home-empire section.
+- NetroBNB desk density rebuilt to real 12-col (profile · flow · cards · market · quote · yellow AI).
+- Vercel keys set for 21st / shaders / AgentRouter / Tavily / TinyFish. Trading keys (Bitquery/Jupiter/Pyth/Privy/Supabase) still empty — Henry must provide.
+- **Rotate** the Vercel token that was pasted in chat.

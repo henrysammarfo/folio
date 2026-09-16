@@ -1,6 +1,6 @@
 /**
  * Desk-density canvas — layout/UX extracted from AbdullahBalfaqih/NetroBNB
- * (12-col bento: profile · metrics stack · yellow AI rail · market strip).
+ * (12-col: left 9 = profile 3 + stack 6 + full market; right 3 = quote + yellow AI).
  * Content + tokens are FOLIO stock-desk; no Binance/Netro brand clone.
  */
 import { useEffect, useState } from "react";
@@ -10,16 +10,16 @@ type Props = {
 };
 
 export function NetroDensityCanvas({ multiplierLabel }: Props) {
-  const [clock, setClock] = useState("00:00:00");
+  const [clock, setClock] = useState({ h: "00", m: "00", s: "00" });
 
   useEffect(() => {
     const tick = () => {
       const n = new Date();
-      setClock(
-        [n.getHours(), n.getMinutes(), n.getSeconds()]
-          .map((x) => String(x).padStart(2, "0"))
-          .join(":"),
-      );
+      setClock({
+        h: String(n.getHours()).padStart(2, "0"),
+        m: String(n.getMinutes()).padStart(2, "0"),
+        s: String(n.getSeconds()).padStart(2, "0"),
+      });
     };
     tick();
     const id = window.setInterval(tick, 1000);
@@ -28,15 +28,13 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
 
   return (
     <div className="netro-density" aria-hidden>
-      {/* Header strip extracted from NetroBNB/components/Header.tsx */}
-      <div className="netro-density-chrome">
+      {/* Header strip — NetroBNB/components/Header.tsx geometry */}
+      <div className="netro-density-chrome netro-density-item">
         <div className="netro-density-brand">
-          <span className="netro-density-mark" aria-hidden>
-            F
-          </span>
+          <span className="netro-density-mark">F</span>
           <b>FOLIO</b>
         </div>
-        <nav className="netro-density-nav" aria-hidden>
+        <nav className="netro-density-nav">
           <span className="netro-nav-on">Truth</span>
           <span>Acquire</span>
           <span>Credit</span>
@@ -48,58 +46,108 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
         </div>
       </div>
 
-      <header className="netro-density-title">
+      <header className="netro-density-title netro-density-item">
         <h3>Share truth desk</h3>
         <span>Mainnet-read · quote-only · broadcast off</span>
       </header>
 
+      {/* Main Desktop Grid: 9 left / 3 right — NetroBNB app/page.tsx */}
       <div className="netro-density-grid">
-        {/* Left 9-col block */}
-        <div className="netro-density-left">
+        <div id="netro-left-column" className="netro-density-left">
+          {/* Top: Profile (3/9) + Center stack (6/9) */}
           <div className="netro-density-top">
-            <div className="netro-density-profile">
+            <div className="netro-density-profile netro-density-item">
               <p className="netro-density-hi">Hi, desk</p>
+              <div className="netro-density-profile-art" aria-hidden>
+                <span className="netro-density-gear" />
+              </div>
               <h4>
                 Make
                 <br />
                 Analysis Easy
               </h4>
-              <div className="netro-density-clock">{clock}</div>
+              <div className="netro-density-clock">
+                <span>{clock.h}</span>
+                <em>:</em>
+                <span>{clock.m}</span>
+                <em>:</em>
+                <span>{clock.s}</span>
+              </div>
               <button type="button" tabIndex={-1} className="netro-density-cta">
                 Start truth pass
               </button>
             </div>
 
             <div className="netro-density-stack">
-              <div className="netro-density-card netro-density-card-wide">
-                <div className="netro-density-pills">
-                  <span className="netro-pill netro-pill-on">Acquisition</span>
-                  <span className="netro-pill">Holding</span>
-                  <span className="netro-pill">Liquidity</span>
+              {/* Today's Market Flow — AttendanceTodayCard geometry */}
+              <div className="netro-density-flow netro-density-item">
+                <div className="netro-density-flow-head">
+                  <div>
+                    <strong>Today&apos;s share flow</strong>
+                    <p>Live wash · diverge · quote spine</p>
+                  </div>
+                  <span className="netro-density-flow-pill">AAPLx | USDC</span>
                 </div>
-                <b>{multiplierLabel}</b>
-                <small>AAPLx Scaled UI · wash fail-closed · ≤$1 quote inspect</small>
+                <div className="netro-density-metrics">
+                  <div>
+                    <span>Multiplier</span>
+                    <b>{multiplierLabel}</b>
+                  </div>
+                  <div>
+                    <span>Wash</span>
+                    <b>Fail-closed</b>
+                  </div>
+                  <div>
+                    <span>Quote</span>
+                    <b>≤$1 inspect</b>
+                  </div>
+                  <div>
+                    <span>Broadcast</span>
+                    <b>Paused</b>
+                  </div>
+                  <div>
+                    <span>NestUSD</span>
+                    <b>Unavailable</b>
+                  </div>
+                </div>
               </div>
+
+              {/* Row: route + paper */}
               <div className="netro-density-row">
-                <div className="netro-density-card">
-                  <span>Route</span>
+                <div className="netro-density-card netro-density-item">
+                  <div className="netro-density-card-head">
+                    <strong>Route</strong>
+                  </div>
                   <b>USDC → AAPLx</b>
                   <small>Jupiter TTL · stale on 429</small>
                 </div>
-                <div className="netro-density-card netro-density-card-dark">
-                  <span>Paper mark</span>
+                <div className="netro-density-card netro-density-card-dark netro-density-item">
+                  <div className="netro-density-card-head">
+                    <strong>Paper mark</strong>
+                  </div>
                   <b>Live · not fixture</b>
                   <small>No invent-a-fill theater</small>
                 </div>
               </div>
+
+              {/* Row: credit + nest */}
               <div className="netro-density-row">
-                <div className="netro-density-card">
-                  <span>Credit LTV</span>
+                <div className="netro-density-card netro-density-item">
+                  <div className="netro-density-card-head">
+                    <strong>Credit LTV</strong>
+                  </div>
+                  <div className="netro-density-pills">
+                    <span className="netro-pill netro-pill-on">Acquisition</span>
+                    <span className="netro-pill">Holding</span>
+                    <span className="netro-pill">Liquidity</span>
+                  </div>
                   <b>Kamino 0.40</b>
                   <small>Borrow CPI unavailable until funded</small>
                 </div>
-                <div className="netro-density-card">
-                  <span>Nest</span>
+                <div className="netro-density-card netro-density-item">
+                  <div className="netro-density-card-head">
+                    <strong>Nest</strong>
+                  </div>
                   <b>Nest.credit ≠ NestUSD</b>
                   <small>NestUSD capacity labeled unavailable</small>
                 </div>
@@ -107,7 +155,8 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
             </div>
           </div>
 
-          <div className="netro-density-market">
+          {/* Full-width market strip */}
+          <div className="netro-density-market netro-density-item">
             <div className="netro-density-market-head">
               <strong>AAPLx / USDC</strong>
               <span>Share truth strip · mainnet-read</span>
@@ -142,19 +191,55 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
           </div>
         </div>
 
-        {/* Right 3-col yellow AI rail */}
-        <aside className="netro-density-rail">
-          <p className="netro-density-rail-title">FOLIO agent</p>
-          <p className="netro-density-rail-body">
-            Ask about AAPLx multiplier, wash pressure, or credit LTV. Paper agent
-            keeps the live spine — never fills while broadcast is paused.
-          </p>
-          <div className="netro-density-rail-actions">
-            <span>Truth pass</span>
-            <span>24h strip</span>
+        {/* Right 3-col: quote status + yellow AI rail */}
+        <div id="netro-right-column" className="netro-density-right">
+          <div className="netro-density-quote netro-density-item">
+            <div className="netro-density-quote-head">
+              <strong>Quote</strong>
+              <span>inspect only</span>
+            </div>
+            <div className="netro-density-quote-pair">
+              <div>
+                <span>You pay</span>
+                <b>USDC</b>
+                <em>≤ $1.00</em>
+              </div>
+              <div className="netro-density-quote-swap" aria-hidden>
+                ↕
+              </div>
+              <div>
+                <span>You receive</span>
+                <b>AAPLx</b>
+                <em>live quote · TTL</em>
+              </div>
+            </div>
+            <button type="button" tabIndex={-1} className="netro-density-quote-cta">
+              Inspect quote
+            </button>
+            <p className="netro-density-quote-foot">
+              Broadcast paused · no mainnet fill theater
+            </p>
           </div>
-          <div className="netro-density-rail-input">Ask about AAPLx…</div>
-        </aside>
+
+          <aside className="netro-density-rail netro-density-item">
+            <div className="netro-density-rail-head">
+              <span className="netro-density-rail-avatar">F</span>
+              <div>
+                <p className="netro-density-rail-title">FOLIO agent</p>
+                <p className="netro-density-rail-sub">Share truth · paper spine</p>
+              </div>
+            </div>
+            <p className="netro-density-rail-body">
+              Ask about AAPLx multiplier, wash pressure, or credit LTV. Paper agent
+              keeps the live spine — never fills while broadcast is paused.
+            </p>
+            <div className="netro-density-rail-actions">
+              <span>Truth pass</span>
+              <span>24h strip</span>
+            </div>
+            <div className="netro-density-rail-input">Ask about AAPLx…</div>
+          </aside>
+        </div>
       </div>
     </div>
   );

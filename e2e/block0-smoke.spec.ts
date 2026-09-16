@@ -381,7 +381,7 @@ test.describe("FOLIO Block 0 smoke", () => {
 
 
   test("home surfaces brand-first hero and lab links", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "networkidle" });
     // Brand is stencil + topbar (no competing h1 FOLIO over the plane)
     await expect(page.locator(".home-brand-hero").getByText("FOLIO")).toBeVisible({
       timeout: 15_000,
@@ -394,6 +394,24 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/own the economic truth|live|broadcast/);
     // Supporting copy + lab links sit below the brand plane — not stacked on letterforms
     expect(body).toMatch(/lab\/ui|lab\/shaders|premium chrome|honest stock desk/);
+    // Hero preserved — Empire readiness lives on desk/lab, not a second home hero
+    await expect(page.getByRole("heading", { name: /live empire/i })).toHaveCount(0);
+  });
+
+  test("lab ui pins 21st Plasma and Trade Journal ids", async ({ page }) => {
+    await page.goto("/lab/ui", { waitUntil: "networkidle" });
+    await expect(page.getByRole("heading", { name: /look at the stages/i })).toBeVisible({
+      timeout: 20_000,
+    });
+    const body = await page.locator("body").innerText();
+    expect(body).toMatch(/24346/);
+    expect(body).toMatch(/27124/);
+    await expect(page.locator("#stage-netro .netro-density-chrome")).toBeVisible();
+    await expect(page.locator("#stage-netro .netro-density-grid")).toBeVisible();
+    await expect(page.locator("#stage-netro #netro-left-column")).toBeVisible();
+    await expect(page.locator("#stage-netro #netro-right-column")).toBeVisible();
+    await expect(page.locator("#stage-netro .netro-density-quote")).toBeVisible();
+    await expect(page.locator("#stage-netro .netro-density-rail")).toBeVisible();
   });
 
   test("paper agent keeps live spine and never fills", async ({ page }) => {

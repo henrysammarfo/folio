@@ -245,7 +245,20 @@
 .lab-aionis-stage{position:relative;height:min(52vh,28rem);margin:.75rem 0 1rem;border-radius:calc(var(--radius) - 2px);overflow:hidden;background:#000}
 .lab-aionis-stage-tall{height:min(62vh,36rem)}
 .lab-aionis-stage .folio-stencil{position:absolute;inset:0}
-.netro-density{margin:.75rem 0 1rem;padding:1rem;border-radius:16px;background:#e5e7eb;color:#1c1c1c}
+.netro-density{margin:.75rem 0 1rem;padding:.85rem .9rem 1rem;border-radius:16px;background:#e5e7eb;color:#1c1c1c;overflow:hidden}
+/* Stagger enter — NetroBNB framer staggerChildren ≈ 0.06s */
+@keyframes netro-item-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.netro-density-item{animation:netro-item-in .45s ease-out both}
+.netro-density-item:nth-child(1){animation-delay:.05s}
+.netro-density-item:nth-child(2){animation-delay:.11s}
+.netro-density-item:nth-child(3){animation-delay:.17s}
+.netro-density-item:nth-child(4){animation-delay:.23s}
+.netro-density-item:nth-child(5){animation-delay:.29s}
+.netro-density-item:nth-child(6){animation-delay:.35s}
+.netro-density-item:nth-child(7){animation-delay:.41s}
+.netro-density-item:nth-child(8){animation-delay:.47s}
+.netro-density-item:nth-child(9){animation-delay:.53s}
+.netro-density-item:nth-child(10){animation-delay:.59s}
 /* NetroBNB Header extract — yellow active pill + dark Connect */
 .netro-density-chrome{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.65rem 1rem;padding:.15rem .15rem .85rem;border-bottom:1px solid #d1d5db;margin-bottom:.55rem}
 .netro-density-brand{display:inline-flex;align-items:center;gap:.55rem}
@@ -262,29 +275,54 @@
 .desk-layout[data-lab-ui="netro-density"] .desk-search-policy{
   background:#f4d014;color:#1c1c1c;border-radius:.55rem;padding:.28rem .7rem;font-weight:650;font-size:.78rem
 }
-.netro-density-title h3{margin:0;font-size:1.35rem;font-weight:650;letter-spacing:-.02em}
+.netro-density-title h3{margin:0;font-size:1.75rem;font-weight:600;letter-spacing:-.02em;line-height:1}
 .netro-density-title span{font-size:.72rem;color:#6b7280;letter-spacing:.04em}
-.netro-density-grid{display:grid;grid-template-columns:1fr;gap:.65rem}
-@media(min-width:900px){.netro-density-grid{grid-template-columns:minmax(0,1fr) 15.5rem;align-items:stretch}}
-.netro-density-left{display:flex;flex-direction:column;gap:.65rem;min-width:0}
-.netro-density-top{display:grid;grid-template-columns:1fr;gap:.65rem}
-@media(min-width:900px){.netro-density-top{grid-template-columns:13.5rem minmax(0,1fr)}}
-.netro-density-profile{background:linear-gradient(180deg,#faf0ad,#faf6ce 45%,#fff);border:1px solid #e5e7eb;border-radius:14px;padding:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.55rem;min-height:16rem}
-.netro-density-hi{margin:0;font-size:.95rem;font-weight:500}
-.netro-density-profile h4{margin:0;font-size:clamp(1.6rem,2.4vw,2.2rem);line-height:1.05;font-weight:700;letter-spacing:-.03em}
-.netro-density-clock{font-size:clamp(2.2rem,4vw,3.2rem);font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1;transform:scaleY(1.12);margin:.35rem 0}
+/* True 12-col: left 9 / right 3 — NetroBNB lg:grid-cols-12 */
+.netro-density-grid{display:grid;grid-template-columns:1fr;gap:.875rem;align-items:stretch}
+@media(min-width:1024px){.netro-density-grid{grid-template-columns:repeat(12,minmax(0,1fr))}}
+.netro-density-left{display:flex;flex-direction:column;gap:.875rem;min-width:0}
+@media(min-width:1024px){.netro-density-left{grid-column:span 9}}
+.netro-density-right{display:flex;flex-direction:column;gap:.875rem;min-width:0;min-height:0}
+@media(min-width:1024px){.netro-density-right{grid-column:span 3}}
+/* Inner 9-col: profile 3 + stack 6 */
+.netro-density-top{display:grid;grid-template-columns:1fr;gap:.875rem;align-items:stretch}
+@media(min-width:1024px){.netro-density-top{grid-template-columns:repeat(9,minmax(0,1fr))}}
+@media(min-width:1024px){.netro-density-profile{grid-column:span 3}.netro-density-stack{grid-column:span 6}}
+.netro-density-profile{background:linear-gradient(180deg,#faf0ad,#faf6ce 45%,#fff);border:1px solid #e5e7eb;border-radius:14px;padding:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.45rem;min-height:100%}
+.netro-density-hi{margin:0;font-size:1.1rem;font-weight:600}
+.netro-density-profile-art{display:flex;align-items:center;justify-content:center;min-height:5.5rem;margin:.15rem 0}
+.netro-density-gear{width:4.5rem;height:4.5rem;border-radius:50%;border:3px solid #1c1c1c22;border-top-color:#f4d014;border-right-color:#1c1c1c55;animation:netro-spin 18s linear infinite;box-shadow:inset 0 0 0 10px #fff8,0 8px 18px rgba(0,0,0,.08)}
+@keyframes netro-spin{to{transform:rotate(360deg)}}
+.netro-density-profile h4{margin:0;font-size:clamp(1.55rem,2.2vw,2.05rem);line-height:1.08;font-weight:800;letter-spacing:-.03em}
+.netro-density-clock{display:flex;align-items:center;justify-content:center;gap:.2rem;font-size:clamp(2rem,3.6vw,2.85rem);font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1;transform:scaleY(1.18);margin:.45rem 0;user-select:none}
+.netro-density-clock em{font-style:normal;opacity:.55;padding-bottom:.15rem;animation:netro-pulse 1.2s ease-in-out infinite}
+@keyframes netro-pulse{0%,100%{opacity:.35}50%{opacity:.85}}
 .netro-density-cta{width:100%;margin-top:auto;border:0;border-radius:10px;background:#f4d014;color:#1c1c1c;font-weight:600;font-size:.95rem;padding:.7rem;cursor:default}
-.netro-density-stack{display:flex;flex-direction:column;gap:.65rem}
-.netro-density-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
-.netro-density-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:.85rem;box-shadow:0 1px 5px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.3rem;min-height:4.5rem}
-.netro-density-card-wide{min-height:5.5rem}
+.netro-density-stack{display:flex;flex-direction:column;gap:.875rem;min-width:0}
+.netro-density-flow{background:#fff;border:1px solid #e5e7eb;border-radius:0;box-shadow:0 1px 5px rgba(0,0,0,.05);overflow:hidden}
+.netro-density-flow-head{background:#1c1c1c;color:#fff;padding:.85rem 1rem;display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;flex-wrap:wrap}
+.netro-density-flow-head strong{display:block;font-size:1.05rem;font-weight:600}
+.netro-density-flow-head p{margin:.2rem 0 0;font-size:.72rem;color:#d1d5db}
+.netro-density-flow-pill{background:#f4d014;color:#1c1c1c;font-weight:700;font-size:.72rem;padding:.35rem .65rem;border-radius:6px;white-space:nowrap}
+.netro-density-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:0;padding:.55rem .85rem .7rem}
+@media(min-width:640px){.netro-density-metrics{grid-template-columns:repeat(5,1fr)}}
+.netro-density-metrics>div{padding:.45rem .55rem;border-right:1px solid #e5e7eb;min-width:0}
+.netro-density-metrics>div:last-child{border-right:0}
+@media(max-width:639px){.netro-density-metrics>div{border-right:0;border-bottom:1px solid #e5e7eb}.netro-density-metrics>div:nth-last-child(-n+2){border-bottom:0}}
+.netro-density-metrics span{display:block;font-size:.68rem;color:#6b7280;margin-bottom:.25rem}
+.netro-density-metrics b{display:block;font-size:.95rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1;color:#1c1c1c}
+.netro-density-row{display:grid;grid-template-columns:1fr;gap:.875rem}
+@media(min-width:768px){.netro-density-row{grid-template-columns:1fr 1fr}}
+.netro-density-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:.85rem 1rem;box-shadow:0 1px 5px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.35rem;min-height:6.5rem}
+.netro-density-card-head{display:flex;justify-content:space-between;align-items:center}
+.netro-density-card-head strong{font-size:1rem;font-weight:600}
 .netro-density-card-dark{background:#111;color:#fff;border-color:#111}
-.netro-density-card-dark span,.netro-density-card-dark small{color:#a3a3a3}
-.netro-density-pills{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.35rem}
+.netro-density-card-dark span,.netro-density-card-dark small,.netro-density-card-dark .netro-density-card-head strong{color:#e5e7eb}
+.netro-density-card-dark small{color:#a3a3a3}
+.netro-density-pills{display:flex;flex-wrap:wrap;gap:.35rem;margin:.1rem 0}
 .netro-pill{font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;border:1px solid #d1d5db;border-radius:99px;padding:.2rem .55rem;color:#6b7280}
 .netro-pill-on{background:#f4d014;border-color:#f4d014;color:#1c1c1c;font-weight:700}
-.netro-density-card span,.netro-density-profile span{font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:#6b7280}
-.netro-density-card b{font-size:1rem;font-weight:500;font-variant-numeric:tabular-nums}
+.netro-density-card b{font-size:1.05rem;font-weight:500;font-variant-numeric:tabular-nums}
 .netro-density-card small{font-size:.72rem;color:#6b7280}
 .netro-density-market{background:#111;border:1px solid #111;border-radius:14px;padding:.85rem 1rem 1rem;box-shadow:0 1px 5px rgba(0,0,0,.08);color:#fff}
 .netro-density-market-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.55rem .85rem;margin-bottom:.65rem}
@@ -297,15 +335,31 @@
 .netro-density-chart-meta b{color:#fff;font-size:.85rem}
 .netro-density-chart svg{display:block;width:100%;height:9.5rem}
 .netro-density-chart-foot{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;padding:.55rem .75rem;font-size:.68rem;color:#a3a3a3;border-top:1px solid #222;background:#111}
-.netro-density-rail{background:#f4d014;border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.75rem;min-height:16rem;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-.netro-density-rail-title{margin:0;font-weight:700;font-size:1.05rem}
+/* Right rail: dark quote + yellow AI — Netro Exchange + AskCoreAI geometry */
+.netro-density-quote{background:#0a0a0a;border:1px solid #1e1e1e;border-radius:14px;padding:1rem;color:#fff;display:flex;flex-direction:column;gap:.75rem;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.netro-density-quote-head{display:flex;justify-content:space-between;align-items:baseline}
+.netro-density-quote-head strong{font-size:1.15rem;font-weight:600}
+.netro-density-quote-head span{font-size:.68rem;color:#8d8a95;text-transform:uppercase;letter-spacing:.06em}
+.netro-density-quote-pair{display:flex;flex-direction:column;gap:.55rem;position:relative}
+.netro-density-quote-pair>div:not(.netro-density-quote-swap){background:#141414;border:1px solid #222;border-radius:12px;padding:.75rem .85rem;display:grid;grid-template-columns:1fr auto;gap:.15rem .65rem;align-items:center}
+.netro-density-quote-pair span{font-size:.68rem;color:#8d8a95;grid-column:1/-1}
+.netro-density-quote-pair b{font-size:1.05rem;font-weight:600}
+.netro-density-quote-pair em{font-style:normal;font-size:.72rem;color:#a3a3a3;justify-self:end}
+.netro-density-quote-swap{align-self:center;width:2.25rem;height:2rem;margin:-.35rem 0;background:#141414;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#f4d014;font-size:.95rem;z-index:1}
+.netro-density-quote-cta{width:100%;border:0;border-radius:12px;background:#f4d014;color:#1c1c1c;font-weight:700;font-size:.95rem;padding:.85rem;cursor:default;box-shadow:0 4px 18px rgba(244,208,20,.25)}
+.netro-density-quote-foot{margin:0;font-size:.68rem;color:#77747e;border-top:1px solid rgba(255,255,255,.04);padding-top:.55rem}
+.netro-density-rail{background:#f4d014;border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.75rem;min-height:16rem;flex:1;box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid rgba(234,179,8,.45)}
+.netro-density-rail-head{display:flex;align-items:center;gap:.65rem}
+.netro-density-rail-avatar{width:2.15rem;height:2.15rem;border-radius:8px;background:#1c1c1c;color:#f4d014;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem}
+.netro-density-rail-title{margin:0;font-weight:700;font-size:1.05rem;line-height:1.1}
+.netro-density-rail-sub{margin:.15rem 0 0;font-size:.68rem;opacity:.7;font-weight:500}
 .netro-density-rail-body{margin:0;font-size:.82rem;line-height:1.45;flex:1}
-.netro-density-rail-actions{display:flex;gap:.45rem;flex-wrap:wrap}
-.netro-density-rail-actions span{background:#fff;border-radius:8px;padding:.35rem .65rem;font-size:.72rem;font-weight:600}
+.netro-density-rail-actions{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.netro-density-rail-actions span{background:#fafafa;border:1px solid #f3f4f6;border-radius:8px;padding:.55rem .65rem;font-size:.72rem;font-weight:600}
 .netro-density-rail-input{background:#fff;border-radius:10px;padding:.7rem .85rem;font-size:.8rem;color:#6b7280}
 .lab-21st-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin:0 0 1rem}
 .lab-21st-gallery-wide{grid-template-columns:repeat(2,1fr)}
-@media(max-width:800px){.lab-21st-gallery,.lab-21st-gallery-wide,.netro-density-row{grid-template-columns:1fr}}
+@media(max-width:800px){.lab-21st-gallery,.lab-21st-gallery-wide{grid-template-columns:1fr}}
 .lab-21st-gallery figure{margin:0;border:1px solid color-mix(in oklab,var(--border) 70%,transparent);border-radius:calc(var(--radius) - 2px);overflow:hidden;background:var(--muted)}
 .lab-21st-gallery img{display:block;width:100%;height:7.5rem;object-fit:cover}
 .lab-21st-gallery figcaption{padding:.4rem .55rem;font-size:.65rem;opacity:.7}

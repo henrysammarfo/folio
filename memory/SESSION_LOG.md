@@ -370,3 +370,11 @@
 - Vercel preview still lacks `API_KEY_21ST` (CLI not logged in — Henry). Lab now **pins Plasma 24346 + Trade Journal 27124** so WebGL/blotter stay attributed without catalog search.
 - NetroBNB Header extract: yellow active Truth pill + dark Connect on `/lab/ui` density stage; desk netro preview topbar picks up yellow policy pill.
 - Goal still blocked: Henry Pick · Vercel API_KEY_21ST · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.
+
+## 2026-09-16 — Preserve hero + Netro 12-col rebuild + Vercel keys
+
+- User: do **not** change former home hero; NetroBNB desk cards were out of place; set Vercel keys now (rotate token after).
+- Restored/kept former hero (no home-empire section). Stripped leftover `.home-empire*` CSS + e2e home Empire heading assert.
+- Rebuilt `NetroDensityCanvas` to true NetroBNB **12-col** (left 9 = profile 3 + stack 6 + market; right 3 = dark quote + yellow AI) with stagger enter + clock pulse.
+- Vercel env now has: `API_KEY_21ST`, `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY` (+ existing SOLANA/BROADCAST/SESSION). Still empty locally/on Vercel: Bitquery · Jupiter · Pyth · Privy · Supabase · Venice (cannot invent).
+- Henry: **rotate Vercel token** pasted in chat; Step 0 Pick · GG Skip · broadcast paused unchanged.
