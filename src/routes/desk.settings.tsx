@@ -333,6 +333,24 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
               </p>
             </div>
           ) : null}
+          {sessionMintReady && !data?.session.ok ? (
+            <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+              <b>DO NOW · Multi-tenant (last Stocklana blocker)</b>
+              <p className="mt-1 opacity-80">
+                1) Privy Dashboard → Configuration → App settings → Domains → Allowed origins →
+                paste{" "}
+                <code>
+                  https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app
+                </code>{" "}
+                (Privy rejects <code>*.vercel.app</code> wildcards).
+                <br />
+                2) Scroll to <a href="#settings-session">session panel</a> →{" "}
+                <b>Log in with Privy (auto-mints)</b>.
+                <br />
+                3) If tenants empty → <b>Join folio-demo as owner</b>.
+              </p>
+            </div>
+          ) : null}
           <p>
             <span>Broadcast</span>
             <b>
@@ -689,6 +707,11 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
             <PrivySessionMint
               appId={data.readiness.privyAppId}
               mintReady={sessionMintReady}
+              allowedOrigin={
+                typeof window !== "undefined"
+                  ? window.location.origin
+                  : "https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app"
+              }
               onMinted={async () => {
                 await invalidateSessionScopedBundles();
                 await refetch();

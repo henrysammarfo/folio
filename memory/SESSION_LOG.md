@@ -537,3 +537,10 @@
 - Henry on unpaid trial — cannot pay ~$2.5k Pro. Wired free cascade: Pyth (if entitled) → Finnhub free key → Yahoo chart keyless; CoinGecko `*-xstock` secondary.
 - Diverge pass/fail scores on labeled free ref vs Jupiter venue. Never claims Pyth when fallback used.
 - Settings/HENRY_STEPS: Pro optional for bounty only. Goal Empire can go DONE without Pyth Equity.US entitlement.
+
+
+## 2026-09-16 — Privy auto-mint + exact Allowed origins
+
+- Tip live: Yahoo diverge green · Empire DONE · multi-tenant still PARTIAL.
+- PrivySessionMint auto-mints httpOnly folio_session after login; Settings DO NOW lists exact origin (Privy rejects *.vercel.app).
+- Goal open until Henry allowlists origin + Log in + Join folio-demo.

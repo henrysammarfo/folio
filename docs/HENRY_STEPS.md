@@ -42,11 +42,13 @@ App ID + secret on Vercel. Rotate after chat paste.
 | Tables + **service_role GRANTs** | ✅ live |
 | `folio-demo` tenant | ✅ seeded |
 
-### Henry next — mint multi-tenant session
-1. Open [Settings](https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk/settings#settings-session)  
-2. Privy Dashboard → **Allowed origins** add the demo origin  
-3. Click **Log in with Privy** → **Mint httpOnly session from Privy login**  
-4. If memberships empty → **Join folio-demo as owner**  
+### Henry next — mint multi-tenant session (LAST BLOCKER)
+1. Privy Dashboard → **Configuration → App settings → Domains** → Allowed origins → paste exactly:  
+   `https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app`  
+   (Privy rejects `*.vercel.app` wildcards; `https://*.teamtitanlink.vercel.app` OK if you own that suffix.)
+2. Open [Settings](https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk/settings#settings-session)
+3. Click **Log in with Privy (auto-mints)** — session cookie sets after login
+4. If memberships empty → **Join folio-demo as owner**
 5. Confirm Active tenant shows `folio-demo`
 
 **Rotate** every secret pasted in chat.

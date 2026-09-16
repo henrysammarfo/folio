@@ -47,7 +47,7 @@ World’s Fair still wins on **working honesty**: live multiplier + wash refuse 
 ## Keys
 
 Present in `.env` + Vercel (2026-09-16 Henry paste): Tavily, TinyFish, AgentRouter, 21st, Shaders, Solana RPC, `FOLIO_SESSION_SECRET`, `BROADCAST_PAUSED`, `FOLIO_APPROVED_LAB_UI=netro-density`, **Bitquery**, **Pyth**, **Privy**, **Supabase URL/anon/service/JWT**, **Jupiter**.
-JWT ✅ · SQL ✅ · **free equity diverge** (Yahoo→Finnhub→Pyth cascade) ✅. Pyth Equity.US still 403 on trial — **do not pay Pro**. Still blocked: Privy login mint + Join folio-demo.
+JWT ✅ · SQL ✅ · **free equity diverge** (Yahoo→Finnhub→Pyth cascade) ✅. Pyth Equity.US still 403 on trial — **do not pay Pro**. Still blocked: Privy Allowed origins + Log in (auto-mint) + Join folio-demo.
 **Rotate all chat-pasted keys immediately after hackathon.**
 
 ## UI / lab (approve-gated)
