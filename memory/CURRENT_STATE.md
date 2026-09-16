@@ -339,3 +339,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Lab `/lab/shaders`: **21st get_component id 24346** WebGL Plasma adapted to FOLIO palettes; shaders.com REST still Clerk 500 (honest).
 - Tip `cfc0cc2` on `cursor/folio-prefs-agent-honesty-f1ec`. Vitest **100**.
 - Still blocked: Henry Pick · keys · funded broadcast.
+
+## 2026-09-16 — Desk preview chrome + Stocklana 588/79
+- Opt-in desk lab preview now paints stronger Netro grey/yellow density or Aionis dark brand plane (session-only).
+- Stocklana live scrape: **588** registered / **79** submissions / **$121k**; deadline conflict SEP 25 hero vs 18 Sep 16:00 ET.
+- Empire keys still empty locally (Bitquery/Privy/Supabase/Pyth). Still blocked: Henry Pick · keys · funded broadcast.

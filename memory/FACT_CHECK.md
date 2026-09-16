@@ -157,3 +157,12 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | 21st get_component Plasma id 24346 retrieved | CONFIRMED | free tier 1/2 remaining after fetch; wired as ShaderBackground | 2026-09-16 |
 | shaders.com REST accepts SHADERS_API_KEY | FAIL-CLOSED | HTTP 500 Clerk on /api/v1/me | 2026-09-16 |
 | Home brand plane matches Aionis stencil pattern | CONFIRMED (pattern) | black void + SVG mask + liquid light; FOLIO tokens | 2026-09-16 |
+
+## Live Stocklana re-check (2026-09-16)
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Stocklana registered **588** / submissions **79** / prize **$121,000** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana (`registrationCount`:588 · `submissionCount`:79 · Prize Pool $121,000) | 2026-09-16 |
+| Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET** | CONFIRMED conflict — re-check at submit | same page DEADLINE strip + Timeline copy | 2026-09-16 |
+| AAPLx multiplier ≈ 1.003269 | CONFIRMED live | api.xstocks.fi .../AAPLx/multiplier?network=Solana | 2026-09-16 |
+| Tavily search for Stocklana | UNAVAILABLE this run | plan usage limit | 2026-09-16 |

@@ -309,15 +309,84 @@
 .lab-preview-banner-actions{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}
 .lab-preview-banner-actions a{color:inherit}
 .lab-preview-banner-actions button{border:1px solid color-mix(in oklab,var(--primary-foreground) 45%,transparent);background:transparent;color:inherit;padding:.25rem .65rem;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;border-radius:var(--radius)}
+.desk-layout[data-lab-ui="netro-density"]{
+  background:#e5e7eb;
+}
+.desk-layout[data-lab-ui="netro-density"] .desk-main{background:#e5e7eb}
 .desk-layout[data-lab-ui="netro-density"] .desk-content{font-size:.95em}
-.desk-layout[data-lab-ui="netro-density"] .panel{border-radius:14px;box-shadow:0 1px 5px rgba(0,0,0,.05)}
+.desk-layout[data-lab-ui="netro-density"] .desk-topbar{
+  background:#fff;
+  border-bottom-color:#e5e7eb;
+  box-shadow:0 1px 5px rgba(0,0,0,.05);
+}
+.desk-layout[data-lab-ui="netro-density"] .panel{
+  border-radius:14px;
+  border-color:#e5e7eb;
+  box-shadow:0 1px 5px rgba(0,0,0,.05);
+}
 .desk-layout[data-lab-ui="netro-density"] .panel-body{padding:.9rem 1rem}
-.desk-layout[data-lab-ui="netro-density"] .desk-heading h1{letter-spacing:-.02em;font-weight:500}
-.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-heading{border-bottom:1px solid var(--border);padding-bottom:.85rem;margin-bottom:1rem}
-.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-heading h1{letter-spacing:.04em}
-.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-metrics,.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-grid{gap:1.35rem}
+.desk-layout[data-lab-ui="netro-density"] .desk-heading h1{
+  letter-spacing:-.02em;
+  font-weight:500;
+  font-family:var(--font-sans);
+}
+.desk-layout[data-lab-ui="netro-density"] .desk-sidebar{
+  background:#1c1c1c;
+}
+.desk-layout[data-lab-ui="netro-density"] .desk-sidebar-foot .status-badge,
+.desk-layout[data-lab-ui="netro-density"] .wallet-pill{
+  background:#f4d014;
+  color:#1c1c1c;
+  border-color:#f4d014;
+}
+.desk-layout[data-lab-ui="aionis-brand-plane"]{
+  background:#05070a;
+}
+.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-main{
+  background:
+    radial-gradient(80% 50% at 20% 0%,color-mix(in oklab,#7a9bb8 18%,transparent),transparent 55%),
+    #0a0c10;
+  color:#f4f6f8;
+}
+.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-topbar{
+  background:transparent;
+  border-bottom-color:oklch(1 0 0/.08);
+  color:#f4f6f8;
+}
+.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-heading{
+  border-bottom:1px solid oklch(1 0 0/.1);
+  padding-bottom:.85rem;
+  margin-bottom:1rem;
+}
+.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-heading p{color:oklch(1 0 0/.55)}
+.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-heading h1{
+  letter-spacing:-.04em;
+  font-size:clamp(2.4rem,4vw,3.4rem);
+  color:#fff;
+}
+.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-metrics,
+.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-grid{gap:1.35rem}
+.desk-layout[data-lab-ui="aionis-brand-plane"] .panel{
+  background:oklch(1 0 0/.03);
+  border-color:oklch(1 0 0/.1);
+  color:#f4f6f8;
+}
+.desk-layout[data-lab-ui="aionis-brand-plane"] .panel>header{border-bottom-color:oklch(1 0 0/.1)}
+.desk-layout[data-lab-ui="aionis-brand-plane"] .desk-sidebar{
+  background:#000;
+  border-right:1px solid oklch(1 0 0/.08);
+}
 .desk-layout[data-lab-ui="trade-journal-21st"] .desk-topbar{gap:.85rem}
-.desk-layout[data-lab-ui="trade-journal-21st"] .position-list>div,.desk-layout[data-lab-ui="trade-journal-21st"] .table-head,.desk-layout[data-lab-ui="trade-journal-21st"] .data-table>a{font-variant-numeric:tabular-nums}
+.desk-layout[data-lab-ui="trade-journal-21st"] .position-list>div,
+.desk-layout[data-lab-ui="trade-journal-21st"] .table-head,
+.desk-layout[data-lab-ui="trade-journal-21st"] .data-table>a{font-variant-numeric:tabular-nums}
+.desk-layout[data-lab-ui="trade-journal-21st"] .panel>header{
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.02em;
+}
+.desk-layout[data-lab-ui="trade-journal-21st"] .data-table>a:hover{
+  background:color-mix(in oklab,var(--muted) 70%,transparent);
+}
 .desk-layout[data-lab-shader="ink-ledger"] .desk-main{background:
   radial-gradient(120% 80% at 10% -10%,color-mix(in oklab,oklch(.55 .04 240) 22%,transparent),transparent 55%),
   var(--muted)}

@@ -18,6 +18,9 @@ Demo (hard-refresh): https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-tea
 Until you reply in chat, premium chrome stays off home/desk on purpose.
 
 Refs extracted: NetroBNB desk density · Aionis brand-plane · live 21st.dev MCP previews.
+Opt-in **Preview on desk** now paints stronger Netro grey/yellow chrome or Aionis dark plane (session-only · Exit anytime).
+
+For live 21st MCP on the Vercel preview, set `API_KEY_21ST` (and optional `SHADERS_API_KEY`) on the Vercel project — local `.env` already has them.
 
 ---
 

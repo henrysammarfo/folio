@@ -301,3 +301,7 @@
 - User called prior lab approve fakes + buried hero; re-analyzed live shots vs clones.
 - Extracted Aionis SVG liquid stencil → production `/`; NetroBNB 12-col density → lab; 21st Plasma WebGL (24346) → shader lab.
 - shaders.com REST still Clerk 500; labeled. Tip `cfc0cc2`. Henry Pick still required.
+
+## 2026-09-16 — Desk preview extract + Stocklana 588/79
+- Strengthened opt-in desk preview CSS for netro-density / aionis-brand-plane / trade-journal-21st.
+- Stocklana official page: 588 / 79 / $121k; AAPLx × still ~1.003269. Goal open: Henry Pick + keys.
