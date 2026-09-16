@@ -474,3 +474,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Settings mint/clear/tenant/watch invalidate session + positions + credit + empire-readiness so wallet qty lights without stale paper cache.
 - Mint button gated until Privy+Supabase+FOLIO_SESSION_SECRET present. Netro positions/credit refetchOnMount always.
 - Empire keys still empty — goal open.
+
+## 2026-09-16 — Inspect/activity honesty gap close
+- Inspect panel meta no longer says **No cookie** when watch-wallet/session/membership is bound (`Inspect idle` / `Bound elsewhere`).
+- Session invalidate also drops `activity-bundle` so CA pref badges refresh after mint/prefs.
+- Classic overview Policy wash/broadcast/NestUSD rows read live network matrix (no hardcoded Bitquery/Disabled theater).
+- Remaining Stocklana blockers: Henry paste Bitquery · Pyth · Privy · Supabase (+ optional Jupiter).
