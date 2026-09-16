@@ -243,3 +243,6 @@ EOF
 ## 2026-09-16 — Truth on-chain Scaled UI
 - `/truth` shows On-chain Scaled UI metric + timeline; diverge `data-diverge-pass=null` without PYTH_API_KEY (e2e).
 - compareApiOnchainMultiplier never invents match when either side missing (unit).
+
+## 2026-09-16 — Acquire Scaled UI gate
+- Desk acquire Checks shows On-chain Scaled UI match/mismatch/off (e2e `acquire-scaled-ui-gate`).

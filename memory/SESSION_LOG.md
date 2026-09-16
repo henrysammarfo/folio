@@ -424,3 +424,9 @@
 - `getTruthBundle` fetches Token-2022 Scaled UI via RPC; API↔on-chain compare (match/mismatch/unavailable).
 - Diverge pass/fail only when Pyth Equity.US + Jupiter venue live; Jupiter stockData vs venue is informational (`pass: null`).
 - Unit + e2e green. Goal still needs Henry Pick + Bitquery/Pyth/Privy/Supabase.
+
+## 2026-09-16 — Acquire on-chain Scaled UI gate
+
+- `getAcquireBundle` fetches Token-2022 Scaled UI + API↔chain compare (same as /truth).
+- Checks UI splits Truth (API) vs On-chain Scaled UI (match/mismatch/off) — no API-only green invent.
+- Honesty notes; strictFailClosed blocks on mismatch/off. Unit + e2e green. Goal open.

@@ -33,6 +33,13 @@ export type AcquireGateInputs = {
     | { kind: "ok"; poolCount: number }
     | { kind: "empty" }
     | { kind: "unavailable"; reason: string };
+  /**
+   * On-chain Token-2022 Scaled UI vs API — honesty-only unless strict + mismatch/off.
+   */
+  scaledUi?:
+    | { kind: "match"; note: string }
+    | { kind: "mismatch"; note: string }
+    | { kind: "unavailable"; note: string };
 };
 
 export type AcquireGateMessages = {
@@ -106,8 +113,38 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
     );
   }
 
+  if (input.scaledUi?.kind === "match") {
+    honestyNotes.push(`Scaled UI: ${input.scaledUi.note}`);
+  } else if (input.scaledUi?.kind === "mismatch") {
+    honestyNotes.push(
+      `Scaled UI mismatch: ${input.scaledUi.note} · labeled (does not alone block review unless Strict)`,
+    );
+    if (input.strictFailClosed) {
+      blockedReasons.push(
+        "Strict fail-closed: API ↔ on-chain Scaled UI mismatch · review blocked",
+      );
+    }
+  } else if (input.scaledUi?.kind === "unavailable") {
+    honestyNotes.push(
+      `Scaled UI: ${input.scaledUi.note} · labeled (does not invent an on-chain pass)`,
+    );
+    if (input.strictFailClosed) {
+      blockedReasons.push(
+        "Strict fail-closed: on-chain Scaled UI unavailable · review blocked",
+      );
+    }
+  }
+
   const canReview =
-    input.truthOk && input.washOk && input.quoteOk && divergeOk;
+    input.truthOk &&
+    input.washOk &&
+    input.quoteOk &&
+    divergeOk &&
+    !(
+      input.strictFailClosed &&
+      input.scaledUi != null &&
+      input.scaledUi.kind !== "match"
+    );
 
   return { divergeOk, canReview, blockedReasons, honestyNotes };
 }

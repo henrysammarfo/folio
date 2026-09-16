@@ -144,15 +144,42 @@ function Page() {
               <div className="desk-gate-grid acquire-gate-grid mb-4">
                 <div className="desk-gate-row">
                   <div>
-                    <b>Truth / Scaled UI</b>
+                    <b>Truth (API)</b>
                     <small>
                       {data.gates.truthOk
-                        ? "Live multiplier available for review"
+                        ? data.multiplier.ok
+                          ? `API ${data.multiplier.data.currentMultiplier.toFixed(6)}×`
+                          : "Live multiplier available for review"
                         : "Corporate-action / asset truth blocked"}
                     </small>
                   </div>
                   <StatusBadge tone={data.gates.truthOk ? "green" : "amber"}>
                     {data.gates.truthOk ? "pass" : "fail-closed"}
+                  </StatusBadge>
+                </div>
+                <div className="desk-gate-row" data-testid="acquire-scaled-ui-gate">
+                  <div>
+                    <b>On-chain Scaled UI</b>
+                    <small>
+                      {data.scaledUi.ok
+                        ? `${data.scaledUi.data.effectiveMultiplier.toFixed(6)}× · ${data.scaledUiCompare.note}`
+                        : data.scaledUi.reason}
+                    </small>
+                  </div>
+                  <StatusBadge
+                    tone={
+                      data.scaledUiCompare.status === "match"
+                        ? "green"
+                        : data.scaledUiCompare.status === "mismatch"
+                          ? "amber"
+                          : "amber"
+                    }
+                  >
+                    {data.scaledUiCompare.status === "match"
+                      ? "match"
+                      : data.scaledUiCompare.status === "mismatch"
+                        ? "mismatch"
+                        : "off"}
                   </StatusBadge>
                 </div>
                 <div className="desk-gate-row">

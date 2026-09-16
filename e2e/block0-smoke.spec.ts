@@ -45,11 +45,18 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 30_000,
     });
     await expect(page.getByText(/canReview/i).first()).toBeVisible();
+    await expect(page.getByTestId("acquire-scaled-ui-gate")).toBeVisible();
+    await expect(page.getByTestId("acquire-scaled-ui-gate")).toContainText(/On-chain Scaled UI/i);
+    await expect(page.getByTestId("acquire-scaled-ui-gate")).toContainText(
+      /match|mismatch|off/i,
+    );
 
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/wash|fail|blocked|unavailable|bitquery|quote|check/);
     expect(body).toMatch(/bitquery_api_key/);
     expect(body).toMatch(/fail-closed|canreview|blocked/);
+    expect(body).toMatch(/on-chain scaled ui/);
+    expect(body).toMatch(/truth \(api\)/);
 
     // Under wash fail-closed, advancing to review must be blocked
     const advance = page.getByRole("button", { name: /continue|blocked|fail-closed/i }).first();

@@ -114,6 +114,10 @@ export type AcquireBundle = {
   jupiter: AdapterResult<JupiterQuote>;
   /** Raydium pool awareness — not a route guarantee. */
   pools: AdapterResult<PoolAwareness>;
+  /** On-chain Token-2022 Scaled UI — Solana mainnet-read when RPC works. */
+  scaledUi: AdapterResult<ScaledUiOnchain>;
+  /** API currentMultiplier ↔ on-chain effective — never invents a match. */
+  scaledUiCompare: ScaledUiApiCompare;
   /**
    * From active-tenant desk prefs when a verified session exists.
    * Without session: false (public demo stays honesty-labeled for missing Pyth).
@@ -126,6 +130,8 @@ export type AcquireBundle = {
     washOk: boolean;
     quoteOk: boolean;
     divergeOk: boolean;
+    /** On-chain Scaled UI match when both sides live; else false (honesty-labeled). */
+    scaledUiOk: boolean;
     canReview: boolean;
     blockedReasons: string[];
     /** Labeled gaps that do not alone block review (e.g. missing Pyth) unless strict. */
@@ -272,13 +278,22 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
     const mint = asset.ok ? asset.data.solanaMint : null;
     const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
 
-    const [pyth, jupiterPrice, wash, pools] = await Promise.all([
+    const [pyth, jupiterPrice, wash, pools, scaledUi] = await Promise.all([
       fetchPythEquityPrice(underlying),
       mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
       evaluateWashGate({ symbol, mint, notionalUsd: spendUsdc }),
       mint
         ? fetchRaydiumPoolsForMint(mint)
         : Promise.resolve(errResult("api-v3.raydium.io", "xstock_mint_missing")),
+      mint
+        ? fetchScaledUiOnchain(mint)
+        : Promise.resolve(
+            errResult(
+              "solana-rpc.scaled-ui",
+              "xstock_mint_missing",
+              "No Solana mint — cannot read Scaled UI",
+            ),
+          ),
     ]);
 
     const jupiter: AdapterResult<JupiterQuote> = !mint
@@ -299,6 +314,17 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
 
     const truthOk = multiplier.ok && asset.ok;
     const washOk = washAllowsSize(wash);
+    const scaledUiCompare = compareApiOnchainMultiplier(
+      multiplier.ok ? multiplier.data.currentMultiplier : null,
+      scaledUi.ok ? scaledUi.data.effectiveMultiplier : null,
+    );
+    const scaledUiOk = scaledUiCompare.status === "match";
+    const scaledUiGate =
+      scaledUiCompare.status === "match"
+        ? ({ kind: "match", note: scaledUiCompare.note } as const)
+        : scaledUiCompare.status === "mismatch"
+          ? ({ kind: "mismatch", note: scaledUiCompare.note } as const)
+          : ({ kind: "unavailable", note: scaledUiCompare.note } as const);
 
     let diverge:
       | { kind: "ok" }
@@ -331,6 +357,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       diverge,
       strictFailClosed: prefs.strictFailClosed,
       pools: poolsGate,
+      scaledUi: scaledUiGate,
     });
 
     return {
@@ -343,6 +370,8 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       wash,
       jupiter,
       pools,
+      scaledUi,
+      scaledUiCompare,
       strictFailClosed: prefs.strictFailClosed,
       prefsFromSession: prefs.prefsFromSession,
       gates: {
@@ -350,6 +379,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         washOk,
         quoteOk: jupiter.ok,
         divergeOk: gateMsgs.divergeOk,
+        scaledUiOk,
         canReview: gateMsgs.canReview,
         blockedReasons: gateMsgs.blockedReasons,
         honestyNotes: gateMsgs.honestyNotes,

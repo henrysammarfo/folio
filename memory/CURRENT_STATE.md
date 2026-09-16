@@ -420,3 +420,6 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 ## 2026-09-16 — /truth on-chain Scaled UI honesty
 - Truth bundle reads Token-2022 Scaled UI on-chain; API↔chain compare labeled.
 - Diverge invent-pass removed (Jupiter stockData alone → informational). Goal open.
+
+## 2026-09-16 — Acquire on-chain Scaled UI gate
+- Acquire Checks: Truth (API) vs On-chain Scaled UI (match/mismatch/off). Goal open.

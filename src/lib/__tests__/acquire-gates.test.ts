@@ -137,4 +137,49 @@ describe("buildAcquireGateMessages", () => {
     expect(down.blockedReasons).toEqual([]);
     expect(down.honestyNotes.join(" ")).toMatch(/Raydium pool awareness unavailable/i);
   });
+
+  it("labels Scaled UI match/mismatch without inventing a hard block", () => {
+    const match = buildAcquireGateMessages({
+      truthOk: true,
+      tradingHalted: false,
+      washOk: true,
+      wash: { kind: "pressure" },
+      quoteOk: true,
+      quoteReason: null,
+      diverge: { kind: "ok" },
+      scaledUi: { kind: "match", note: "API ↔ on-chain within 1 bps" },
+    });
+    expect(match.canReview).toBe(true);
+    expect(match.honestyNotes.join(" ")).toMatch(/Scaled UI/);
+
+    const mismatch = buildAcquireGateMessages({
+      truthOk: true,
+      tradingHalted: false,
+      washOk: true,
+      wash: { kind: "pressure" },
+      quoteOk: true,
+      quoteReason: null,
+      diverge: { kind: "ok" },
+      scaledUi: { kind: "mismatch", note: "diverge 50 bps" },
+    });
+    expect(mismatch.canReview).toBe(true);
+    expect(mismatch.blockedReasons).toEqual([]);
+    expect(mismatch.honestyNotes.join(" ")).toMatch(/mismatch/i);
+  });
+
+  it("blocks Scaled UI mismatch when strictFailClosed is on", () => {
+    const g = buildAcquireGateMessages({
+      truthOk: true,
+      tradingHalted: false,
+      washOk: true,
+      wash: { kind: "pressure" },
+      quoteOk: true,
+      quoteReason: null,
+      diverge: { kind: "ok" },
+      strictFailClosed: true,
+      scaledUi: { kind: "mismatch", note: "diverge 50 bps" },
+    });
+    expect(g.canReview).toBe(false);
+    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed.*Scaled UI/i);
+  });
 });
