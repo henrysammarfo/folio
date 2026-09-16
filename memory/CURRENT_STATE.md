@@ -56,6 +56,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `/lab/ui`: Aionis plane + NetroBNB density + pinned 21st Plasma 24346 + trade journal 27124.
 - `/lab/shaders`: live WebGL Plasma (glacial ink); shaders.com keyed but API gated (HTTP 500).
 - Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; Vercel preview still needs `API_KEY_21ST`.
+- Desk opt-in lab preview mounts live WebGL Plasma for shader / cinematic picks (Exit clears; not production merge).
+- Stocklana live 2026-09-16: **591** regs · **79** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
 
 ## Live deltas (do not regress)
 

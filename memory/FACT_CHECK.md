@@ -195,3 +195,10 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | 21st Plasma id 24346 adapted in-lab | CONFIRMED | `ShaderBackground` WebGL path on `/lab/shaders` + `/lab/ui` |
 | shaders.com REST frames | FAIL-CLOSED labeled | key present; probe HTTP 500 / Clerk gate — no invented frames |
 | FOLIO hero buried-footer feel | REMEDIATED (parity pass) | stencil raised to Aionis geometry + hotter ledger-ice floor; e2e 22/22 |
+
+| 2026-09-16 Stocklana / desk Plasma | Result | Source |
+|---|---|---|
+| Registered / submissions / prize | CONFIRMED live **591** / **79** / **$121,000** | hackathons.solana.com/hackathons/stocklana (+ jina 590) |
+| Hero deadline SEP 25 vs timeline 18 Sep | CONFLICT labeled | Hero + countdown ~9d vs timeline “Fri 18 Sep 16:00 ET” — treat 18 Sep conservative |
+| Public Hermes without PYTH_API_KEY | FAIL-CLOSED 401 | hermes.pyth.network + pyth.dourolabs.app/hermes |
+| Desk lab preview live WebGL Plasma | CONFIRMED local | `data-lab-plasma=1` + `.desk-plasma-canvas` when shader/cinematic preview active |

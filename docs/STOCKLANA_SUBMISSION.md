@@ -2,7 +2,7 @@
 
 Re-check live counts on https://hackathons.solana.com/hackathons/stocklana before final submit.
 
-**Live (2026-09-16 jina):** **590** registered · **79** submissions · hero prize **$121,000** · hero deadline **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET** — confirm which the form uses at submit.
+**Live (2026-09-16 hackathons.solana.com + jina):** **591** registered · **79** submissions · hero prize **$121,000** · hero deadline **SEP 25, 2026** · countdown ~9 days. Timeline body still lists **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)** — confirm which the form uses at submit; treat **18 Sep as conservative**.
 
 ## Form fields (paste)
 
@@ -15,7 +15,7 @@ Re-check live counts on https://hackathons.solana.com/hackathons/stocklana befor
 **Repo:** https://github.com/henrysammarfo/folio (branch `cursor/folio-prefs-agent-honesty-f1ec` / PR #3)
 
 **Pitch (≤ short paragraph):**
-FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after corporate actions — we read the live xStocks Scaled UI multiplier (AAPLx ≈ 1.003× today) and surface pending newMultiplier honestly (or none). If wash tape is missing or linked-flow looks dirty, acquire stays fail-closed. Jupiter quotes stay quote-only with short TTL / labeled stale-on-429 and broadcast paused on a ≤~$1 budget. Credit shows live Kamino LTV, Nest.credit vault awareness, and NestUSD labeled unavailable until a verified borrow endpoint exists. Watch-wallet mainnet-read qty is live on the public demo; multi-tenant Privy + Supabase sessions are wired but fail-closed without keys. We do not claim unhackable security.
+FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after corporate actions — we read the live xStocks Scaled UI multiplier (AAPLx ≈ 1.003× today) and surface pending newMultiplier honestly (or none). If wash tape is missing or linked-flow looks dirty, acquire stays fail-closed. Jupiter quotes stay quote-only with short TTL / labeled stale-on-429 and broadcast paused on a ≤~$1 budget. Credit shows live Kamino LTV, Nest.credit vault awareness, and NestUSD labeled unavailable until a verified borrow endpoint exists. Watch-wallet mainnet-read qty is live on the public demo; multi-tenant Privy + Supabase sessions are wired but fail-closed without keys. Lab ships live 21st.dev Plasma WebGL (id 24346) behind an approve gate — production chrome stays locked until Henry picks. We do not claim unhackable security.
 
 **Links judges can open:**
 1. Demo: https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app
@@ -31,9 +31,9 @@ FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after
 - [x] Vercel `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true` — settings shows **Watch-wallet secret set** · bind ready (live-verified)
 - [x] Vercel `SOLANA_RPC_URL` (public mainnet) for Scaled UI + wallet reads
 - [ ] Land `API_KEY_21ST` on Vercel Preview so `/lab/ui` shows live 21st MCP (local `.env` already set)
-- [ ] Reply with one lab id to approve premium chrome: `netro-density` · `aionis-brand-plane` · `trade-journal-21st` · `ink-ledger` · `ledger-mist` · `aurora-grid`
+- [ ] Reply with one lab id to approve premium chrome: `netro-density` · `aionis-brand-plane` · `cinematic-landing-21st` · `trade-journal-21st` · `ink-ledger` · `ledger-mist` · `aurora-grid`
 - [ ] Land `BITQUERY_API_KEY` for live wash (fail-closed until then)
-- [ ] Land `PYTH_API_KEY` for Hermes equity diverge (fail-closed until then)
+- [ ] Land `PYTH_API_KEY` for Hermes equity diverge (fail-closed until then — public Hermes returns 401)
 - [ ] Land Privy + Supabase keys for multi-tenant sessions — see `docs/KEYS_LANDING.md`
 - [ ] GitGuardian **Skip: false positive** on historical public AAPLx mint (tip remediates; no Lovable history rewrite)
 - [ ] Rotate any chat-pasted Vercel token
@@ -43,4 +43,5 @@ FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after
 - Watch-wallet bind live: `/opt/cursor/artifacts/screenshots/watch-wallet-bind-live.png`
 - Truth CA pending: `/opt/cursor/artifacts/screenshots/demo-truth-ca-pending.png`
 - Activity CA pending: `/opt/cursor/artifacts/screenshots/demo-activity-ca-pending.png`
+- Aionis / FOLIO / Netro / lab screens: `/opt/cursor/artifacts/screenshots/*-final.png`
 - Lab approve CTAs + candidates: `/lab/ui` · `/lab/shaders`

@@ -357,3 +357,10 @@
 - Lab shaders: WebGL Plasma retinted glacial (hue=0, no purple); `preserveDrawingBuffer`; shaders.com still HTTP 500 / Clerk-gated (labeled).
 - Paper agent e2e: scrollIntoView + fail `nl=` labels — **22/22** Playwright green locally.
 - Henry blockers unchanged (Pick, keys, Vercel API_KEY_21ST, GG Skip, broadcast paused).
+
+## 2026-09-16 — Desk live Plasma preview + Stocklana fact refresh
+
+- Stocklana live: **591** registered · **79** submissions · **$121k** · hero deadline **SEP 25** (timeline body still lists **18 Sep 16:00 ET** — conservative).
+- Desk opt-in lab preview now mounts **live WebGL Plasma** (21st id 24346 path) for shader picks + `cinematic-landing-21st` — not CSS-only fakes; Exit clears.
+- DEMO_SCRIPT + STOCKLANA_SUBMISSION refreshed; Hermes public still **401** without `PYTH_API_KEY`.
+- Henry blockers unchanged: Step 0 Pick · Vercel `API_KEY_21ST` · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.

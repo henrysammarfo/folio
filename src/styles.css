@@ -435,6 +435,7 @@
 .desk-layout[data-lab-ui="cinematic-landing-21st"] .desk-main{
   background:radial-gradient(120% 80% at 50% -10%,#1a2430 0%,#05070a 55%);
   color:#f4f7fa;
+  position:relative;
 }
 .desk-layout[data-lab-ui="cinematic-landing-21st"] .desk-topbar{
   background:color-mix(in oklab,#05070a 80%,transparent);
@@ -450,6 +451,26 @@
 .desk-layout[data-lab-ui="cinematic-landing-21st"] .desk-heading h1{
   font-family:var(--font-display);letter-spacing:-.03em;color:#fff;
 }
+/* Live 21st Plasma on desk preview — replaces CSS-only shader fakes */
+.desk-main{position:relative}
+.desk-plasma-layer{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.55}
+.desk-plasma-canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.desk-layout[data-lab-plasma="1"] .desk-topbar,
+.desk-layout[data-lab-plasma="1"] .desk-content{position:relative;z-index:1}
+.desk-layout[data-lab-plasma="1"] .desk-main{background:#05070a;color:#f4f7fa}
+.desk-layout[data-lab-plasma="1"] .panel{
+  background:color-mix(in oklab,#0b1016 82%,transparent);
+  border-color:oklch(1 0 0/.14);
+  backdrop-filter:blur(12px);
+  color:#f4f7fa;
+}
+.desk-layout[data-lab-plasma="1"] .desk-topbar{
+  background:color-mix(in oklab,#05070a 72%,transparent);
+  border-bottom:1px solid oklch(1 0 0/.1);
+  color:#f4f7fa;
+}
+.desk-layout[data-lab-plasma="1"] .desk-heading h1{color:#fff}
+.desk-layout[data-lab-plasma="1"] .desk-heading p{color:oklch(1 0 0/.6)}
 .folio-journal{margin:.75rem 0 1rem;border:1px solid color-mix(in oklab,var(--border) 80%,transparent);border-radius:1rem;background:var(--card);box-shadow:0 16px 36px color-mix(in oklab,var(--foreground) 6%,transparent);overflow:hidden}
 .folio-journal-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.75rem;align-items:center;padding:1rem 1rem .75rem}
 .folio-journal-head h3{margin:0;font-size:.95rem;font-weight:600}

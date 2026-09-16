@@ -11,6 +11,10 @@ import { useEffect, useState } from "react";
 import { FolioMark, StatusBadge } from "./folio-brand";
 import { DeskWalletPill } from "./desk-wallet-pill";
 import {
+  ShaderBackground,
+  type ShaderLabVariant,
+} from "@/components/lab/shader-background";
+import {
   isLabPreviewActive,
   readLabShaderPick,
   readLabUiPick,
@@ -27,6 +31,16 @@ const links = [
   ["Activity", "/desk/activity", Activity],
   ["Settings", "/desk/settings", Settings],
 ] as const;
+
+function previewShaderVariant(
+  labShader: LabShaderId | null,
+  labUi: LabUiId | null,
+): ShaderLabVariant | null {
+  if (labShader) return labShader;
+  // Cinematic 21st UI pick → live Plasma 24346 (ink-ledger), not a CSS fake
+  if (labUi === "cinematic-landing-21st") return "ink-ledger";
+  return null;
+}
 
 export function DeskShell({
   title,
@@ -64,12 +78,14 @@ export function DeskShell({
   }
 
   const previewing = previewOn && (labUi != null || labShader != null);
+  const liveShader = previewing ? previewShaderVariant(labShader, labUi) : null;
 
   return (
     <div
       className="desk-layout"
       data-lab-ui={previewing && labUi ? labUi : undefined}
       data-lab-shader={previewing && labShader ? labShader : undefined}
+      data-lab-plasma={liveShader ? "1" : undefined}
     >
       {previewing ? (
         <div className="lab-preview-banner" role="status">
@@ -87,7 +103,8 @@ export function DeskShell({
                 · shader <code>{labShader}</code>
               </>
             ) : null}
-            . Reply in chat with the id to approve a merge.
+            {liveShader ? <> · live WebGL Plasma</> : null}. Reply in chat with
+            the id to approve a merge.
           </span>
           <span className="lab-preview-banner-actions">
             <Link to="/lab/ui" className="underline">
@@ -129,6 +146,14 @@ export function DeskShell({
         </div>
       </aside>
       <div className="desk-main">
+        {liveShader ? (
+          <div className="desk-plasma-layer" aria-hidden>
+            <ShaderBackground
+              variant={liveShader}
+              className="desk-plasma-canvas"
+            />
+          </div>
+        ) : null}
         <header className="desk-topbar">
           <div className="desk-search desk-search-policy" aria-label="Desk policy">
             Quote-only · broadcast off · ≤~$1
