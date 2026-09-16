@@ -404,7 +404,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 ## 2026-09-16 — Approved lab env merge path
 - Production desk chrome gated by `FOLIO_APPROVED_LAB_UI` / `FOLIO_APPROVED_LAB_SHADER` after Henry chat approve.
-- Unset today — desk stays default. Goal open.
+- Set `FOLIO_APPROVED_LAB_UI=netro-density` on Vercel (2026-09-16). Overview mounts Netro; hero untouched. Goal open for Empire keys.
 
 ## 2026-09-16 — Netro desk surface parity + keys honesty
 - Netro density is the **desk surface** when active (no stacked overview cards under it); stagger via `--netro-delay`; AI rail height-synced to left column; share ticker; larger profile gears.
@@ -433,3 +433,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 ## 2026-09-16 — Positions Scaled UI honesty
 - Position Verified requires wallet-read + API↔on-chain Scaled UI match; list shows chain match/mismatch/off.
+
+## 2026-09-16 — Netro overview-only + Henry approve env
+- Home **hero preserved** (Aionis brand-plane). NetroBNB 12-col is **/desk overview only** — does not replace Positions/Acquire/Credit.
+- `FOLIO_APPROVED_LAB_UI=netro-density` set on Vercel (prod/preview/dev). Overview hides FOLIO sidebar so Netro chrome owns the surface; nav links are real routes.
+- Empire keys still empty (Bitquery/Pyth/Privy/Supabase/Jupiter) — cannot invent; paste per KEYS_LANDING. Rotate chat-pasted Vercel token. Goal open.

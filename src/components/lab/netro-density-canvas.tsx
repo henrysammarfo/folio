@@ -2,7 +2,9 @@
  * Desk-density canvas — layout/UX extracted from AbdullahBalfaqih/NetroBNB
  * (12-col: left 9 = profile 3 + stack 6 + full market; right 3 = quote + yellow AI).
  * Content + tokens are FOLIO stock-desk; no Binance/Netro brand clone.
+ * Mounted on /desk overview only — never replaces Positions/Acquire routes.
  */
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type CSSProperties } from "react";
 
 type Props = {
@@ -18,6 +20,14 @@ const SHARE_TICKER = [
   "METAx",
   "MSCFx",
   "SPYx",
+] as const;
+
+const NETRO_NAV = [
+  { label: "Truth", to: "/desk" as const, on: true },
+  { label: "Acquire", to: "/desk/acquire" as const, on: false },
+  { label: "Positions", to: "/desk/positions" as const, on: false },
+  { label: "Credit", to: "/desk/credit" as const, on: false },
+  { label: "Network", to: "/network" as const, on: false },
 ] as const;
 
 /** Stagger ≈ NetroBNB framer staggerChildren 0.06s */
@@ -61,6 +71,7 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
     update();
     const t1 = window.setTimeout(update, 150);
     const t2 = window.setTimeout(update, 600);
+    const t3 = window.setTimeout(update, 1200);
     window.addEventListener("resize", update);
     const left = document.getElementById("netro-left-column");
     let ro: ResizeObserver | null = null;
@@ -72,6 +83,7 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
       window.removeEventListener("resize", update);
       window.clearTimeout(t1);
       window.clearTimeout(t2);
+      window.clearTimeout(t3);
       ro?.disconnect();
     };
   }, [multiplierLabel]);
@@ -79,22 +91,31 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
   const tickerLoop = [...SHARE_TICKER, ...SHARE_TICKER];
 
   return (
-    <div className="netro-density" aria-hidden>
+    <div className="netro-density" data-testid="netro-density-surface">
       {/* Header strip — NetroBNB/components/Header.tsx geometry */}
       <div className="netro-density-chrome netro-density-item" style={delay(0)}>
-        <div className="netro-density-brand">
+        <Link to="/" className="netro-density-brand">
           <span className="netro-density-mark">F</span>
           <b>FOLIO</b>
-        </div>
-        <nav className="netro-density-nav">
-          <span className="netro-nav-on">Truth</span>
-          <span>Acquire</span>
-          <span>Credit</span>
-          <span>Network</span>
+        </Link>
+        <nav className="netro-density-nav" aria-label="Share truth desk">
+          {NETRO_NAV.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={item.on ? "netro-nav-on" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
         <div className="netro-density-chrome-actions">
-          <span className="netro-density-new">+ Truth pass</span>
-          <span className="netro-density-connect">Connect</span>
+          <Link to="/truth" className="netro-density-new">
+            + Truth pass
+          </Link>
+          <Link to="/desk/settings" className="netro-density-connect">
+            Connect
+          </Link>
         </div>
       </div>
 

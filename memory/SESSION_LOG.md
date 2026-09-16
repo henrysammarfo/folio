@@ -444,3 +444,8 @@
 
 ## 2026-09-16 — Positions Scaled UI honesty
 - Position Verified requires wallet-read + API↔on-chain Scaled UI match; list shows chain match/mismatch/off.
+
+## 2026-09-16 — Netro overview-only + approve env
+- Preserved home hero. NetroBNB desk is overview-only (`data-netro-surface`); Positions/Acquire keep ledger chrome.
+- Set `FOLIO_APPROVED_LAB_UI=netro-density` on Vercel all targets. Empire trading keys still need Henry paste (cannot invent).
+- Rotate Vercel token pasted in chat. Goal open.

@@ -97,8 +97,10 @@ export function DeskShell({
   const effectiveUi = previewing ? labUi : approvedUi;
   const effectiveShader = previewing ? labShader : approvedShader;
   const liveShader = previewShaderVariant(effectiveShader, effectiveUi);
-  const showNetroCanvas = effectiveUi === "netro-density";
-  const showJournal = effectiveUi === "trade-journal-21st";
+  // NetroBNB 12-col is the OVERVIEW surface only — never replace Acquire/Positions/etc.
+  const isDeskOverview = path === "/desk" || path === "/desk/";
+  const showNetroCanvas = effectiveUi === "netro-density" && isDeskOverview;
+  const showJournal = effectiveUi === "trade-journal-21st" && isDeskOverview;
   const productionChrome = !previewing && (approvedUi != null || approvedShader != null);
 
   const truth = useQuery({
@@ -119,6 +121,7 @@ export function DeskShell({
       data-lab-shader={effectiveShader ?? undefined}
       data-lab-plasma={liveShader ? "1" : undefined}
       data-lab-approved={productionChrome ? "1" : undefined}
+      data-netro-surface={showNetroCanvas ? "1" : undefined}
     >
       {previewing ? (
         <div className="lab-preview-banner" role="status">

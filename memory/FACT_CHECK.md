@@ -253,3 +253,8 @@ EOF
 ## 2026-09-16 — Positions Scaled UI honesty
 - Positions list + detail surface API↔on-chain Scaled UI (match/mismatch/off).
 - Wallet-verified requires chain match — no API-only green.
+
+## 2026-09-16 — Netro production approve
+- `FOLIO_APPROVED_LAB_UI=netro-density` on Vercel — CONFIRMED via `vercel env ls` (value hidden).
+- Home hero unchanged (Aionis brand-plane) — CONFIRMED screenshot home-hero-now.png.
+- Empire keys Bitquery/Pyth/Privy/Supabase/Jupiter — still EMPTY locally and unset on Vercel.

@@ -80,7 +80,9 @@ After Henry replies `Approve lab UI: …` in chat, set on Vercel (Preview + Prod
 | `FOLIO_APPROVED_LAB_UI` | `netro-density` |
 | `FOLIO_APPROVED_LAB_SHADER` | `ink-ledger` (optional) |
 
-Production `/desk` then shows a yellow **Henry-approved** banner and mounts that chrome. Local Pick / Preview alone never sets these.
+**2026-09-16:** `FOLIO_APPROVED_LAB_UI=netro-density` is set on Vercel (all targets). Production `/desk` overview mounts Netro 12-col; home hero stays the Aionis brand-plane. Local **Pick** alone never merges.
+
+Empire trading keys still need Henry paste (Bitquery · Pyth · Privy · Supabase · optional Jupiter) — agents cannot invent provider secrets.
 
 ---
 

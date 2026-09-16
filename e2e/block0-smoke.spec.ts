@@ -104,9 +104,12 @@ test.describe("FOLIO Block 0 smoke", () => {
     });
     await pickNetro.scrollIntoViewIfNeeded();
     await pickNetro.click();
-    await expect(
-      page.getByText(/picked netro-density|chat reply ready|approve lab ui: netro-density/i).first(),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(pickNetro).toHaveAttribute("aria-pressed", "true", {
+      timeout: 10_000,
+    });
+    await expect(page.getByText(/Chat reply ready:/i).first()).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByRole("link", { name: /preview on desk/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible({
       timeout: 30_000,
@@ -117,10 +120,18 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(page.locator("[data-testid='desk-lab-netro'] .netro-density-grid")).toBeVisible();
     await expect(page.locator("[data-testid='desk-lab-netro'] #netro-left-column")).toBeVisible();
     await expect(page.locator("[data-testid='desk-lab-netro'] #netro-right-column")).toBeVisible();
-    // Netro IS the desk surface — no stacked overview heading/panels under it
+    // Netro IS the desk overview surface — no stacked overview heading/panels under it
     await expect(page.locator(".desk-content > .desk-heading")).toHaveCount(0);
     await expect(page.locator(".desk-content > .panel")).toHaveCount(0);
     await expect(page.locator(".netro-density-ticker")).toBeVisible();
+    await expect(page.locator("[data-netro-surface='1']")).toHaveCount(1);
+    // Positions stays the ledger — Netro must not replace other desk routes
+    await page.goto("/desk/positions");
+    await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();
+    await expect(page.locator("[data-testid='desk-lab-netro']")).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: /positions/i }).first()).toBeVisible();
+    await page.goto("/desk");
+    await expect(page.locator("[data-testid='desk-lab-netro']")).toBeVisible();
     await page.getByRole("button", { name: /exit preview/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i)).toHaveCount(0);
 

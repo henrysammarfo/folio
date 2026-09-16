@@ -6,7 +6,7 @@ Demo (hard-refresh): https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-tea
 
 ---
 
-## Step 0 — Approve lab look ← DO THIS NEXT
+## Step 0 — Approve lab look ✅ DONE (netro-density)
 
 1. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/ui  
    Tap **Pick** on one id (recommended for Stocklana desk: **`netro-density`** — Preview on desk mounts the full NetroBNB **12-col** canvas with live AAPLx ×).  
