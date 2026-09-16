@@ -179,6 +179,22 @@ function Page() {
             </b>
           </p>
           <p>
+            <span>JUPITER_API_KEY (optional)</span>
+            <b>
+              {data?.readiness.jupiterKeyPresent
+                ? "Set · quote/price auth header armed"
+                : "Missing · public quote/price (429 → TTL cache / fail-closed)"}
+            </b>
+          </p>
+          <p>
+            <span>SOLANA_RPC_URL</span>
+            <b>
+              {data?.readiness.solanaRpcDedicated
+                ? "Dedicated · Scaled UI + wallet reads"
+                : "Public fallback · rate-limit risk (B004)"}
+            </b>
+          </p>
+          <p>
             <span>AGENTROUTER_API_KEY</span>
             <b>
               {data?.readiness.agentRouterKeyPresent

@@ -57,7 +57,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - `/lab/shaders`: live WebGL Plasma (glacial ink); shaders.com keyed but API gated (HTTP 500).
 - Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; **Vercel** now has `API_KEY_21ST`, `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY` (all targets). Still missing: Bitquery · Jupiter · Pyth · Privy · Supabase.
 - Desk opt-in lab preview mounts live WebGL Plasma for shader / cinematic picks (Exit clears; not production merge).
-- Stocklana live 2026-09-16: **591** regs · **79** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
+- Stocklana live 2026-09-16: **596** regs · **81** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
 
 ## Live deltas (do not regress)
 
@@ -410,3 +410,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Netro density is the **desk surface** when active (no stacked overview cards under it); stagger via `--netro-delay`; AI rail height-synced to left column; share ticker; larger profile gears.
 - Home hero untouched. Vercel lab/research keys already set; Bitquery/Pyth/Privy/Supabase/Jupiter **cannot invent** — empty until Henry pastes.
 - **Rotate** Vercel token from chat. Goal open.
+
+## 2026-09-16 — Matrix honesty + Stocklana 596/81
+- Membership / role-gated matrix rows stay **unavailable** until multi-tenant keys (no false green).
+- Settings readiness lists `JUPITER_API_KEY` + `SOLANA_RPC_URL` (B004).
+- E2E locks Netro replace-children + approved-lab readiness rows.
+- Live Stocklana: **596** regs · **81** subs · **$121k**. Goal open (Henry Pick + Empire keys).

@@ -224,6 +224,10 @@ export type SessionBundle = {
     approvedLabUi: string | null;
     /** Production desk shader after Henry chat approve (FOLIO_APPROVED_LAB_SHADER). */
     approvedLabShader: string | null;
+    /** Optional Jupiter auth header — public path works without it. */
+    jupiterKeyPresent: boolean;
+    /** Dedicated SOLANA_RPC_URL (false = labeled public RPC fallback · B004). */
+    solanaRpcDedicated: boolean;
   };
 };
 
@@ -662,6 +666,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     const shadersKeyPresent = Boolean(process.env["SHADERS_API_KEY"]?.trim());
     const approvedLabUi = readApprovedLabUi();
     const approvedLabShader = readApprovedLabShader();
+    const jupiterKeyPresent = Boolean(process.env["JUPITER_API_KEY"]?.trim());
+    const solanaRpcDedicated = Boolean(process.env["SOLANA_RPC_URL"]?.trim());
     return {
       auth,
       session,
@@ -691,6 +697,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         shadersKeyPresent,
         approvedLabUi,
         approvedLabShader,
+        jupiterKeyPresent,
+        solanaRpcDedicated,
       },
     };
   },

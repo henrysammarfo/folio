@@ -139,15 +139,17 @@ export function buildNetworkMatrix(input: {
     },
     {
       capability: "Membership wallet qty binding",
-      mode: "mainnet-read",
-      detail:
-        "Priority: active-tenant membership wallet → session → watch-wallet → ?inspect= · never invent a foreign pubkey",
+      mode: input.multiTenantKeysPresent ? "mainnet-read" : "unavailable",
+      detail: input.multiTenantKeysPresent
+        ? "Priority: active-tenant membership wallet → session → watch-wallet → ?inspect= · never invent a foreign pubkey"
+        : "Requires Privy + Supabase memberships · until then watch-wallet / ?inspect= only",
     },
     {
       capability: "Role-gated desk prefs",
-      mode: "mainnet-read",
-      detail:
-        "owner/trader may write · viewer fail-closed (prefs_role_denied) · settings switches disabled",
+      mode: input.multiTenantKeysPresent ? "mainnet-read" : "unavailable",
+      detail: input.multiTenantKeysPresent
+        ? "owner/trader may write · viewer fail-closed (prefs_role_denied) · settings switches disabled"
+        : "Tenant roles inactive until multi-tenant keys land · prefs non-authoritative",
     },
     {
       capability: "Watch-wallet mainnet-read qty",

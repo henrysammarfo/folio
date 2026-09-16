@@ -230,3 +230,12 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 - Desk with `netro-density` preview: `deskHeading=0`, `stackedPanels=0`, `netro=1` (Playwright) — canvas replaces overview cards.
 - Home `/` hero preserved (brand stencil, no home-empire).
 - Vercel `env ls` reconfirmed lab/research keys present; Bitquery/Pyth/Privy/Supabase/Jupiter still absent (cannot invent).
+
+## 2026-09-16 — Stocklana counts + matrix honesty
+- Live hackathons.solana.com: Registered **596** · Submissions **81** · Prize **$121,000** · Deadline hero **SEP 25, 2026** · countdown ~9 days · timeline Fri 18 Sep 16:00 ET.
+- Membership / role-gated network-matrix rows: unavailable without multi-tenant keys (unit-tested).
+EOF
+
+## 2026-09-16 — Stocklana counts + matrix honesty
+- Live hackathons.solana.com: Registered **596** · Submissions **81** · Prize **$121,000** · Deadline hero **SEP 25, 2026** · countdown ~9 days · timeline Fri 18 Sep 16:00 ET.
+- Membership / role-gated network-matrix rows: unavailable without multi-tenant keys (unit-tested).

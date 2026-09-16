@@ -411,3 +411,10 @@
 - Stagger delays via `--netro-delay` (nth-child was broken across nested parents).
 - Yellow AI rail height-synced to left column baseline; share ticker marquee; dual spinning profile gears; taller cards.
 - Home hero preserved. Confirmed Vercel already has 21st/shaders/AgentRouter/Tavily/TinyFish; trading keys still empty (cannot invent). Rotate Vercel token.
+
+## 2026-09-16 — Matrix/settings honesty + Stocklana 596/81
+
+- Network matrix: Membership wallet + Role-gated prefs → `unavailable` until multi-tenant keys (was false mainnet-read).
+- Settings readiness: `JUPITER_API_KEY` optional + `SOLANA_RPC_URL` dedicated vs public fallback (B004).
+- E2E: Netro preview asserts zero stacked `.desk-heading`/`.panel`; settings asserts approved-lab + Jupiter + RPC rows.
+- Live scrape: **596** registered · **81** submissions · **$121k**. Still blocked: Henry Pick · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.

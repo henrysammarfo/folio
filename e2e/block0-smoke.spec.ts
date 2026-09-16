@@ -110,6 +110,10 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(page.locator("[data-testid='desk-lab-netro'] .netro-density-grid")).toBeVisible();
     await expect(page.locator("[data-testid='desk-lab-netro'] #netro-left-column")).toBeVisible();
     await expect(page.locator("[data-testid='desk-lab-netro'] #netro-right-column")).toBeVisible();
+    // Netro IS the desk surface — no stacked overview heading/panels under it
+    await expect(page.locator(".desk-content > .desk-heading")).toHaveCount(0);
+    await expect(page.locator(".desk-content > .panel")).toHaveCount(0);
+    await expect(page.locator(".netro-density-ticker")).toBeVisible();
     await page.getByRole("button", { name: /exit preview/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i)).toHaveCount(0);
 
@@ -165,6 +169,10 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/supabase_jwt_secret|user-jwt|service-role labeled|rls/);
     expect(body).toMatch(/api_key_21st|21st.*lab|lab mcp/);
     expect(body).toMatch(/shaders_api_key|shaders.*lab|clerk may still gate/);
+    expect(body).toMatch(/folio_approved_lab_ui|production desk stays default|henry chat approve/);
+    expect(body).toMatch(/folio_approved_lab_shader/);
+    expect(body).toMatch(/jupiter_api_key|public quote\/price|ttl cache/);
+    expect(body).toMatch(/solana_rpc_url|public fallback|dedicated/);
     expect(body).toMatch(/smoke:keys|keys_landing|npm run keys/);
     expect(body).toMatch(/active tenant/);
     expect(body).toMatch(/rls|service-role|jwt sub/);

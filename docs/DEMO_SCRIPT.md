@@ -1,6 +1,6 @@
 # FOLIO — Stocklana demo script (≤8 seconds spoken)
 
-**Live Stocklana (2026-09-16, hackathons.solana.com):** **593** registered · **80** submissions · prize **$121,000** · hero deadline **SEP 25, 2026** (countdown ~9d). Timeline body still lists **Fri 18 Sep 2026, 16:00 ET** · stocklana.fun **18 Sep 23:59 UTC** — treat **18 Sep as conservative**; re-check hero at submit.
+**Live Stocklana (2026-09-16, hackathons.solana.com):** **596** registered · **81** submissions · prize **$121,000** · hero deadline **SEP 25, 2026** (countdown ~9d). Timeline body still lists **Fri 18 Sep 2026, 16:00 ET** · stocklana.fun **18 Sep 23:59 UTC** — treat **18 Sep as conservative**; re-check hero at submit.
 
 Network: mainnet-read + quote-only · Budget: ≤~$1 · Broadcast: paused
 

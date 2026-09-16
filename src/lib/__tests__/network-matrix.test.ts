@@ -48,13 +48,13 @@ describe("buildNetworkMatrix honesty", () => {
 
     expect(byCap["Multi-tenant sessions (Privy + Supabase)"]?.mode).toBe("unavailable");
 
-    expect(byCap["Membership wallet qty binding"]?.mode).toBe("mainnet-read");
+    expect(byCap["Membership wallet qty binding"]?.mode).toBe("unavailable");
     expect(byCap["Membership wallet qty binding"]?.detail).toMatch(
-      /membership wallet → session → watch-wallet/i,
+      /Privy \+ Supabase|watch-wallet|inspect/i,
     );
-    expect(byCap["Role-gated desk prefs"]?.mode).toBe("mainnet-read");
+    expect(byCap["Role-gated desk prefs"]?.mode).toBe("unavailable");
     expect(byCap["Role-gated desk prefs"]?.detail).toMatch(
-      /viewer fail-closed|prefs_role_denied/i,
+      /multi-tenant keys|non-authoritative/i,
     );
 
     expect(byCap["Kamino xStocks market (read)"]?.mode).toBe("mainnet-read");
@@ -100,5 +100,9 @@ describe("buildNetworkMatrix honesty", () => {
     const wash = rows.find((r) => r.capability.startsWith("Wash"));
     expect(wash?.mode).toBe("mainnet-read");
     expect(wash?.detail).toMatch(/Bitquery live/);
+    const membership = rows.find((r) => r.capability === "Membership wallet qty binding");
+    expect(membership?.mode).toBe("mainnet-read");
+    const roles = rows.find((r) => r.capability === "Role-gated desk prefs");
+    expect(roles?.mode).toBe("mainnet-read");
   });
 });
