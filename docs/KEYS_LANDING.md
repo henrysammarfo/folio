@@ -7,6 +7,8 @@ Demo: https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.verc
 
 Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL`
 
+Optional lab (so preview `/lab/*` matches local MCP): `API_KEY_21ST` · `SHADERS_API_KEY`
+
 ---
 
 ## A — Bitquery (wash tape)
@@ -62,7 +64,18 @@ Then:
 Verify: Settings → paste Privy access token → mint httpOnly `folio_session` → tenant list non-empty only when `tenant_members` rows exist for that Privy subject. Empty memberships stay fail-closed (no invented tenants). Settings RLS note should say **user-JWT path armed** when JWT secret is set.
 ---
 
-## E — After keys: redeploy + checklist
+## E — Lab UI registries (optional · approve gate)
+
+| Name | Where |
+|------|--------|
+| `API_KEY_21ST` | 21st.dev → API key → Vercel + `.env` |
+| `SHADERS_API_KEY` | shaders.com → `ak_*` key → Vercel + `.env` |
+
+Verify: Settings readiness rows for lab keys; `/lab/ui` shows MCP connected when `API_KEY_21ST` set; `/lab/shaders` probes shaders.com (Clerk may still 500 — WebGL Plasma from 21st still runs). Never auto-merge lab picks without Henry chat reply.
+
+---
+
+## F — After keys: redeploy + checklist
 
 1. Redeploy Vercel preview so env binds.
 2. Hard-refresh `/desk/settings` — readiness rows green only for keys that actually landed.
@@ -86,3 +99,4 @@ npm run replay      # unit + e2e + empire smoke + build
 - No “Ready” NestUSD until endpoint verified
 - Never claim unhackable / nation-state proof
 - Paper agent: AgentRouter WAF/HTML → keep live spine, label NL skipped
+- Lab picks stay local until Henry replies in chat

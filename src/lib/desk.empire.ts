@@ -215,6 +215,10 @@ export type SessionBundle = {
     /** SUPABASE_JWT_SECRET + anon + URL — user-JWT RLS path armed. */
     supabaseJwtConfigured: boolean;
     broadcastPaused: boolean;
+    /** Lab only — 21st.dev MCP catalog (approve gate). */
+    twentyFirstKeyPresent: boolean;
+    /** Lab only — shaders.com probe (often Clerk-gated). */
+    shadersKeyPresent: boolean;
   };
 };
 
@@ -649,6 +653,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     const agentRouterKeyPresent = Boolean(
       process.env["AGENTROUTER_API_KEY"]?.trim(),
     );
+    const twentyFirstKeyPresent = Boolean(process.env["API_KEY_21ST"]?.trim());
+    const shadersKeyPresent = Boolean(process.env["SHADERS_API_KEY"]?.trim());
     return {
       auth,
       session,
@@ -674,6 +680,8 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         agentRouterKeyPresent,
         supabaseJwtConfigured: isSupabaseUserJwtConfigured(),
         broadcastPaused: isBroadcastPaused(),
+        twentyFirstKeyPresent,
+        shadersKeyPresent,
       },
     };
   },

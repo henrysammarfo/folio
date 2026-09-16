@@ -219,6 +219,22 @@ function Page() {
             </b>
           </p>
           <p>
+            <span>API_KEY_21ST (lab MCP)</span>
+            <b>
+              {data?.readiness.twentyFirstKeyPresent
+                ? "Set · /lab/ui catalog live"
+                : "Missing · lab falls back without 21st previews"}
+            </b>
+          </p>
+          <p>
+            <span>SHADERS_API_KEY (lab probe)</span>
+            <b>
+              {data?.readiness.shadersKeyPresent
+                ? "Set · probed (Clerk may still gate REST)"
+                : "Missing · 21st WebGL studies still run locally"}
+            </b>
+          </p>
+          <p>
             <span>Lab premium UI</span>
             <b>
               {labUiPick || labShaderPick

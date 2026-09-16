@@ -1,14 +1,17 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("FOLIO Block 0 smoke", () => {
-  test("home renders brand", async ({ page }) => {
+  test("home renders brand stencil plane (not fixture 4×)", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByText(/FOLIO/i).first()).toBeVisible();
+    await expect(page.getByText(/own the economic truth/i).first()).toBeVisible();
     const body = (await page.locator("body").innerText()).toLowerCase();
     // Live multiplier woven into hero copy — never fixture 4× theater
     expect(body).toMatch(/aapl|live|solana|broadcast/);
     expect(body).not.toMatch(/\b4\.0000\s*×|\bfixture 4× theater only\b/);
     expect(body).toMatch(/not fixture 4|never fixture 4/);
+    // Brand plane: stencil SVG present (Aionis pattern)
+    await expect(page.locator(".folio-stencil, .folio-stencil-svg").first()).toBeVisible();
   });
 
   test("truth page shows live or unavailable multiplier (never fixture 4.0×)", async ({
@@ -91,8 +94,29 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 30_000,
     });
     await expect(page.locator("[data-lab-ui='netro-density']")).toHaveCount(1);
+    // Netro extract paints grey canvas on desk
+    await expect(page.locator(".desk-layout[data-lab-ui='netro-density']")).toBeVisible();
     await page.getByRole("button", { name: /exit preview/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i)).toHaveCount(0);
+
+    // Aionis brand-plane preview path
+    await page.goto("/lab/ui");
+    await page.getByRole("button", { name: /pick candidate aionis-brand-plane/i }).click();
+    await page.getByRole("link", { name: /preview on desk/i }).click();
+    await expect(page.locator("[data-lab-ui='aionis-brand-plane']")).toHaveCount(1);
+    await page.getByRole("button", { name: /exit preview/i }).click();
+
+    // Lab surfaces Netro/Aionis extract + 21st MCP honesty
+    await page.goto("/lab/ui");
+    await expect(page.getByText(/netrobnb desk density|make analysis easy/i).first()).toBeVisible();
+    await expect(page.locator(".lab-aionis-stage, .folio-stencil").first()).toBeVisible();
+    await expect(page.getByText(/21st|api_key_21st|mcp/i).first()).toBeVisible();
+
+    await page.goto("/lab/shaders");
+    await expect(page.getByText(/webgl|21st|shaders/i).first()).toBeVisible();
+    await expect(page.locator(".lab-swatch-live, canvas.lab-swatch-canvas").first()).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test("settings exposes watch-wallet bind (not Privy auth)", async ({ page }) => {
@@ -115,6 +139,8 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/privy|multi-tenant fail-closed/);
     expect(body).toMatch(/supabase|tenants fail-closed/);
     expect(body).toMatch(/supabase_jwt_secret|user-jwt|service-role labeled|rls/);
+    expect(body).toMatch(/api_key_21st|21st.*lab|lab mcp/);
+    expect(body).toMatch(/shaders_api_key|shaders.*lab|clerk may still gate/);
     expect(body).toMatch(/smoke:keys|keys_landing|npm run keys/);
     expect(body).toMatch(/active tenant/);
     expect(body).toMatch(/rls|service-role|jwt sub/);
