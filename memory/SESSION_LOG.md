@@ -320,3 +320,8 @@
 - Aionis gold stencil is the hero; FOLIO ice stencil was too dark → bumped luminance + soft floor + Aionis horizon CSS.
 - Removed midband stack; supporting copy below fold. 21st MCP confirmed live locally; shaders REST still 500.
 - smoke:keys + unit tests updated. Goal open: Henry Pick + Empire keys + Vercel `API_KEY_21ST`.
+
+## 2026-09-16 — Netro extract rebuild + Trade Journal 27124
+- Netro lab canvas now mirrors 12-col density (market strip + yellow rail).
+- get_component Trade Journal Table → FOLIO honesty blotter on `/lab/ui`.
+- Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · Vercel `API_KEY_21ST` · funded broadcast.

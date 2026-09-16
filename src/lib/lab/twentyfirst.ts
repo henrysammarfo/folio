@@ -84,3 +84,57 @@ export async function searchTwentyFirstComponents(
     return { ok: false, reason: String(e) };
   }
 }
+
+/** Paid/free-quota get_component — lab adaptation only; never auto-merge. */
+export async function getTwentyFirstComponent(id: number | string): Promise<
+  | { ok: true; name: string | null; code: string; rawChars: number }
+  | { ok: false; reason: string }
+> {
+  const apiKey = process.env["API_KEY_21ST"]?.trim();
+  if (!apiKey) {
+    return { ok: false, reason: "API_KEY_21ST missing" };
+  }
+  try {
+    const res = await fetch("https://21st.dev/api/mcp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "x-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "tools/call",
+        params: {
+          name: "get_component",
+          arguments: { id: typeof id === "string" && /^\d+$/.test(id) ? Number(id) : id },
+        },
+      }),
+      signal: AbortSignal.timeout(45_000),
+    });
+    if (!res.ok) {
+      return { ok: false, reason: `21st get_component HTTP ${res.status}` };
+    }
+    const json = (await res.json()) as {
+      result?: { content?: Array<{ type?: string; text?: string }> };
+      error?: { message?: string };
+    };
+    if (json.error?.message) {
+      return { ok: false, reason: json.error.message };
+    }
+    const text = json.result?.content?.find((c) => c.type === "text")?.text ?? "";
+    if (!text) {
+      return { ok: false, reason: "21st get_component empty" };
+    }
+    const nameMatch = text.match(/^#\s+(.+?)(?:\s+—|\n)/);
+    return {
+      ok: true,
+      name: nameMatch?.[1]?.trim() ?? null,
+      code: text,
+      rawChars: text.length,
+    };
+  } catch (e) {
+    return { ok: false, reason: String(e) };
+  }
+}

@@ -9,16 +9,16 @@ Demo (hard-refresh): https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-tea
 ## Step 0 — Approve lab look ← DO THIS NEXT
 
 1. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/ui  
-   Tap **Pick** on one: `netro-density` · `aionis-brand-plane` · `trade-journal-21st`  
+   Tap **Pick** on one: `aionis-brand-plane` · `netro-density` · `cinematic-landing-21st` · `trade-journal-21st`  
    (optional) **Preview on desk** — opt-in only; Exit preview anytime; not a production merge.
 2. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/shaders  
    Tap **Pick** on one: `ink-ledger` · `ledger-mist` · `aurora-grid`
-3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: netro-density`) + screenshot.
+3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: aionis-brand-plane`) + screenshot.
 
 Until you reply in chat, premium chrome stays off home/desk on purpose.
 
-Refs extracted: NetroBNB desk density · Aionis brand-plane · live 21st.dev MCP previews.
-Opt-in **Preview on desk** now paints stronger Netro grey/yellow chrome or Aionis dark plane (session-only · Exit anytime).
+Refs extracted: **Aionis** brand-plane (production `/` already mirrors composition) · **NetroBNB** 12-col desk density · live **21st.dev** MCP previews.
+Opt-in **Preview on desk** paints stronger Netro grey/yellow chrome, Aionis dark plane, or cinematic/trade-journal desk skin (session-only · Exit anytime).
 
 For live 21st MCP on the Vercel preview, set `API_KEY_21ST` (and optional `SHADERS_API_KEY`) on the Vercel project — local `.env` already has them. **Live check 2026-09-16:** preview `/lab/ui` still shows `API_KEY_21ST missing` until that Vercel env lands.
 

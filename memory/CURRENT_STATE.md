@@ -356,3 +356,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - smoke:keys probes 21st MCP live (Trade Journal + Cinematic Landing hits) + shaders Clerk 500 labeled.
 - Lab ids: `aionis-brand-plane` · `netro-density` · `cinematic-landing-21st` · `trade-journal-21st`.
 - Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · `API_KEY_21ST` on Vercel · funded broadcast.
+
+## 2026-09-16 — Netro 12-col + 21st Trade Journal adapt
+- Rebuilt `NetroDensityCanvas` to match NetroBNB 12-col (profile · metrics · market strip · yellow AI rail).
+- Spent last free 21st `get_component` on Trade Journal Table id **27124** → FOLIO honesty blotter (`FolioTradeJournalLab`) — paper Open/Blocked/Quoted, never invent fills.
+- `getTwentyFirstComponent` helper in lab client. HENRY_STEPS Step 0 lists all four UI ids.
+- Empire keys still empty locally. Goal open.

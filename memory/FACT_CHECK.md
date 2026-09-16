@@ -161,6 +161,7 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | smoke:keys probes 21st MCP when API_KEY_21ST set | CONFIRMED | twentyfirst_live · Trade Journal Table hits | 2026-09-16 |
 | smoke:keys probes shaders.com | FAIL-CLOSED labeled | shaders_live HTTP 500 Clerk | 2026-09-16 |
 | Vercel preview has API_KEY_21ST | MISSING | /lab/ui amber on preview; local green | 2026-09-16 |
+| 21st get_component Trade Journal Table id 27124 | CONFIRMED | free retrieval spent; adapted as FolioTradeJournalLab | 2026-09-16 |
 
 ## Live Stocklana re-check (2026-09-16)
 

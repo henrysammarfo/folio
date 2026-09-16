@@ -82,12 +82,19 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(page.getByText(/awaiting henry|approve/i).first()).toBeVisible();
     await expect(page.getByText(/netro-density/i).first()).toBeVisible();
     await expect(page.getByText(/aionis-brand-plane/i).first()).toBeVisible();
+    await expect(page.getByText(/cinematic-landing-21st/i).first()).toBeVisible();
     await expect(page.getByText(/trade-journal-21st/i).first()).toBeVisible();
     await expect(page.getByText(/21st|netrobnb|aionis/i).first()).toBeVisible();
 
     // Pick is local-only; preview on desk is opt-in and never a production merge
-    await page.getByRole("button", { name: /pick candidate netro-density/i }).click();
-    await expect(page.getByText(/chat reply ready|approve lab ui: netro-density/i).first()).toBeVisible();
+    const pickNetro = page.getByRole("button", {
+      name: /pick candidate netro-density/i,
+    });
+    await pickNetro.scrollIntoViewIfNeeded();
+    await pickNetro.click();
+    await expect(
+      page.getByText(/picked netro-density|chat reply ready|approve lab ui: netro-density/i).first(),
+    ).toBeVisible({ timeout: 10_000 });
     await page.getByRole("link", { name: /preview on desk/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible({
       timeout: 30_000,
@@ -107,9 +114,9 @@ test.describe("FOLIO Block 0 smoke", () => {
 
     // Lab surfaces Netro/Aionis extract + 21st MCP honesty
     await page.goto("/lab/ui");
-    await expect(page.getByText(/netrobnb desk density|make analysis easy/i).first()).toBeVisible();
+    await expect(page.getByText(/netrobnb desk density|make analysis easy|share truth desk/i).first()).toBeVisible();
     await expect(page.locator(".lab-aionis-stage, .folio-stencil").first()).toBeVisible();
-    await expect(page.getByText(/21st|api_key_21st|mcp/i).first()).toBeVisible();
+    await expect(page.getByText(/21st|api_key_21st|mcp|truth journal/i).first()).toBeVisible();
 
     await page.goto("/lab/shaders");
     await expect(page.getByText(/webgl|21st|shaders/i).first()).toBeVisible();

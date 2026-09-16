@@ -234,8 +234,14 @@
 .lab-aionis-stage-tall{height:min(62vh,36rem)}
 .lab-aionis-stage .folio-stencil{position:absolute;inset:0}
 .netro-density{margin:.75rem 0 1rem;padding:1rem;border-radius:16px;background:#e5e7eb;color:#1c1c1c}
+.netro-density-title{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem;align-items:baseline;padding:.15rem .15rem .85rem}
+.netro-density-title h3{margin:0;font-size:1.35rem;font-weight:650;letter-spacing:-.02em}
+.netro-density-title span{font-size:.72rem;color:#6b7280;letter-spacing:.04em}
 .netro-density-grid{display:grid;grid-template-columns:1fr;gap:.65rem}
-@media(min-width:900px){.netro-density-grid{grid-template-columns:1.1fr 1.8fr .95fr;align-items:stretch}}
+@media(min-width:900px){.netro-density-grid{grid-template-columns:minmax(0,1fr) 15.5rem;align-items:stretch}}
+.netro-density-left{display:flex;flex-direction:column;gap:.65rem;min-width:0}
+.netro-density-top{display:grid;grid-template-columns:1fr;gap:.65rem}
+@media(min-width:900px){.netro-density-top{grid-template-columns:13.5rem minmax(0,1fr)}}
 .netro-density-profile{background:linear-gradient(180deg,#faf0ad,#faf6ce 45%,#fff);border:1px solid #e5e7eb;border-radius:14px;padding:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.55rem;min-height:16rem}
 .netro-density-hi{margin:0;font-size:.95rem;font-weight:500}
 .netro-density-profile h4{margin:0;font-size:clamp(1.6rem,2.4vw,2.2rem);line-height:1.05;font-weight:700;letter-spacing:-.03em}
@@ -244,9 +250,23 @@
 .netro-density-stack{display:flex;flex-direction:column;gap:.65rem}
 .netro-density-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
 .netro-density-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:.85rem;box-shadow:0 1px 5px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.3rem;min-height:4.5rem}
+.netro-density-card-wide{min-height:5.5rem}
+.netro-density-card-dark{background:#111;color:#fff;border-color:#111}
+.netro-density-card-dark span,.netro-density-card-dark small{color:#a3a3a3}
+.netro-density-pills{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.35rem}
+.netro-pill{font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;border:1px solid #d1d5db;border-radius:99px;padding:.2rem .55rem;color:#6b7280}
+.netro-pill-on{background:#f4d014;border-color:#f4d014;color:#1c1c1c;font-weight:700}
 .netro-density-card span,.netro-density-profile span{font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:#6b7280}
 .netro-density-card b{font-size:1rem;font-weight:500;font-variant-numeric:tabular-nums}
 .netro-density-card small{font-size:.72rem;color:#6b7280}
+.netro-density-market{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:.85rem 1rem 1rem;box-shadow:0 1px 5px rgba(0,0,0,.05)}
+.netro-density-market-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.55rem .85rem;margin-bottom:.65rem}
+.netro-density-market-head strong{font-size:1rem}
+.netro-density-market-head span{font-size:.72rem;color:#6b7280}
+.netro-density-market-head em{margin-left:auto;font-style:normal;font-variant-numeric:tabular-nums;font-weight:600}
+.netro-density-chart{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+.netro-density-chart svg{display:block;width:100%;height:7.5rem}
+.netro-density-chart-foot{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;padding:.55rem .75rem;font-size:.68rem;color:#6b7280;border-top:1px solid #e5e7eb;background:#fff}
 .netro-density-rail{background:#f4d014;border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.75rem;min-height:16rem;box-shadow:0 2px 10px rgba(0,0,0,.05)}
 .netro-density-rail-title{margin:0;font-weight:700;font-size:1.05rem}
 .netro-density-rail-body{margin:0;font-size:.82rem;line-height:1.45;flex:1}
@@ -396,6 +416,46 @@
 }
 .desk-layout[data-lab-ui="trade-journal-21st"] .data-table>a:hover{
   background:color-mix(in oklab,var(--muted) 70%,transparent);
+}
+.desk-layout[data-lab-ui="cinematic-landing-21st"] .desk-main{
+  background:radial-gradient(120% 80% at 50% -10%,#1a2430 0%,#05070a 55%);
+  color:#f4f7fa;
+}
+.desk-layout[data-lab-ui="cinematic-landing-21st"] .desk-topbar{
+  background:color-mix(in oklab,#05070a 80%,transparent);
+  border-bottom:1px solid oklch(1 0 0/.1);
+  color:#f4f7fa;
+}
+.desk-layout[data-lab-ui="cinematic-landing-21st"] .panel{
+  background:color-mix(in oklab,#0b1016 88%,transparent);
+  border-color:oklch(1 0 0/.12);
+  backdrop-filter:blur(10px);
+  color:#f4f7fa;
+}
+.desk-layout[data-lab-ui="cinematic-landing-21st"] .desk-heading h1{
+  font-family:var(--font-display);letter-spacing:-.03em;color:#fff;
+}
+.folio-journal{margin:.75rem 0 1rem;border:1px solid color-mix(in oklab,var(--border) 80%,transparent);border-radius:1rem;background:var(--card);box-shadow:0 16px 36px color-mix(in oklab,var(--foreground) 6%,transparent);overflow:hidden}
+.folio-journal-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.75rem;align-items:center;padding:1rem 1rem .75rem}
+.folio-journal-head h3{margin:0;font-size:.95rem;font-weight:600}
+.folio-journal-head span{display:block;font-size:.72rem;color:var(--muted-foreground);margin-top:.15rem}
+.folio-journal-ranges{display:inline-flex;gap:.15rem;padding:3px;border-radius:99px;background:color-mix(in oklab,var(--foreground) 4%,transparent)}
+.folio-journal-ranges button{border:0;background:transparent;border-radius:99px;padding:.25rem .65rem;font-size:.7rem;font-weight:600;color:var(--muted-foreground);cursor:pointer}
+.folio-journal-ranges button.on{background:var(--background);color:var(--foreground);box-shadow:0 1px 3px color-mix(in oklab,var(--foreground) 12%,transparent)}
+.folio-journal-cols,.folio-journal-rows>li{display:grid;grid-template-columns:4.5rem 6.5rem 3.5rem minmax(0,1.4fr) 5.5rem 5.5rem;gap:.65rem;align-items:center;padding:.55rem 1rem;font-size:.75rem}
+.folio-journal-cols{color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.04em;font-size:.62rem;border-bottom:1px solid var(--border)}
+.folio-journal-rows{list-style:none;margin:0;padding:0}
+.folio-journal-rows>li{border-bottom:1px solid color-mix(in oklab,var(--border) 70%,transparent)}
+.folio-journal-rows>li:last-child{border:0}
+.folio-journal-rows .tabular{font-variant-numeric:tabular-nums}
+.folio-journal-pill{display:inline-flex;align-items:center;justify-content:flex-end;gap:.35rem;margin-left:auto;border:1px solid var(--border);border-radius:99px;padding:.15rem .5rem;font-size:.65rem;font-weight:600}
+.folio-journal-pill i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--success)}
+.folio-journal-pill-blocked{color:var(--warning);border-color:color-mix(in oklab,var(--warning) 30%,transparent);background:var(--warning-soft)}
+.folio-journal-pill-quoted{color:var(--success);border-color:color-mix(in oklab,var(--success) 30%,transparent);background:var(--success-soft)}
+.folio-journal-pill-open{color:var(--muted-foreground)}
+@media(max-width:800px){
+  .folio-journal-cols{display:none}
+  .folio-journal-rows>li{grid-template-columns:1fr 1fr;gap:.35rem .75rem}
 }
 .desk-layout[data-lab-shader="ink-ledger"] .desk-main{background:
   radial-gradient(120% 80% at 10% -10%,color-mix(in oklab,oklch(.55 .04 240) 22%,transparent),transparent 55%),

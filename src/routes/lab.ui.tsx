@@ -4,6 +4,7 @@ import { StatusBadge } from "@/components/folio-brand";
 import { LabApprovePanel } from "@/components/lab-approve-panel";
 import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
 import { NetroDensityCanvas } from "@/components/lab/netro-density-canvas";
+import { FolioTradeJournalLab } from "@/components/lab/folio-trade-journal-lab";
 import { LAB_UI_IDS } from "@/lib/lab-pick";
 import {
   isTwentyFirstConfigured,
@@ -163,33 +164,18 @@ function Page() {
 
         <article className="lab-card lab-card-span">
           <StatusBadge tone="amber">trade-journal-21st</StatusBadge>
-          <h3>{data.tradeJournal?.name ?? "21st desk catalog"}</h3>
+          <h3>
+            {data.tradeJournal?.name ?? "Trade journal"} · FOLIO honesty blotter
+          </h3>
+          <FolioTradeJournalLab />
           {data.tradeJournal?.previewUrl ? (
             <img
               className="lab-preview-frame lab-preview-frame-lg"
               src={data.tradeJournal.previewUrl}
-              alt={`${data.tradeJournal.name} preview from 21st.dev`}
+              alt={`${data.tradeJournal.name} upstream preview from 21st.dev`}
               loading="lazy"
             />
-          ) : (
-            <div className="lab-desk-preview" aria-hidden>
-              <div>
-                <span>AAPLx</span>
-                <b>
-                  {data.multiplierLabel}
-                  <small> sample</small>
-                </b>
-              </div>
-              <div>
-                <span>Wash</span>
-                <b>fail-closed</b>
-              </div>
-              <div>
-                <span>Quote</span>
-                <b>USDC → AAPLx</b>
-              </div>
-            </div>
-          )}
+          ) : null}
           {data.gallery.length > 1 ? (
             <div className="lab-21st-gallery">
               {data.gallery
@@ -208,10 +194,10 @@ function Page() {
           ) : null}
           <p className="text-sm opacity-80">
             {data.tradeJournal
-              ? `Live 21st.dev MCP · id ${data.tradeJournal.id}${
+              ? `Adapted from 21st.dev MCP get_component id ${data.tradeJournal.id}${
                   data.tradeJournal.author ? ` · @${data.tradeJournal.author}` : ""
-                }. Preview metadata is free; get_component code is paid quota — merge still needs your approve.`
-              : "21st MCP unavailable — fallback desk row until API_KEY_21ST lands."}
+                } — FOLIO rows are paper honesty (Open / Blocked / Quoted), never invent fills. Merge still needs your approve.`
+              : "21st MCP unavailable — blotter still shows local honesty rows."}
           </p>
         </article>
       </div>
