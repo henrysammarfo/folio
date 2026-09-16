@@ -270,3 +270,8 @@ EOF
 
 ## 2026-09-16 — Netro paper agent
 - e2e: Truth pass on Netro rail surfaces `broadcast=false` / `nl=` meta; forbids fill/unhackable claims.
+
+## 2026-09-16 — Netro inspect + hero preserve
+- VERIFIED: `/` keeps Aionis brand-plane hero (no second hero). Netro is `/desk` overview only.
+- VERIFIED: `FOLIO_APPROVED_LAB_UI=netro-density` present on Vercel Development/Preview/Production.
+- OPEN: Bitquery / Pyth / Privy / Supabase / Jupiter keys — fail-closed until Henry pastes. Rotate chat-pasted Vercel token.

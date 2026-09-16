@@ -100,8 +100,9 @@ function Home() {
           <h2>Own the economic truth.</h2>
           <p>
             {liveLine} Corporate-action share truth before trade. Broadcast stays
-            off until funded. Desk overview mounts Henry-approved Netro density;
-            this landing hero stays the Aionis brand-plane.
+            off until funded. The NetroBNB-density desk lives at{" "}
+            <Link to="/desk">/desk</Link> — this landing hero stays the Aionis
+            brand-plane.
           </p>
           <div className="home-cta-row">
             <Link to="/desk" className="home-cta">

@@ -164,6 +164,19 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 60_000,
     });
     await expect(agentRail).not.toContainText(/filled on mainnet|unhackable/i);
+    // Netro inspect wallet restores overview → Positions ephemeral path
+    const inspectForm = page.getByTestId("netro-inspect-wallet");
+    await expect(inspectForm).toBeVisible();
+    const inspectPk = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+    await inspectForm.getByLabel(/inspect wallet pubkey/i).fill(inspectPk);
+    await inspectForm.getByRole("button", { name: /inspect qty/i }).click();
+    await expect(page).toHaveURL(new RegExp(`/desk/positions\\?inspect=${inspectPk}`), {
+      timeout: 15_000,
+    });
+    await expect(page.getByRole("heading", { name: /positions/i }).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(page.getByText(/inspect active|ephemeral|mainnet/i).first()).toBeVisible();
     // Positions stays the ledger — Netro must not replace other desk routes
     await page.goto("/desk/positions");
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();
@@ -281,9 +294,18 @@ test.describe("FOLIO Block 0 smoke", () => {
   }) => {
     const inspect = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
     await page.goto(`/desk?inspect=${inspect}`);
-    await expect(page.getByText(/prime desk|portfolio|FOLIO/i).first()).toBeVisible({
+    await expect(page.getByText(/prime desk|portfolio|FOLIO|share truth desk/i).first()).toBeVisible({
       timeout: 30_000,
     });
+    // Production Netro overview replaces classic panels — inspect lives on the Netro strip
+    // or deep-links to Positions. Classic overview assertions only when Netro is off.
+    const netro = page.getByTestId("desk-lab-netro");
+    if ((await netro.count()) > 0) {
+      await expect(page.getByTestId("netro-inspect-wallet")).toBeVisible();
+      await expect(page.locator("body")).toContainText(/ephemeral mainnet-read|not auth|no cookie/i);
+      await expect(page.locator("body")).not.toContainText(/unhackable|filled on mainnet/i);
+      return;
+    }
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/inspect|ephemeral|mainnet/);
     expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);

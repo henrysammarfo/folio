@@ -6,7 +6,7 @@
  * Flow metrics prefer live /network matrix modes (never invent greens).
  * Optional paper-agent rail: live Block 0 spine · never broadcasts.
  */
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import { runDeskAgent } from "@/lib/desk.functions";
@@ -58,7 +58,9 @@ export function NetroDensityCanvas({
   const [agentBusy, setAgentBusy] = useState(false);
   const [agentReply, setAgentReply] = useState<string | null>(null);
   const [agentMeta, setAgentMeta] = useState<string | null>(null);
+  const [inspectInput, setInspectInput] = useState("");
   const runAgent = useServerFn(runDeskAgent);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const tick = () => {
@@ -107,7 +109,7 @@ export function NetroDensityCanvas({
       window.clearTimeout(t3);
       ro?.disconnect();
     };
-  }, [multiplierLabel]);
+  }, [multiplierLabel, enablePaperAgent, agentReply, gates.quoteOut, gates.kaminoLtv]);
 
   async function submitPaperAgent(prompt: string) {
     const trimmed = prompt.trim();
@@ -140,6 +142,16 @@ export function NetroDensityCanvas({
   function onAgentSubmit(e: FormEvent) {
     e.preventDefault();
     void submitPaperAgent(agentPrompt);
+  }
+
+  function onInspectSubmit(e: FormEvent) {
+    e.preventDefault();
+    const next = inspectInput.trim();
+    if (!next) return;
+    void navigate({
+      to: "/desk/positions",
+      search: { inspect: next },
+    });
   }
 
   const tickerLoop = [...SHARE_TICKER, ...SHARE_TICKER];
@@ -190,6 +202,34 @@ export function NetroDensityCanvas({
           ))}
         </div>
       </div>
+
+      {enablePaperAgent ? (
+        <form
+          className="netro-density-inspect netro-density-item"
+          style={delay(2)}
+          data-testid="netro-inspect-wallet"
+          onSubmit={onInspectSubmit}
+        >
+          <div>
+            <strong>Inspect wallet</strong>
+            <span>Ephemeral mainnet-read · not auth · no cookie</span>
+          </div>
+          <input
+            value={inspectInput}
+            onChange={(e) => setInspectInput(e.target.value)}
+            placeholder="Base58 pubkey"
+            autoComplete="off"
+            spellCheck={false}
+            aria-label="Inspect wallet pubkey"
+          />
+          <button type="submit" disabled={!inspectInput.trim()}>
+            Inspect qty
+          </button>
+          <Link to="/desk/settings" className="netro-density-inspect-bind">
+            Or bind watch-wallet
+          </Link>
+        </form>
+      ) : null}
 
       {/* Main Desktop Grid: 9 left / 3 right — NetroBNB app/page.tsx */}
       <div className="netro-density-grid">

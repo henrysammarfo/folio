@@ -3,9 +3,11 @@
 Use this **after** Henry replies with a lab candidate id (or in parallel if he asks).  
 Do **one key family at a time**. Paste into Vercel (Preview + Production) and local `.env`. Never commit values. Rotate anything pasted in chat.
 
-Demo: https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/desk/settings
+Demo: https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk/settings
 
-Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY`
+Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density`
+
+Still need Henry paste (cannot invent): Bitquery · Pyth · Privy · Supabase · Jupiter (if gated). **Rotate any Vercel token pasted in chat.**
 
 Lab MCP live-verified on branch preview `/lab/ui` (2026-09-16): **21st MCP connected**.
 

@@ -2,7 +2,7 @@
 
 Re-check live counts on https://hackathons.solana.com/hackathons/stocklana before final submit.
 
-**Live (2026-09-16):** hackathons.solana.com **596** registered · **81** submissions · prize **$121,000** · hero deadline **SEP 25, 2026** (countdown ~9d). Timeline **Fri 18 Sep 2026, 16:00 ET** · stocklana.fun **18 Sep 23:59 UTC** — treat **18 Sep as conservative**. Demo preview: 21st MCP **connected** · AAPLx ≈ **1.003269×** live.
+**Live (2026-09-16, jina):** hackathons.solana.com **598** registered · **82** submissions · prize **$121,000** · hero deadline **SEP 25, 2026**. Timeline body may still list **Fri 18 Sep** — treat **18 Sep as conservative**. Demo: AAPLx ≈ **1.003269×** live · on-chain Scaled UI match · Netro desk approved.
 
 ## Form fields (paste)
 
@@ -12,17 +12,18 @@ Re-check live counts on https://hackathons.solana.com/hackathons/stocklana befor
 
 **Demo URL:** https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app
 
-**Repo:** https://github.com/henrysammarfo/folio (branch `cursor/folio-prefs-agent-honesty-f1ec` / PR #3)
+**Repo:** https://github.com/henrysammarfo/folio (branch `cursor/folio-netro-desk-approve-f1ec` / PR #5)
 
 **Pitch (≤ short paragraph):**
-FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after corporate actions — we read the live xStocks Scaled UI multiplier (AAPLx ≈ 1.003× today) and surface pending newMultiplier honestly (or none). If wash tape is missing or linked-flow looks dirty, acquire stays fail-closed. Jupiter quotes stay quote-only with short TTL / labeled stale-on-429 and broadcast paused on a ≤~$1 budget. Credit shows live Kamino LTV, Nest.credit vault awareness, and NestUSD labeled unavailable until a verified borrow endpoint exists. Watch-wallet mainnet-read qty is live on the public demo; multi-tenant Privy + Supabase sessions are wired but fail-closed without keys. Lab ships live 21st.dev Plasma WebGL (id 24346) behind an approve gate — production chrome stays locked until Henry picks. We do not claim unhackable security.
+FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after corporate actions — we read the live xStocks Scaled UI multiplier (AAPLx ≈ 1.003× today) and compare API↔on-chain Token-2022 Scaled UI honestly. If wash tape is missing or linked-flow looks dirty, acquire stays fail-closed. Jupiter quotes stay quote-only with short TTL / labeled stale-on-429 and broadcast paused on a ≤~$1 budget. Credit shows live Kamino LTV (AAPLx 0.40), Nest.credit vault awareness, and NestUSD labeled unavailable until a verified borrow endpoint exists. The production desk overview mounts Henry-approved NetroBNB density with live Empire gates, live ≤$1 Jupiter inspect, live paper-agent spine, and ephemeral wallet inspect — home hero stays the Aionis brand-plane. Watch-wallet mainnet-read qty is live; multi-tenant Privy + Supabase sessions are wired but fail-closed without keys. We do not claim unhackable security.
 
 **Links judges can open:**
-1. Demo: https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app
-2. Truth: `…/truth?symbol=AAPLx`
-3. Network honesty: `…/network`
-4. Settings readiness: `…/desk/settings` (secret set · wash/Pyth/Privy/Supabase fail-closed)
-5. Demo script: `docs/DEMO_SCRIPT.md`
+1. Demo desk (Netro): https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk
+2. Home hero (preserved): `…/`
+3. Truth + on-chain Scaled UI: `…/truth?symbol=AAPLx`
+4. Network honesty: `…/network`
+5. Settings readiness: `…/desk/settings` (secret set · wash/Pyth/Privy/Supabase fail-closed)
+6. Demo script: `docs/DEMO_SCRIPT.md`
 
 **Track fit:** Investing / credit & yield / infrastructure (honest price + corporate-action truth + borrow reads). **Pyth bounty:** Equity.US.AAPL/USD · Crypto.AAPLX/USD · Crypto.AAPLON/USD mapped on `/truth` (prices fail-closed until `PYTH_API_KEY`); diverge vs Jupiter venue when both live.
 
@@ -40,8 +41,9 @@ FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after
 
 ## Walkthrough artifacts
 
+- Netro paper agent: `/opt/cursor/artifacts/screenshots/desk-netro-paper-agent.png`
+- Netro live Jupiter quote: `/opt/cursor/artifacts/screenshots/desk-netro-live-quote.png`
+- Netro Kamino LTV: `/opt/cursor/artifacts/screenshots/desk-netro-kamino-ltv.png`
+- Home hero preserved: `/opt/cursor/artifacts/screenshots/home-hero-preserved.png`
 - Watch-wallet bind live: `/opt/cursor/artifacts/screenshots/watch-wallet-bind-live.png`
-- Truth CA pending: `/opt/cursor/artifacts/screenshots/demo-truth-ca-pending.png`
-- Activity CA pending: `/opt/cursor/artifacts/screenshots/demo-activity-ca-pending.png`
-- Aionis / FOLIO / Netro / lab screens: `/opt/cursor/artifacts/screenshots/*-final.png`
 - Lab approve CTAs + candidates: `/lab/ui` · `/lab/shaders`

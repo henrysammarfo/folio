@@ -465,3 +465,9 @@
 ## 2026-09-16 — Netro paper-agent rail
 - Desk Netro yellow AI rail runs live paper-agent spine (truth / ≤$1 quote). NL optional via AgentRouter; always broadcast=false. Lab stage stays decorative.
 - Goal open: Bitquery/Pyth/Privy/Supabase + rotate Vercel token.
+
+## 2026-09-16 — Netro inspect wallet + layout stabilize
+- Netro overview restores ephemeral Inspect wallet → `/desk/positions?inspect=` (not auth).
+- Grid/card CSS: minmax containment, rounded flow card, gentler stagger (cards no longer clip/jump).
+- Home hero untouched; below-fold mission points to `/desk` Netro surface.
+- Submission paste pack + KEYS_LANDING demo URL on PR #5. Empire keys still need Henry paste. Goal open.
