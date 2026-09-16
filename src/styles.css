@@ -471,3 +471,8 @@
 .about-vision p,.about-vision li{line-height:1.65;color:var(--muted-foreground)}
 .about-vision ol{padding-left:1.2rem}
 .desk-search-policy{display:flex;align-items:center;font-size:.78rem;opacity:.72;padding:0 .25rem;letter-spacing:.02em}
+.desk-gate-grid{display:flex;flex-direction:column;gap:.15rem}
+.desk-gate-row{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;padding:.7rem 0;border-bottom:1px solid var(--border)}
+.desk-gate-row:last-child{border:0}
+.desk-gate-row b{display:block;font-size:.8rem;font-weight:600}
+.desk-gate-row small{display:block;margin-top:.2rem;font-size:.68rem;color:var(--muted-foreground);line-height:1.4}

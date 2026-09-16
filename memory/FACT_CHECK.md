@@ -167,7 +167,9 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 
 | Claim | Verdict | Evidence | As of |
 |---|---|---|---|
-| Stocklana registered **588** / submissions **79** / prize **$121,000** | CONFIRMED live | hackathons.solana.com/hackathons/stocklana (`registrationCount`:588 · `submissionCount`:79 · Prize Pool $121,000) | 2026-09-16 |
+| Stocklana registered **588** / submissions **79** / prize **$121,000** | SUPERSEDED by 590/79 | prior scrape | 2026-09-16 |
+| Stocklana registered **590** / submissions **79** / prize **$121,000** | CONFIRMED live | hackathons.solana.com via jina (Registered 590 · Submissions 79 · Prize Pool $121,000) | 2026-09-16 |
+| NestUSD public capacity endpoint (Tavily/TinyFish this run) | UNAVAILABLE | Tavily 432 plan limit; TinyFish search 404 path; NestUSD stays fail-closed | 2026-09-16 |
 | Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET** | CONFIRMED conflict — re-check at submit | same page DEADLINE strip + Timeline copy | 2026-09-16 |
 | AAPLx multiplier ≈ 1.003269 | CONFIRMED live | api.xstocks.fi .../AAPLx/multiplier?network=Solana | 2026-09-16 |
 | Tavily search for Stocklana | UNAVAILABLE this run | plan usage limit | 2026-09-16 |

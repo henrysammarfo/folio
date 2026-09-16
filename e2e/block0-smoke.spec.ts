@@ -240,6 +240,19 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
+  test("prime desk surfaces live Empire gates from network matrix", async ({ page }) => {
+    await page.goto("/desk/");
+    await expect(page.getByText(/live empire gates/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toMatch(/wash/);
+    expect(body).toMatch(/nestusd/);
+    expect(body).toMatch(/broadcast/);
+    expect(body).toMatch(/fail-closed|unavailable|quote-only|mainnet-read/);
+    expect(body).not.toMatch(/unhackable|filled on mainnet/);
+  });
+
   test("position detail surfaces pending CA honestly", async ({ page }) => {
     await page.goto("/desk/positions/AAPLx");
     await expect(page.getByText(/AAPLx|position|FOLIO/i).first()).toBeVisible({

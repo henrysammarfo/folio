@@ -362,3 +362,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Spent last free 21st `get_component` on Trade Journal Table id **27124** → FOLIO honesty blotter (`FolioTradeJournalLab`) — paper Open/Blocked/Quoted, never invent fills.
 - `getTwentyFirstComponent` helper in lab client. HENRY_STEPS Step 0 lists all four UI ids.
 - Empire keys still empty locally. Goal open.
+
+## 2026-09-16 — Desk live Empire gates + Stocklana 590
+- Prime desk SSR-prefetches `getNetworkBundle` and paints **Live Empire gates** (wash/Pyth/NestUSD/multi-tenant/broadcast) — operational honesty, not a lab chrome merge.
+- Stocklana live (jina): **590** registered / **79** submissions / **$121k**. NestUSD research still unverified (Tavily 432 / TinyFish 404).
+- Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · Vercel `API_KEY_21ST` · funded broadcast.

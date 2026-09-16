@@ -6,12 +6,34 @@ import { z } from "zod";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
-import { getCreditBundle, getPositionsBundle } from "@/lib/desk.functions";
+import {
+  getCreditBundle,
+  getNetworkBundle,
+  getPositionsBundle,
+} from "@/lib/desk.functions";
+import type { IntegrationMode } from "@/lib/adapters/types";
 
 const deskSearchSchema = z.object({
   /** Ephemeral mainnet-read inspect pubkey — not auth, not persisted. */
   inspect: z.string().max(64).optional().catch(undefined),
 });
+
+const GATE_CAPS = [
+  "xStocks multiplier + asset metadata",
+  "Wash / linked-flow gate",
+  "Jupiter swap quote",
+  "Pyth Hermes equity reference",
+  "NestUSD capacity",
+  "Multi-tenant sessions (Privy + Supabase)",
+  "Broadcast swap / borrow",
+] as const;
+
+function toneFor(mode: IntegrationMode): "green" | "amber" | "blue" | "neutral" {
+  if (mode === "mainnet-read") return "green";
+  if (mode === "quote-only" || mode === "fork") return "blue";
+  if (mode === "paper") return "amber";
+  return "neutral";
+}
 
 export const Route = createFileRoute("/desk/")({
   head: () => ({
@@ -24,11 +46,12 @@ export const Route = createFileRoute("/desk/")({
   loaderDeps: ({ search }) => ({ inspect: search.inspect }),
   /** Prefetch overview bundles so qty/credit honesty paints on first load. */
   loader: async ({ deps }) => {
-    const [positions, credit] = await Promise.all([
+    const [positions, credit, network] = await Promise.all([
       getPositionsBundle({ data: { inspectWallet: deps.inspect } }),
       getCreditBundle({ data: { inspectWallet: deps.inspect } }),
+      getNetworkBundle(),
     ]);
-    return { positions, credit };
+    return { positions, credit, network };
   },
   component: Page,
 });
@@ -39,6 +62,7 @@ function Page() {
   const navigate = useNavigate({ from: Route.fullPath });
   const fetchPositions = useServerFn(getPositionsBundle);
   const fetchCredit = useServerFn(getCreditBundle);
+  const fetchNetwork = useServerFn(getNetworkBundle);
   const [inspectInput, setInspectInput] = useState(inspect ?? "");
   const positions = useQuery({
     queryKey: ["positions-bundle", inspect ?? ""],
@@ -54,6 +78,14 @@ function Page() {
     initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,
   });
+  const network = useQuery({
+    queryKey: ["network-matrix-desk"],
+    queryFn: () => fetchNetwork(),
+    initialData: initial.network,
+    initialDataUpdatedAt: Date.now(),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
 
   const rows = positions.data?.rows ?? [];
   const walletVerified = rows.filter((r) => r.health === "Verified").length;
@@ -62,6 +94,9 @@ function Page() {
   const walletRead = rows.some((r) => r.qtySource === "wallet-read");
   const creditLabel = credit.data?.paper.label === "wallet-read" ? "wallet-read" : "paper";
   const walletSource = positions.data?.walletSource ?? credit.data?.walletSource ?? null;
+  const gateRows = (network.data?.rows ?? []).filter((r) =>
+    (GATE_CAPS as readonly string[]).includes(r.capability),
+  );
 
   return (
     <DeskShell eyebrow="Portfolio command" title="Prime desk">
@@ -94,6 +129,35 @@ function Page() {
         </ModeBadge>
         <ModeBadge mode="quote-only">Broadcast off</ModeBadge>
       </div>
+
+      <Panel
+        title="Live Empire gates"
+        meta={
+          <StatusBadge tone="blue">
+            {network.data?.broadcastPaused !== false ? "Broadcast paused" : "Broadcast armed"}
+          </StatusBadge>
+        }
+      >
+        <p className="mb-3 text-sm opacity-80">
+          Same matrix as{" "}
+          <Link to="/network" className="underline">
+            /network
+          </Link>
+          — missing Bitquery / Pyth / Privy / Supabase stay fail-closed. Operational honesty for
+          Stocklana (not a lab chrome merge).
+        </p>
+        <div className="desk-gate-grid">
+          {gateRows.map((row) => (
+            <div key={row.capability} className="desk-gate-row">
+              <div>
+                <b>{row.capability.replace(/ \(.*\)$/, "")}</b>
+                <small>{row.detail}</small>
+              </div>
+              <StatusBadge tone={toneFor(row.mode)}>{row.mode}</StatusBadge>
+            </div>
+          ))}
+        </div>
+      </Panel>
 
       <Panel
         title="Inspect wallet (ephemeral)"

@@ -325,3 +325,7 @@
 - Netro lab canvas now mirrors 12-col density (market strip + yellow rail).
 - get_component Trade Journal Table → FOLIO honesty blotter on `/lab/ui`.
 - Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · Vercel `API_KEY_21ST` · funded broadcast.
+
+## 2026-09-16 — Desk Empire gates panel + Stocklana 590/79
+- `/desk` shows live network-matrix gate strip (fail-closed wash/Pyth/NestUSD/auth/broadcast).
+- Stocklana jina: 590 / 79 / $121k. Goal open.
