@@ -186,3 +186,12 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 |---|---|---|
 | Session/JWT HMAC works under Vitest ESM without static node:crypto | CONFIRMED | `process.getBuiltinModule("crypto")` + 101 vitest green | 2026-09-16 |
 | Stocklana registered **590** / submissions **79** / prize **$121,000** | CONFIRMED live (re-check) | jina hackathons.solana.com/stocklana | 2026-09-16 |
+
+| 2026-09-16 UI / MCP | Result | Source |
+|---|---|---|
+| Aionis landing stencil geometry | CONFIRMED live | clone `manovHacksaw/aionis-app/landing` @ :3110 — viewBox 1400×550, text y=465, footer-above-stencil bottom:55% |
+| NetroBNB 12-col desk | CONFIRMED live | clone `AbdullahBalfaqih/NetroBNB` @ :3111 — grey canvas + yellow profile/AI rail |
+| 21st.dev MCP search | CONFIRMED local | `API_KEY_21ST` → `https://21st.dev/api/mcp` tools/call search |
+| 21st Plasma id 24346 adapted in-lab | CONFIRMED | `ShaderBackground` WebGL path on `/lab/shaders` + `/lab/ui` |
+| shaders.com REST frames | FAIL-CLOSED labeled | key present; probe HTTP 500 / Clerk gate — no invented frames |
+| FOLIO hero buried-footer feel | REMEDIATED (parity pass) | stencil raised to Aionis geometry + hotter ledger-ice floor; e2e 22/22 |

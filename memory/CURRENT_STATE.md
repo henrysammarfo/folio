@@ -1,6 +1,6 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-15 · Stocklana deadline **2026-09-18 20:00 UTC**
+> Updated: 2026-09-16 · Stocklana deadline **2026-09-18 20:00 UTC**
 > Doctrine: honest security only — **never claim unhackable / NK-proof**.
 
 ## Product lock
@@ -49,6 +49,13 @@ World’s Fair still wins on **working honesty**: live multiplier + wash refuse 
 Present in `.env`: Tavily, TinyFish, AgentRouter, 21st, Shaders, Solana RPC.
 Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESSION_SECRET` set locally for watch-wallet + session signing readiness.
 **Rotate all chat-pasted keys after hackathon.**
+
+## UI / lab (approve-gated)
+
+- Production `/` hero: Aionis-parity liquid stencil (`1400×550` / y=465 / horizon 55%).
+- `/lab/ui`: Aionis plane + NetroBNB density + pinned 21st Plasma 24346 + trade journal 27124.
+- `/lab/shaders`: live WebGL Plasma (glacial ink); shaders.com keyed but API gated (HTTP 500).
+- Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; Vercel preview still needs `API_KEY_21ST`.
 
 ## Live deltas (do not regress)
 

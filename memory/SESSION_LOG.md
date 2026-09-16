@@ -348,3 +348,12 @@
 - `process.getBuiltinModule("crypto")` replaces `eval(require)` so session/JWT unit tests pass under Vitest ESM while client graphs still avoid static `node:crypto` imports.
 - Vitest **101/101** green; smoke-empire honesty ok; Stocklana still **590**/79/$121k (jina).
 - Henry blockers unchanged: lab Pick, Vercel API_KEY_21ST, Bitquery→Pyth→Privy→Supabase, GG Skip, broadcast paused.
+
+## 2026-09-16 — UI ref screen + 21st/shaders honesty
+
+- Cloned refs live: Aionis `:3110`, NetroBNB `:3111`; screened side-by-side vs FOLIO `:3000`.
+- Hero: matched Aionis stencil geometry (`1400×550`, baseline `y=465`, horizon `bottom:55%`); brighter ledger-ice punch so brand mass no longer reads as buried footer strip.
+- Lab UI: removed junk 21st catalog heroes (consumer/recovery apps); pinned live Plasma WebGL **id 24346** as cinematic candidate; finance-filtered gallery.
+- Lab shaders: WebGL Plasma retinted glacial (hue=0, no purple); `preserveDrawingBuffer`; shaders.com still HTTP 500 / Clerk-gated (labeled).
+- Paper agent e2e: scrollIntoView + fail `nl=` labels — **22/22** Playwright green locally.
+- Henry blockers unchanged (Pick, keys, Vercel API_KEY_21ST, GG Skip, broadcast paused).
