@@ -148,7 +148,7 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
                   <div className="netro-density-card-head">
                     <strong>Nest</strong>
                   </div>
-                  <b>Nest.credit ≠ NestUSD</b>
+                  <b>Nest.credit is not NestUSD</b>
                   <small>NestUSD capacity labeled unavailable</small>
                 </div>
               </div>
