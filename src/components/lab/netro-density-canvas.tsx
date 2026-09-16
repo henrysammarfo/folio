@@ -24,6 +24,8 @@ type Props = {
   ownership?: NetroOwnershipSummary | null;
   /** Prefill from `/desk?inspect=` deep-link. */
   initialInspect?: string | undefined;
+  /** Live API↔on-chain Scaled UI status for the market strip (never fake candles). */
+  scaledUiStripLabel?: string;
   /** Desk overview only — lab stage stays decorative. */
   enablePaperAgent?: boolean;
 };
@@ -57,6 +59,7 @@ export function NetroDensityCanvas({
   gates = NETRO_LIVE_GATE_DEFAULTS,
   ownership = null,
   initialInspect = "",
+  scaledUiStripLabel = "Scaled UI pending",
   enablePaperAgent = false,
 }: Props) {
   const [clock, setClock] = useState({ h: "00", m: "00", s: "00" });
@@ -459,12 +462,16 @@ export function NetroDensityCanvas({
               <span>Share truth strip · mainnet-read</span>
               <em>{multiplierLabel}</em>
             </div>
-            <div className="netro-density-chart netro-density-chart-dark" role="presentation">
+            <div
+              className="netro-density-chart netro-density-chart-dark"
+              role="presentation"
+              data-testid="netro-truth-strip"
+            >
               <div className="netro-density-chart-meta">
-                <b>Truth strip</b>
-                <span>15m · wash fail-closed</span>
+                <b>Illustrative strip</b>
+                <span>Not live candles · geometry only</span>
               </div>
-              <svg viewBox="0 0 640 180" preserveAspectRatio="none">
+              <svg viewBox="0 0 640 180" preserveAspectRatio="none" aria-hidden>
                 <polyline
                   fill="none"
                   stroke="#f4d014"
@@ -480,6 +487,7 @@ export function NetroDensityCanvas({
                 />
               </svg>
               <div className="netro-density-chart-foot">
+                <span data-testid="netro-scaled-ui-strip">{scaledUiStripLabel}</span>
                 <span>Wash · {gates.wash}</span>
                 <span>Pyth diverge · {gates.pyth}</span>
                 <span>Broadcast · {gates.broadcast}</span>

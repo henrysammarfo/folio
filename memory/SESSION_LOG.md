@@ -476,3 +476,8 @@
 - Netro overview lost economic positions when it replaced classic panels — restored live Ownership strip (paper vs wallet-read / inspect).
 - Inspect stays on `/desk?inspect=` so qty + credit LTV rebind; Positions ledger link preserved.
 - Unit + e2e updated. Empire keys still need Henry paste. Goal open.
+
+## 2026-09-16 — SSR Netro first-paint + honest truth strip
+- `/desk` layout loader seeds `getLabApprovals` so Henry-approved Netro paints without classic overview flash.
+- Market strip labeled illustrative (not live candles) + live API↔on-chain Scaled UI status.
+- Empire keys still need Henry paste. Goal open.

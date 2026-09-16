@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useLoaderData, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -86,6 +86,8 @@ export function DeskShell({
   const fetchCredit = useServerFn(getCreditBundle);
   const fetchAcquire = useServerFn(getAcquireBundle);
   const fetchPositions = useServerFn(getPositionsBundle);
+  /** Parent `/desk` loader — SSR seed so approved Netro paints before client refetch. */
+  const approvalsSeed = useLoaderData({ from: "/desk" });
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -109,6 +111,8 @@ export function DeskShell({
   const approvals = useQuery({
     queryKey: ["lab-approvals"],
     queryFn: () => fetchApprovals(),
+    initialData: approvalsSeed,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 60_000,
   });
   const approvedUi = approvals.data?.approvedUi ?? null;
@@ -177,6 +181,14 @@ export function DeskShell({
     note: positions.data?.note ?? null,
     rows: positions.data?.rows ?? [],
   });
+  const scaledUiCompare = truth.data?.scaledUiCompare;
+  const scaledUiStripLabel = scaledUiCompare
+    ? scaledUiCompare.status === "match"
+      ? `API↔chain match · ${scaledUiCompare.note}`
+      : scaledUiCompare.status === "mismatch"
+        ? `API↔chain mismatch · ${scaledUiCompare.note}`
+        : `Scaled UI ${scaledUiCompare.status} · ${scaledUiCompare.note}`
+    : "Scaled UI pending";
 
   return (
     <div
@@ -295,6 +307,7 @@ export function DeskShell({
                 gates={netroGates}
                 ownership={ownership}
                 initialInspect={inspectSearch}
+                scaledUiStripLabel={scaledUiStripLabel}
                 enablePaperAgent
               />
             </div>

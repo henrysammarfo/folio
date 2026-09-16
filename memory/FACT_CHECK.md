@@ -279,3 +279,8 @@ EOF
 ## 2026-09-16 — Netro ownership strip
 - VERIFIED unit: paper default / inspect+wallet-read labels; never invents Verified count.
 - OPEN: Empire keys still empty — wash/Pyth/multi-tenant fail-closed.
+
+## 2026-09-16 — SSR Netro + strip honesty
+- VERIFIED: desk layout loader returns approvedUi/approvedShader from env.
+- VERIFIED e2e intent: netro-truth-strip says illustrative / not live candles; scaled-ui strip labeled.
+- OPEN: Bitquery/Pyth/Privy/Supabase empty.

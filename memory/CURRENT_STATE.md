@@ -58,7 +58,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; **Vercel** now has `API_KEY_21ST`, `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY` (all targets). Still missing: Bitquery · Jupiter · Pyth · Privy · Supabase.
 - Desk opt-in lab preview mounts live WebGL Plasma for shader / cinematic picks (Exit clears; not production merge).
 - Stocklana live 2026-09-16: **598** regs · **82** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
-- Netro overview: live Empire gates + ≤$1 Jupiter quote + paper-agent + **inspect wallet** + **ownership qty strip** (paper vs wallet-read). Home hero preserved. Layout grid stabilized.
+- Netro overview: live Empire gates + ≤$1 Jupiter quote + paper-agent + **inspect wallet** + **ownership qty strip** (paper vs wallet-read). **SSR approvals seed** (no classic flash). Truth strip labeled illustrative + live Scaled UI. Home hero preserved.
 - Vercel: `FOLIO_APPROVED_LAB_UI=netro-density` set. Still missing Empire keys (Bitquery/Pyth/Privy/Supabase).
 
 ## Live deltas (do not regress)

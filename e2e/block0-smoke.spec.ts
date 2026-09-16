@@ -128,6 +128,13 @@ test.describe("FOLIO Block 0 smoke", () => {
     // Live Empire gates must still paint on Netro surface (not static theater only)
     await expect(page.getByTestId("netro-live-gates")).toBeVisible();
     await expect(page.getByTestId("netro-empire-strip")).toBeVisible();
+    // Decorative strip must not claim live candles; live Scaled UI status is labeled
+    await expect(page.getByTestId("netro-truth-strip")).toContainText(
+      /illustrative strip|not live candles/i,
+    );
+    await expect(page.getByTestId("netro-scaled-ui-strip")).toContainText(
+      /API↔chain|Scaled UI|match|mismatch|pending|off/i,
+    );
     const gateText = (
       await page.getByTestId("netro-live-gates").innerText()
     ).toLowerCase();
