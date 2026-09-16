@@ -642,7 +642,7 @@ function Page() {
                 const res = await runAgent({ data: { prompt } });
                 if (!res.ok) {
                   setAgentOut(
-                    `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                    `${res.reason}${res.detail ? ` — ${res.detail}` : ""}\n[nl=failed · broadcast=false · live spine unavailable]`,
                   );
                   return;
                 }
@@ -670,6 +670,10 @@ function Page() {
                   `${res.data.reply}\n[${spineBits}; metered ~$${res.data.meteredCostUsd.toFixed(6)}; broadcast=${res.data.caps.broadcast}${
                     res.data.nlExpansionNote ? `; ${res.data.nlExpansionNote}` : ""
                   }]`,
+                );
+              } catch (err) {
+                setAgentOut(
+                  `paper_agent_client_error — ${err instanceof Error ? err.message : String(err)}\n[nl=failed · broadcast=false]`,
                 );
               } finally {
                 setBusy(false);

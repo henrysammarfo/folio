@@ -1,11 +1,13 @@
 /**
- * FOLIO liquid-light brand stencil — pattern extracted from
+ * FOLIO liquid-light brand stencil — geometry extracted from
  * manovHacksaw/aionis-app/landing (SVG mask + inertia-eased radial glow).
  * Brand name / copy / colors are FOLIO; not an Aionis clone.
  *
- * Screened against live Aionis @ :3110: letters must READ luminous in the
- * lower half — never a dim footer strip. FOLIO is 5 glyphs vs AIONIS 6, so
- * we bump type size so mass matches the reference plane.
+ * Screened live vs Aionis @ :3110 (1440×900):
+ * - viewBox 1400×550, baseline y=465, preserveAspectRatio xMidYMax slice
+ * - horizon chrome floats at bottom:55% ABOVE letter mass
+ * - luminous core must punch; no muddy floor wash that buries glyphs
+ * FOLIO is 5 glyphs vs AIONIS 6 → fontSize 290 (Aionis uses 260).
  */
 import { useEffect, useId, useRef } from "react";
 
@@ -34,7 +36,7 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
     // Match Aionis physics: pool left, drift right, blackout, bloom reset
     let curX = 380;
     let curRadius = 240;
-    let curBlur = 48;
+    let curBlur = 60;
     let curCore = 1;
     let curEdge = 0.95;
 
@@ -42,7 +44,7 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
       const elapsed = (Date.now() - start) % 12000;
       let targetX = 380;
       let targetRadius = 240;
-      let targetBlur = 48;
+      let targetBlur = 60;
       let targetCore = 1;
       let targetEdge = 0.95;
 
@@ -50,7 +52,7 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
         targetX = 380;
       } else if (elapsed < 5000) {
         targetX = 1050;
-        targetBlur = 50;
+        targetBlur = 62;
       } else if (elapsed < 6000) {
         targetX = 1050;
       } else if (elapsed < 6200) {
@@ -63,7 +65,7 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
         const p = (elapsed - 6200) / 1000;
         targetX = 380;
         targetRadius = 600 - p * 360;
-        targetBlur = 160 - p * 112;
+        targetBlur = 160 - p * 100;
         targetCore = Math.min(1, p * 1.6);
         targetEdge = Math.min(0.95, p * 1.6);
       }
@@ -87,12 +89,12 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  /* Extra viewBox depth below baseline lifts letter mass out of the foot
-     (Aionis y≈465 / 550; we pad to 640 so YMax doesn't bury FOLIO). */
-  const fontSize = compact ? 210 : 320;
-  const baseline = compact ? 390 : 440;
-  const viewH = compact ? 550 : 640;
-  const aspect = compact ? "xMidYMid meet" : "xMidYMax slice";
+  // Aionis parity: 1400×550 / y=465 / xMidYMax — compact shrinks for lab stages
+  const fontSize = compact ? 200 : 290;
+  const baseline = compact ? 400 : 465;
+  const viewH = compact ? 480 : 550;
+  const aspect = "xMidYMax slice";
+  const glowCy = compact ? 240 : 260;
 
   return (
     <div className={className ?? "folio-stencil"} aria-hidden>
@@ -114,23 +116,24 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
               FOLIO
             </text>
           </mask>
+          {/* Ledger-ice core (FOLIO tokens) — must punch like Aionis gold */}
           <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#ffffff" ref={stop1Ref} stopOpacity="1" />
-            <stop offset="40%" stopColor="#d7ecfa" ref={stop2Ref} stopOpacity="1" />
-            <stop offset="100%" stopColor="#8eb8d8" stopOpacity="0" />
+            <stop offset="0%" stopColor="#f4f8fc" ref={stop1Ref} stopOpacity="1" />
+            <stop offset="45%" stopColor="#c5daf0" ref={stop2Ref} stopOpacity="0.98" />
+            <stop offset="100%" stopColor="#7a9ec0" stopOpacity="0" />
           </radialGradient>
           <filter id={blurId} x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur ref={blurFilterRef} stdDeviation="52" />
+            <feGaussianBlur ref={blurFilterRef} stdDeviation="60" />
           </filter>
         </defs>
         <g mask={`url(#${maskId})`}>
           <rect width="1400" height={viewH} fill="#000000" />
-          {/* Always-readable letter floor — Aionis gold reads; FOLIO ice must too */}
-          <rect width="1400" height={viewH} fill="#3d5166" opacity="0.55" />
+          {/* Soft readable floor — bright enough that unlit glyphs still register */}
+          <rect width="1400" height={viewH} fill="#1a2838" opacity="0.85" />
           <circle
             ref={circleRef}
             cx="380"
-            cy="300"
+            cy={glowCy}
             r="280"
             fill={`url(#${gradId})`}
             filter={`url(#${blurId})`}

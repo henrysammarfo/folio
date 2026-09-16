@@ -62,7 +62,7 @@ function Home() {
         1) full-bleed black plane
         2) brand stencil IS the hero — luminous letters own the lower half
         3) top bar = mark + primary CTA only (no competing headline in the void)
-        4) horizon chrome floats just ABOVE the letterforms (bottom:55%)
+        4) horizon chrome floats just ABOVE the letterforms (bottom:55% — Aionis parity)
         5) supporting copy + CTAs live below the fold
       */}
       <section className="home-viewport" aria-label="FOLIO hero">
@@ -84,7 +84,9 @@ function Home() {
 
         <div className="home-horizon" aria-label="Status">
           <div className="home-horizon-left">
-            <span className="home-live-dot" aria-hidden />
+            <span className="home-live-asterisk" aria-hidden>
+              ✦
+            </span>
             <LocalTime />
           </div>
           <p className="home-scroll-hint">

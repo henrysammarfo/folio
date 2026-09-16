@@ -186,9 +186,11 @@
 .home-hero-void{display:none}
 .home-hero-tagline,.home-copy-tight{display:none}
 /* Aionis footer-above-stencil: floats just above letterforms at ~bottom:52% */
-.home-horizon{position:absolute;z-index:25;left:0;right:0;bottom:58%;padding:0 6%;display:flex;justify-content:space-between;align-items:center;gap:1rem;pointer-events:auto}
-.home-horizon-left{display:inline-flex;align-items:center;gap:.45rem;font-weight:500;font-size:.7rem;letter-spacing:.02em}
+/* Aionis footer-above-stencil uses bottom:55% — keep FOLIO horizon ON the letter plane */
+.home-horizon{position:absolute;z-index:25;left:0;right:0;bottom:55%;padding:0 6%;display:flex;justify-content:space-between;align-items:center;gap:1rem;pointer-events:auto;color:#fff}
+.home-horizon-left{display:inline-flex;align-items:center;gap:.5rem;font-weight:500;font-size:.7rem;letter-spacing:.02em;color:#fff}
 .home-live-dot{width:6px;height:6px;border-radius:50%;background:#d7e6f4;box-shadow:0 0 12px #d7e6f4}
+.home-live-asterisk{font-size:.65rem;line-height:1;opacity:.95;color:#fff}
 .home-scroll-hint{margin:0;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;opacity:.8;display:inline-flex;align-items:center;gap:.35rem}
 .home-below{position:relative;z-index:2;padding:clamp(3rem,8vw,5.5rem) 6%;background:#05070a;border-top:1px solid oklch(1 0 0/.06);display:grid;gap:2rem}
 @media(min-width:900px){.home-below{grid-template-columns:1.4fr .8fr;align-items:end}}
@@ -231,7 +233,10 @@
 .lab-stage-head h3{margin:.35rem 0 .25rem;font-size:1.15rem;font-weight:650;letter-spacing:-.02em}
 .lab-stage-head p{margin:0;font-size:.85rem;line-height:1.5;opacity:.78;max-width:48rem}
 .lab-aionis-stage-viewport{height:min(72vh,40rem);margin:0;border-radius:14px;border:1px solid oklch(1 0 0/.08)}
-.lab-aionis-horizon{position:absolute;z-index:3;left:0;right:0;bottom:52%;padding:0 1.25rem;display:flex;justify-content:space-between;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:oklch(1 0 0/.85);pointer-events:none}
+.lab-aionis-horizon{position:absolute;z-index:3;left:0;right:0;bottom:55%;padding:0 1.25rem;display:flex;justify-content:space-between;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:oklch(1 0 0/.85);pointer-events:none}
+.lab-plasma-stage{position:relative;height:min(48vh,26rem);margin:.75rem 0 1rem;border-radius:14px;overflow:hidden;border:1px solid oklch(1 0 0/.08);background:#05070a}
+.lab-plasma-canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.lab-plasma-caption{position:absolute;z-index:2;left:0;right:0;bottom:0;display:flex;justify-content:space-between;padding:.85rem 1.1rem;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:oklch(1 0 0/.88);background:linear-gradient(transparent,oklch(0 0 0/.72))}
 .lab-swatch{height:9.5rem;margin:.75rem 0 1rem;border-radius:calc(var(--radius) - 2px);position:relative;overflow:hidden}
 .lab-swatch-live{height:14rem;background:#05070a}
 .lab-swatch-canvas{position:absolute;inset:0;width:100%!important;height:100%!important}

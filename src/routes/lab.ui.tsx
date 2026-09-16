@@ -5,6 +5,7 @@ import { LabApprovePanel } from "@/components/lab-approve-panel";
 import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
 import { NetroDensityCanvas } from "@/components/lab/netro-density-canvas";
 import { FolioTradeJournalLab } from "@/components/lab/folio-trade-journal-lab";
+import { ShaderBackground } from "@/components/lab/shader-background";
 import { LAB_UI_IDS } from "@/lib/lab-pick";
 import {
   isTwentyFirstConfigured,
@@ -12,6 +13,21 @@ import {
   type TwentyFirstHit,
 } from "@/lib/lab/twentyfirst";
 import { getTruthBundle } from "@/lib/desk.functions";
+
+/** Prefer finance / desk / plasma — never surface random consumer-app heroes (e.g. recovery apps). */
+function isFinanceRelevant(h: TwentyFirstHit): boolean {
+  const blob = `${h.name} ${h.description ?? ""}`.toLowerCase();
+  if (
+    /sober|recovery|dating|fitness|recipe|travel|saas landing|accountability/i.test(
+      blob,
+    )
+  ) {
+    return false;
+  }
+  return /trade|journal|market|desk|dashboard|chart|finance|trading|shader|plasma|grain|stock|ledger/i.test(
+    blob,
+  );
+}
 
 export const Route = createFileRoute("/lab/ui")({
   head: () => ({
@@ -26,7 +42,7 @@ export const Route = createFileRoute("/lab/ui")({
   }),
   loader: async () => {
     const configured = isTwentyFirstConfigured();
-    const [truth, deskSearch, heroSearch] = await Promise.all([
+    const [truth, deskSearch, shaderSearch] = await Promise.all([
       getTruthBundle({ data: { symbol: "AAPLx" } }),
       configured
         ? searchTwentyFirstComponents(
@@ -36,38 +52,32 @@ export const Route = createFileRoute("/lab/ui")({
         : Promise.resolve({ ok: false as const, reason: "API_KEY_21ST missing" }),
       configured
         ? searchTwentyFirstComponents(
-            "cinematic landing hero plasma financial",
-            8,
+            "shader background grain noise liquid plasma WebGL",
+            6,
           )
         : Promise.resolve({ ok: false as const, reason: "API_KEY_21ST missing" }),
     ]);
 
     const hits: TwentyFirstHit[] = [];
-    if (deskSearch.ok) hits.push(...deskSearch.hits);
-    if (heroSearch.ok) {
-      for (const h of heroSearch.hits) {
+    if (deskSearch.ok) {
+      hits.push(...deskSearch.hits.filter(isFinanceRelevant));
+    }
+    if (shaderSearch.ok) {
+      for (const h of shaderSearch.hits.filter(isFinanceRelevant)) {
         if (!hits.some((x) => String(x.id) === String(h.id))) hits.push(h);
       }
     }
-
-    const cinematicHero =
-      (heroSearch.ok
-        ? heroSearch.hits.find((h) => /cinematic landing/i.test(h.name))
-        : null) ??
-      (heroSearch.ok ? heroSearch.hits[0] : null) ??
-      null;
 
     const tradeJournal =
       (deskSearch.ok
         ? deskSearch.hits.find((h) => /trade journal/i.test(h.name))
         : null) ??
-      hits.find((h) => /trade journal|financial hero|dashboard/i.test(h.name)) ??
-      hits[0] ??
+      hits.find((h) => /trade journal/i.test(h.name)) ??
       null;
 
     const note = configured
-      ? deskSearch.ok || heroSearch.ok
-        ? `21st MCP live · ${hits.length} catalog hits (search free; code fetch paid)`
+      ? deskSearch.ok || shaderSearch.ok
+        ? `21st MCP live · Plasma WebGL id 24346 adapted in-lab · ${hits.length} finance-filtered catalog hits`
         : `21st MCP error · ${"reason" in deskSearch ? deskSearch.reason : "unknown"}`
       : "API_KEY_21ST missing — set on Vercel preview + local .env for live catalog";
 
@@ -79,9 +89,8 @@ export const Route = createFileRoute("/lab/ui")({
     return {
       twentyFirstConfigured: configured,
       twentyFirstNote: note,
-      cinematicHero,
       tradeJournal,
-      gallery: hits.slice(0, 8),
+      gallery: hits.slice(0, 6),
       multiplierLabel,
     };
   },
@@ -112,8 +121,9 @@ function Page() {
             <StatusBadge tone="amber">aionis-brand-plane</StatusBadge>
             <h3>Aionis brand plane → production `/`</h3>
             <p>
-              Live extract: luminous stencil owns the lower half. No headline in
-              the void. Horizon chrome at ~52% (time + scroll only).
+              Live extract: luminous stencil owns the lower half (Aionis
+              1400×550 / y=465 parity). No headline in the void. Horizon at
+              bottom:55% (time + scroll only).
             </p>
           </header>
           <div className="lab-aionis-stage lab-aionis-stage-viewport">
@@ -143,30 +153,20 @@ function Page() {
             <StatusBadge tone={data.twentyFirstConfigured ? "green" : "amber"}>
               cinematic-landing-21st
             </StatusBadge>
-            <h3>{data.cinematicHero?.name ?? "21st cinematic landing"}</h3>
+            <h3>21st Plasma WebGL · id 24346 (FOLIO ink)</h3>
             <p>
-              {data.cinematicHero
-                ? `Live 21st.dev MCP · id ${data.cinematicHero.id}${
-                    data.cinematicHero.author ? ` · @${data.cinematicHero.author}` : ""
-                  }. Reference catalog — FOLIO production stays on the Aionis brand-plane extract.`
-                : "21st MCP unavailable — set API_KEY_21ST on Vercel for live previews."}
+              Pinned 21st.dev Shader Builder Plasma — live canvas retinted to
+              ledger ice. Not a random catalog marketing preview. Production
+              hero stays on the Aionis brand-plane extract until you Pick.
             </p>
           </header>
-          {data.cinematicHero?.previewUrl ? (
-            <img
-              className="lab-preview-frame lab-preview-frame-hero"
-              src={data.cinematicHero.previewUrl}
-              alt={`${data.cinematicHero.name} preview from 21st.dev`}
-              loading="lazy"
-            />
-          ) : (
-            <div className="lab-desk-preview" aria-hidden>
-              <div>
-                <span>21st MCP</span>
-                <b>catalog offline</b>
-              </div>
+          <div className="lab-plasma-stage" aria-hidden>
+            <ShaderBackground variant="ink-ledger" className="lab-plasma-canvas" />
+            <div className="lab-plasma-caption">
+              <span>21st MCP · Plasma 24346</span>
+              <span>WebGL live · approve-gated</span>
             </div>
-          )}
+          </div>
         </section>
 
         <section className="lab-stage" id="stage-journal">

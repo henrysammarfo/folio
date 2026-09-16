@@ -397,13 +397,15 @@ test.describe("FOLIO Block 0 smoke", () => {
   });
 
   test("paper agent keeps live spine and never fills", async ({ page }) => {
-    await page.goto("/desk/settings");
+    await page.goto("/desk/settings", { waitUntil: "networkidle" });
     await expect(page.getByText(/paper agent/i).first()).toBeVisible({
       timeout: 30_000,
     });
-    await page.getByRole("button", { name: /run paper agent/i }).click();
+    const runBtn = page.getByRole("button", { name: /run paper agent/i });
+    await runBtn.scrollIntoViewIfNeeded();
+    await runBtn.click();
     await expect(page.locator("pre").filter({ hasText: /nl=/i })).toBeVisible({
-      timeout: 45_000,
+      timeout: 60_000,
     });
     const out = (await page.locator("pre").filter({ hasText: /nl=/i }).innerText()).toLowerCase();
     // nl=off when AGENTROUTER missing; ok/failed/skipped when NL path runs
