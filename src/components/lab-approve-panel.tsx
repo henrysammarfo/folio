@@ -83,6 +83,13 @@ export function LabApprovePanel({
         <li>
           Tap <b>Pick</b> on <b>one</b> id
           {kind === "ui" ? " for desk chrome" : " for backdrop only"}.
+          {kind === "ui" ? (
+            <>
+              {" "}
+              Recommended for Stocklana desk: <code>netro-density</code> (full
+              12-col mounts on Preview on desk).
+            </>
+          ) : null}
         </li>
         <li>
           Reply in Cursor chat with the copied line (example:{" "}
@@ -100,6 +107,9 @@ export function LabApprovePanel({
               aria-label={`Copy candidate id ${id}`}
             >
               <code>{id}</code>
+              {kind === "ui" && id === "netro-density" ? (
+                <span className="lab-id-rec">rec</span>
+              ) : null}
               <span className="lab-id-copy-hint">
                 {copied === id || copied === `pick:${id}` ? "copied" : "copy"}
               </span>

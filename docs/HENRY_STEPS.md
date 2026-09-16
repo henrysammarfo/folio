@@ -9,45 +9,40 @@ Demo (hard-refresh): https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-tea
 ## Step 0 — Approve lab look ← DO THIS NEXT
 
 1. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/ui  
-   Tap **Pick** on one: `aionis-brand-plane` · `netro-density` · `cinematic-landing-21st` · `trade-journal-21st`  
+   Tap **Pick** on one id (recommended for Stocklana desk: **`netro-density`** — Preview on desk mounts the full NetroBNB **12-col** canvas with live AAPLx ×).  
+   Other ids: `aionis-brand-plane` (already mirrors production `/` hero) · `cinematic-landing-21st` · `trade-journal-21st`  
    (optional) **Preview on desk** — opt-in only; Exit preview anytime; not a production merge.
 2. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/shaders  
    Tap **Pick** on one: `ink-ledger` · `ledger-mist` · `aurora-grid`
-3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: aionis-brand-plane`) + screenshot.
+3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: netro-density`) + screenshot.
 
-Until you reply in chat, premium chrome stays off home/desk on purpose.
+Until you reply in chat, premium chrome stays off production home/desk on purpose.
 
-Refs extracted: **Aionis** brand-plane (production `/` already mirrors composition) · **NetroBNB** 12-col desk density · live **21st.dev** MCP previews.
-Opt-in **Preview on desk** paints stronger Netro grey/yellow chrome, Aionis dark plane, or cinematic/trade-journal desk skin (session-only · Exit anytime).
+Refs extracted: **Aionis** brand-plane (production `/` already mirrors composition) · **NetroBNB** 12-col desk density (lab + desk preview) · live **21st.dev** MCP (Plasma 24346 + Trade Journal 27124 pinned).
 
-### Optional before Step 2 — Vercel lab keys
-Set on the Vercel project (Preview + Production) so `/lab/ui` is live on the public demo (local `.env` already has them):
+### Optional before Step 2 — Vercel lab keys ✅ DONE
 
-| Name | Why |
-|------|-----|
-| `API_KEY_21ST` | 21st.dev MCP catalog + previews on `/lab/ui` |
-| `SHADERS_API_KEY` | optional — shaders.com probe (often Clerk 500; WebGL still ships from 21st) |
+Live-verified 2026-09-16 on branch preview `/lab/ui`: **21st MCP connected**.
 
-**Live check 2026-09-16:** preview `/lab/ui` still shows `API_KEY_21ST missing` until that Vercel env lands — **pinned Plasma 24346 + Trade Journal 27124 still adapt in-lab** (WebGL + blotter work without catalog search).
+| Name | Status |
+|------|--------|
+| `API_KEY_21ST` | ✅ on Vercel (all targets) |
+| `SHADERS_API_KEY` | ✅ on Vercel (Clerk may still 500; WebGL Plasma still ships) |
+| `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` | ✅ on Vercel |
 
 ---
 
 ## Step 1 — Vercel secrets (no paid API) ✅ DONE
 
-`FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED=true` are set on Vercel (all targets) and verified live on Settings:
-
-- Badge: **Watch-wallet secret set**
-- Readiness: **Set · watch-wallet bind ready**
-
-Demo: https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/desk/settings  
+`FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED=true` + `SOLANA_RPC_URL` are set on Vercel and verified live on Settings.
 
 **Rotate** any Vercel token pasted in chat (Account → Tokens). Do not paste tokens in chat again.
 
-What this unlocked: watch-wallet bind on the public demo (live-verified: bind Tokenkeg… → cookie set, Positions can mainnet-read qty). Broadcast stays paused.
+What this unlocked: watch-wallet bind on the public demo. Broadcast stays paused.
 
 ---
 
-## Step 2 — Bitquery (after Step 1 done)
+## Step 2 — Bitquery (after Step 0 Pick)
 
 Only when I say so. Needed for live wash tape (fail-closed until then).
 
@@ -55,7 +50,7 @@ Only when I say so. Needed for live wash tape (fail-closed until then).
 |------|--------|
 | `BITQUERY_API_KEY` | Bitquery dashboard → API key → paste into Vercel + local `.env` |
 
-Optional same sitting (unlocks Pyth diverge vs Jupiter):
+Optional same sitting (unlocks Pyth diverge vs Jupiter — Pyth bounty):
 
 | Name | Where |
 |------|--------|
@@ -81,11 +76,7 @@ Optional same sitting (unlocks Pyth diverge vs Jupiter):
 | `SUPABASE_SERVICE_ROLE_KEY` | Project settings → API (server only — never expose to browser) |
 | `SUPABASE_JWT_SECRET` | Project settings → API → **JWT Secret** (≥16) |
 
-`SUPABASE_JWT_SECRET` arms the user-JWT RLS path (`sub` = Privy DID). Without it FOLIO keeps a labeled service-role fallback. Desk prefs RLS: viewers read-only; owner/trader write.
-
-Run migration `supabase/migrations/*folio_tenants*` when keys land. Optional seed: `supabase/seed/demo_tenant.sql`.
-
-Full checklist when pasting keys: `docs/KEYS_LANDING.md`.
+Full checklist: `docs/KEYS_LANDING.md`.
 
 ---
 
@@ -93,3 +84,6 @@ Full checklist when pasting keys: `docs/KEYS_LANDING.md`.
 - Mainnet broadcast / swap send
 - Custom program deploy (rent ≫ $1)
 - Mentors/judges cold DMs (we draft after product looks premium)
+
+## CI note
+GitGuardian may flag historical public AAPLx mint in old commits — **Skip: false positive** (tip remediates; no Lovable history rewrite).

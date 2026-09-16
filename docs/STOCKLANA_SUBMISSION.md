@@ -2,7 +2,7 @@
 
 Re-check live counts on https://hackathons.solana.com/hackathons/stocklana before final submit.
 
-**Live (2026-09-16):** hackathons.solana.com + preview verify: hero prize **$121,000** · hero deadline **SEP 25, 2026** (re-check at submit). **stocklana.fun** shows hackathon close **18 SEP 2026 · 23:59 UTC** — treat **18 Sep as conservative**. Demo preview: 21st MCP **connected** · AAPLx ≈ **1.003269×** live.
+**Live (2026-09-16):** hackathons.solana.com **593** registered · **80** submissions · prize **$121,000** · hero deadline **SEP 25, 2026** (countdown ~9d). Timeline **Fri 18 Sep 2026, 16:00 ET** · stocklana.fun **18 Sep 23:59 UTC** — treat **18 Sep as conservative**. Demo preview: 21st MCP **connected** · AAPLx ≈ **1.003269×** live.
 
 ## Form fields (paste)
 

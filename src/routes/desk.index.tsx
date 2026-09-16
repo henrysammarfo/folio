@@ -169,8 +169,12 @@ function Page() {
       >
         <p className="mb-3 text-sm opacity-80">
           Mainnet-read overview qty + illustrative credit for a pubkey without a watch-wallet
-          cookie or Privy session. Useful on Vercel before <code>FOLIO_SESSION_SECRET</code>{" "}
-          lands. Inspect is <b>not</b> multi-tenant auth — and broadcast stays off.
+          cookie or Privy session. Prefer{" "}
+          <Link to="/desk/settings" className="underline">
+            Settings → bind watch wallet
+          </Link>{" "}
+          when you want a cookie. Inspect is <b>not</b> multi-tenant auth — and broadcast stays
+          off.
         </p>
         <div className="form-grid">
           <label>

@@ -143,11 +143,13 @@ function Page() {
         <section className="lab-stage" id="stage-netro">
           <header className="lab-stage-head">
             <StatusBadge tone="amber">netro-density</StatusBadge>
+            <StatusBadge tone="green">recommended · desk preview mounts 12-col</StatusBadge>
             <h3>NetroBNB 12-col desk density</h3>
             <p>
               Extracted from AbdullahBalfaqih/NetroBNB: grey canvas, yellow
               analysis clock, dark market strip, yellow AI rail — FOLIO truth
-              tokens only.
+              tokens only. Pick + Preview on desk embeds this canvas live on
+              `/desk` (session-only · Exit anytime).
             </p>
           </header>
           <NetroDensityCanvas multiplierLabel={data.multiplierLabel} />

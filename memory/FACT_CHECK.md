@@ -217,3 +217,8 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 - Branch preview `/lab/ui`: badge **21st MCP connected**; note Plasma 24346 + Journal 27124 pinned · finance-filtered catalog hits present (WebFetch).
 - AAPLx multiplier on Netro canvas: **1.003269× live** (preview).
 - stocklana.fun: HACKATHON CLOSE **18 SEP 2026 · 23:59 UTC** (WebFetch). Hero SEP 25 conflict unchanged — re-check at submit.
+
+## 2026-09-16 — Stocklana counts (hackathons.solana.com WebFetch)
+- Registered **593** · Submissions **80** · Prize pool **$121,000** · Deadline hero **SEP 25, 2026** · countdown ~9 days.
+- Timeline: submissions close Friday 18 September, 4:00pm ET.
+- stocklana.fun close banner earlier: 18 SEP 2026 · 23:59 UTC.

@@ -385,3 +385,10 @@
 - `DeskShell` now mounts `NetroDensityCanvas` (live multiplier) when opt-in preview is `netro-density`, and `FolioTradeJournalLab` for `trade-journal-21st` — not CSS-only.
 - stocklana.fun close banner: **18 SEP 2026 · 23:59 UTC** (conservative vs hero SEP 25).
 - Still blocked for full objective: Henry Pick · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused · rotate Vercel token.
+
+## 2026-09-16 — Stocklana 593/80 + netro recommended Pick
+
+- Live hackathons.solana.com: **593** registered · **80** submissions · **$121k** · hero SEP 25 · timeline 18 Sep 16:00 ET.
+- HENRY_STEPS: Vercel lab keys marked DONE; Step 0 recommends `netro-density` (desk preview mounts 12-col).
+- Lab approve panel marks netro as rec; LAB_UI_IDS order leads with netro-density.
+- Still blocked: Henry Pick reply · Bitquery · Pyth · Privy · Supabase · GG Skip · rotate token · broadcast paused.

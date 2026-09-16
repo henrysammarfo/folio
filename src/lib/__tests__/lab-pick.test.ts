@@ -16,6 +16,8 @@ describe("lab-pick", () => {
     expect(isLabUiId("desk-density-a")).toBe(false);
     expect(isLabUiId("")).toBe(false);
     expect(LAB_UI_IDS).toHaveLength(4);
+    // Stocklana desk recommend: Netro 12-col leads the pick list
+    expect(LAB_UI_IDS[0]).toBe("netro-density");
   });
 
   it("accepts only known shader candidate ids", () => {

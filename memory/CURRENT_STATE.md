@@ -392,3 +392,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Opt-in desk preview `netro-density` now embeds live `NetroDensityCanvas` (not token CSS alone); `trade-journal-21st` embeds honesty blotter.
 - Vercel `API_KEY_21ST` verified live on branch preview.
 - Goal still open: Henry Pick · Bitquery · Pyth · Privy · Supabase · GG Skip · broadcast paused.
+
+## 2026-09-16 — Stocklana 593/80 + Step 0 netro recommend
+- Live counts **593**/80/$121k; hero SEP 25 vs timeline 18 Sep conservative.
+- Step 0 recommends `netro-density`; Vercel 21st keys verified.
+- Goal open until Henry Pick + Empire keys + GG Skip.
