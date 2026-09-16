@@ -338,7 +338,7 @@
 .netro-density-top{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--netro-gap,1.1rem);align-items:stretch}
 @media(min-width:1024px){.netro-density-top{grid-template-columns:repeat(9,minmax(0,1fr))}}
 @media(min-width:1024px){.netro-density-profile{grid-column:span 3}.netro-density-stack{grid-column:span 6}}
-.netro-density-profile{background:linear-gradient(180deg,var(--netro-yellow-wash,#faf3c8),#fff8d6 45%,#fff);border:1px solid #e5e7eb;border-radius:14px;padding:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.45rem;min-height:100%;min-width:0;justify-content:space-between}
+.netro-density-profile{background:linear-gradient(180deg,#fbf7e6,#fffef8 40%,#fff);border:1px solid #e5e7eb;border-radius:14px;padding:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.45rem;min-height:100%;min-width:0;justify-content:space-between}
 .netro-density-hi{margin:0;font-size:1.15rem;font-weight:600}
 .netro-density-profile-art{position:relative;display:flex;align-items:center;justify-content:center;min-height:10rem;flex:1;margin:.35rem 0}
 .netro-density-gear{width:7.5rem;height:7.5rem;border-radius:50%;border:4px solid #1c1c1c18;border-top-color:var(--netro-yellow,#f4d014);border-right-color:#1c1c1c44;animation:netro-spin 45s linear infinite;box-shadow:inset 0 0 0 14px #fff9,0 10px 22px rgba(0,0,0,.1)}
