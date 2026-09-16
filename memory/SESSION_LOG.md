@@ -430,3 +430,8 @@
 - `getAcquireBundle` fetches Token-2022 Scaled UI + API↔chain compare (same as /truth).
 - Checks UI splits Truth (API) vs On-chain Scaled UI (match/mismatch/off) — no API-only green invent.
 - Honesty notes; strictFailClosed blocks on mismatch/off. Unit + e2e green. Goal open.
+
+## 2026-09-16 — Paper agent + activity Scaled UI spine
+
+- Paper agent truth/quote spines include on-chain Scaled UI compare (match/mismatch/off).
+- Activity feed emits On-chain Scaled UI event. Unit + e2e green. Goal open.

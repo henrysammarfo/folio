@@ -423,3 +423,6 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 ## 2026-09-16 — Acquire on-chain Scaled UI gate
 - Acquire Checks: Truth (API) vs On-chain Scaled UI (match/mismatch/off). Goal open.
+
+## 2026-09-16 — Paper agent + activity Scaled UI
+- Paper agent + activity show API↔on-chain Scaled UI (not API-only). Goal open.

@@ -5,6 +5,57 @@ import { parsePaperIntent, runPaperAgent } from "../agent/paper-agent";
 const FIXTURE_USDC = "USDCtestMint111111111111111111111111111111";
 const FIXTURE_XSTOCK = "AAPLxTestMint111111111111111111111111111111";
 
+function assetResponse() {
+  return new Response(
+    JSON.stringify({
+      symbol: "AAPLx",
+      name: "Apple",
+      underlyingSymbol: "AAPL",
+      deployments: [
+        {
+          network: "Solana",
+          address: FIXTURE_XSTOCK,
+          decimals: 8,
+        },
+      ],
+    }),
+    { status: 200, headers: { "Content-Type": "application/json" } },
+  );
+}
+
+function scaledUiRpcResponse(eff = 1.003269) {
+  return new Response(
+    JSON.stringify({
+      result: {
+        value: {
+          data: {
+            parsed: {
+              info: {
+                decimals: 8,
+                extensions: [
+                  {
+                    extension: "scaledUiAmountConfig",
+                    state: {
+                      multiplier: String(eff),
+                      newMultiplier: String(eff),
+                      newMultiplierEffectiveTimestamp: 0,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    }),
+    { status: 200, headers: { "Content-Type": "application/json" } },
+  );
+}
+
+function isSolanaRpc(_url: string, init?: RequestInit) {
+  return init?.method === "POST" && typeof init.body === "string" && init.body.includes("getAccountInfo");
+}
+
 describe("parsePaperIntent", () => {
   it("parses quote intents with spend cap semantics left to runner", () => {
     const intent = parsePaperIntent("quote 25 USDC AAPLx");
@@ -21,9 +72,11 @@ describe("parsePaperIntent", () => {
 describe("runPaperAgent live spine", () => {
   const prevKey = process.env["AGENTROUTER_API_KEY"];
   const prevBroadcast = process.env["BROADCAST_PAUSED"];
+  const prevBitquery = process.env["BITQUERY_API_KEY"];
 
   beforeEach(() => {
     delete process.env["AGENTROUTER_API_KEY"];
+    delete process.env["BITQUERY_API_KEY"];
     process.env["BROADCAST_PAUSED"] = "true";
     vi.restoreAllMocks();
   });
@@ -34,10 +87,12 @@ describe("runPaperAgent live spine", () => {
     else process.env["AGENTROUTER_API_KEY"] = prevKey;
     if (prevBroadcast == null) delete process.env["BROADCAST_PAUSED"];
     else process.env["BROADCAST_PAUSED"] = prevBroadcast;
+    if (prevBitquery == null) delete process.env["BITQUERY_API_KEY"];
+    else process.env["BITQUERY_API_KEY"] = prevBitquery;
   });
 
   it("attaches live multiplier facts for truth intents (no AgentRouter)", async () => {
-    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.includes("/multiplier")) {
         return new Response(
@@ -45,6 +100,8 @@ describe("runPaperAgent live spine", () => {
           { status: 200, headers: { "Content-Type": "application/json" } },
         );
       }
+      if (url.includes("/assets/AAPLx")) return assetResponse();
+      if (isSolanaRpc(url, init)) return scaledUiRpcResponse(1.003269);
       return new Response(`unexpected ${url}`, { status: 500 });
     });
     vi.stubGlobal("fetch", fetchMock);
@@ -55,14 +112,17 @@ describe("runPaperAgent live spine", () => {
     expect(res.data.caps.broadcast).toBe(false);
     expect(res.data.spine.truth?.multiplier).toBeCloseTo(1.003269);
     expect(res.data.spine.truth?.pendingMultiplier).toBeNull();
+    expect(res.data.spine.truth?.scaledUiStatus).toBe("match");
+    expect(res.data.spine.truth?.onchainEffective).toBeCloseTo(1.003269);
     expect(res.data.reply).toMatch(/1\.003269/);
+    expect(res.data.reply).toMatch(/on-chain match|Scaled UI/i);
     expect(res.data.reply).toMatch(/no pending newMultiplier|pending CA/i);
     expect(res.data.reply).toMatch(/broadcast=paused/);
     expect(res.data.reply).toMatch(/AgentRouter key missing/);
   });
 
   it("surfaces pending CA on truth spine when newMultiplier is live", async () => {
-    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.includes("/multiplier")) {
         return new Response(
@@ -75,6 +135,8 @@ describe("runPaperAgent live spine", () => {
           { status: 200, headers: { "Content-Type": "application/json" } },
         );
       }
+      if (url.includes("/assets/AAPLx")) return assetResponse();
+      if (isSolanaRpc(url, init)) return scaledUiRpcResponse(1.003269);
       return new Response(`unexpected ${url}`, { status: 500 });
     });
     vi.stubGlobal("fetch", fetchMock);
@@ -87,26 +149,18 @@ describe("runPaperAgent live spine", () => {
   });
 
   it("attaches quote-only spine for quote intents", async () => {
-    delete process.env["BITQUERY_API_KEY"];
-    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.includes("/assets/AAPLx?") || (url.includes("/assets/AAPLx") && !url.includes("multiplier"))) {
+        return assetResponse();
+      }
+      if (url.includes("/multiplier")) {
         return new Response(
-          JSON.stringify({
-            symbol: "AAPLx",
-            name: "Apple",
-            underlyingSymbol: "AAPL",
-            deployments: [
-              {
-                network: "Solana",
-                address: FIXTURE_XSTOCK,
-                decimals: 8,
-              },
-            ],
-          }),
+          JSON.stringify({ currentMultiplier: 1.003269 }),
           { status: 200, headers: { "Content-Type": "application/json" } },
         );
       }
+      if (isSolanaRpc(url, init)) return scaledUiRpcResponse(1.003269);
       if (url.includes("api.jup.ag/swap/v1/quote")) {
         return new Response(
           JSON.stringify({
@@ -135,6 +189,7 @@ describe("runPaperAgent live spine", () => {
     expect(res.data.spine.gates?.washOk).toBe(false);
     expect(res.data.spine.gates?.canReview).toBe(false);
     expect(res.data.spine.gates?.blockedReasons.join(" ")).toMatch(/BITQUERY_API_KEY/);
+    expect(res.data.spine.gates?.honestyNotes.join(" ")).toMatch(/Scaled UI/i);
     expect(res.data.reply).toMatch(/quote-only/);
     expect(res.data.reply).toMatch(/\blive\b/);
     expect(res.data.reply).toMatch(/Never a fill|acquire gates blocked/i);
@@ -142,7 +197,7 @@ describe("runPaperAgent live spine", () => {
 
   it("keeps live spine when AgentRouter returns WAF HTML", async () => {
     process.env["AGENTROUTER_API_KEY"] = "test-agentrouter-key";
-    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.includes("/multiplier")) {
         return new Response(
@@ -150,6 +205,8 @@ describe("runPaperAgent live spine", () => {
           { status: 200, headers: { "Content-Type": "application/json" } },
         );
       }
+      if (url.includes("/assets/AAPLx")) return assetResponse();
+      if (isSolanaRpc(url, init)) return scaledUiRpcResponse(1.003269);
       if (url.includes("/chat/completions")) {
         return new Response("<!doctype html><html><body>WAF</body></html>", {
           status: 200,
@@ -166,6 +223,7 @@ describe("runPaperAgent live spine", () => {
     expect(res.data.nlExpansion).toBe("failed");
     expect(res.data.nlExpansionNote ?? "").toMatch(/WAF|HTML|non-JSON/i);
     expect(res.data.spine.truth?.multiplier).toBeCloseTo(1.003269);
+    expect(res.data.spine.truth?.scaledUiStatus).toBe("match");
     expect(res.data.reply).toMatch(/1\.003269/);
     expect(res.data.reply).toMatch(/live spine only|Never a fill/i);
     expect(res.data.caps.broadcast).toBe(false);
@@ -176,22 +234,15 @@ describe("runPaperAgent live spine", () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.includes("/assets/AAPLx?") || (url.includes("/assets/AAPLx") && !url.includes("multiplier"))) {
+        return assetResponse();
+      }
+      if (url.includes("/multiplier")) {
         return new Response(
-          JSON.stringify({
-            symbol: "AAPLx",
-            name: "Apple",
-            underlyingSymbol: "AAPL",
-            deployments: [
-              {
-                network: "Solana",
-                address: FIXTURE_XSTOCK,
-                decimals: 8,
-              },
-            ],
-          }),
+          JSON.stringify({ currentMultiplier: 1.003269 }),
           { status: 200, headers: { "Content-Type": "application/json" } },
         );
       }
+      if (isSolanaRpc(url, init)) return scaledUiRpcResponse(1.003269);
       if (url.includes("api.jup.ag/swap/v1/quote")) {
         return new Response(
           JSON.stringify({

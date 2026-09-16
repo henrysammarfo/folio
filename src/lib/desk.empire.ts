@@ -10,7 +10,7 @@ import {
   type JupiterTokenPrice,
 } from "./adapters/jupiter";
 import { evaluateWashGate } from "./adapters/wash";
-import { fetchScaledUiOnchain } from "./adapters/scaled-ui";
+import { fetchScaledUiOnchain, compareApiOnchainMultiplier } from "./adapters/scaled-ui";
 import { fetchKaminoXStocksMarket } from "./adapters/kamino";
 import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
 import { fetchNestUsdStatus } from "./adapters/nestusd";
@@ -490,7 +490,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
     const decimals =
       asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
 
-    const [wash, jupiterQuote, pools, kamino, nestCredit, nestusd] = await Promise.all([
+    const [wash, jupiterQuote, pools, kamino, nestCredit, nestusd, scaledUi] = await Promise.all([
       evaluateWashGate({ symbol, mint, notionalUsd: 1 }),
       mint
         ? fetchJupiterQuote({
@@ -505,6 +505,9 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
       fetchKaminoXStocksMarket(),
       fetchNestCreditVaults(),
       fetchNestUsdStatus(),
+      mint
+        ? fetchScaledUiOnchain(mint)
+        : Promise.resolve(errResult("solana-rpc.scaled-ui", "mint_missing")),
     ]);
 
     const jupiterCacheLabel = jupiterQuote.ok
@@ -526,6 +529,29 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         tone: multiplier.ok ? "green" : "amber",
         mode: multiplier.ok ? multiplier.mode : "unavailable",
       },
+      (() => {
+        const compare = compareApiOnchainMultiplier(
+          multiplier.ok ? multiplier.data.currentMultiplier : null,
+          scaledUi.ok ? scaledUi.data.effectiveMultiplier : null,
+        );
+        return {
+          at: now,
+          title:
+            compare.status === "match"
+              ? `On-chain Scaled UI match · ${compare.onchainEffective?.toFixed(6)}×`
+              : compare.status === "mismatch"
+                ? `On-chain Scaled UI mismatch · ${compare.deltaBps?.toFixed(1)} bps`
+                : "On-chain Scaled UI unavailable",
+          detail: compare.note,
+          tone:
+            compare.status === "match"
+              ? ("green" as const)
+              : compare.status === "mismatch"
+                ? ("amber" as const)
+                : ("neutral" as const),
+          mode: scaledUi.ok ? scaledUi.mode : ("unavailable" as const),
+        };
+      })(),
       {
         at: now,
         title:

@@ -2,6 +2,10 @@ import { okResult, type AdapterResult } from "../adapters/types";
 import { fetchXStockAsset, fetchXStockMultiplier } from "../adapters/xstocks";
 import { fetchJupiterQuote } from "../adapters/jupiter";
 import { evaluateWashGate, washAllowsSize } from "../adapters/wash";
+import {
+  compareApiOnchainMultiplier,
+  fetchScaledUiOnchain,
+} from "../adapters/scaled-ui";
 import { buildAcquireGateMessages } from "../acquire-gates";
 import { isBroadcastPaused } from "../broadcast";
 
@@ -16,6 +20,11 @@ export type AgentSpineEvidence = {
     multiplier: number | null;
     /** Live xStocks pending newMultiplier — null means none on feed. */
     pendingMultiplier: number | null;
+    /** On-chain Token-2022 effective × when RPC works. */
+    onchainEffective: number | null;
+    /** API ↔ on-chain compare — never invents a match. */
+    scaledUiStatus: "match" | "mismatch" | "unavailable";
+    scaledUiNote: string;
     mode: string;
     note: string;
   };
@@ -97,7 +106,10 @@ export async function fetchPaperAgentSpine(
   }
 
   if (intent.kind === "truth") {
-    const mult = await fetchXStockMultiplier(intent.symbol);
+    const [mult, asset] = await Promise.all([
+      fetchXStockMultiplier(intent.symbol),
+      fetchXStockAsset(intent.symbol),
+    ]);
     if (!mult.ok) {
       const note = `${mult.reason}${mult.detail ? ` — ${mult.detail}` : ""}`;
       return {
@@ -106,6 +118,9 @@ export async function fetchPaperAgentSpine(
             symbol: intent.symbol,
             multiplier: null,
             pendingMultiplier: null,
+            onchainEffective: null,
+            scaledUiStatus: "unavailable",
+            scaledUiNote: "API multiplier unavailable — cannot score on-chain match",
             mode: "unavailable",
             note,
           },
@@ -113,23 +128,34 @@ export async function fetchPaperAgentSpine(
         facts: `Truth ${intent.symbol} fail-closed (${note}). ${broadcastNote}.`,
       };
     }
+    const mint = asset.ok ? asset.data.solanaMint : null;
+    const scaledUi = mint
+      ? await fetchScaledUiOnchain(mint)
+      : null;
+    const compare = compareApiOnchainMultiplier(
+      mult.data.currentMultiplier,
+      scaledUi?.ok ? scaledUi.data.effectiveMultiplier : null,
+    );
     const pending = mult.data.pendingMultiplier;
     const caNote =
       pending != null
         ? `pending CA ${pending.toFixed(6)}×`
         : "no pending newMultiplier on live feed";
-    const note = `live ×${mult.data.currentMultiplier.toFixed(6)} · ${caNote} · ${mult.source}`;
+    const note = `live ×${mult.data.currentMultiplier.toFixed(6)} · ${caNote} · on-chain ${compare.status} · ${mult.source}`;
     return {
       spine: {
         truth: {
           symbol: intent.symbol,
           multiplier: mult.data.currentMultiplier,
           pendingMultiplier: pending,
+          onchainEffective: compare.onchainEffective,
+          scaledUiStatus: compare.status,
+          scaledUiNote: compare.note,
           mode: mult.mode,
           note,
         },
       },
-      facts: `Truth ${intent.symbol}: ${note}. ${broadcastNote}.`,
+      facts: `Truth ${intent.symbol}: ${note}. Scaled UI: ${compare.note}. ${broadcastNote}.`,
     };
   }
 
@@ -160,7 +186,7 @@ export async function fetchPaperAgentSpine(
   }
 
   const mint = asset.data.solanaMint;
-  const [quote, wash] = await Promise.all([
+  const [quote, wash, scaledUi, multiplier] = await Promise.all([
     fetchJupiterQuote({
       outputMint: mint,
       amountRaw: Math.round(intent.spendUsdc * 1_000_000),
@@ -171,11 +197,24 @@ export async function fetchPaperAgentSpine(
       mint,
       notionalUsd: intent.spendUsdc,
     }),
+    fetchScaledUiOnchain(mint),
+    fetchXStockMultiplier(intent.symbol),
   ]);
+
+  const scaledUiCompare = compareApiOnchainMultiplier(
+    multiplier.ok ? multiplier.data.currentMultiplier : null,
+    scaledUi.ok ? scaledUi.data.effectiveMultiplier : null,
+  );
+  const scaledUiGate =
+    scaledUiCompare.status === "match"
+      ? ({ kind: "match", note: scaledUiCompare.note } as const)
+      : scaledUiCompare.status === "mismatch"
+        ? ({ kind: "mismatch", note: scaledUiCompare.note } as const)
+        : ({ kind: "unavailable", note: scaledUiCompare.note } as const);
 
   const washOk = washAllowsSize(wash);
   const gateMsgs = buildAcquireGateMessages({
-    truthOk: true,
+    truthOk: multiplier.ok && asset.ok,
     tradingHalted: Boolean(asset.data.isTradingHalted),
     washOk,
     wash: wash.ok
@@ -185,6 +224,7 @@ export async function fetchPaperAgentSpine(
     quoteReason: quote.ok ? null : quote.reason,
     // Paper agent does not invent a Pyth pass on this path.
     diverge: { kind: "unavailable" },
+    scaledUi: scaledUiGate,
   });
 
   const gates = {

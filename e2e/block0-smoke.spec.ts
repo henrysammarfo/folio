@@ -198,6 +198,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/nest\.credit|vault awareness|not nestusd/);
     expect(body).toMatch(/corporate-action alerts/);
+    expect(body).toMatch(/on-chain scaled ui/);
     expect(body).toMatch(
       /corporate action|pending multiplier|no pending|no session prefs|multiplier/,
     );
