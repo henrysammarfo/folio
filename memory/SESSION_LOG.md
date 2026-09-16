@@ -342,3 +342,9 @@
 - Fixed client `node:crypto` leak via lazy `node-hmac.ts`.
 - Acquire gate grid + e2e networkidle/hydration fixes.
 - Henry still needs Vercel `API_KEY_21ST` (+ optional `SHADERS_API_KEY`) for public preview lab.
+
+## 2026-09-16 — node-hmac Vitest ESM fix (multi-tenant path)
+
+- `process.getBuiltinModule("crypto")` replaces `eval(require)` so session/JWT unit tests pass under Vitest ESM while client graphs still avoid static `node:crypto` imports.
+- Vitest **101/101** green; smoke-empire honesty ok; Stocklana still **590**/79/$121k (jina).
+- Henry blockers unchanged: lab Pick, Vercel API_KEY_21ST, Bitquery→Pyth→Privy→Supabase, GG Skip, broadcast paused.

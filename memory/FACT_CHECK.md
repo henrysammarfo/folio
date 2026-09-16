@@ -180,3 +180,9 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 - Aionis landing first viewport = empty upper void + luminous brand stencil lower half + horizon chrome ~55% (no headline on letters). Verified via live :3110 screenshot.
 - NetroBNB = grey #E5E7EB 12-col + yellow analysis clock + dark market strip + yellow AI rail. Verified via live :3111 screenshot.
 - Local `/lab/ui` shows `21st MCP connected` with live catalog hits when `API_KEY_21ST` in process env; Vercel preview still needs that env set.
+
+## 2026-09-16 node-hmac
+| Claim | Status | Evidence |
+|---|---|---|
+| Session/JWT HMAC works under Vitest ESM without static node:crypto | CONFIRMED | `process.getBuiltinModule("crypto")` + 101 vitest green | 2026-09-16 |
+| Stocklana registered **590** / submissions **79** / prize **$121,000** | CONFIRMED live (re-check) | jina hackathons.solana.com/stocklana | 2026-09-16 |

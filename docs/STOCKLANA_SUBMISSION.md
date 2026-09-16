@@ -30,10 +30,12 @@ FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after
 
 - [x] Vercel `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true` — settings shows **Watch-wallet secret set** · bind ready (live-verified)
 - [x] Vercel `SOLANA_RPC_URL` (public mainnet) for Scaled UI + wallet reads
+- [ ] Land `API_KEY_21ST` on Vercel Preview so `/lab/ui` shows live 21st MCP (local `.env` already set)
 - [ ] Reply with one lab id to approve premium chrome: `netro-density` · `aionis-brand-plane` · `trade-journal-21st` · `ink-ledger` · `ledger-mist` · `aurora-grid`
 - [ ] Land `BITQUERY_API_KEY` for live wash (fail-closed until then)
 - [ ] Land `PYTH_API_KEY` for Hermes equity diverge (fail-closed until then)
 - [ ] Land Privy + Supabase keys for multi-tenant sessions — see `docs/KEYS_LANDING.md`
+- [ ] GitGuardian **Skip: false positive** on historical public AAPLx mint (tip remediates; no Lovable history rewrite)
 - [ ] Rotate any chat-pasted Vercel token
 
 ## Walkthrough artifacts
