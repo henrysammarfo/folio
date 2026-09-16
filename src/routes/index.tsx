@@ -78,28 +78,31 @@ function Home() {
           </div>
         </header>
 
+        {/* Horizon band ABOVE the stencil — copy never sits in the footer zone */}
         <div className="home-midband">
-          <div className="home-midband-left">
-            <span className="home-live-dot" aria-hidden />
-            <LocalTime />
+          <div className="home-midband-stack">
+            <div className="home-midband-left">
+              <span className="home-live-dot" aria-hidden />
+              <LocalTime />
+            </div>
+            <main className="home-hero">
+              <p className="home-hero-tagline">Own the economic truth.</p>
+              <p className="home-copy">
+                Honest stock desk on Solana. {liveLine} Broadcast stays off until
+                funded.
+              </p>
+              <div className="home-cta-row">
+                <Link to="/desk" className="home-cta">
+                  Open the desk <ArrowRight />
+                </Link>
+                <Link to="/truth" className="home-cta-secondary">
+                  See live truth
+                </Link>
+              </div>
+            </main>
           </div>
           <p className="home-scroll-hint">Scroll to explore ↓</p>
         </div>
-
-        <main className="home-hero">
-          <p className="home-hero-tagline">Own the economic truth.</p>
-          <p className="home-copy">
-            Honest stock desk on Solana. {liveLine} Broadcast stays off until funded.
-          </p>
-          <div className="home-cta-row">
-            <Link to="/desk" className="home-cta">
-              Open the desk <ArrowRight />
-            </Link>
-            <Link to="/truth" className="home-cta-secondary">
-              See live truth
-            </Link>
-          </div>
-        </main>
       </section>
 
       <footer className="home-footer">

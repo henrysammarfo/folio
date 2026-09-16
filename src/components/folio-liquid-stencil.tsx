@@ -105,9 +105,9 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
             </text>
           </mask>
           <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#c8d6e5" ref={stop1Ref} stopOpacity="1" />
-            <stop offset="55%" stopColor="#7a9bb8" ref={stop2Ref} stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#3d5a73" stopOpacity="0" />
+            <stop offset="0%" stopColor="#f2f6fa" ref={stop1Ref} stopOpacity="1" />
+            <stop offset="40%" stopColor="#b7d0e6" ref={stop2Ref} stopOpacity="0.98" />
+            <stop offset="100%" stopColor="#6e93b4" stopOpacity="0" />
           </radialGradient>
           <filter id={blurId} x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur ref={blurFilterRef} stdDeviation="56" />
