@@ -30,7 +30,6 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  /** Prefetch live AAPLx multiplier so first viewport copy is not fixture theater. */
   loader: async () => getTruthBundle({ data: { symbol: "AAPLx" } }),
   component: Home,
 });
@@ -39,54 +38,69 @@ function Home() {
   const truth = Route.useLoaderData();
   const mult = truth?.multiplier;
   const liveLine = mult?.ok
-    ? `AAPLx live ${mult.data.currentMultiplier.toFixed(6)}× on Solana — not fixture 4×. Broadcast stays off.`
-    : "Live share-count truth on Solana — never fixture 4×. Broadcast stays off until funded.";
+    ? `AAPLx live ${mult.data.currentMultiplier.toFixed(6)}× — not fixture theater.`
+    : "Live share-count truth on Solana — never fixture 4×.";
 
   return (
     <div className="cinematic-home">
-      <div className="home-media">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/693205bf-8048-456a-879e-4e0a1b85a098.webp"
-          aria-label="Painted alpine panorama: a lone hiker with a pink backpack faces a snow-capped peak above a sea of clouds"
-        >
-          <source
-            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260826_123836_11a3c5e0-713f-4bef-a8e9-7dd93bdea3b0.mp4"
-            type="video/mp4"
-          />
-        </video>
-      </div>
-      <div className="home-scrim" />
-      <main className="home-hero">
-        <div className="home-brand-hero">
-          <FolioMark className="size-10" />
-          <span>FOLIO</span>
+      {/* First viewport: brand + headline + one sentence + CTA · full-bleed media */}
+      <section className="home-viewport" aria-label="FOLIO hero">
+        <div className="home-media" aria-hidden>
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/693205bf-8048-456a-879e-4e0a1b85a098.webp"
+          >
+            <source
+              src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260826_123836_11a3c5e0-713f-4bef-a8e9-7dd93bdea3b0.mp4"
+              type="video/mp4"
+            />
+          </video>
         </div>
-        <p className="home-eyebrow">Corporate-action prime desk</p>
-        <h1>Own the economic truth.</h1>
-        <div className="home-copy">
-          FOLIO keeps Solana stock share counts honest and refuses shady pools.{" "}
-          {liveLine} Lab chrome waits on Henry’s approve.
-        </div>
-        <div className="home-cta-row">
-          <Link to="/desk" className="home-cta">
-            Open the desk <ArrowRight />
-          </Link>
-          <Link to="/lab/ui" className="home-cta-secondary">
-            Approve desk UI
-          </Link>
-          <Link to="/lab/shaders" className="home-cta-secondary">
-            Approve shaders
-          </Link>
-        </div>
-        <p className="home-approve-hint">
-          Open lab → pick one id → reply in chat. This hero does not change
-          without your approve.
+        <div className="home-scrim" aria-hidden />
+
+        <header className="home-topbar">
+          <div className="home-brand-hero">
+            <FolioMark className="size-9" />
+            <span>FOLIO</span>
+          </div>
+          <div className="home-topbar-actions">
+            <Link to="/lab/ui" className="home-top-link">
+              Lab UI
+            </Link>
+            <Link to="/lab/shaders" className="home-top-link">
+              Shaders
+            </Link>
+            <Link to="/desk" className="home-top-cta">
+              Open desk
+            </Link>
+          </div>
+        </header>
+
+        <main className="home-hero">
+          <h1>FOLIO</h1>
+          <p className="home-hero-tagline">Own the economic truth.</p>
+          <p className="home-copy">
+            Honest stock desk on Solana. {liveLine} Broadcast stays off until funded.
+          </p>
+          <div className="home-cta-row">
+            <Link to="/desk" className="home-cta">
+              Open the desk <ArrowRight />
+            </Link>
+            <Link to="/truth" className="home-cta-secondary">
+              See live truth
+            </Link>
+          </div>
+        </main>
+
+        <p className="home-scroll-hint" aria-hidden>
+          Scroll
         </p>
-      </main>
+      </section>
+
+      {/* Below fold — never steals first viewport */}
       <footer className="home-footer">
         <div className="home-brand">
           <div className="brand-lockup text-primary-foreground">
@@ -94,6 +108,11 @@ function Home() {
             <span>FOLIO</span>
           </div>
           <p>Truth before trade. Credit without compromise.</p>
+          <p className="home-footer-lab">
+            Premium chrome: pick on{" "}
+            <Link to="/lab/ui">/lab/ui</Link> · <Link to="/lab/shaders">/lab/shaders</Link> then
+            reply in chat.
+          </p>
         </div>
         <nav className="home-nav">
           <div>

@@ -85,11 +85,11 @@ function Page() {
         <p className="mt-4 text-sm opacity-80">
           Premium look is gated on purpose.{" "}
           <Link to="/lab/ui" className="underline">
-            Approve desk UI
+            Lab UI
           </Link>{" "}
           ·{" "}
           <Link to="/lab/shaders" className="underline">
-            Approve shaders
+            Lab shaders
           </Link>{" "}
           ·{" "}
           <Link to="/network" className="underline">

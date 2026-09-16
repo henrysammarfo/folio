@@ -60,17 +60,17 @@ See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readines
 
 Step-by-step for Henry (keys + lab): `docs/HENRY_STEPS.md` · Vision/interview: `docs/COLOSSEUM_VISION.md`
 
-Live home now shows **Approve desk UI** / **Approve shaders** CTAs.
+Live home: brand-first FOLIO hero (footer below fold) · topbar Lab UI / Shaders.
 
 Shaders (`/lab/shaders`):
 - `ink-ledger`
 - `ledger-mist`
 - `aurora-grid`
 
-UI (`/lab/ui`):
-- `desk-density-a`
-- `desk-density-b`
-- `gate-chip`
+UI (`/lab/ui`) — extracted from NetroBNB + Aionis + live 21st.dev:
+- `netro-density`
+- `aionis-brand-plane`
+- `trade-journal-21st`
 
 Production hero + desk chrome stay frozen until Henry names an id in chat.
 

@@ -9,13 +9,15 @@ Demo (hard-refresh): https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-tea
 ## Step 0 — Approve lab look ← DO THIS NEXT
 
 1. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/ui  
-   Tap **Pick** on one: `desk-density-a` · `desk-density-b` · `gate-chip`  
+   Tap **Pick** on one: `netro-density` · `aionis-brand-plane` · `trade-journal-21st`  
    (optional) **Preview on desk** — opt-in only; Exit preview anytime; not a production merge.
 2. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/shaders  
    Tap **Pick** on one: `ink-ledger` · `ledger-mist` · `aurora-grid`
-3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: desk-density-a`) + screenshot.
+3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: netro-density`) + screenshot.
 
 Until you reply in chat, premium chrome stays off home/desk on purpose.
+
+Refs extracted: NetroBNB desk density · Aionis brand-plane · live 21st.dev MCP previews.
 
 ---
 

@@ -140,7 +140,7 @@ export function LabApprovePanel({
         <Link to={other.to} className="underline">
           {other.label}
         </Link>
-        . Home CTAs: Approve desk UI · Approve shaders. Production hero stays locked until you
+        . Home topbar: Lab UI · Shaders · Open desk. Production hero stays locked until you
         reply in chat.
       </p>
     </aside>

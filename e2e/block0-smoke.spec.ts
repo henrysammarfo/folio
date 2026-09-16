@@ -78,19 +78,19 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(page.getByText(/ink-ledger|ledger-mist|aurora-grid/i).first()).toBeVisible();
     await page.goto("/lab/ui");
     await expect(page.getByText(/awaiting henry|approve/i).first()).toBeVisible();
-    await expect(page.getByText(/desk-density-a/i).first()).toBeVisible();
-    await expect(page.getByText(/desk-density-b/i).first()).toBeVisible();
-    await expect(page.getByText(/gate-chip/i).first()).toBeVisible();
-    await expect(page.getByText(/mainnet-read|quote-only|unavailable/i).first()).toBeVisible();
+    await expect(page.getByText(/netro-density/i).first()).toBeVisible();
+    await expect(page.getByText(/aionis-brand-plane/i).first()).toBeVisible();
+    await expect(page.getByText(/trade-journal-21st/i).first()).toBeVisible();
+    await expect(page.getByText(/21st|netrobnb|aionis/i).first()).toBeVisible();
 
     // Pick is local-only; preview on desk is opt-in and never a production merge
-    await page.getByRole("button", { name: /pick candidate desk-density-a/i }).click();
-    await expect(page.getByText(/chat reply ready|approve lab ui: desk-density-a/i).first()).toBeVisible();
+    await page.getByRole("button", { name: /pick candidate netro-density/i }).click();
+    await expect(page.getByText(/chat reply ready|approve lab ui: netro-density/i).first()).toBeVisible();
     await page.getByRole("link", { name: /preview on desk/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible({
       timeout: 30_000,
     });
-    await expect(page.locator("[data-lab-ui='desk-density-a']")).toHaveCount(1);
+    await expect(page.locator("[data-lab-ui='netro-density']")).toHaveCount(1);
     await page.getByRole("button", { name: /exit preview/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i)).toHaveCount(0);
   });
@@ -321,12 +321,18 @@ test.describe("FOLIO Block 0 smoke", () => {
   });
 
 
-  test("home surfaces lab approve CTAs", async ({ page }) => {
+  test("home surfaces brand-first hero and lab links", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("link", { name: /approve desk ui/i })).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByRole("link", { name: /approve shaders/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^FOLIO$/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByRole("link", { name: /open the desk/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /^lab ui$/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /^shaders$/i }).first()).toBeVisible();
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/approve a look|without your approve|lab/);
+    expect(body).toMatch(/own the economic truth|live|broadcast/);
+    // Footer lab copy is below fold — not competing with hero brand
+    expect(body).toMatch(/lab\/ui|lab\/shaders|premium chrome/);
   });
 
   test("paper agent keeps live spine and never fills", async ({ page }) => {

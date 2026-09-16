@@ -292,6 +292,7 @@
 - Matrix rows for membership wallet priority + role-gated prefs.
 - Goal open: Henry lab Pick + keys.
 
-## 2026-09-15 — Pyth Equity.US/Crypto.xStock + RLS writer policies
-- Dual Pyth references on truth; desk_prefs RLS owner/trader write; Stocklana **546**/72/$121k.
-- Goal open: Henry lab Pick + Bitquery/Pyth/Privy/Supabase(+JWT); broadcast paused.
+## 2026-09-16 — UI refs + hero fix
+- Cloned NetroBNB + Aionis; 21st MCP live on lab; shaders key probed (Clerk fail-closed labeled).
+- Home footer unburied (was min-height 40vh on first viewport). New lab ids from real refs.
+- Goal open: Henry Pick + keys.

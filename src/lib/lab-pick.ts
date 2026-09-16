@@ -1,9 +1,9 @@
 /** Lab approve-gate helpers. Picks stay local until Henry replies in chat — never auto-merge. */
 
 export const LAB_UI_IDS = [
-  "desk-density-a",
-  "desk-density-b",
-  "gate-chip",
+  "netro-density",
+  "aionis-brand-plane",
+  "trade-journal-21st",
 ] as const;
 
 export const LAB_SHADER_IDS = [

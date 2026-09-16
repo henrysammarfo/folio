@@ -326,7 +326,9 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Matrix documents membership→session→watch→inspect qty priority and owner/trader prefs write (viewer fail-closed).
 - Still blocked: Henry lab id · Bitquery · Pyth · Privy · Supabase (+ JWT) · funded broadcast.
 
-## 2026-09-15 — Pyth Equity.US + Crypto.xStock + RLS role write
-- Hermes maps Equity.US AAPL/NVDA/TSLA + Crypto.AAPLX/NVDAX/TSLAX; `/truth` surfaces both (diverge still Equity vs Jupiter).
-- Supabase desk_prefs RLS: select self; insert/update/delete require owner/trader.
-- Stocklana live re-check: **546** / **72** / **$121k**. Vitest **99** green. Still blocked: Henry lab id · keys · funded broadcast.
+## 2026-09-16 — UI refs connected + hero unburied
+- Cloned NetroBNB + Aionis landing; wired live **21st.dev MCP** (`API_KEY_21ST`) into `/lab/ui`.
+- Probed **SHADERS_API_KEY** on shaders.com (Clerk-gated — labeled; local ink/ledger studies keep motion).
+- Home: first viewport = brand-first FOLIO + one line + CTAs; **footer no longer 40vh overlay** (was burying hero).
+- Lab UI ids: `netro-density` · `aionis-brand-plane` · `trade-journal-21st` (live 21st preview).
+- Still blocked: Henry Pick reply · Bitquery/Pyth/Privy/Supabase · funded broadcast.

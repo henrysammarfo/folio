@@ -9,10 +9,10 @@ import {
 
 describe("lab-pick", () => {
   it("accepts only known UI candidate ids", () => {
-    expect(isLabUiId("desk-density-a")).toBe(true);
-    expect(isLabUiId("desk-density-b")).toBe(true);
-    expect(isLabUiId("gate-chip")).toBe(true);
-    expect(isLabUiId("desk-density-z")).toBe(false);
+    expect(isLabUiId("netro-density")).toBe(true);
+    expect(isLabUiId("aionis-brand-plane")).toBe(true);
+    expect(isLabUiId("trade-journal-21st")).toBe(true);
+    expect(isLabUiId("desk-density-a")).toBe(false);
     expect(isLabUiId("")).toBe(false);
     expect(LAB_UI_IDS).toHaveLength(3);
   });
@@ -26,8 +26,8 @@ describe("lab-pick", () => {
   });
 
   it("builds chat reply lines Henry can paste", () => {
-    expect(chatReplyForPick("ui", "desk-density-a")).toBe(
-      "Approve lab UI: desk-density-a",
+    expect(chatReplyForPick("ui", "netro-density")).toBe(
+      "Approve lab UI: netro-density",
     );
     expect(chatReplyForPick("shaders", "ink-ledger")).toBe(
       "Approve lab shader: ink-ledger",
