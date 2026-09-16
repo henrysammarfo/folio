@@ -40,6 +40,16 @@ describe("goal-smoke", () => {
     expect(summarizeGoalSmoke(rows).shipReady).toBe(false);
   });
 
+  it("calls out grants SQL when schema not ready but keys present", () => {
+    const rows = classifyGoalRequirements({
+      ...base,
+      privyKey: true,
+      supabaseKey: true,
+      supabaseSchemaReady: false,
+    });
+    expect(rows.find((r) => r.id === "multi_tenant")?.detail).toMatch(/20260916_folio_tenants_grants/);
+  });
+
   it("shipReady only when wash+Pyth live and multi-tenant armed", () => {
     const rows = classifyGoalRequirements({
       ...base,

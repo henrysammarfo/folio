@@ -21,6 +21,7 @@ import { resolveSolanaRpcUrl } from "../src/lib/adapters/solana-rpc.ts";
 import { isBroadcastPaused } from "../src/lib/broadcast.ts";
 import { readApprovedLabUi } from "../src/lib/lab-pick.ts";
 import { getAuthProviderStatus } from "../src/lib/auth/session.ts";
+import { loadEmpireReadiness } from "../src/lib/desk.empire.ts";
 import {
   classifyGoalRequirements,
   summarizeGoalSmoke,
@@ -72,6 +73,7 @@ async function main() {
   const pythLive = pythEquity.ok || pythX.ok;
   const pythFailClosed = !pythLive;
   const auth = getAuthProviderStatus();
+  const readiness = await loadEmpireReadiness();
 
   const rows = classifyGoalRequirements({
     approvedLabUi: readApprovedLabUi(),
@@ -96,6 +98,7 @@ async function main() {
     sessionSecret,
     /** Keys alone ≠ multi-tenant ready — mint + memberships still required. */
     multiTenantSessionReady: false,
+    supabaseSchemaReady: readiness.supabaseSchemaReady,
   });
 
   const summary = summarizeGoalSmoke(rows);

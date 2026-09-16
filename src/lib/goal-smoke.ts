@@ -32,6 +32,8 @@ export type GoalSmokeInput = {
   supabaseKey: boolean;
   sessionSecret: boolean;
   multiTenantSessionReady: boolean;
+  /** PostgREST tenants reachable (migration + service_role GRANTs). */
+  supabaseSchemaReady?: boolean;
 };
 
 export function classifyGoalRequirements(
@@ -63,7 +65,7 @@ export function classifyGoalRequirements(
       if (!input.pythLive) {
         waiting.push(
           input.pythKey
-            ? "Pyth keyed but Equity/xStock feed not entitled (BTC/ETH crypto works — enable equities on Pyth Terminal)"
+            ? "Pyth keyed but Equity/xStock not entitled — upgrade to Pro (not Starter) + Equities at app.pyth.com"
             : "PYTH_API_KEY (Hermes fail-closed)",
         );
       }
@@ -85,7 +87,9 @@ export function classifyGoalRequirements(
       ? "Missing PRIVY_* and/or SUPABASE_* — multi-tenant fail-closed"
       : !input.sessionSecret
         ? "Missing FOLIO_SESSION_SECRET ≥16 — cookie mint fail-closed"
-        : "Keys present — mint httpOnly session + tenant memberships to finish";
+        : input.supabaseSchemaReady === false
+          ? "Keys+JWT present · run 20260916_folio_tenants_grants.sql (service_role 42501) then mint session"
+          : "Keys present — mint httpOnly session + tenant memberships to finish";
 
   const uiStatus: GoalStatus =
     input.approvedLabUi === "netro-density" ? "done" : "partial";

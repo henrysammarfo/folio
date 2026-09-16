@@ -283,6 +283,36 @@ function Page() {
                 : "Missing · service-role labeled fallback"}
             </b>
           </p>
+          {(data?.readiness.supabaseSchemaDetail ?? "").includes("42501") ||
+          (data?.readiness.supabaseSchemaDetail ?? "").includes("grants") ? (
+            <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+              <b>DO NOW · Supabase SQL editor</b>
+              <p className="mt-1 opacity-80">
+                Tables exist but <code>service_role</code> lacks privileges. Paste this exactly, then
+                Run:
+              </p>
+              <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs leading-relaxed opacity-90">{`grant select, insert, update, delete on public.tenants to service_role;
+grant select, insert, update, delete on public.tenant_members to service_role;
+grant select, insert, update, delete on public.desk_preferences to service_role;
+grant select on public.tenants to anon, authenticated;
+grant select on public.tenant_members to anon, authenticated;
+grant select, insert, update, delete on public.desk_preferences to anon, authenticated;`}</pre>
+            </div>
+          ) : null}
+          {data?.readiness.pythApiKeyPresent ? (
+            <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+              <b>DO NOW · Pyth Pro (not Starter)</b>
+              <p className="mt-1 opacity-80">
+                Current key = crypto-only (BTC/ETH OK · AAPL 403). Open{" "}
+                <a href="https://app.pyth.com/" target="_blank" rel="noreferrer">
+                  app.pyth.com
+                </a>{" "}
+                → Subscribe / <b>Start free trial</b> → pick <b>Pro</b> → enable{" "}
+                <b>Equities</b> → 🔑 View API key → replace <code>PYTH_API_KEY</code> on Vercel →
+                redeploy. Prove Equity.US.AAPL Hermes returns HTTP 200.
+              </p>
+            </div>
+          ) : null}
           <p>
             <span>Broadcast</span>
             <b>
