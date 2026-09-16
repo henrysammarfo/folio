@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
@@ -19,6 +19,12 @@ import {
 } from "@/lib/desk.functions";
 import { readLabShaderPick, readLabUiPick } from "@/lib/lab-pick";
 import { canWriteDeskPrefs } from "@/lib/auth/role-gates";
+
+const PrivySessionMint = lazy(() =>
+  import("@/components/privy-session-mint").then((m) => ({
+    default: m.PrivySessionMint,
+  })),
+);
 
 export const Route = createFileRoute("/desk/settings")({
   head: () => ({
@@ -69,6 +75,10 @@ function Page() {
   const [prefsMsg, setPrefsMsg] = useState("");
   const [tenantBusy, setTenantBusy] = useState(false);
   const [tenantMsg, setTenantMsg] = useState("");
+  const [privyClient, setPrivyClient] = useState(false);
+  useEffect(() => {
+    setPrivyClient(true);
+  }, []);
   const tenants = data?.session.ok ? data.session.data.tenants : [];
   const activeTenantId = data?.activeTenantId ?? null;
   const prefsTenant =
@@ -303,15 +313,20 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
           ) : null}
           {data?.readiness.pythApiKeyPresent ? (
             <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
-              <b>DO NOW · Pyth Pro (not Starter)</b>
+              <b>DO NOW · Pyth entitle Equity.US + Crypto.xStock</b>
               <p className="mt-1 opacity-80">
-                Current key = crypto-only (BTC/ETH OK · AAPL 403). Open{" "}
+                Live probe: Hermes <b>403 Not entitled</b> on both{" "}
+                <code>Equity.US.AAPL/USD</code> and <code>Crypto.AAPLX/USD</code> (Starter =
+                crypto majors only). Exact path:{" "}
                 <a href="https://app.pyth.com/" target="_blank" rel="noreferrer">
                   app.pyth.com
                 </a>{" "}
-                → Subscribe / <b>Start free trial</b> → pick <b>Pro</b> → enable{" "}
-                <b>Equities</b> → 🔑 View API key → replace <code>PYTH_API_KEY</code> on Vercel →
-                redeploy. Prove Equity.US.AAPL Hermes returns HTTP 200.
+                → <b>Start free Pro trial</b> (or U.S. Equities / All Asset Classes) → in plan /
+                entitlements enable feeds matching <b>Equity.US.*</b> and{" "}
+                <b>Crypto.*X</b> (xStock) → 🔑 View API key → replace{" "}
+                <code>PYTH_API_KEY</code> on Vercel → redeploy. Prove both Hermes IDs return HTTP
+                200 (not 403). Stuck → email <code>data@dourolabs.xyz</code> subject{" "}
+                <code>Equity.US / Crypto.xStock Hermes 403 Not entitled</code>.
               </p>
             </div>
           ) : null}
@@ -403,29 +418,34 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
               </span>
             </div>
             <div className="settings-step">
-              <strong>2 · Pyth (be specific — equity is NOT on Starter)</strong>
+              <strong>2 · Pyth — entitle Equity.US + Crypto.xStock (not Starter)</strong>
               <span>
+                FOLIO diverge needs <b>both</b> symbol families live on Hermes:
+                <br />• <code>Equity.US.AAPL/USD</code> → feed{" "}
+                <code>49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688</code>
+                <br />• <code>Crypto.AAPLX/USD</code> (xStock) → feed{" "}
+                <code>978e6cc68a119ce066aa830017318563a9ed04ec3a0a6439010fc11296a58675</code>
+                <br />
                 1) Open{" "}
                 <a href="https://app.pyth.com/" target="_blank" rel="noreferrer">
                   app.pyth.com
                 </a>{" "}
                 → sign in.
                 <br />
-                2) Pricing reality (
+                2) Pricing (
                 <a href="https://www.pyth.network/price-feeds" target="_blank" rel="noreferrer">
                   pyth.network/price-feeds
                 </a>
-                ): <b>Free</b> = Terminal view-only (no API). <b>Starter $500/mo</b> ={" "}
-                <b>crypto only</b> (BTC/ETH work — that is your current key).{" "}
-                <b>Pro from $2,500/mo</b> (or free Pro trial) = equities + customize asset
-                classes.
+                ): <b>Starter $500/mo</b> = crypto majors only (your current key — BTC/ETH 200,
+                Equity.US + Crypto.AAPLX = <b>403 Not entitled</b>). Need <b>Pro free trial</b> /
+                Pro customize / <b>U.S. Equities</b> / <b>All Asset Classes</b> — not Starter.
                 <br />
-                3) In Terminal → <b>Subscribe / Upgrade / Start free trial</b> → pick{" "}
-                <b>Pro</b> (not Starter) → enable asset class <b>Equities</b> (and tokenized
-                stock / RWA if listed).
+                3) Terminal → <b>Subscribe / Upgrade / Start free trial</b> → enable entitlements
+                that cover <b>Equity.US.*</b> and <b>Crypto.*X</b> (xStock tokenized equities).
+                Confirm in Terminal search: <code>Equity.US.AAPL</code> and{" "}
+                <code>Crypto.AAPLX</code> show as entitled for your key.
                 <br />
-                4) Click <b>🔑 View your API key</b> → copy → replace{" "}
-                <code>PYTH_API_KEY</code> on{" "}
+                4) <b>🔑 View your API key</b> → replace <code>PYTH_API_KEY</code> on{" "}
                 <a
                   href="https://vercel.com/teamtitanlink/folio/settings/environment-variables"
                   target="_blank"
@@ -433,12 +453,11 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
                 >
                   Vercel env
                 </a>{" "}
-                + local <code>.env</code> → redeploy.
+                + <code>.env</code> → redeploy.
                 <br />
-                5) Verify these Hermes IDs return <b>HTTP 200</b> (not 403 Not entitled):
-                <code>Equity.US.AAPL/USD</code>{" "}
-                <code>49f6b65c…ad55688</code>, <code>Crypto.AAPLX/USD</code>{" "}
-                <code>978e6cc6…a58675</code>. Docs:{" "}
+                5) Prove both feeds HTTP <b>200</b> (not 403). Stuck → email{" "}
+                <code>data@dourolabs.xyz</code> subject{" "}
+                <code>Equity.US / Crypto.xStock Hermes 403 Not entitled</code>. Docs:{" "}
                 <a
                   href="https://docs.pyth.network/price-feeds/how-pyth-works/hermes"
                   target="_blank"
@@ -446,8 +465,7 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
                 >
                   Hermes
                 </a>
-                . Stuck → email <code>data@dourolabs.xyz</code> with subject “Equity.US.AAPL
-                Hermes 403 Not entitled — need equities on API key”.
+                .
               </span>
             </div>
             <div className="settings-step">
@@ -461,17 +479,14 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
               </span>
             </div>
             <div className="settings-step">
-              <strong>4 · Supabase</strong>
+              <strong>4 · Supabase ✅ keys + JWT + SQL done</strong>
               <span>
-                Project settings → API at{" "}
-                <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">
-                  supabase.com/dashboard
-                </a>{" "}
-                → <code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code> (JWT),{" "}
-                <code>SUPABASE_SERVICE_ROLE_KEY</code>, <code>SUPABASE_JWT_SECRET</code>.
-                SQL editor in order: (1) <code>20260915_folio_tenants.sql</code> (done) (2){" "}
-                <code>20260916_folio_tenants_grants.sql</code> — without grants, service_role
-                returns <code>42501</code> even when tables exist.
+                <code>SUPABASE_URL</code> / anon / service_role /{" "}
+                <code>SUPABASE_JWT_SECRET</code> on Vercel. Migrations applied:{" "}
+                <code>20260915_folio_tenants.sql</code> +{" "}
+                <code>20260916_folio_tenants_grants.sql</code> +{" "}
+                <code>folio-demo</code> seed. Next = Privy mint + Join folio-demo (session
+                panel below).
               </span>
             </div>
             <div className="settings-step">
@@ -691,15 +706,29 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
         defaultOpen={empireKeysReady}
       >
         <p className="mb-3 text-sm opacity-80">
-          Paste a Privy access token only after Privy + Supabase + FOLIO_SESSION_SECRET are set.
-          FOLIO mints an httpOnly <code>folio_session</code> cookie — never localStorage auth.
+          Server keys ready (Privy + Supabase + JWT + session secret + schema). FOLIO mints an
+          httpOnly <code>folio_session</code> — never localStorage auth.
+          Prefer <b>Log in with Privy</b> below; paste-token remains a fallback. After mint, if
+          tenants empty → <b>Join folio-demo as owner</b>. Do not paste the App Secret.
           {!sessionMintReady
-            ? " Mint stays disabled until those three are present on the server."
+            ? " Mint stays disabled until Privy + Supabase + FOLIO_SESSION_SECRET are present."
             : null}
         </p>
+        {privyClient && data?.readiness.privyAppId ? (
+          <Suspense fallback={<p className="mb-3 text-sm opacity-70">Loading Privy…</p>}>
+            <PrivySessionMint
+              appId={data.readiness.privyAppId}
+              mintReady={sessionMintReady}
+              onMinted={async () => {
+                await invalidateSessionScopedBundles();
+                await refetch();
+              }}
+            />
+          </Suspense>
+        ) : null}
         <div className="form-grid">
           <label>
-            Privy access token
+            Privy access token (fallback)
             <input
               value={privyToken}
               onChange={(e) => setPrivyToken(e.target.value)}

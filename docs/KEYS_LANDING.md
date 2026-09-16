@@ -8,7 +8,7 @@ Vercel env UI: https://vercel.com/teamtitanlink/folio/settings/environment-varia
 
 Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density` · `BITQUERY_API_KEY` · `PYTH_API_KEY` · `PRIVY_*` · `SUPABASE_URL` · `SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_JWT_SECRET` · `JUPITER_API_KEY`
 
-Still need Henry: **Pyth Pro (not Starter) with Equities entitlement** · run `20260916_folio_tenants_grants.sql` (tables exist; service_role 42501) · mint session + tenant_members. **Rotate all chat-pasted secrets.**
+SQL ✅ (`20260915` + grants + `folio-demo` seed) · JWT ✅. Still need Henry: **entitle `Equity.US.*` + `Crypto.*X` (xStock) on Pyth Pro** (both Hermes feeds currently 403 Not entitled) · mint Privy session + Join folio-demo. **Rotate all chat-pasted secrets.**
 
 Stocklana live 2026-09-16 (jina): **605** registered · **84** submissions · **$121k** · SEP 25.
 
@@ -27,20 +27,27 @@ Lab MCP live-verified on branch preview `/lab/ui` (2026-09-16): **21st MCP conne
 
 Verify: `/desk/acquire` wash row leaves “key missing”; `/network` wash capability becomes live or labeled error (never silent green).
 
-### 2 — Pyth Hermes (equity diverge) — BE SPECIFIC
+### 2 — Pyth Hermes — BE SPECIFIC: `Equity.US` + `Crypto.xStock`
 
-Your current key authenticates Hermes for **BTC/ETH** but returns **403 Not entitled** for Stocklana feeds (`Equity.US.AAPL/USD`, `Crypto.AAPLX/USD`). That matches **Starter = crypto only**.
+FOLIO diverge needs **both** symbol families. Live probes on the current key:
+
+| Symbol | Feed id | Result |
+|--------|---------|--------|
+| `Equity.US.AAPL/USD` | `49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688` | **403 Not entitled** |
+| `Crypto.AAPLX/USD` | `978e6cc68a119ce066aa830017318563a9ed04ec3a0a6439010fc11296a58675` | **403 Not entitled** |
+
+That matches **Starter = crypto majors only**. Tokenized xStock (`Crypto.*X`) is **not** covered by Starter either.
 
 1. Open **[app.pyth.com](https://app.pyth.com/)** → sign in.
 2. Pricing ([pyth.network/price-feeds](https://www.pyth.network/price-feeds)):
    - Free = view-only Terminal (no API)
-   - **Starter $500/mo = crypto API only** ← you are here
-   - **Pro from $2,500/mo** or **free Pro trial** = equities + custom asset classes
-3. Terminal → **Subscribe / Upgrade / Start free trial** → pick **Pro** (not Starter).
-4. Enable asset class **Equities**.
+   - **Starter $500/mo = crypto majors only** ← you are here
+   - **Pro free trial** / Pro customize / **U.S. Equities** / **All Asset Classes** = what FOLIO needs
+3. Terminal → **Subscribe / Upgrade / Start free trial** (not Starter).
+4. Enable entitlements covering **`Equity.US.*`** and **`Crypto.*X`** (xStock). Confirm Terminal search shows `Equity.US.AAPL` + `Crypto.AAPLX` entitled.
 5. **🔑 View your API key** → replace `PYTH_API_KEY` on Vercel + `.env` → redeploy.
-6. Verify HTTP 200 on feed `49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688` (Equity.US.AAPL).
-7. Stuck → email **data@dourolabs.xyz** subject `Equity.US.AAPL Hermes 403 Not entitled`.
+6. Prove **HTTP 200** on **both** feed ids above (not 403).
+7. Stuck → email **data@dourolabs.xyz** subject `Equity.US / Crypto.xStock Hermes 403 Not entitled`.
 
 Docs: [Hermes](https://docs.pyth.network/price-feeds/how-pyth-works/hermes) · [Terminal](https://docs.pyth.network/price-feeds/pro/pyth-terminal).
 
@@ -60,13 +67,13 @@ Verify: Settings auth badge still fail-closed until Supabase lands (both require
    - Project URL → `SUPABASE_URL`
    - `anon` `public` → `SUPABASE_ANON_KEY`
    - `service_role` → `SUPABASE_SERVICE_ROLE_KEY` (**server only**)
-3. **Project Settings → API → JWT Secret** (≥16) → `SUPABASE_JWT_SECRET`.
-4. Paste all four on Vercel (`SUPABASE_JWT_SECRET` included).
-5. SQL editor — run in order:
+3. **Project Settings → API → JWT Secret** (≥16) → `SUPABASE_JWT_SECRET`. ✅ pasted + on Vercel.
+4. Paste all four on Vercel (`SUPABASE_JWT_SECRET` included). ✅
+5. SQL editor — ✅ DONE:
    1. `supabase/migrations/20260915_folio_tenants.sql` (tables + RLS)
-   2. `supabase/migrations/20260916_folio_tenants_grants.sql` (**required** — without this, service_role gets `42501` even when tables exist)
-6. Optional seed: `supabase/seed/demo_tenant.sql`.
-7. Redeploy.
+   2. `supabase/migrations/20260916_folio_tenants_grants.sql` (service_role GRANTs)
+   3. Optional seed: `supabase/seed/demo_tenant.sql` (`folio-demo`)
+6. Redeploy if needed.
 
 `SUPABASE_JWT_SECRET` arms the **user-JWT RLS path**: server mints short-lived HS256 JWTs with `sub` = Privy DID so PostgREST policies (`auth.jwt() ->> 'sub'`) authorize tenants/prefs. Without the JWT secret, FOLIO keeps a labeled **service-role** fallback (not end-user authz).
 

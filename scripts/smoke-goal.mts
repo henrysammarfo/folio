@@ -142,7 +142,7 @@ async function main() {
   );
   if (!summary.shipReady) {
     console.log(
-      "remaining: Pyth Pro+Equities at app.pyth.com · mint folio_session + Join folio-demo · rotate chat secrets — docs/HENRY_STEPS.md",
+      "remaining: entitle Equity.US + Crypto.xStock at app.pyth.com · mint folio_session + Join folio-demo · rotate chat secrets — docs/HENRY_STEPS.md",
     );
   }
 }

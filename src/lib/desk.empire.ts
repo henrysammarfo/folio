@@ -222,6 +222,8 @@ export type SessionBundle = {
 export type EmpireReadiness = {
   bitqueryKeyPresent: boolean;
   privyConfigured: boolean;
+  /** Public Privy app id for client PrivyProvider (never the secret). */
+  privyAppId: string | null;
   supabaseConfigured: boolean;
   sessionSecretPresent: boolean;
   pythApiKeyPresent: boolean;
@@ -254,11 +256,11 @@ export function readEmpireReadiness(
   env: NodeJS.ProcessEnv = process.env,
 ): EmpireReadiness {
   const sessionSecretPresent = (env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
+  const privyAppId = env["PRIVY_APP_ID"]?.trim() || null;
   return {
     bitqueryKeyPresent: Boolean(env["BITQUERY_API_KEY"]?.trim()),
-    privyConfigured: Boolean(
-      env["PRIVY_APP_ID"]?.trim() && env["PRIVY_APP_SECRET"]?.trim(),
-    ),
+    privyConfigured: Boolean(privyAppId && env["PRIVY_APP_SECRET"]?.trim()),
+    privyAppId,
     supabaseConfigured: Boolean(
       env["SUPABASE_URL"]?.trim() &&
         env["SUPABASE_ANON_KEY"]?.trim() &&

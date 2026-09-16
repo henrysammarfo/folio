@@ -11,6 +11,7 @@ describe("readEmpireReadiness", () => {
     expect(r.bitqueryKeyPresent).toBe(false);
     expect(r.pythApiKeyPresent).toBe(false);
     expect(r.privyConfigured).toBe(false);
+    expect(r.privyAppId).toBe(null);
     expect(r.supabaseConfigured).toBe(false);
     expect(r.supabaseSchemaReady).toBe(false);
     expect(r.sessionSecretPresent).toBe(true);
@@ -30,6 +31,7 @@ describe("readEmpireReadiness", () => {
       SUPABASE_JWT_SECRET: "y".repeat(16),
     } as NodeJS.ProcessEnv);
     expect(r.privyConfigured).toBe(true);
+    expect(r.privyAppId).toBe("did:privy:test");
     expect(r.supabaseConfigured).toBe(true);
     expect(r.supabaseJwtConfigured).toBe(true);
   });

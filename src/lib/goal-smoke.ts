@@ -65,7 +65,7 @@ export function classifyGoalRequirements(
       if (!input.pythLive) {
         waiting.push(
           input.pythKey
-            ? "Pyth keyed but Equity/xStock not entitled — upgrade to Pro (not Starter) + Equities at app.pyth.com"
+            ? "Pyth keyed but Equity.US + Crypto.xStock 403 Not entitled — Pro trial / U.S. Equities at app.pyth.com (not Starter)"
             : "PYTH_API_KEY (Hermes fail-closed)",
         );
       }

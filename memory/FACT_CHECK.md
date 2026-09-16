@@ -320,3 +320,6 @@ EOF
 - VERIFIED: PostgREST `tenants` SELECT via service_role → 200; `supabaseSchemaDetail` = Ready.
 - VERIFIED: `folio-demo` tenant id `29eadccb…` upserted; placeholder `privy_did_here` membership deleted.
 - OPEN: Pyth Equity.US.AAPL still 403 Not entitled; multi-tenant needs Privy access token mint + Join folio-demo.
+
+| Pyth Starter entitles Equity.US.AAPL + Crypto.AAPLX Hermes | REJECTED live | Both feeds HTTP 403 Not entitled with current PYTH_API_KEY; Starter=crypto majors | 2026-09-16 |
+| SUPABASE_JWT_SECRET on Vercel + schema grants | CONFIRMED | smoke:goal JWT+schemaReady; Henry paste + SQL DONE | 2026-09-16 |

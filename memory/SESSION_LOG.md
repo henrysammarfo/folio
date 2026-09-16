@@ -522,3 +522,11 @@
 - Live probe: `supabaseSchemaReady=true` (service_role GRANTs applied). Seeded `folio-demo` tenant; removed placeholder `privy_did_here` membership.
 - Added Settings **Join folio-demo as owner** (`attachDemoTenantMembership`) — requires real Privy mint first; remints cookie with memberships.
 - Henry next: mint Privy session + Join folio-demo; Pyth Pro+Equities still blocks Empire DONE. Goal open. Rotate chat secrets.
+
+
+## 2026-09-16 — JWT+SQL done · Pyth Equity.US/Crypto.xStock B-SPECIFIC · Privy login mint
+
+- Henry: `SUPABASE_JWT_SECRET` confirmed on `.env`+Vercel · SQL migration/grants DONE · schemaReady live.
+- Settings/docs/HENRY_STEPS/KEYS_LANDING: Pyth DO NOW names exact feeds `Equity.US.AAPL/USD` + `Crypto.AAPLX/USD` (both 403 Not entitled on Starter) + email subject `Equity.US / Crypto.xStock Hermes 403 Not entitled`.
+- Wired `@privy-io/react-auth` Settings **Log in with Privy → Mint httpOnly session** (public App ID only; paste-token fallback). Henry must allowlist demo origin in Privy Dashboard.
+- Goal still open: shipReady=false until Pyth entitlement + Privy mint + Join folio-demo.

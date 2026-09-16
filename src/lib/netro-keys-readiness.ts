@@ -36,7 +36,7 @@ export function buildNetroKeysReadiness(
       id: "pyth",
       label: "Pyth Hermes",
       status: input.pythApiKeyPresent
-        ? "Keyed · entitle Equity/xStock before diverge live"
+        ? "Keyed · entitle Equity.US + Crypto.xStock before diverge live"
         : "Missing · fail-closed",
       ok: input.pythApiKeyPresent,
     },
