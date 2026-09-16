@@ -350,6 +350,11 @@ test.describe("FOLIO Block 0 smoke", () => {
     // Without Pyth key, diverge must stay labeled unavailable — not silent pass theater
     expect(body).toMatch(/pyth unavailable|unavailable|no invent|diverge/);
     expect(body).toMatch(/jupiter price (live|cached|stale-cache|unavailable)/);
+    // Stocklana Pyth bounty triad mapped even when key missing
+    expect(body).toMatch(/equity\.us\.aapl\/usd/);
+    expect(body).toMatch(/crypto\.aaplx\/usd/);
+    expect(body).toMatch(/crypto\.aaplon\/usd/);
+    expect(body).toMatch(/pyth_api_key|fail-closed until pyth_api_key|mapped/);
     expect(body).not.toMatch(/unhackable|nation-state|4\.0000/);
   });
 

@@ -397,3 +397,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Live counts **593**/80/$121k; hero SEP 25 vs timeline 18 Sep conservative.
 - Step 0 recommends `netro-density`; Vercel 21st keys verified.
 - Goal open until Henry Pick + Empire keys + GG Skip.
+
+## 2026-09-16 — Pyth bounty triad on /truth
+- Equity.US.AAPL/USD · Crypto.AAPLX/USD · Crypto.AAPLON/USD (Ondo) mapped; prices fail-closed until PYTH_API_KEY.
+- Goal still open: Henry Pick · Bitquery · Pyth key · Privy · Supabase · GG Skip · broadcast paused.

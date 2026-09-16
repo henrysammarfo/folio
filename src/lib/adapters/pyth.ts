@@ -25,6 +25,14 @@ const XSTOCK_USD_FEED_IDS: Record<string, string> = {
   TSLAX: "47a156470288850a440df3a6ce85a55917b813a19bb5b31128a33a986566a362",
 };
 
+/**
+ * Crypto.{SYM}ON/USD Ondo tokenized stock feeds (Hermes catalog 2026-09-16).
+ * Stocklana Pyth bounty lists Crypto.AAPLON/USD — tertiary labeled reference.
+ */
+const ONDO_USD_FEED_IDS: Record<string, string> = {
+  AAPLON: "e6734de88a83d9d2fb33072adab319004700aefd069653aba30ba9e3cac056f2",
+};
+
 export type PythPrice = {
   underlying: string;
   feedId: string;
@@ -60,6 +68,32 @@ export function xStockUsdFeedId(xSymbol: string): string | null {
   const key = xSymbol.replace(/x$/i, "X").toUpperCase();
   const normalized = key.endsWith("X") ? key : `${key}X`;
   return XSTOCK_USD_FEED_IDS[normalized] ?? null;
+}
+
+/** Known Crypto.{SYM}ON/USD Ondo feed id from underlying ticker (AAPL → AAPLON). */
+export function ondoUsdFeedId(underlying: string): string | null {
+  const key = `${underlying.toUpperCase()}ON`;
+  return ONDO_USD_FEED_IDS[key] ?? null;
+}
+
+/** Stocklana Pyth bounty feed symbols for an xStock (mapped even when key missing). */
+export function pythBountyFeedSymbols(xSymbol: string): {
+  equityUs: string | null;
+  cryptoXStock: string | null;
+  cryptoOndo: string | null;
+} {
+  const underlying = xSymbol.replace(/x$/i, "").toUpperCase();
+  const xKey = xSymbol.replace(/x$/i, "X").toUpperCase();
+  const xNorm = xKey.endsWith("X") ? xKey : `${xKey}X`;
+  return {
+    equityUs: equityUsFeedId(underlying)
+      ? `Equity.US.${underlying}/USD`
+      : null,
+    cryptoXStock: xStockUsdFeedId(xSymbol) ? `Crypto.${xNorm}/USD` : null,
+    cryptoOndo: ondoUsdFeedId(underlying)
+      ? `Crypto.${underlying}ON/USD`
+      : null,
+  };
 }
 
 function hermesAuthHeaders(apiKey: string): HeadersInit {
@@ -234,6 +268,42 @@ export async function fetchPythXStockUsdPrice(
     return await fetchHermesLatest(feedId, apiKey, {
       underlying: normalized,
       feedSymbol: `Crypto.${normalized}/USD`,
+    });
+  } catch (e) {
+    return errResult("hermes.pyth.network", "pyth_fetch_failed", String(e));
+  }
+}
+
+/**
+ * Hermes Crypto.{SYM}ON/USD — Ondo tokenized stock (Stocklana Pyth bounty tertiary).
+ * Labeled only — never alone scores acquire diverge.
+ */
+export async function fetchPythOndoUsdPrice(
+  underlying: string,
+): Promise<AdapterResult<PythPrice>> {
+  const apiKey = process.env["PYTH_API_KEY"]?.trim() || null;
+  if (!apiKey) {
+    return errResult(
+      "hermes.pyth.network",
+      "pyth_api_key_missing",
+      "PYTH_API_KEY required for Hermes Crypto.ONDO USD updates (fail-closed).",
+    );
+  }
+
+  const feedId = ondoUsdFeedId(underlying);
+  if (!feedId) {
+    return errResult(
+      "hermes.pyth.network",
+      "pyth_ondo_feed_unmapped",
+      `No Crypto.*ON/USD map for ${underlying}`,
+    );
+  }
+
+  const sym = `${underlying.toUpperCase()}ON`;
+  try {
+    return await fetchHermesLatest(feedId, apiKey, {
+      underlying: sym,
+      feedSymbol: `Crypto.${sym}/USD`,
     });
   } catch (e) {
     return errResult("hermes.pyth.network", "pyth_fetch_failed", String(e));

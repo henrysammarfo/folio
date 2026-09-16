@@ -392,3 +392,9 @@
 - HENRY_STEPS: Vercel lab keys marked DONE; Step 0 recommends `netro-density` (desk preview mounts 12-col).
 - Lab approve panel marks netro as rec; LAB_UI_IDS order leads with netro-density.
 - Still blocked: Henry Pick reply · Bitquery · Pyth · Privy · Supabase · GG Skip · rotate token · broadcast paused.
+
+## 2026-09-16 — Pyth bounty triad (Equity + xStock + Ondo)
+
+- Mapped Hermes `Crypto.AAPLON/USD` (Ondo) feed id from live catalog; wired `fetchPythOndoUsdPrice` + `/truth` bounty feed list.
+- `/truth` shows Equity.US.AAPL/USD · Crypto.AAPLX/USD · Crypto.AAPLON/USD even when `PYTH_API_KEY` missing (prices still fail-closed).
+- Vitest **105+** path extended; goal still needs Henry Pick + Bitquery/Pyth/Privy/Supabase keys.

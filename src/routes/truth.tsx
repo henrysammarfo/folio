@@ -77,6 +77,11 @@ function Page() {
             ? data.pythXStock.data.feedSymbol ?? "Pyth Crypto.xStock"
             : "Pyth Crypto.xStock off"}
         </ModeBadge>
+        <ModeBadge mode={data?.pythOndo?.ok ? data.pythOndo.mode : "unavailable"}>
+          {data?.pythOndo?.ok
+            ? data.pythOndo.data.feedSymbol ?? "Pyth Crypto.ONDO"
+            : "Pyth Crypto.ONDO off"}
+        </ModeBadge>
       </div>
 
       <div className="metrics-grid">
@@ -201,6 +206,25 @@ function Page() {
               {data?.pythXStock.ok
                 ? ` · ${data.pythXStock.data.feedSymbol ?? "Crypto.xStock"} $${data.pythXStock.data.price.toFixed(2)} (secondary)`
                 : " · Crypto.xStock secondary off until keyed/mapped"}
+              {data?.pythOndo?.ok
+                ? ` · ${data.pythOndo.data.feedSymbol ?? "Crypto.ONDO"} $${data.pythOndo.data.price.toFixed(2)} (tertiary Ondo)`
+                : " · Crypto.ONDO tertiary off until keyed/mapped"}
+            </span>
+          </li>
+          <li>
+            <Database />
+            <span>
+              <b>Pyth bounty feeds</b>{" "}
+              {[
+                data?.pythBountyFeeds?.equityUs,
+                data?.pythBountyFeeds?.cryptoXStock,
+                data?.pythBountyFeeds?.cryptoOndo,
+              ]
+                .filter(Boolean)
+                .join(" · ") || "unmapped for this symbol"}
+              {data?.pyth && !data.pyth.ok && data.pyth.reason === "pyth_api_key_missing"
+                ? " — mapped · prices fail-closed until PYTH_API_KEY"
+                : ""}
             </span>
           </li>
           <li>

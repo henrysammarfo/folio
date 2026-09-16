@@ -222,3 +222,6 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 - Registered **593** · Submissions **80** · Prize pool **$121,000** · Deadline hero **SEP 25, 2026** · countdown ~9 days.
 - Timeline: submissions close Friday 18 September, 4:00pm ET.
 - stocklana.fun close banner earlier: 18 SEP 2026 · 23:59 UTC.
+
+## 2026-09-16 — Hermes Crypto.AAPLON/USD
+- Catalog search `hermes.pyth.network/v2/price_feeds?query=AAPLON`: id `e6734de88a83d9d2fb33072adab319004700aefd069653aba30ba9e3cac056f2`, symbol `Crypto.AAPLON/USD` (APPLE ONDO TOKENIZED STOCK).
