@@ -453,3 +453,10 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 ## 2026-09-16 — Netro live paper agent
 - Overview Netro rail: Truth pass + Quote inspect → `runDeskAgent` live spine. Never fills. Goal open for Empire keys.
+
+## 2026-09-16 — Soft Netro yellow + decongest + full landing + settings template
+- Sampled NetroBNB yellow remains `#f4d014` for accents; large fills use soft wash (`--netro-yellow-soft` / `--netro-yellow-wash`) so chrome is not bold-yellow. Gaps increased; quote-swap no longer overlaps cards.
+- Ownership / Empire keys strips are collapsible (keys auto-open when missing; ownership opens on inspect).
+- Landing: **Aionis primary hero preserved**; below-fold honesty pillars + secondary Netro desk section + Empire key links. Not a second hero replacement.
+- Settings: rail nav + collapsible panels + step-by-step key links (`docs/KEYS_LANDING.md`). Sidebar minimize on non-Netro desk pages.
+- Vercel still missing Bitquery/Pyth/Privy/Supabase/Jupiter — cannot invent. Rotate chat-pasted Vercel token. Goal open.

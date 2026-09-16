@@ -489,3 +489,6 @@
 ## 2026-09-16 — SSR Empire readiness + Settings deep-link
 - `getEmpireReadiness` + `/desk` loader seed keys strip SSR; Netro Paste keys → `/desk/settings#empire-readiness`.
 - Empire strip adds live Raydium + Nest.credit modes. Goal open for key paste.
+
+## 2026-09-16 — UI soften / landing / keys guide
+- Softened Netro yellow fills; decongested desk grid; collapsible honesty strips; expandable settings layout; full landing below preserved Aionis hero; KEYS_LANDING step-by-step with provider links. Empire keys still need Henry paste. Goal open.

@@ -85,6 +85,7 @@ export function DeskShell({
   const [labUi, setLabUi] = useState<LabUiId | null>(null);
   const [labShader, setLabShader] = useState<LabShaderId | null>(null);
   const [previewOn, setPreviewOn] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const fetchTruth = useServerFn(getTruthBundle);
   const fetchApprovals = useServerFn(getLabApprovals);
   const fetchNetwork = useServerFn(getNetworkBundle);
@@ -227,6 +228,7 @@ export function DeskShell({
       data-lab-plasma={liveShader ? "1" : undefined}
       data-lab-approved={productionChrome ? "1" : undefined}
       data-netro-surface={showNetroCanvas ? "1" : undefined}
+      data-sidebar-collapsed={sidebarCollapsed ? "1" : undefined}
     >
       {previewing ? (
         <div className="lab-preview-banner" role="status">
@@ -285,6 +287,14 @@ export function DeskShell({
           <FolioMark />
           <span>FOLIO</span>
         </Link>
+        <button
+          type="button"
+          className="desk-sidebar-collapse"
+          aria-pressed={sidebarCollapsed}
+          onClick={() => setSidebarCollapsed((v) => !v)}
+        >
+          {sidebarCollapsed ? "Expand" : "Minimize"}
+        </button>
         <nav aria-label="Desk navigation">
           {links.map(([label, to, Icon]) => {
             const active = to === "/desk" ? path === to : path.startsWith(to);
@@ -293,6 +303,7 @@ export function DeskShell({
                 key={to}
                 to={to}
                 className={`desk-nav-link ${active ? "desk-nav-active" : ""}`}
+                title={label}
               >
                 <Icon />
                 {label}
@@ -369,17 +380,49 @@ export function Panel({
   meta,
   children,
   className = "",
+  collapsible = false,
+  defaultOpen = true,
 }: {
   title: string;
   meta?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  /** Settings / dense pages — maximize / minimize without losing content. */
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
+  if (!collapsible) {
+    return (
+      <section className={`panel ${className}`}>
+        <header>
+          <h2>{title}</h2>
+          {meta}
+        </header>
+        <div className="panel-body">{children}</div>
+      </section>
+    );
+  }
   return (
-    <section className={`panel ${className}`}>
-      <header>
+    <section
+      className={`panel panel-collapsible ${className}`}
+      data-open={open ? "1" : "0"}
+    >
+      <header
+        role="button"
+        tabIndex={0}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen((v) => !v);
+          }
+        }}
+      >
         <h2>{title}</h2>
         {meta}
+        <span className="panel-toggle">{open ? "Minimize" : "Maximize"}</span>
       </header>
       <div className="panel-body">{children}</div>
     </section>

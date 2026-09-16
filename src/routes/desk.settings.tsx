@@ -145,9 +145,22 @@ function Page() {
         <ModeBadge mode="paper">Paper agent</ModeBadge>
       </div>
 
+      <div className="settings-layout">
+        <nav className="settings-rail" aria-label="Settings sections">
+          <a href="#empire-readiness">Empire readiness</a>
+          <a href="#settings-network">Network + policy</a>
+          <a href="#settings-tenant">Active tenant</a>
+          <a href="#settings-session">Privy session</a>
+          <a href="#settings-watch">Watch wallet</a>
+          <a href="#settings-agent">Paper agent</a>
+          <a href="#settings-key-guide">Key links</a>
+        </nav>
+        <div className="settings-main">
       <Panel
         title="Production readiness"
         meta={<StatusBadge tone="amber">Henry actions</StatusBadge>}
+        collapsible
+        defaultOpen
       >
         <div id="empire-readiness" className="scroll-mt-24" />
         <p className="mb-3 text-sm opacity-80">
@@ -285,8 +298,87 @@ function Page() {
         </div>
       </Panel>
 
-      <div className="desk-grid">
-        <Panel title="Network mode" meta={<StatusBadge tone="blue">Quote-only default</StatusBadge>}>
+      <div id="settings-key-guide" className="scroll-mt-24">
+        <Panel
+          title="Get Empire API keys (step-by-step)"
+          meta={<StatusBadge tone="blue">Links</StatusBadge>}
+          collapsible
+          defaultOpen
+        >
+          <div className="settings-keys-guide">
+            <div className="settings-step">
+              <strong>1 · Bitquery</strong>
+              <span>
+                Open{" "}
+                <a href="https://account.bitquery.io/" target="_blank" rel="noreferrer">
+                  account.bitquery.io
+                </a>{" "}
+                → API keys → create → paste as <code>BITQUERY_API_KEY</code> on Vercel
+                (Preview + Production).
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>2 · Pyth</strong>
+              <span>
+                Start at{" "}
+                <a href="https://pyth.network/" target="_blank" rel="noreferrer">
+                  pyth.network
+                </a>{" "}
+                → Hermes / developer access → set <code>PYTH_API_KEY</code>.
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>3 · Privy</strong>
+              <span>
+                Create an app at{" "}
+                <a href="https://dashboard.privy.io/" target="_blank" rel="noreferrer">
+                  dashboard.privy.io
+                </a>{" "}
+                → copy <code>PRIVY_APP_ID</code> + <code>PRIVY_APP_SECRET</code>.
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>4 · Supabase</strong>
+              <span>
+                Project settings → API at{" "}
+                <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">
+                  supabase.com/dashboard
+                </a>{" "}
+                → <code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code>,{" "}
+                <code>SUPABASE_SERVICE_ROLE_KEY</code>, <code>SUPABASE_JWT_SECRET</code>.
+                Apply <code>supabase/migrations/20260915_folio_tenants.sql</code>.
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>5 · Optional Jupiter</strong>
+              <span>
+                Portal at{" "}
+                <a href="https://portal.jup.ag/" target="_blank" rel="noreferrer">
+                  portal.jup.ag
+                </a>{" "}
+                if quotes gate → <code>JUPITER_API_KEY</code>. Public path works until 429.
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>6 · Vercel paste</strong>
+              <span>
+                Project env for{" "}
+                <a
+                  href="https://vercel.com/teamtitanlink/folio/settings/environment-variables"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  folio → Environment Variables
+                </a>{" "}
+                → redeploy preview. Rotate any token pasted in chat.
+              </span>
+            </div>
+          </div>
+        </Panel>
+      </div>
+
+      <div id="settings-network" className="desk-grid scroll-mt-24">
+        <Panel title="Network mode" meta={<StatusBadge tone="blue">Quote-only default</StatusBadge>} collapsible defaultOpen>
           <div className="setting-row">
             <span>
               <b>Mainnet read</b>
@@ -334,7 +426,7 @@ function Page() {
             </StatusBadge>
           </div>
         </Panel>
-        <Panel title="Policy preferences">
+        <Panel title="Policy preferences" collapsible defaultOpen>
           <label className="setting-row">
             <span>
               <b>Corporate-action alerts</b>
@@ -387,6 +479,7 @@ function Page() {
         </Panel>
       </div>
 
+      <div id="settings-tenant" className="scroll-mt-24">
       <Panel
         title="Active tenant"
         meta={
@@ -394,6 +487,8 @@ function Page() {
             {prefsTenant ? "Scoped" : "No membership"}
           </StatusBadge>
         }
+        collapsible
+        defaultOpen
       >
         <p className="mb-3 text-sm opacity-80">
           Prefs and desk scope follow the membership-validated active tenant on the httpOnly
@@ -459,10 +554,14 @@ function Page() {
           </p>
         ) : null}
       </Panel>
+      </div>
 
+      <div id="settings-session" className="scroll-mt-24">
       <Panel
         title="Bind Privy → httpOnly session"
         meta={<StatusBadge tone="amber">Fail-closed without keys</StatusBadge>}
+        collapsible
+        defaultOpen={false}
       >
         <p className="mb-3 text-sm opacity-80">
           Paste a Privy access token only after Privy + Supabase + FOLIO_SESSION_SECRET are set.
@@ -569,8 +668,9 @@ function Page() {
           </button>
         </div>
       </Panel>
+      </div>
 
-      
+      <div id="settings-watch" className="scroll-mt-24">
       <Panel
         title="Watch wallet (mainnet-read qty)"
         meta={
@@ -578,6 +678,8 @@ function Page() {
             {data?.sessionSecretPresent ? "Secret ready" : "Secret missing"}
           </StatusBadge>
         }
+        collapsible
+        defaultOpen={false}
       >
         <p className="mb-3 text-sm opacity-80">
           Bind a Solana pubkey for mainnet token-balance reads on Positions. Requires{" "}
@@ -652,8 +754,15 @@ function Page() {
         </div>
         {watchMsg ? <p className="mt-3 text-sm">{watchMsg}</p> : null}
       </Panel>
+      </div>
 
-      <Panel title="Paper agent" meta={<StatusBadge tone="blue">Live spine · no broadcast</StatusBadge>}>
+      <div id="settings-agent" className="scroll-mt-24">
+      <Panel
+        title="Paper agent"
+        meta={<StatusBadge tone="blue">Live spine · no broadcast</StatusBadge>}
+        collapsible
+        defaultOpen={false}
+      >
         <p className="mb-3 text-sm opacity-80">
           Runs live xStocks multiplier / Jupiter quote-only reads and the same acquire wash
           gates on quote intents. Never broadcasts. AgentRouter expands NL only when keyed —
@@ -721,6 +830,9 @@ function Page() {
           <pre className="mt-3 whitespace-pre-wrap text-sm opacity-90">{agentOut}</pre>
         ) : null}
       </Panel>
+      </div>
+        </div>
+      </div>
     </DeskShell>
   );
 }

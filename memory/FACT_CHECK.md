@@ -293,3 +293,6 @@ EOF
 ## 2026-09-16 — Empire readiness SSR
 - VERIFIED unit: readEmpireReadiness fail-closes empty env; arms Privy+Supabase only when both set.
 - VERIFIED: Raydium/Nest.credit map into Netro empire strip from matrix modes.
+
+## 2026-09-16 — Netro yellow sample
+- Reference PNGs (`ref-netrobnb-desk.png`, `ref-netro-desk-final.png`) mode yellow ≈ RGB(244,208,20) = `#f4d014` (confirmed via PNG decode). Soft fills are intentional wash, not a different brand hue.

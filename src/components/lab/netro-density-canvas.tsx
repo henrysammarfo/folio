@@ -73,12 +73,21 @@ export function NetroDensityCanvas({
   const [agentReply, setAgentReply] = useState<string | null>(null);
   const [agentMeta, setAgentMeta] = useState<string | null>(null);
   const [inspectInput, setInspectInput] = useState(initialInspect ?? "");
+  const [ownershipOpen, setOwnershipOpen] = useState(Boolean(initialInspect));
+  const [keysOpen, setKeysOpen] = useState(
+    () => (keysReadiness?.missingCount ?? 0) > 0,
+  );
   const runAgent = useServerFn(runDeskAgent);
   const navigate = useNavigate();
 
   useEffect(() => {
     setInspectInput(initialInspect ?? "");
+    if (initialInspect) setOwnershipOpen(true);
   }, [initialInspect]);
+
+  useEffect(() => {
+    if ((keysReadiness?.missingCount ?? 0) > 0) setKeysOpen(true);
+  }, [keysReadiness?.missingCount]);
 
   useEffect(() => {
     const tick = () => {
@@ -284,12 +293,21 @@ export function NetroDensityCanvas({
       ) : null}
 
       {enablePaperAgent && ownership ? (
-        <section
-          className="netro-density-ownership netro-density-item"
+        <details
+          className="netro-density-collapse netro-density-item"
           style={delay(2.5)}
           data-testid="netro-ownership"
-          aria-label="Ownership honesty"
+          open={ownershipOpen}
+          onToggle={(e) => setOwnershipOpen((e.target as HTMLDetailsElement).open)}
         >
+          <summary>
+            <span>Ownership · {ownership.walletSourceLabel}</span>
+            <em>Expand / minimize</em>
+          </summary>
+          <section
+            className="netro-density-ownership"
+            aria-label="Ownership honesty"
+          >
           <div className="netro-density-ownership-head">
             <div>
               <strong>Ownership</strong>
@@ -316,16 +334,31 @@ export function NetroDensityCanvas({
               </div>
             ))}
           </div>
-        </section>
+          </section>
+        </details>
       ) : null}
 
       {enablePaperAgent && keysReadiness ? (
-        <section
-          className="netro-density-keys netro-density-item"
+        <details
+          className="netro-density-collapse netro-density-collapse-dark netro-density-item"
           style={delay(2.7)}
           data-testid="netro-keys-readiness"
-          aria-label="Empire keys readiness"
+          open={keysOpen}
+          onToggle={(e) => setKeysOpen((e.target as HTMLDetailsElement).open)}
         >
+          <summary>
+            <span>
+              Empire keys
+              {keysReadiness.missingCount > 0
+                ? ` · ${keysReadiness.missingCount} missing`
+                : " · ready"}
+            </span>
+            <em>Expand / minimize</em>
+          </summary>
+          <section
+            className="netro-density-keys"
+            aria-label="Empire keys readiness"
+          >
           <div className="netro-density-keys-head">
             <div>
               <strong>Empire keys</strong>
@@ -353,7 +386,8 @@ export function NetroDensityCanvas({
               </div>
             ))}
           </div>
-        </section>
+          </section>
+        </details>
       ) : null}
 
       {/* Main Desktop Grid: 9 left / 3 right — NetroBNB app/page.tsx */}
