@@ -18,7 +18,7 @@ import {
 } from "@/components/lab/shader-background";
 import { NetroDensityCanvas } from "@/components/lab/netro-density-canvas";
 import { FolioTradeJournalLab } from "@/components/lab/folio-trade-journal-lab";
-import { getLabApprovals, getNetworkBundle, getTruthBundle } from "@/lib/desk.functions";
+import { getCreditBundle, getLabApprovals, getNetworkBundle, getTruthBundle } from "@/lib/desk.functions";
 import {
   isLabPreviewActive,
   readLabShaderPick,
@@ -66,6 +66,7 @@ export function DeskShell({
   const fetchTruth = useServerFn(getTruthBundle);
   const fetchApprovals = useServerFn(getLabApprovals);
   const fetchNetwork = useServerFn(getNetworkBundle);
+  const fetchCredit = useServerFn(getCreditBundle);
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -118,6 +119,12 @@ export function DeskShell({
     staleTime: 30_000,
     refetchInterval: 60_000,
   });
+  const credit = useQuery({
+    queryKey: ["credit-bundle", "netro-surface"],
+    queryFn: () => fetchCredit({ data: {} }),
+    enabled: showNetroCanvas,
+    staleTime: 20_000,
+  });
   const mult = truth.data?.multiplier;
   const multiplierLabel = mult?.ok
     ? `${mult.data.currentMultiplier.toFixed(6)}× live`
@@ -125,6 +132,9 @@ export function DeskShell({
   const netroGates = buildNetroLiveGateLabels({
     rows: network.data?.rows ?? [],
     broadcastPaused: network.data?.broadcastPaused !== false,
+    kaminoMaxLtv: credit.data?.paper.maxLtvUsed ?? null,
+    illustrativeBorrowUsd: credit.data?.paper.illustrativeBorrowUsd ?? null,
+    creditQtyLabel: credit.data?.paper.label ?? null,
   });
 
   return (

@@ -51,6 +51,9 @@ describe("buildNetroLiveGateLabels", () => {
         },
       ],
       broadcastPaused: true,
+      kaminoMaxLtv: 0.4,
+      illustrativeBorrowUsd: 2381.8,
+      creditQtyLabel: "paper",
     });
     expect(labels.wash).toBe("Fail-closed");
     expect(labels.quote).toBe("≤$1 inspect");
@@ -60,6 +63,10 @@ describe("buildNetroLiveGateLabels", () => {
     expect(labels.scaledUi).toBe("Mainnet-read");
     expect(labels.kamino).toBe("Mainnet-read");
     expect(labels.multiTenant).toBe("Unavailable");
+    expect(labels.kaminoLtv).toBe("0.40");
+    expect(labels.creditCapacity).toMatch(/\$2,382/);
+    expect(labels.creditCapacity).toMatch(/paper/);
+    expect(labels.creditCapacity).toMatch(/no broadcast/);
   });
 
   it("labels wash Live only when mainnet-read", () => {

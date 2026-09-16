@@ -13,6 +13,10 @@ export type NetroLiveGateLabels = {
   scaledUi: string;
   kamino: string;
   multiTenant: string;
+  /** Live AAPLx maxLtv from Kamino when mainnet-read — e.g. "0.40". */
+  kaminoLtv: string | null;
+  /** Paper/wallet illustrative borrow capacity label. */
+  creditCapacity: string;
 };
 
 export type MatrixLikeRow = {
@@ -49,6 +53,12 @@ function washLabel(mode: IntegrationMode | null): string {
 export function buildNetroLiveGateLabels(input: {
   rows: readonly MatrixLikeRow[];
   broadcastPaused: boolean;
+  /** Live AAPLx Kamino maxLtv when credit bundle is mainnet-read. */
+  kaminoMaxLtv?: number | null;
+  /** Illustrative borrow USD from credit bundle (paper or wallet-read × LTV). */
+  illustrativeBorrowUsd?: number | null;
+  /** paper | wallet-read */
+  creditQtyLabel?: string | null;
 }): NetroLiveGateLabels {
   const wash = findMode(input.rows, "Wash");
   const quote = findMode(input.rows, "Jupiter swap quote");
@@ -57,6 +67,20 @@ export function buildNetroLiveGateLabels(input: {
   const scaledUi = findMode(input.rows, "On-chain Scaled UI");
   const kamino = findMode(input.rows, "Kamino");
   const multiTenant = findMode(input.rows, "Multi-tenant");
+
+  const ltv =
+    typeof input.kaminoMaxLtv === "number" && Number.isFinite(input.kaminoMaxLtv)
+      ? input.kaminoMaxLtv.toFixed(2)
+      : null;
+
+  let creditCapacity = "Illustrative · borrow off";
+  if (
+    typeof input.illustrativeBorrowUsd === "number" &&
+    Number.isFinite(input.illustrativeBorrowUsd)
+  ) {
+    const qty = input.creditQtyLabel === "wallet-read" ? "wallet-read" : "paper";
+    creditCapacity = `$${Math.round(input.illustrativeBorrowUsd).toLocaleString("en-US")} · ${qty} × LTV · no broadcast`;
+  }
 
   return {
     wash: washLabel(wash),
@@ -70,6 +94,8 @@ export function buildNetroLiveGateLabels(input: {
     scaledUi: modeLabel(scaledUi, "Unavailable"),
     kamino: modeLabel(kamino, "Unavailable"),
     multiTenant: modeLabel(multiTenant, "Unavailable"),
+    kaminoLtv: ltv,
+    creditCapacity,
   };
 }
 
@@ -82,4 +108,6 @@ export const NETRO_LIVE_GATE_DEFAULTS: NetroLiveGateLabels = {
   scaledUi: "Unavailable",
   kamino: "Unavailable",
   multiTenant: "Unavailable",
+  kaminoLtv: null,
+  creditCapacity: "Illustrative · borrow off",
 };

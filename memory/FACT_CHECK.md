@@ -261,3 +261,6 @@ EOF
 
 ## 2026-09-16 — Netro live gates
 - `buildNetroLiveGateLabels` unit: empty → fail-closed defaults; live Kamino/Scaled UI → Mainnet-read; wash unavailable → Fail-closed.
+
+## 2026-09-16 — Stocklana live 598/82/$121k
+- jina scrape hackathons.solana.com/hackathons/stocklana: **598** registered · **82** submissions · **$121,000** prize · deadline **SEP 25, 2026** · 5 bounty tracks (incl. PythNetwork).

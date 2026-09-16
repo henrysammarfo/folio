@@ -441,3 +441,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 ## 2026-09-16 — Netro live Empire gates on overview
 - Approved Netro surface paints live matrix modes (not static theater). Overview-only; hero untouched. Goal open: Bitquery/Pyth/Privy/Supabase + GG Skip.
+
+## 2026-09-16 — Netro live Kamino LTV + Stocklana 598
+- Netro credit card shows live AAPLx maxLTV + illustrative paper×LTV capacity (borrow broadcast off).
+- Stocklana live: **598** / **82** / **$121k** · deadline SEP 25. Goal open: Bitquery/Pyth/Privy/Supabase + rotate Vercel token.

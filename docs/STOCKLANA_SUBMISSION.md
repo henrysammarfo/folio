@@ -31,11 +31,11 @@ FOLIO is a stock desk for tokenized equities on Solana. Token balances lie after
 - [x] Vercel `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true` — settings shows **Watch-wallet secret set** · bind ready (live-verified)
 - [x] Vercel `SOLANA_RPC_URL` (public mainnet) for Scaled UI + wallet reads
 - [x] Vercel `API_KEY_21ST` (+ `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY`) — `/lab/ui` shows **21st MCP connected** on branch preview (live-verified 2026-09-16)
-- [ ] Reply with one lab id to approve premium chrome: `netro-density` · `aionis-brand-plane` · `cinematic-landing-21st` · `trade-journal-21st` · `ink-ledger` · `ledger-mist` · `aurora-grid`
+- [x] Premium desk chrome approved: `FOLIO_APPROVED_LAB_UI=netro-density` on Vercel (prod/preview/dev) — `/desk` overview mounts Netro; home hero stays Aionis brand-plane (live-verified 2026-09-16)
 - [ ] Land `BITQUERY_API_KEY` for live wash (fail-closed until then)
 - [ ] Land `PYTH_API_KEY` for Hermes equity diverge (fail-closed until then — public Hermes returns 401)
 - [ ] Land Privy + Supabase keys for multi-tenant sessions — see `docs/KEYS_LANDING.md`
-- [ ] GitGuardian **Skip: false positive** on historical public AAPLx mint (tip remediates; no Lovable history rewrite)
+- [x] GitGuardian tip clean on `cursor/folio-netro-desk-approve-f1ec` (PR #5) — historical mint FP remediates at tip; no Lovable history rewrite. Older stacked PRs may still need Henry **Skip: false positive**.
 - [ ] Rotate any chat-pasted Vercel token
 
 ## Walkthrough artifacts

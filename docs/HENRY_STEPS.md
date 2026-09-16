@@ -51,7 +51,10 @@ What this unlocked: watch-wallet bind on the public demo. Broadcast stays paused
 
 ---
 
-## Step 2 — Bitquery (after Step 0 Pick)
+## Step 2 — Bitquery (DO THIS NEXT)
+
+Stocklana live 2026-09-16: **598** regs · **82** subs · **$121k** · deadline SEP 25.
+
 
 Only when I say so. Needed for live wash tape (fail-closed until then).
 

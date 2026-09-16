@@ -267,8 +267,14 @@ export function NetroDensityCanvas({
                     <span className="netro-pill">Holding</span>
                     <span className="netro-pill">Liquidity</span>
                   </div>
-                  <b>Kamino {gates.kamino === "Mainnet-read" ? "live LTV" : gates.kamino}</b>
-                  <small>Borrow CPI unavailable until funded</small>
+                  <b>
+                    {gates.kaminoLtv
+                      ? `Kamino ${gates.kaminoLtv} maxLTV`
+                      : gates.kamino === "Mainnet-read"
+                        ? "Kamino live LTV"
+                        : `Kamino ${gates.kamino}`}
+                  </b>
+                  <small>{gates.creditCapacity}</small>
                 </div>
                 <div
                   className="netro-density-card netro-density-item"

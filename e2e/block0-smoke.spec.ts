@@ -140,6 +140,13 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(strip).toMatch(/pyth/);
     expect(strip).toMatch(/scaled ui/);
     expect(strip).toMatch(/multi-tenant/);
+    // Live Kamino maxLTV from credit bundle (not hardcoded theater alone)
+    await expect(page.getByText(/Kamino 0\.\d{2} maxLTV/i).first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(
+      page.locator("[data-testid='desk-lab-netro']").getByText(/paper × LTV · no broadcast/i),
+    ).toBeVisible();
     // Positions stays the ledger — Netro must not replace other desk routes
     await page.goto("/desk/positions");
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();

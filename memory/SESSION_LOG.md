@@ -453,3 +453,7 @@
 ## 2026-09-16 — Netro live Empire gates
 - Netro overview flow strip + empire strip map live `/network` modes (wash fail-closed, Pyth/NestUSD/multi-tenant unavailable, Scaled UI/Kamino mainnet-read when live). No invent greens.
 - Demo URLs → netro desk preview. Goal open for Empire keys + GG Skip.
+
+## 2026-09-16 — Netro live Kamino LTV + Stocklana refresh
+- Credit bundle feeds Netro credit card (maxLTV + illustrative capacity). Submission checklist: lab UI approved + GG tip clean on PR #5.
+- Stocklana 598/82/$121k (jina). Still need Empire keys paste + token rotate. Goal open.
