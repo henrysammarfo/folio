@@ -344,3 +344,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Opt-in desk lab preview now paints stronger Netro grey/yellow density or Aionis dark brand plane (session-only).
 - Stocklana live scrape: **588** registered / **79** submissions / **$121k**; deadline conflict SEP 25 hero vs 18 Sep 16:00 ET.
 - Empire keys still empty locally (Bitquery/Privy/Supabase/Pyth). Still blocked: Henry Pick · keys · funded broadcast.
+
+## 2026-09-16 — Preview honesty + e2e lock
+- Preview home ships Aionis stencil + live AAPLx ×. Lab Netro/Aionis extracts live; 21st MCP needs `API_KEY_21ST` on Vercel.
+- `npm run keys` includes lab optional keys. E2E 21/21. Empire keys still empty. Goal open.

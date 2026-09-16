@@ -34,18 +34,16 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 30_000,
     });
 
-    // Enter checks step if the first Continue is enabled
+    // Enter checks step — wait for named BITQUERY env (not the step-1 Wash badge)
     const step1 = page.getByRole("button", { name: /^Continue$/i }).first();
-    if (await step1.isEnabled().catch(() => false)) {
-      await step1.click();
-      await page.getByText(/wash|checks|policy|gate|fail-closed/i).first().waitFor({
-        timeout: 30_000,
-      });
-    }
+    await expect(step1).toBeEnabled({ timeout: 15_000 });
+    await step1.click();
+    await expect(page.getByText(/BITQUERY_API_KEY/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
 
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/wash|fail|blocked|unavailable|bitquery|quote|check/);
-    // Named env on checks — no silent wash fallback
     expect(body).toMatch(/bitquery_api_key/);
 
     // Under wash fail-closed, advancing to review must be blocked
@@ -350,9 +348,11 @@ test.describe("FOLIO Block 0 smoke", () => {
 
   test("home surfaces brand-first hero and lab links", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: /^FOLIO$/i }).first()).toBeVisible({
+    // Brand is stencil + topbar (no competing h1 FOLIO over the plane)
+    await expect(page.locator(".home-brand-hero").getByText("FOLIO")).toBeVisible({
       timeout: 15_000,
     });
+    await expect(page.locator(".folio-stencil, .folio-stencil-svg").first()).toBeVisible();
     await expect(page.getByRole("link", { name: /open the desk/i }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: /^lab ui$/i }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: /^shaders$/i }).first()).toBeVisible();
@@ -372,10 +372,10 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 45_000,
     });
     const out = (await page.locator("pre").filter({ hasText: /nl=/i }).innerText()).toLowerCase();
-    expect(out).toMatch(/nl=(ok|failed|skipped)/);
+    // nl=off when AGENTROUTER missing; ok/failed/skipped when NL path runs
+    expect(out).toMatch(/nl=(ok|failed|skipped|off)/);
     expect(out).toMatch(/broadcast=false/);
     expect(out).toMatch(/truth|quote|gates|×|multiplier|pending/);
     expect(out).not.toMatch(/filled on mainnet|broadcast complete|unhackable/);
   });
-
 });

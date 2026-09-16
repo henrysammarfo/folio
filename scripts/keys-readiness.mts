@@ -56,6 +56,18 @@ const rows: Array<{ name: string; ok: boolean; note: string; required?: boolean 
     ok: (process.env["SUPABASE_JWT_SECRET"]?.trim().length ?? 0) >= 16,
     note: "user-JWT RLS path (sub=Privy DID); service-role labeled fallback when missing",
   },
+  {
+    name: "API_KEY_21ST",
+    ok: Boolean(process.env["API_KEY_21ST"]?.trim()),
+    note: "optional lab — 21st.dev MCP catalog on /lab/ui",
+    required: false,
+  },
+  {
+    name: "SHADERS_API_KEY",
+    ok: Boolean(process.env["SHADERS_API_KEY"]?.trim()),
+    note: "optional lab — shaders.com probe (Clerk may still gate REST)",
+    required: false,
+  },
 ];
 
 let missing = 0;

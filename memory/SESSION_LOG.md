@@ -309,3 +309,8 @@
 ## 2026-09-16 — Lab readiness + e2e extract locks
 - Settings readiness: API_KEY_21ST + SHADERS_API_KEY. E2E locks stencil home + Netro/Aionis desk preview + WebGL swatches.
 - Vercel preview READY on prior tip; Empire keys still empty. Goal open: Henry Pick + keys.
+
+## 2026-09-16 — Preview verify + e2e green + keys-readiness lab rows
+- Live Vercel preview: home stencil + live ×1.003269 OK; `/lab/ui` shows API_KEY_21ST missing on Vercel (local has it).
+- keys-readiness lists optional API_KEY_21ST / SHADERS. Full Playwright **21/21** green.
+- Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · Vercel lab keys · funded broadcast.
