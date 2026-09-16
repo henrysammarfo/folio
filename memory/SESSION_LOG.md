@@ -404,3 +404,10 @@
 - Wired `FOLIO_APPROVED_LAB_UI` / `FOLIO_APPROVED_LAB_SHADER` (set on Vercel only after Henry chat reply).
 - DeskShell applies approved chrome without opt-in preview; Settings shows approved rows; local Pick still never merges.
 - Goal still needs Henry Pick reply before env can be set; then Bitquery/Pyth/Privy/Supabase.
+
+## 2026-09-16 — Netro layout parity (cards/animations)
+
+- DeskShell: when `netro-density` is effective UI, Netro **replaces** overview children (was stacking → cards looked out of place).
+- Stagger delays via `--netro-delay` (nth-child was broken across nested parents).
+- Yellow AI rail height-synced to left column baseline; share ticker marquee; dual spinning profile gears; taller cards.
+- Home hero preserved. Confirmed Vercel already has 21st/shaders/AgentRouter/Tavily/TinyFish; trading keys still empty (cannot invent). Rotate Vercel token.

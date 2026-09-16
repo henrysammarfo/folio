@@ -220,24 +220,28 @@ export function DeskShell({
           <DeskWalletPill />
         </header>
         <main className="desk-content">
-          <div className="desk-heading">
-            <div>
-              <p>{eyebrow}</p>
-              <h1>{title}</h1>
-            </div>
-            {actions}
-          </div>
           {showNetroCanvas ? (
+            /* Netro 12-col IS the desk surface — do not stack overview cards under it */
             <div className="desk-lab-netro" data-testid="desk-lab-netro">
               <NetroDensityCanvas multiplierLabel={multiplierLabel} />
             </div>
-          ) : null}
-          {showJournal ? (
-            <div className="desk-lab-journal" data-testid="desk-lab-journal">
-              <FolioTradeJournalLab />
-            </div>
-          ) : null}
-          {children}
+          ) : (
+            <>
+              <div className="desk-heading">
+                <div>
+                  <p>{eyebrow}</p>
+                  <h1>{title}</h1>
+                </div>
+                {actions}
+              </div>
+              {showJournal ? (
+                <div className="desk-lab-journal" data-testid="desk-lab-journal">
+                  <FolioTradeJournalLab />
+                </div>
+              ) : null}
+              {children}
+            </>
+          )}
         </main>
       </div>
     </div>

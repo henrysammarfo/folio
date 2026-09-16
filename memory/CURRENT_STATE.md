@@ -405,3 +405,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 ## 2026-09-16 — Approved lab env merge path
 - Production desk chrome gated by `FOLIO_APPROVED_LAB_UI` / `FOLIO_APPROVED_LAB_SHADER` after Henry chat approve.
 - Unset today — desk stays default. Goal open.
+
+## 2026-09-16 — Netro desk surface parity + keys honesty
+- Netro density is the **desk surface** when active (no stacked overview cards under it); stagger via `--netro-delay`; AI rail height-synced to left column; share ticker; larger profile gears.
+- Home hero untouched. Vercel lab/research keys already set; Bitquery/Pyth/Privy/Supabase/Jupiter **cannot invent** — empty until Henry pastes.
+- **Rotate** Vercel token from chat. Goal open.
