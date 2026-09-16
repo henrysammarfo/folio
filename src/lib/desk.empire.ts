@@ -35,6 +35,8 @@ import {
 } from "./auth/session";
 import { isSupabaseUserJwtConfigured } from "./auth/supabase-user-jwt";
 import { buildSessionFromPrivyToken } from "./auth/session-from-privy";
+import { attachUserToDemoTenant } from "./auth/demo-tenant";
+import { resolveTenantMemberships } from "./auth/tenants";
 import {
   FOLIO_WATCH_WALLET_COOKIE,
   mintWatchWalletCookie,
@@ -213,30 +215,157 @@ export type SessionBundle = {
    */
   rlsNote: string;
   /** Production readiness flags — fail-closed honesty for Henry / Stocklana ops. */
-  readiness: {
-    bitqueryKeyPresent: boolean;
-    privyConfigured: boolean;
-    supabaseConfigured: boolean;
-    sessionSecretPresent: boolean;
-    pythApiKeyPresent: boolean;
-    agentRouterKeyPresent: boolean;
-    /** SUPABASE_JWT_SECRET + anon + URL — user-JWT RLS path armed. */
-    supabaseJwtConfigured: boolean;
-    broadcastPaused: boolean;
-    /** Lab only — 21st.dev MCP catalog (approve gate). */
-    twentyFirstKeyPresent: boolean;
-    /** Lab only — shaders.com probe (often Clerk-gated). */
-    shadersKeyPresent: boolean;
-    /** Production desk chrome after Henry chat approve (FOLIO_APPROVED_LAB_UI). */
-    approvedLabUi: string | null;
-    /** Production desk shader after Henry chat approve (FOLIO_APPROVED_LAB_SHADER). */
-    approvedLabShader: string | null;
-    /** Optional Jupiter auth header — public path works without it. */
-    jupiterKeyPresent: boolean;
-    /** Dedicated SOLANA_RPC_URL (false = labeled public RPC fallback · B004). */
-    solanaRpcDedicated: boolean;
-  };
+  readiness: EmpireReadiness;
 };
+
+/** Env presence flags only — no invented greens. Shared by Settings + Netro. */
+export type EmpireReadiness = {
+  bitqueryKeyPresent: boolean;
+  privyConfigured: boolean;
+  /** Public Privy app id for client PrivyProvider (never the secret). */
+  privyAppId: string | null;
+  supabaseConfigured: boolean;
+  sessionSecretPresent: boolean;
+  pythApiKeyPresent: boolean;
+  agentRouterKeyPresent: boolean;
+  /** SUPABASE_JWT_SECRET + anon + URL — user-JWT RLS path armed. */
+  supabaseJwtConfigured: boolean;
+  broadcastPaused: boolean;
+  /** Lab only — 21st.dev MCP catalog (approve gate). */
+  twentyFirstKeyPresent: boolean;
+  /** Lab only — shaders.com probe (often Clerk-gated). */
+  shadersKeyPresent: boolean;
+  /** Production desk chrome after Henry chat approve (FOLIO_APPROVED_LAB_UI). */
+  approvedLabUi: string | null;
+  /** Production desk shader after Henry chat approve (FOLIO_APPROVED_LAB_SHADER). */
+  approvedLabShader: string | null;
+  /** Optional Jupiter auth header — public path works without it. */
+  jupiterKeyPresent: boolean;
+  /** Dedicated SOLANA_RPC_URL (false = labeled public RPC fallback · B004). */
+  solanaRpcDedicated: boolean;
+  /**
+   * tenants / tenant_members / desk_preferences reachable via service-role.
+   * False when keys missing, migration not applied (PGRST205), or GRANTs missing (42501).
+   */
+  supabaseSchemaReady: boolean;
+  /** Honest probe detail for Settings (never invents ready). */
+  supabaseSchemaDetail: string;
+};
+
+export function readEmpireReadiness(
+  env: NodeJS.ProcessEnv = process.env,
+): EmpireReadiness {
+  const sessionSecretPresent = (env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
+  const privyAppId = env["PRIVY_APP_ID"]?.trim() || null;
+  return {
+    bitqueryKeyPresent: Boolean(env["BITQUERY_API_KEY"]?.trim()),
+    privyConfigured: Boolean(privyAppId && env["PRIVY_APP_SECRET"]?.trim()),
+    privyAppId,
+    supabaseConfigured: Boolean(
+      env["SUPABASE_URL"]?.trim() &&
+        env["SUPABASE_ANON_KEY"]?.trim() &&
+        env["SUPABASE_SERVICE_ROLE_KEY"]?.trim(),
+    ),
+    sessionSecretPresent,
+    pythApiKeyPresent: Boolean(env["PYTH_API_KEY"]?.trim()),
+    agentRouterKeyPresent: Boolean(env["AGENTROUTER_API_KEY"]?.trim()),
+    supabaseJwtConfigured: isSupabaseUserJwtConfigured(env),
+    broadcastPaused: isBroadcastPaused(env),
+    twentyFirstKeyPresent: Boolean(env["API_KEY_21ST"]?.trim()),
+    shadersKeyPresent: Boolean(env["SHADERS_API_KEY"]?.trim()),
+    approvedLabUi: readApprovedLabUi(env),
+    approvedLabShader: readApprovedLabShader(env),
+    jupiterKeyPresent: Boolean(env["JUPITER_API_KEY"]?.trim()),
+    solanaRpcDedicated: Boolean(env["SOLANA_RPC_URL"]?.trim()),
+    /** Sync path defaults false — enrich via loadEmpireReadiness. */
+    supabaseSchemaReady: false,
+    supabaseSchemaDetail: "Not probed",
+  };
+}
+
+/** Live PostgREST probe — never invents schema greens. */
+export async function probeSupabaseSchemaReady(
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<boolean> {
+  const url = env["SUPABASE_URL"]?.trim()?.replace(/\/$/, "");
+  const key = env["SUPABASE_SERVICE_ROLE_KEY"]?.trim();
+  if (!url || !key) return false;
+  try {
+    const res = await fetch(`${url}/rest/v1/tenants?select=id&limit=1`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(8_000),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Honest detail for Settings — distinguishes missing tables vs missing GRANTs. */
+export async function probeSupabaseSchemaDetail(
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<{ ready: boolean; detail: string }> {
+  const url = env["SUPABASE_URL"]?.trim()?.replace(/\/$/, "");
+  const key = env["SUPABASE_SERVICE_ROLE_KEY"]?.trim();
+  if (!url || !key) {
+    return { ready: false, detail: "Blocked · Supabase keys first" };
+  }
+  try {
+    const res = await fetch(`${url}/rest/v1/tenants?select=id&limit=1`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (res.ok) {
+      return { ready: true, detail: "Ready · tenants / tenant_members reachable" };
+    }
+    const body = await res.text().catch(() => "");
+    if (res.status === 404 || /PGRST205/i.test(body)) {
+      return {
+        ready: false,
+        detail: "Missing · run 20260915_folio_tenants.sql (PGRST205)",
+      };
+    }
+    if (res.status === 403 || /42501|permission denied|GRANT SELECT/i.test(body)) {
+      return {
+        ready: false,
+        detail:
+          "Tables exist · run 20260916_folio_tenants_grants.sql (service_role 42501)",
+      };
+    }
+    return {
+      ready: false,
+      detail: `Probe HTTP ${res.status} · fail-closed`,
+    };
+  } catch (e) {
+    return { ready: false, detail: `Probe failed · ${String(e).slice(0, 80)}` };
+  }
+}
+
+export async function loadEmpireReadiness(
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<EmpireReadiness> {
+  const base = readEmpireReadiness(env);
+  if (!base.supabaseConfigured) {
+    return {
+      ...base,
+      supabaseSchemaDetail: "Blocked · Supabase keys first",
+    };
+  }
+  const probe = await probeSupabaseSchemaDetail(env);
+  return {
+    ...base,
+    supabaseSchemaReady: probe.ready,
+    supabaseSchemaDetail: probe.detail,
+  };
+}
 
 const InspectWalletInput = z
   .object({
@@ -676,30 +805,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     const userId = session.ok ? session.data.userId : null;
     const preferences = await loadDeskPreferences(activeTenantId, userId);
     const watch = readWatchWallet();
-    const sessionSecretPresent =
-      (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
-    const bitqueryKeyPresent = Boolean(
-      process.env["BITQUERY_API_KEY"]?.trim(),
-    );
-    const privyConfigured = Boolean(
-      process.env["PRIVY_APP_ID"]?.trim() &&
-        process.env["PRIVY_APP_SECRET"]?.trim(),
-    );
-    const supabaseConfigured = Boolean(
-      process.env["SUPABASE_URL"]?.trim() &&
-        process.env["SUPABASE_ANON_KEY"]?.trim() &&
-        process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim(),
-    );
-    const pythApiKeyPresent = Boolean(process.env["PYTH_API_KEY"]?.trim());
-    const agentRouterKeyPresent = Boolean(
-      process.env["AGENTROUTER_API_KEY"]?.trim(),
-    );
-    const twentyFirstKeyPresent = Boolean(process.env["API_KEY_21ST"]?.trim());
-    const shadersKeyPresent = Boolean(process.env["SHADERS_API_KEY"]?.trim());
-    const approvedLabUi = readApprovedLabUi();
-    const approvedLabShader = readApprovedLabShader();
-    const jupiterKeyPresent = Boolean(process.env["JUPITER_API_KEY"]?.trim());
-    const solanaRpcDedicated = Boolean(process.env["SOLANA_RPC_URL"]?.trim());
+    const readiness = await loadEmpireReadiness();
     return {
       auth,
       session,
@@ -713,27 +819,17 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         customProgramDeploy: false,
       },
       watchWallet: watch.ok ? watch.data.wallet : null,
-      sessionSecretPresent,
-      agentRouterKeyPresent,
+      sessionSecretPresent: readiness.sessionSecretPresent,
+      agentRouterKeyPresent: readiness.agentRouterKeyPresent,
       rlsNote: deskRlsHonestyNote(),
-      readiness: {
-        bitqueryKeyPresent,
-        privyConfigured,
-        supabaseConfigured,
-        sessionSecretPresent,
-        pythApiKeyPresent,
-        agentRouterKeyPresent,
-        supabaseJwtConfigured: isSupabaseUserJwtConfigured(),
-        broadcastPaused: isBroadcastPaused(),
-        twentyFirstKeyPresent,
-        shadersKeyPresent,
-        approvedLabUi,
-        approvedLabShader,
-        jupiterKeyPresent,
-        solanaRpcDedicated,
-      },
+      readiness,
     };
   },
+);
+
+/** Empire key flags + optional Supabase schema probe — never invents greens. */
+export const getEmpireReadiness = createServerFn({ method: "GET" }).handler(
+  async (): Promise<EmpireReadiness> => loadEmpireReadiness(),
 );
 
 const AgentInput = z.object({
@@ -894,6 +990,73 @@ export const clearFolioSession = createServerFn({ method: "POST" }).handler(
     } catch (e) {
       return errResult("folio.session.clear", "clear_failed", String(e));
     }
+  },
+);
+
+/**
+ * Attach current httpOnly session user to folio-demo as owner (service-role).
+ * Then remint cookie so tenant memberships appear on the session.
+ */
+export const attachDemoTenantMembership = createServerFn({ method: "POST" }).handler(
+  async () => {
+    const session = readVerifiedSession();
+    if (!session.ok) {
+      return errResult(
+        "folio.demo-tenant.attach",
+        "attach_requires_session",
+        "Mint httpOnly folio_session with a Privy access token first.",
+      );
+    }
+    const attached = await attachUserToDemoTenant({
+      userId: session.data.userId,
+      walletAddress: session.data.walletAddress,
+    });
+    if (!attached.ok) {
+      return errResult(
+        "folio.demo-tenant.attach",
+        attached.reason,
+        attached.detail,
+      );
+    }
+
+    const memberships = await resolveTenantMemberships({
+      userId: session.data.userId,
+    });
+    const tenants = memberships.ok ? memberships.data : session.data.tenants;
+    const remainingMs = Date.parse(session.data.expiresAt) - Date.now();
+    const ttlSec = Math.max(60, Math.floor(remainingMs / 1000));
+    const minted = mintFolioSession({
+      userId: session.data.userId,
+      walletAddress: session.data.walletAddress,
+      tenants,
+      activeTenantId: attached.data.tenantId,
+      ttlSec,
+    });
+    if (!minted.ok) {
+      return errResult(
+        "folio.demo-tenant.attach",
+        minted.reason,
+        `${attached.data.note} · remint failed: ${minted.detail ?? minted.reason}`,
+      );
+    }
+    setCookie(FOLIO_SESSION_COOKIE, minted.data.cookieValue, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: ttlSec,
+      secure: process.env["NODE_ENV"] === "production",
+    });
+    return {
+      ok: true as const,
+      mode: "mainnet-read" as const,
+      asOf: new Date().toISOString(),
+      source: "folio.demo-tenant.attach",
+      data: {
+        ...attached.data,
+        session: minted.data.session,
+        note: `${attached.data.note} · cookie reminted with ${tenants.length} membership(s)`,
+      },
+    };
   },
 );
 

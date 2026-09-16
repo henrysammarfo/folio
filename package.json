@@ -17,6 +17,7 @@
     "replay": "npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build",
     "smoke": "npx tsx scripts/smoke-empire.mts",
     "smoke:keys": "npx tsx scripts/smoke-keys.mts",
+    "smoke:goal": "npx tsx --env-file=.env scripts/smoke-goal.mts",
     "keys": "npx tsx scripts/keys-readiness.mts"
   },
   "overrides": {
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@privy-io/react-auth": "^3.43.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",

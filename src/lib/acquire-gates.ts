@@ -81,15 +81,15 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
   let divergeOk = true;
   if (input.diverge.kind === "blocked") {
     divergeOk = false;
-    blockedReasons.push("Pyth vs Jupiter venue diverge outside band");
+    blockedReasons.push("Equity ref vs Jupiter venue diverge outside band");
   } else if (input.diverge.kind === "pyth_missing") {
-    honestyNotes.push(
-      "Pyth: PYTH_API_KEY missing · Hermes equity reference unavailable (labeled; does not invent a pass)",
+      honestyNotes.push(
+      "Live equity ref unavailable (Yahoo/Finnhub) · labeled; does not invent a pass",
     );
     if (input.strictFailClosed) {
       divergeOk = false;
       blockedReasons.push(
-        "Strict fail-closed: PYTH_API_KEY missing · Hermes reference required before review",
+        "Strict fail-closed: live equity reference required before review",
       );
     }
   } else if (input.diverge.kind === "unavailable" && input.strictFailClosed) {

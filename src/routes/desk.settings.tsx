@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
 import { Switch } from "@/components/ui/switch";
 import {
+  attachDemoTenantMembership,
   bindWatchWallet,
   clearFolioSession,
   clearWatchWallet,
@@ -18,6 +19,12 @@ import {
 } from "@/lib/desk.functions";
 import { readLabShaderPick, readLabUiPick } from "@/lib/lab-pick";
 import { canWriteDeskPrefs } from "@/lib/auth/role-gates";
+
+const PrivySessionMint = lazy(() =>
+  import("@/components/privy-session-mint").then((m) => ({
+    default: m.PrivySessionMint,
+  })),
+);
 
 export const Route = createFileRoute("/desk/settings")({
   head: () => ({
@@ -43,6 +50,7 @@ function Page() {
   const switchTenant = useServerFn(setActiveTenant);
   const createSession = useServerFn(createSessionFromPrivyToken);
   const clearSession = useServerFn(clearFolioSession);
+  const attachDemo = useServerFn(attachDemoTenantMembership);
   const bindWatch = useServerFn(bindWatchWallet);
   const clearWatch = useServerFn(clearWatchWallet);
   const { data, refetch } = useQuery({
@@ -67,6 +75,10 @@ function Page() {
   const [prefsMsg, setPrefsMsg] = useState("");
   const [tenantBusy, setTenantBusy] = useState(false);
   const [tenantMsg, setTenantMsg] = useState("");
+  const [privyClient, setPrivyClient] = useState(false);
+  useEffect(() => {
+    setPrivyClient(true);
+  }, []);
   const tenants = data?.session.ok ? data.session.data.tenants : [];
   const activeTenantId = data?.activeTenantId ?? null;
   const prefsTenant =
@@ -100,7 +112,7 @@ function Page() {
       const res = await savePrefs({ data: next });
       if (res.ok) {
         setPrefsMsg("Saved to Supabase desk_preferences.");
-        await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+        await invalidateSessionScopedBundles();
         await refetch();
       } else {
         setPrefsMsg(`${res.reason}${res.detail ? ` — ${res.detail}` : ""}`);
@@ -110,17 +122,48 @@ function Page() {
     }
   }
 
+  /** After mint/clear/tenant/watch — drop stale paper positions/credit/activity so wallet qty + CA prefs light up. */
+  async function invalidateSessionScopedBundles() {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["session-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["positions-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["credit-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["activity-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["empire-readiness"] }),
+    ]);
+  }
+
+  const sessionMintReady = Boolean(
+    data?.readiness.privyConfigured &&
+      data?.readiness.supabaseConfigured &&
+      data?.sessionSecretPresent,
+  );
+
   useEffect(() => {
     setLabUiPick(readLabUiPick());
     setLabShaderPick(readLabShaderPick());
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash.replace(/^#/, "");
+    if (!hash) return;
+    const el = document.getElementById(hash);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [data]);
+
+  const empireKeysReady = Boolean(
+    data?.readiness.privyConfigured && data?.readiness.supabaseConfigured,
+  );
 
   return (
     <DeskShell eyebrow="Server preferences" title="Settings">
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Mainnet read</ModeBadge>
         <ModeBadge mode={data?.networkPolicy.broadcast ? "mainnet-read" : "unavailable"}>
-          {data?.networkPolicy.broadcast ? "Broadcast armed" : "Broadcast off"}
+          {data?.networkPolicy.broadcast ? "Broadcast armed" : "Broadcast paused"}
         </ModeBadge>
         <ModeBadge
           mode={
@@ -145,13 +188,28 @@ function Page() {
         <ModeBadge mode="paper">Paper agent</ModeBadge>
       </div>
 
+      <div className="settings-layout">
+        <nav className="settings-rail" aria-label="Settings sections">
+          <a href="#empire-readiness">Empire readiness</a>
+          <a href="#settings-network">Network + policy</a>
+          <a href="#settings-tenant">Active tenant</a>
+          <a href="#settings-session">Privy session</a>
+          <a href="#settings-watch">Watch wallet</a>
+          <a href="#settings-agent">Paper agent</a>
+          <a href="#settings-key-guide">Key links</a>
+        </nav>
+        <div className="settings-main">
       <Panel
         title="Production readiness"
         meta={<StatusBadge tone="amber">Henry actions</StatusBadge>}
+        collapsible
+        defaultOpen
       >
+        <div id="empire-readiness" className="scroll-mt-24" />
         <p className="mb-3 text-sm opacity-80">
           Fail-closed checklist for Stocklana production. Missing keys stay unavailable — we do
-          not invent wash clears, multi-tenant sessions, or broadcast.
+          not invent wash clears, multi-tenant sessions, or broadcast. Paste into Vercel
+          (Preview + Production) then redeploy — Netro Empire keys strip updates live.
         </p>
         <div className="policy-list">
           <p>
@@ -166,7 +224,7 @@ function Page() {
             <span>BITQUERY_API_KEY</span>
             <b>
               {data?.readiness.bitqueryKeyPresent
-                ? "Set · wash tape live"
+                ? "Set · wash path keyed (live probe on Acquire / Network)"
                 : "Missing · wash fail-closed"}
             </b>
           </p>
@@ -174,7 +232,7 @@ function Page() {
             <span>PYTH_API_KEY</span>
             <b>
               {data?.readiness.pythApiKeyPresent
-                ? "Set · Hermes equity reference live"
+                ? "Set · Hermes keyed — Equity.US/xStock must entitle before diverge live"
                 : "Missing · Pyth diverge fail-closed"}
             </b>
           </p>
@@ -219,6 +277,17 @@ function Page() {
             </b>
           </p>
           <p>
+            <span>Supabase tenant schema</span>
+            <b>
+              {data?.readiness.supabaseSchemaDetail ??
+                (data?.readiness.supabaseSchemaReady
+                  ? "Ready · tenants / tenant_members reachable"
+                  : data?.readiness.supabaseConfigured
+                    ? "Missing · run migration + grants"
+                    : "Blocked · Supabase keys first")}
+            </b>
+          </p>
+          <p>
             <span>SUPABASE_JWT_SECRET (RLS user path)</span>
             <b>
               {data?.readiness.supabaseJwtConfigured
@@ -226,6 +295,53 @@ function Page() {
                 : "Missing · service-role labeled fallback"}
             </b>
           </p>
+          {(data?.readiness.supabaseSchemaDetail ?? "").includes("42501") ||
+          (data?.readiness.supabaseSchemaDetail ?? "").includes("grants") ? (
+            <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+              <b>DO NOW · Supabase SQL editor</b>
+              <p className="mt-1 opacity-80">
+                Tables exist but <code>service_role</code> lacks privileges. Paste this exactly, then
+                Run:
+              </p>
+              <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs leading-relaxed opacity-90">{`grant select, insert, update, delete on public.tenants to service_role;
+grant select, insert, update, delete on public.tenant_members to service_role;
+grant select, insert, update, delete on public.desk_preferences to service_role;
+grant select on public.tenants to anon, authenticated;
+grant select on public.tenant_members to anon, authenticated;
+grant select, insert, update, delete on public.desk_preferences to anon, authenticated;`}</pre>
+            </div>
+          ) : null}
+          <div className="mt-3 rounded-lg border border-ledger/40 bg-ink/30 p-3 text-sm">
+            <b>Diverge · live free equity ref (Pyth off ship path)</b>
+            <p className="mt-1 opacity-80">
+              Ship path does <b>not</b> call Pyth Hermes. Diverge scores live{" "}
+              <b>Finnhub</b> (optional <code>FINNHUB_API_KEY</code>) → <b>Yahoo chart</b> keyless
+              + CoinGecko xStock secondary vs Jupiter venue. Fail-closed when those HTTP probes
+              miss — no invented prices. Optional Finnhub:{" "}
+              <a href="https://finnhub.io/register" target="_blank" rel="noreferrer">
+                finnhub.io/register
+              </a>
+              .
+            </p>
+          </div>
+          {sessionMintReady && !data?.session.ok ? (
+            <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+              <b>DO NOW · Multi-tenant (last Stocklana blocker)</b>
+              <p className="mt-1 opacity-80">
+                1) Privy Dashboard → Configuration → App settings → Domains → Allowed origins →
+                paste{" "}
+                <code>
+                  https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app
+                </code>{" "}
+                (Privy rejects <code>*.vercel.app</code> wildcards).
+                <br />
+                2) Scroll to <a href="#settings-session">session panel</a> →{" "}
+                <b>Log in with Privy (auto-mints)</b>.
+                <br />
+                3) If tenants empty → <b>Join folio-demo as owner</b>.
+              </p>
+            </div>
+          ) : null}
           <p>
             <span>Broadcast</span>
             <b>
@@ -253,10 +369,21 @@ function Page() {
           <p>
             <span>Lab premium UI</span>
             <b>
-              {labUiPick || labShaderPick
-                ? `Local pick ${[labUiPick, labShaderPick].filter(Boolean).join(" · ")} · awaiting chat reply — `
-                : "Awaiting Henry candidate id — "}
-              <a href="/lab/ui">/lab/ui</a> · <a href="/lab/shaders">/lab/shaders</a>
+              {data?.readiness.approvedLabUi
+                ? `Production · ${data.readiness.approvedLabUi}`
+                : labUiPick || labShaderPick
+                  ? `Local pick ${[labUiPick, labShaderPick].filter(Boolean).join(" · ")} · awaiting chat reply — `
+                  : "Awaiting Henry candidate id — "}
+              {!data?.readiness.approvedLabUi ? (
+                <>
+                  <a href="/lab/ui">/lab/ui</a> · <a href="/lab/shaders">/lab/shaders</a>
+                </>
+              ) : (
+                <>
+                  {" "}
+                  · <a href="/lab/ui">/lab/ui</a>
+                </>
+              )}
             </b>
           </p>
           <p>
@@ -283,8 +410,88 @@ function Page() {
         </div>
       </Panel>
 
-      <div className="desk-grid">
-        <Panel title="Network mode" meta={<StatusBadge tone="blue">Quote-only default</StatusBadge>}>
+      <div id="settings-key-guide" className="scroll-mt-24">
+        <Panel
+          title="Get Empire API keys (step-by-step)"
+          meta={<StatusBadge tone="blue">Links</StatusBadge>}
+          collapsible
+          defaultOpen
+        >
+          <div className="settings-keys-guide">
+            <div className="settings-step">
+              <strong>1 · Bitquery</strong>
+              <span>
+                Open{" "}
+                <a href="https://account.bitquery.io/" target="_blank" rel="noreferrer">
+                  account.bitquery.io
+                </a>{" "}
+                → API keys → create → paste as <code>BITQUERY_API_KEY</code> on Vercel
+                (Preview + Production).
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>2 · Equity reference — live free (Pyth off ship path)</strong>
+              <span>
+                Diverge: <b>Finnhub</b> (
+                <a href="https://finnhub.io/register" target="_blank" rel="noreferrer">
+                  finnhub.io/register
+                </a>{" "}
+                → <code>FINNHUB_API_KEY</code>) → <b>Yahoo chart</b> keyless → CoinGecko{" "}
+                <code>*-xstock</code> secondary vs Jupiter venue. No Pyth Pro. Fail-closed on
+                HTTP miss — no mocks.
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>3 · Privy</strong>
+              <span>
+                Create an app at{" "}
+                <a href="https://dashboard.privy.io/" target="_blank" rel="noreferrer">
+                  dashboard.privy.io
+                </a>{" "}
+                → copy <code>PRIVY_APP_ID</code> + <code>PRIVY_APP_SECRET</code>.
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>4 · Supabase ✅ keys + JWT + SQL done</strong>
+              <span>
+                <code>SUPABASE_URL</code> / anon / service_role /{" "}
+                <code>SUPABASE_JWT_SECRET</code> on Vercel. Migrations applied:{" "}
+                <code>20260915_folio_tenants.sql</code> +{" "}
+                <code>20260916_folio_tenants_grants.sql</code> +{" "}
+                <code>folio-demo</code> seed. Next = Privy mint + Join folio-demo (session
+                panel below).
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>5 · Optional Jupiter</strong>
+              <span>
+                Portal at{" "}
+                <a href="https://portal.jup.ag/" target="_blank" rel="noreferrer">
+                  portal.jup.ag
+                </a>{" "}
+                if quotes gate → <code>JUPITER_API_KEY</code>. Public path works until 429.
+              </span>
+            </div>
+            <div className="settings-step">
+              <strong>6 · Vercel paste</strong>
+              <span>
+                Project env for{" "}
+                <a
+                  href="https://vercel.com/teamtitanlink/folio/settings/environment-variables"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  folio → Environment Variables
+                </a>{" "}
+                → redeploy preview. Rotate any token pasted in chat.
+              </span>
+            </div>
+          </div>
+        </Panel>
+      </div>
+
+      <div id="settings-network" className="desk-grid scroll-mt-24">
+        <Panel title="Network mode" meta={<StatusBadge tone="blue">Quote-only default</StatusBadge>} collapsible defaultOpen>
           <div className="setting-row">
             <span>
               <b>Mainnet read</b>
@@ -297,8 +504,12 @@ function Page() {
               <b>Broadcast</b>
               <small>Requires funding and explicit enablement</small>
             </span>
-            <StatusBadge tone="neutral">
-              {data?.networkPolicy.broadcast ? "Enabled" : "Unavailable"}
+            <StatusBadge tone={data?.networkPolicy.broadcast ? "amber" : "neutral"}>
+              {data?.networkPolicy.broadcast
+                ? "Enabled"
+                : data?.readiness.broadcastPaused
+                  ? "Paused · ≤~$1 · quote-only"
+                  : "Policy off"}
             </StatusBadge>
           </div>
           <div className="setting-row">
@@ -332,7 +543,7 @@ function Page() {
             </StatusBadge>
           </div>
         </Panel>
-        <Panel title="Policy preferences">
+        <Panel title="Policy preferences" collapsible defaultOpen>
           <label className="setting-row">
             <span>
               <b>Corporate-action alerts</b>
@@ -385,6 +596,7 @@ function Page() {
         </Panel>
       </div>
 
+      <div id="settings-tenant" className="scroll-mt-24">
       <Panel
         title="Active tenant"
         meta={
@@ -392,6 +604,8 @@ function Page() {
             {prefsTenant ? "Scoped" : "No membership"}
           </StatusBadge>
         }
+        collapsible
+        defaultOpen
       >
         <p className="mb-3 text-sm opacity-80">
           Prefs and desk scope follow the membership-validated active tenant on the httpOnly
@@ -429,9 +643,7 @@ function Page() {
                         });
                         if (res.ok) {
                           setTenantMsg(res.data.note);
-                          await queryClient.invalidateQueries({
-                            queryKey: ["session-bundle"],
-                          });
+                          await invalidateSessionScopedBundles();
                           await refetch();
                         } else {
                           setTenantMsg(
@@ -457,29 +669,56 @@ function Page() {
           </p>
         ) : null}
       </Panel>
+      </div>
 
+      <div id="settings-session" className="scroll-mt-24">
       <Panel
         title="Bind Privy → httpOnly session"
         meta={<StatusBadge tone="amber">Fail-closed without keys</StatusBadge>}
+        collapsible
+        defaultOpen={empireKeysReady}
       >
         <p className="mb-3 text-sm opacity-80">
-          Paste a Privy access token only after Privy + Supabase + FOLIO_SESSION_SECRET are set.
-          FOLIO mints an httpOnly <code>folio_session</code> cookie — never localStorage auth.
+          Server keys ready (Privy + Supabase + JWT + session secret + schema). FOLIO mints an
+          httpOnly <code>folio_session</code> — never localStorage auth.
+          Prefer <b>Log in with Privy</b> below; paste-token remains a fallback. After mint, if
+          tenants empty → <b>Join folio-demo as owner</b>. Do not paste the App Secret.
+          {!sessionMintReady
+            ? " Mint stays disabled until Privy + Supabase + FOLIO_SESSION_SECRET are present."
+            : null}
         </p>
+        {privyClient && data?.readiness.privyAppId ? (
+          <Suspense fallback={<p className="mb-3 text-sm opacity-70">Loading Privy…</p>}>
+            <PrivySessionMint
+              appId={data.readiness.privyAppId}
+              mintReady={sessionMintReady}
+              allowedOrigin={
+                typeof window !== "undefined"
+                  ? window.location.origin
+                  : "https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app"
+              }
+              onMinted={async () => {
+                await invalidateSessionScopedBundles();
+                await refetch();
+              }}
+            />
+          </Suspense>
+        ) : null}
         <div className="form-grid">
           <label>
-            Privy access token
+            Privy access token (fallback)
             <input
               value={privyToken}
               onChange={(e) => setPrivyToken(e.target.value)}
               placeholder="eyJ… (server-verified)"
               autoComplete="off"
+              disabled={!sessionMintReady}
             />
           </label>
           <button
             type="button"
             className="wallet-pill"
-            disabled={sessionBusy || !privyToken.trim()}
+            disabled={sessionBusy || !privyToken.trim() || !sessionMintReady}
             onClick={async () => {
               setSessionBusy(true);
               setSessionMsg("");
@@ -492,7 +731,7 @@ function Page() {
                     `Session bound for ${res.data.session.userId.slice(0, 16)}… — httpOnly cookie set.`,
                   );
                   setPrivyToken("");
-                  await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+                  await invalidateSessionScopedBundles();
                   await refetch();
                 } else {
                   setSessionMsg(
@@ -504,7 +743,11 @@ function Page() {
               }
             }}
           >
-            {sessionBusy ? "Verifying…" : "Mint httpOnly session"}
+            {sessionBusy
+              ? "Verifying…"
+              : sessionMintReady
+                ? "Mint httpOnly session"
+                : "Mint blocked · keys missing"}
           </button>
         </div>
         {sessionMsg ? <p className="mt-3 text-sm">{sessionMsg}</p> : null}
@@ -542,6 +785,31 @@ function Page() {
               ))}
             </ul>
           )}
+          {data?.session.ok && tenants.length === 0 ? (
+            <button
+              type="button"
+              className="wallet-pill mt-3"
+              disabled={sessionBusy || !data.readiness.supabaseSchemaReady}
+              onClick={async () => {
+                setSessionBusy(true);
+                setSessionMsg("");
+                try {
+                  const res = await attachDemo();
+                  setSessionMsg(
+                    res.ok
+                      ? res.data.note
+                      : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                  );
+                  await invalidateSessionScopedBundles();
+                  await refetch();
+                } finally {
+                  setSessionBusy(false);
+                }
+              }}
+            >
+              Join folio-demo as owner
+            </button>
+          ) : null}
           <button
             type="button"
             className="wallet-pill mt-3"
@@ -556,7 +824,7 @@ function Page() {
                     ? res.data.note
                     : "Failed to clear session",
                 );
-                await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+                await invalidateSessionScopedBundles();
                 await refetch();
               } finally {
                 setSessionBusy(false);
@@ -567,8 +835,9 @@ function Page() {
           </button>
         </div>
       </Panel>
+      </div>
 
-      
+      <div id="settings-watch" className="scroll-mt-24">
       <Panel
         title="Watch wallet (mainnet-read qty)"
         meta={
@@ -576,6 +845,8 @@ function Page() {
             {data?.sessionSecretPresent ? "Secret ready" : "Secret missing"}
           </StatusBadge>
         }
+        collapsible
+        defaultOpen={false}
       >
         <p className="mb-3 text-sm opacity-80">
           Bind a Solana pubkey for mainnet token-balance reads on Positions. Requires{" "}
@@ -614,8 +885,7 @@ function Page() {
                 if (res.ok) {
                   setWatchMsg(res.data.note);
                   setWatchWalletInput("");
-                  await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
-                  await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
+                  await invalidateSessionScopedBundles();
                   await refetch();
                 } else {
                   setWatchMsg(`${res.reason}${res.detail ? ` — ${res.detail}` : ""}`);
@@ -637,8 +907,7 @@ function Page() {
               try {
                 const res = await clearWatch();
                 setWatchMsg(res.ok ? res.data.note : "Failed to clear watch wallet");
-                await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
-                await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
+                await invalidateSessionScopedBundles();
                 await refetch();
               } finally {
                 setWatchBusy(false);
@@ -650,8 +919,15 @@ function Page() {
         </div>
         {watchMsg ? <p className="mt-3 text-sm">{watchMsg}</p> : null}
       </Panel>
+      </div>
 
-      <Panel title="Paper agent" meta={<StatusBadge tone="blue">Live spine · no broadcast</StatusBadge>}>
+      <div id="settings-agent" className="scroll-mt-24">
+      <Panel
+        title="Paper agent"
+        meta={<StatusBadge tone="blue">Live spine · no broadcast</StatusBadge>}
+        collapsible
+        defaultOpen={false}
+      >
         <p className="mb-3 text-sm opacity-80">
           Runs live xStocks multiplier / Jupiter quote-only reads and the same acquire wash
           gates on quote intents. Never broadcasts. AgentRouter expands NL only when keyed —
@@ -719,6 +995,9 @@ function Page() {
           <pre className="mt-3 whitespace-pre-wrap text-sm opacity-90">{agentOut}</pre>
         ) : null}
       </Panel>
+      </div>
+        </div>
+      </div>
     </DeskShell>
   );
 }

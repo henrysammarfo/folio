@@ -253,3 +253,77 @@ EOF
 ## 2026-09-16 — Positions Scaled UI honesty
 - Positions list + detail surface API↔on-chain Scaled UI (match/mismatch/off).
 - Wallet-verified requires chain match — no API-only green.
+
+## 2026-09-16 — Netro production approve
+- `FOLIO_APPROVED_LAB_UI=netro-density` on Vercel — CONFIRMED via `vercel env ls` (value hidden).
+- Home hero unchanged (Aionis brand-plane) — CONFIRMED screenshot home-hero-now.png.
+- Empire keys Bitquery/Pyth/Privy/Supabase/Jupiter — still EMPTY locally and unset on Vercel.
+
+## 2026-09-16 — Netro live gates
+- `buildNetroLiveGateLabels` unit: empty → fail-closed defaults; live Kamino/Scaled UI → Mainnet-read; wash unavailable → Fail-closed.
+
+## 2026-09-16 — Stocklana live 598/82/$121k
+- jina scrape hackathons.solana.com/hackathons/stocklana: **598** registered · **82** submissions · **$121,000** prize · deadline **SEP 25, 2026** · 5 bounty tracks (incl. PythNetwork).
+
+## 2026-09-16 — Netro Jupiter quote
+- Unit: live jupiterOutUi → `0.002994 AAPLx` + cached meta; never claims fill/broadcast.
+
+## 2026-09-16 — Netro paper agent
+- e2e: Truth pass on Netro rail surfaces `broadcast=false` / `nl=` meta; forbids fill/unhackable claims.
+
+## 2026-09-16 — Netro inspect + hero preserve
+- VERIFIED: `/` keeps Aionis brand-plane hero (no second hero). Netro is `/desk` overview only.
+- VERIFIED: `FOLIO_APPROVED_LAB_UI=netro-density` present on Vercel Development/Preview/Production.
+- OPEN: Bitquery / Pyth / Privy / Supabase / Jupiter keys — fail-closed until Henry pastes. Rotate chat-pasted Vercel token.
+
+## 2026-09-16 — Netro ownership strip
+- VERIFIED unit: paper default / inspect+wallet-read labels; never invents Verified count.
+- OPEN: Empire keys still empty — wash/Pyth/multi-tenant fail-closed.
+
+## 2026-09-16 — SSR Netro + strip honesty
+- VERIFIED: desk layout loader returns approvedUi/approvedShader from env.
+- VERIFIED e2e intent: netro-truth-strip says illustrative / not live candles; scaled-ui strip labeled.
+- OPEN: Bitquery/Pyth/Privy/Supabase empty.
+
+## 2026-09-16 — Stocklana + Netro keys strip
+- Stocklana jina: **598** registered · **82** submissions · **$121,000** · SEP 25, 2026.
+- VERIFIED unit: keys readiness miss counts; multi-tenant armed only when Privy+Supabase set.
+- OPEN: Empire keys still empty on env.
+
+## 2026-09-16 — Empire readiness SSR
+- VERIFIED unit: readEmpireReadiness fail-closes empty env; arms Privy+Supabase only when both set.
+- VERIFIED: Raydium/Nest.credit map into Netro empire strip from matrix modes.
+
+## 2026-09-16 — Netro yellow sample
+- Reference PNGs (`ref-netrobnb-desk.png`, `ref-netro-desk-final.png`) mode yellow ≈ RGB(244,208,20) = `#f4d014` (confirmed via PNG decode). Soft fills are intentional wash, not a different brand hue.
+
+## 2026-09-16 — Stocklana live 605/84/$121k
+- jina scrape https://hackathons.solana.com/hackathons/stocklana: **605** registered · **84** submissions · Prize Pool **$121,000** · deadline hero **SEP 25, 2026** · timeline submissions close Fri 18 Sep 16:00 ET (conservative).
+
+## 2026-09-16 — Empire key paste live evidence
+- VERIFIED: Bitquery wash live via V2 `/graphql` (Authorization Bearer) — sampleSize 50, pressure low on AAPLx mint probe.
+- VERIFIED: Pyth API key authenticates Hermes (BTC + ETH price latest HTTP 200 on upgraded + legacy hosts).
+- VERIFIED: same Pyth key returns HTTP 403 "Not entitled" for Equity.US.AAPL, Crypto.AAPLX, Crypto.AAPLON — plan entitlement gap, not adapter bug.
+- VERIFIED: Privy+Supabase env present → `getAuthProviderStatus` keys-present; `SUPABASE_JWT_SECRET` absent → service-role fallback labeled.
+- VERIFIED: PostgREST `tenants` / `tenant_members` / `desk_preferences` → PGRST205 (migration not applied).
+- VERIFIED: Jupiter quote ok with `JUPITER_API_KEY` (`x-api-key` header per portal docs).
+- VERIFIED: `FOLIO_APPROVED_LAB_UI=netro-density` via applyDotEnv → premium UI DONE in smoke:goal.
+- OPEN: Pyth equity entitlement · SUPABASE_JWT_SECRET · SQL migration · session mint · rotate chat secrets.
+
+## 2026-09-16 — JWT + schema grants + Pyth plan evidence
+- VERIFIED: `SUPABASE_JWT_SECRET` set locally + Vercel CREATE 201; `isSupabaseUserJwtConfigured` true.
+- VERIFIED: PostgREST `tenants` → HTTP 403 code 42501 (`GRANT SELECT … TO service_role`) — tables exist, privileges missing.
+- VERIFIED: Pyth pricing — Free view-only; Starter crypto-only $500; Pro equities from $2500 / free trial (pyth.network/price-feeds). Current key BTC/ETH 200, Equity.US.AAPL 403 Not entitled.
+- OPEN: Henry runs `20260916_folio_tenants_grants.sql`; upgrades Pyth to Pro+Equities; rotates chat-pasted secrets.
+
+## 2026-09-16 — Schema grants verified live
+- VERIFIED: PostgREST `tenants` SELECT via service_role → 200; `supabaseSchemaDetail` = Ready.
+- VERIFIED: `folio-demo` tenant id `29eadccb…` upserted; placeholder `privy_did_here` membership deleted.
+- OPEN: Pyth Equity.US.AAPL still 403 Not entitled; multi-tenant needs Privy access token mint + Join folio-demo.
+
+| Pyth Starter entitles Equity.US.AAPL + Crypto.AAPLX Hermes | REJECTED live | Both feeds HTTP 403 Not entitled with current PYTH_API_KEY; Starter=crypto majors | 2026-09-16 |
+| SUPABASE_JWT_SECRET on Vercel + schema grants | CONFIRMED | smoke:goal JWT+schemaReady; Henry paste + SQL DONE | 2026-09-16 |
+
+| Yahoo chart v8 returns AAPL USD without API key | CONFIRMED live | query1.finance.yahoo.com/v8/finance/chart/AAPL · labeled YAHOO:AAPL | 2026-09-16 |
+| CoinGecko apple-xstock free USD | CONFIRMED live | api.coingecko.com/api/v3/simple/price | 2026-09-16 |
+| Pyth Pro required for FOLIO diverge ship | REJECTED | Free Yahoo/Finnhub cascade scores diverge; Pro optional for bounty | 2026-09-16 |

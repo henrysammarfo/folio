@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useLoaderData, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -18,7 +18,15 @@ import {
 } from "@/components/lab/shader-background";
 import { NetroDensityCanvas } from "@/components/lab/netro-density-canvas";
 import { FolioTradeJournalLab } from "@/components/lab/folio-trade-journal-lab";
-import { getLabApprovals, getTruthBundle } from "@/lib/desk.functions";
+import {
+  getAcquireBundle,
+  getCreditBundle,
+  getLabApprovals,
+  getNetworkBundle,
+  getPositionsBundle,
+  getEmpireReadiness,
+  getTruthBundle,
+} from "@/lib/desk.functions";
 import {
   isLabPreviewActive,
   readLabShaderPick,
@@ -27,6 +35,13 @@ import {
   type LabShaderId,
   type LabUiId,
 } from "@/lib/lab-pick";
+import { buildNetroLiveGateLabels } from "@/lib/netro-live-gates";
+import {
+  buildNetroKeysReadiness,
+  type NetroKeysReadiness,
+} from "@/lib/netro-keys-readiness";
+import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
+import { buildNetroOwnershipSummary } from "@/lib/netro-ownership";
 
 const links = [
   ["Overview", "/desk", LayoutDashboard],
@@ -59,11 +74,34 @@ export function DeskShell({
   actions?: React.ReactNode;
 }) {
   const path = useRouterState({ select: (state) => state.location.pathname });
+  const inspectSearch = useRouterState({
+    select: (state) => {
+      const raw = state.location.search as { inspect?: unknown };
+      return typeof raw.inspect === "string" && raw.inspect.trim()
+        ? raw.inspect.trim().slice(0, 64)
+        : undefined;
+    },
+  });
   const [labUi, setLabUi] = useState<LabUiId | null>(null);
   const [labShader, setLabShader] = useState<LabShaderId | null>(null);
   const [previewOn, setPreviewOn] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const fetchTruth = useServerFn(getTruthBundle);
   const fetchApprovals = useServerFn(getLabApprovals);
+  const fetchNetwork = useServerFn(getNetworkBundle);
+  const fetchCredit = useServerFn(getCreditBundle);
+  const fetchAcquire = useServerFn(getAcquireBundle);
+  const fetchPositions = useServerFn(getPositionsBundle);
+  const fetchEmpireReadiness = useServerFn(getEmpireReadiness);
+  /** Parent `/desk` loader — SSR seed so approved Netro + keys strip paint immediately. */
+  const deskSeed = useLoaderData({ from: "/desk" });
+  const approvalsSeed = deskSeed.approvals;
+  const readinessSeed = deskSeed.readiness;
+  const truthSeed = deskSeed.truth;
+  const networkSeed = deskSeed.network;
+  const creditSeed = deskSeed.credit;
+  const acquireSeed = deskSeed.acquire;
+  const positionsSeed = deskSeed.positions;
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -87,6 +125,8 @@ export function DeskShell({
   const approvals = useQuery({
     queryKey: ["lab-approvals"],
     queryFn: () => fetchApprovals(),
+    initialData: approvalsSeed,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 60_000,
   });
   const approvedUi = approvals.data?.approvedUi ?? null;
@@ -97,20 +137,108 @@ export function DeskShell({
   const effectiveUi = previewing ? labUi : approvedUi;
   const effectiveShader = previewing ? labShader : approvedShader;
   const liveShader = previewShaderVariant(effectiveShader, effectiveUi);
-  const showNetroCanvas = effectiveUi === "netro-density";
-  const showJournal = effectiveUi === "trade-journal-21st";
+  // NetroBNB 12-col is the OVERVIEW surface only — never replace Acquire/Positions/etc.
+  const isDeskOverview = path === "/desk" || path === "/desk/";
+  const showNetroCanvas = effectiveUi === "netro-density" && isDeskOverview;
+  const showJournal = effectiveUi === "trade-journal-21st" && isDeskOverview;
   const productionChrome = !previewing && (approvedUi != null || approvedShader != null);
 
   const truth = useQuery({
     queryKey: ["truth-bundle", "desk-lab-preview", "AAPLx"],
     queryFn: () => fetchTruth({ data: { symbol: "AAPLx" } }),
     enabled: showNetroCanvas,
+    initialData: showNetroCanvas ? truthSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 30_000,
+  });
+  const network = useQuery({
+    queryKey: ["network-matrix-desk", "netro-surface"],
+    queryFn: () => fetchNetwork(),
+    enabled: showNetroCanvas,
+    initialData: showNetroCanvas ? networkSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
+  const credit = useQuery({
+    queryKey: ["credit-bundle", "netro-surface", inspectSearch ?? ""],
+    queryFn: () => fetchCredit({ data: { inspectWallet: inspectSearch } }),
+    enabled: showNetroCanvas,
+    initialData:
+      showNetroCanvas && !inspectSearch ? creditSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
+    staleTime: 20_000,
+    refetchOnMount: "always",
+  });
+  const positions = useQuery({
+    queryKey: ["positions-bundle", "netro-surface", inspectSearch ?? ""],
+    queryFn: () =>
+      fetchPositions({ data: { inspectWallet: inspectSearch } }),
+    enabled: showNetroCanvas,
+    initialData:
+      showNetroCanvas && !inspectSearch ? positionsSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
+    staleTime: 15_000,
+    refetchOnMount: "always",
+  });
+  const session = useQuery({
+    queryKey: ["empire-readiness", "netro-keys"],
+    queryFn: () => fetchEmpireReadiness(),
+    enabled: showNetroCanvas,
+    initialData: readinessSeed,
+    initialDataUpdatedAt: Date.now(),
+    staleTime: 60_000,
+  });
+  const acquire = useQuery({
+    queryKey: ["acquire-bundle", "netro-surface", "AAPLx", 1],
+    queryFn: () => fetchAcquire({ data: { symbol: "AAPLx", spendUsdc: 1 } }),
+    enabled: showNetroCanvas,
+    initialData: showNetroCanvas ? acquireSeed : undefined,
+    initialDataUpdatedAt: Date.now(),
+    staleTime: 15_000,
   });
   const mult = truth.data?.multiplier;
   const multiplierLabel = mult?.ok
     ? `${mult.data.currentMultiplier.toFixed(6)}× live`
     : "live pending";
+  const jup = acquire.data?.jupiter;
+  const netroGates = buildNetroLiveGateLabels({
+    rows: network.data?.rows ?? [],
+    broadcastPaused: network.data?.broadcastPaused !== false,
+    kaminoMaxLtv: credit.data?.paper.maxLtvUsed ?? null,
+    illustrativeBorrowUsd: credit.data?.paper.illustrativeBorrowUsd ?? null,
+    creditQtyLabel: credit.data?.paper.label ?? null,
+    jupiterOutUi: jup?.ok ? jup.data.outUiAmount : null,
+    jupiterSource: jup?.ok ? jup.source : null,
+    jupiterReason: jup && !jup.ok ? jup.reason : null,
+  });
+  const ownership: NetroOwnershipSummary = buildNetroOwnershipSummary({
+    walletSource: positions.data?.walletSource ?? null,
+    note: positions.data?.note ?? null,
+    rows: positions.data?.rows ?? [],
+  });
+  const readiness = session.data;
+  const keysReadiness: NetroKeysReadiness | null = readiness
+    ? buildNetroKeysReadiness({
+        bitqueryKeyPresent: readiness.bitqueryKeyPresent,
+        pythApiKeyPresent: readiness.pythApiKeyPresent,
+        privyConfigured: readiness.privyConfigured,
+        supabaseConfigured: readiness.supabaseConfigured,
+        supabaseJwtConfigured: readiness.supabaseJwtConfigured,
+        supabaseSchemaReady: readiness.supabaseSchemaReady,
+        sessionSecretPresent: readiness.sessionSecretPresent,
+        broadcastPaused: readiness.broadcastPaused,
+        jupiterKeyPresent: readiness.jupiterKeyPresent,
+      })
+    : null;
+  const scaledUiCompare = truth.data?.scaledUiCompare;
+  const scaledUiStripLabel = scaledUiCompare
+    ? scaledUiCompare.status === "match"
+      ? `API↔chain match · ${scaledUiCompare.note}`
+      : scaledUiCompare.status === "mismatch"
+        ? `API↔chain mismatch · ${scaledUiCompare.note}`
+        : `Scaled UI ${scaledUiCompare.status} · ${scaledUiCompare.note}`
+    : "Scaled UI pending";
 
   return (
     <div
@@ -119,6 +247,8 @@ export function DeskShell({
       data-lab-shader={effectiveShader ?? undefined}
       data-lab-plasma={liveShader ? "1" : undefined}
       data-lab-approved={productionChrome ? "1" : undefined}
+      data-netro-surface={showNetroCanvas ? "1" : undefined}
+      data-sidebar-collapsed={sidebarCollapsed ? "1" : undefined}
     >
       {previewing ? (
         <div className="lab-preview-banner" role="status">
@@ -177,6 +307,14 @@ export function DeskShell({
           <FolioMark />
           <span>FOLIO</span>
         </Link>
+        <button
+          type="button"
+          className="desk-sidebar-collapse"
+          aria-pressed={sidebarCollapsed}
+          onClick={() => setSidebarCollapsed((v) => !v)}
+        >
+          {sidebarCollapsed ? "Expand" : "Minimize"}
+        </button>
         <nav aria-label="Desk navigation">
           {links.map(([label, to, Icon]) => {
             const active = to === "/desk" ? path === to : path.startsWith(to);
@@ -185,6 +323,7 @@ export function DeskShell({
                 key={to}
                 to={to}
                 className={`desk-nav-link ${active ? "desk-nav-active" : ""}`}
+                title={label}
               >
                 <Icon />
                 {label}
@@ -194,10 +333,12 @@ export function DeskShell({
         </nav>
         <div className="desk-sidebar-foot">
           <StatusBadge tone="blue">Quote-only</StatusBadge>
-          <p>Broadcast disabled</p>
+          <p>Broadcast paused</p>
           <p>
-            <Link to="/lab/ui">Approve lab UI</Link> ·{" "}
-            <Link to="/lab/shaders">shaders</Link>
+            <Link to="/lab/ui">
+              {approvedUi ? `Lab UI (${approvedUi})` : "Approve lab UI"}
+            </Link>{" "}
+            · <Link to="/lab/shaders">shaders</Link>
           </p>
         </div>
       </aside>
@@ -212,7 +353,7 @@ export function DeskShell({
         ) : null}
         <header className="desk-topbar">
           <div className="desk-search desk-search-policy" aria-label="Desk policy">
-            Quote-only · broadcast off · ≤~$1
+            Quote-only · broadcast paused · ≤~$1
           </div>
           <div className="desk-network">
             <span className="live-dot" /> Mainnet read · no broadcast
@@ -223,7 +364,15 @@ export function DeskShell({
           {showNetroCanvas ? (
             /* Netro 12-col IS the desk surface — do not stack overview cards under it */
             <div className="desk-lab-netro" data-testid="desk-lab-netro">
-              <NetroDensityCanvas multiplierLabel={multiplierLabel} />
+              <NetroDensityCanvas
+                multiplierLabel={multiplierLabel}
+                gates={netroGates}
+                ownership={ownership}
+                keysReadiness={keysReadiness}
+                initialInspect={inspectSearch}
+                scaledUiStripLabel={scaledUiStripLabel}
+                enablePaperAgent
+              />
             </div>
           ) : (
             <>
@@ -253,17 +402,49 @@ export function Panel({
   meta,
   children,
   className = "",
+  collapsible = false,
+  defaultOpen = true,
 }: {
   title: string;
   meta?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  /** Settings / dense pages — maximize / minimize without losing content. */
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
+  if (!collapsible) {
+    return (
+      <section className={`panel ${className}`}>
+        <header>
+          <h2>{title}</h2>
+          {meta}
+        </header>
+        <div className="panel-body">{children}</div>
+      </section>
+    );
+  }
   return (
-    <section className={`panel ${className}`}>
-      <header>
+    <section
+      className={`panel panel-collapsible ${className}`}
+      data-open={open ? "1" : "0"}
+    >
+      <header
+        role="button"
+        tabIndex={0}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen((v) => !v);
+          }
+        }}
+      >
         <h2>{title}</h2>
         {meta}
+        <span className="panel-toggle">{open ? "Minimize" : "Maximize"}</span>
       </header>
       <div className="panel-body">{children}</div>
     </section>

@@ -100,7 +100,9 @@ function Home() {
           <h2>Own the economic truth.</h2>
           <p>
             {liveLine} Corporate-action share truth before trade. Broadcast stays
-            off until funded. Premium chrome stays on the lab until you approve.
+            off until funded. The NetroBNB-density desk lives at{" "}
+            <Link to="/desk">/desk</Link> — this landing hero stays the Aionis
+            brand-plane.
           </p>
           <div className="home-cta-row">
             <Link to="/desk" className="home-cta">
@@ -115,6 +117,118 @@ function Home() {
           <Link to="/lab/ui">Lab UI</Link>
           <Link to="/lab/shaders">Lab shaders</Link>
           <Link to="/network">Network</Link>
+        </div>
+      </section>
+
+      <section className="home-section home-section-ink" aria-label="Honesty pillars">
+        <h2>Truth before trade.</h2>
+        <p>
+          One job on Solana: honest share counts, refuse wash, quote-only routes,
+          credit without selling. Labels stay fail-closed until keys land.
+        </p>
+        <div className="home-pillars">
+          <article className="home-pillar">
+            <strong>Share truth</strong>
+            <p>Live xStocks multiplier + on-chain Scaled UI — never fixture 4×.</p>
+          </article>
+          <article className="home-pillar">
+            <strong>Safe route</strong>
+            <p>Wash fail-closed without Bitquery. Jupiter ≤$1 inspect · no broadcast.</p>
+          </article>
+          <article className="home-pillar">
+            <strong>Credit spine</strong>
+            <p>Kamino maxLTV reads labeled. NestUSD stays unavailable until verified.</p>
+          </article>
+        </div>
+      </section>
+
+      {/* Secondary hero/section — Netro density tease. Does NOT replace the Aionis brand-plane above. */}
+      <section className="home-section home-section-netro" aria-label="Desk density section">
+        <div className="home-desk-tease">
+          <div>
+            <h2>Share truth desk.</h2>
+            <p>
+              Henry-approved Netro density on <Link to="/desk">/desk</Link> —
+              soft yellow fills, authentic accent <code>#f4d014</code>, collapsible
+              honesty strips so cards stop crowding. Positions, Acquire, Credit keep
+              the FOLIO sidebar (minimize when you need space).
+            </p>
+            <Link to="/desk" className="home-desk-preview-cta">
+              Enter the desk <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="home-desk-preview" aria-hidden>
+            <div className="home-desk-preview-row">
+              <div className="home-desk-preview-card soft">
+                <span>Analysis clock</span>
+                <b>Make Analysis Easy</b>
+              </div>
+              <div className="home-desk-preview-card dark">
+                <span>Today&apos;s share flow</span>
+                <b>AAPLx · wash fail-closed</b>
+              </div>
+            </div>
+            <div className="home-desk-preview-card">
+              <span>Quote · inspect only</span>
+              <b>USDC ≤ $1 → AAPLx · no broadcast</b>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section home-section-soft" aria-label="Empire keys">
+        <h2>Paste Empire keys when ready.</h2>
+        <p>
+          Agents cannot invent Bitquery · Pyth · Privy · Supabase secrets. Follow the
+          linked dashboards, paste into Vercel Preview + Production, then redeploy.
+          Full runbook: <code>docs/KEYS_LANDING.md</code>.
+        </p>
+        <div className="home-keys-steps">
+          <div className="home-keys-step">
+            <strong>1 · Bitquery wash tape</strong>
+            <p>
+              Create an API key at{" "}
+              <a href="https://account.bitquery.io/" target="_blank" rel="noreferrer">
+                account.bitquery.io
+              </a>{" "}
+              → set <code>BITQUERY_API_KEY</code>.
+            </p>
+          </div>
+          <div className="home-keys-step">
+            <strong>2 · Pyth Hermes</strong>
+            <p>
+              Key from{" "}
+              <a href="https://pyth.network/" target="_blank" rel="noreferrer">
+                pyth.network
+              </a>{" "}
+              / Hermes docs → <code>PYTH_API_KEY</code>.
+            </p>
+          </div>
+          <div className="home-keys-step">
+            <strong>3 · Privy wallet identity</strong>
+            <p>
+              App ID + secret from{" "}
+              <a href="https://dashboard.privy.io/" target="_blank" rel="noreferrer">
+                dashboard.privy.io
+              </a>
+              .
+            </p>
+          </div>
+          <div className="home-keys-step">
+            <strong>4 · Supabase tenants</strong>
+            <p>
+              URL + anon + service-role (+ JWT secret) from{" "}
+              <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">
+                supabase.com/dashboard
+              </a>
+              .
+            </p>
+          </div>
+        </div>
+        <div className="home-cta-row">
+          <Link to="/desk/settings" hash="empire-readiness" className="home-cta-secondary">
+            Open Settings readiness
+          </Link>
         </div>
       </section>
 

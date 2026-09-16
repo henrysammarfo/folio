@@ -1,3 +1,6 @@
+import { applyDotEnv } from "./lib/load-dotenv";
+applyDotEnv();
+
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";

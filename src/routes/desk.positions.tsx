@@ -100,7 +100,13 @@ function Page() {
         title="Inspect wallet (ephemeral)"
         meta={
           <StatusBadge tone={data?.walletSource === "inspect" ? "green" : "neutral"}>
-            {data?.walletSource === "inspect" ? "Inspect active" : "No cookie"}
+            {data?.walletSource === "inspect"
+              ? "Inspect active"
+              : data?.walletSource === "watch-wallet" ||
+                  data?.walletSource === "membership" ||
+                  data?.walletSource === "session"
+                ? "Bound elsewhere"
+                : "Inspect idle"}
           </StatusBadge>
         }
       >

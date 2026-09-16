@@ -444,3 +444,110 @@
 
 ## 2026-09-16 — Positions Scaled UI honesty
 - Position Verified requires wallet-read + API↔on-chain Scaled UI match; list shows chain match/mismatch/off.
+
+## 2026-09-16 — Netro overview-only + approve env
+- Preserved home hero. NetroBNB desk is overview-only (`data-netro-surface`); Positions/Acquire keep ledger chrome.
+- Set `FOLIO_APPROVED_LAB_UI=netro-density` on Vercel all targets. Empire trading keys still need Henry paste (cannot invent).
+- Rotate Vercel token pasted in chat. Goal open.
+
+## 2026-09-16 — Netro live Empire gates
+- Netro overview flow strip + empire strip map live `/network` modes (wash fail-closed, Pyth/NestUSD/multi-tenant unavailable, Scaled UI/Kamino mainnet-read when live). No invent greens.
+- Demo URLs → netro desk preview. Goal open for Empire keys + GG Skip.
+
+## 2026-09-16 — Netro live Kamino LTV + Stocklana refresh
+- Credit bundle feeds Netro credit card (maxLTV + illustrative capacity). Submission checklist: lab UI approved + GG tip clean on PR #5.
+- Stocklana 598/82/$121k (jina). Still need Empire keys paste + token rotate. Goal open.
+
+## 2026-09-16 — Netro live Jupiter ≤$1 quote
+- Netro quote widget shows live Jupiter out amount for $1 USDC inspect (quote-only · no broadcast). CTAs link to /truth and /desk/acquire.
+- Demo script refreshed to 598/82 + Netro click path. Goal open for Empire keys.
+
+## 2026-09-16 — Netro paper-agent rail
+- Desk Netro yellow AI rail runs live paper-agent spine (truth / ≤$1 quote). NL optional via AgentRouter; always broadcast=false. Lab stage stays decorative.
+- Goal open: Bitquery/Pyth/Privy/Supabase + rotate Vercel token.
+
+## 2026-09-16 — Netro inspect wallet + layout stabilize
+- Netro overview restores ephemeral Inspect wallet → `/desk/positions?inspect=` (not auth).
+- Grid/card CSS: minmax containment, rounded flow card, gentler stagger (cards no longer clip/jump).
+- Home hero untouched; below-fold mission points to `/desk` Netro surface.
+- Submission paste pack + KEYS_LANDING demo URL on PR #5. Empire keys still need Henry paste. Goal open.
+
+## 2026-09-16 — Netro ownership qty honesty
+- Netro overview lost economic positions when it replaced classic panels — restored live Ownership strip (paper vs wallet-read / inspect).
+- Inspect stays on `/desk?inspect=` so qty + credit LTV rebind; Positions ledger link preserved.
+- Unit + e2e updated. Empire keys still need Henry paste. Goal open.
+
+## 2026-09-16 — SSR Netro first-paint + honest truth strip
+- `/desk` layout loader seeds `getLabApprovals` so Henry-approved Netro paints without classic overview flash.
+- Market strip labeled illustrative (not live candles) + live API↔on-chain Scaled UI status.
+- Empire keys still need Henry paste. Goal open.
+
+## 2026-09-16 — Netro Empire keys readiness strip
+- Production Netro overview surfaces live Bitquery/Pyth/Privy/Supabase/session/broadcast readiness from getSessionBundle — paste CTA → Settings.
+- Connect becomes Paste keys when misses > 0. Stocklana still 598/82/$121k (jina). Goal open for key paste.
+
+## 2026-09-16 — SSR Empire readiness + Settings deep-link
+- `getEmpireReadiness` + `/desk` loader seed keys strip SSR; Netro Paste keys → `/desk/settings#empire-readiness`.
+- Empire strip adds live Raydium + Nest.credit modes. Goal open for key paste.
+
+## 2026-09-16 — UI soften / landing / keys guide
+- Softened Netro yellow fills; decongested desk grid; collapsible honesty strips; expandable settings layout; full landing below preserved Aionis hero; KEYS_LANDING step-by-step with provider links. Empire keys still need Henry paste. Goal open.
+
+## 2026-09-16 — SSR Netro spine + honesty labels
+- Seeded desk loader with live Block 0 bundles for Netro SSR; Paused broadcast label; approve-panel production state; e2e Netro/home updates. Goal open for Empire key paste.
+
+## 2026-09-16 — Stocklana honesty pack 605/84
+- Refreshed submission/Henry/demo docs to live 605/84; Broadcast Paused label consistency across desk. Empire keys still need Henry paste. Goal open.
+## 2026-09-16 — Multi-tenant cache parity
+- Session mint/clear/tenant switch now invalidates positions/credit caches; mint gated on keys. Goal open for Empire paste.
+
+## 2026-09-16 — Inspect label + activity invalidate
+- Fixed false **No cookie** on inspect panels when a bound wallet exists; activity-bundle joins session invalidate; Policy state wash/broadcast from live matrix. Empire keys still need Henry paste.
+
+## 2026-09-16 — Empire keys landed (Henry paste) + Bitquery V2 + smoke:goal
+- Wired Bitquery · Pyth · Privy · Supabase (URL/anon/service) · Jupiter to Vercel (all targets) + local `.env` (never committed; never echoed).
+- Docs-fix: Bitquery wash now prefers Streaming V2 `https://streaming.bitquery.io/graphql` with EAP fallback; Bearer `ory_at_…` per Bitquery auth docs.
+- Live probes: wash **ok** (pass, n=50); Jupiter quote ok; Privy+Supabase keys present; Pyth Hermes BTC/ETH **200** but Equity.US.AAPL / Crypto.AAPLX / Crypto.AAPLON **403 Not entitled**.
+- Supabase tables missing (`PGRST205`) until Henry runs `supabase/migrations/20260915_folio_tenants.sql`; `SUPABASE_JWT_SECRET` still missing.
+- `applyDotEnv` overrides empty shell placeholders that shadowed `.env` (cloud BITQUERY_*='').
+- `npm run smoke:goal` matrix: done=4 partial=2 blocked=0 (Empire waiting Pyth entitlement; multi-tenant waiting mint+tables). Goal open. **Rotate chat-pasted secrets.**
+
+## 2026-09-16 — JWT secret + grants gap + specific Pyth plan
+- Wired `SUPABASE_JWT_SECRET` to Vercel + `.env` (never echoed). User-JWT RLS path armed in readiness.
+- Migration tables exist but service_role hit **42501** — added `20260916_folio_tenants_grants.sql` + GRANTs into base migration; Settings probe distinguishes PGRST205 vs grants.
+- Pyth: documented exact Terminal path — current key = crypto-only (Starter behavior); Equity needs **Pro / free Pro trial** + Equities asset class (not vague "entitle"). Honesty: Settings no longer claims Hermes equity live from key presence alone.
+- Goal still open: Pyth Pro equities · run grants SQL · mint session. Rotate chat secrets.
+
+## 2026-09-16 — Supabase grants live + folio-demo seed + Join button
+- Live probe: `supabaseSchemaReady=true` (service_role GRANTs applied). Seeded `folio-demo` tenant; removed placeholder `privy_did_here` membership.
+- Added Settings **Join folio-demo as owner** (`attachDemoTenantMembership`) — requires real Privy mint first; remints cookie with memberships.
+- Henry next: mint Privy session + Join folio-demo; Pyth Pro+Equities still blocks Empire DONE. Goal open. Rotate chat secrets.
+
+
+## 2026-09-16 — JWT+SQL done · Pyth Equity.US/Crypto.xStock B-SPECIFIC · Privy login mint
+
+- Henry: `SUPABASE_JWT_SECRET` confirmed on `.env`+Vercel · SQL migration/grants DONE · schemaReady live.
+- Settings/docs/HENRY_STEPS/KEYS_LANDING: Pyth DO NOW names exact feeds `Equity.US.AAPL/USD` + `Crypto.AAPLX/USD` (both 403 Not entitled on Starter) + email subject `Equity.US / Crypto.xStock Hermes 403 Not entitled`.
+- Wired `@privy-io/react-auth` Settings **Log in with Privy → Mint httpOnly session** (public App ID only; paste-token fallback). Henry must allowlist demo origin in Privy Dashboard.
+- Goal still open: shipReady=false until Pyth entitlement + Privy mint + Join folio-demo.
+
+
+## 2026-09-16 — Free equity diverge (no Pyth Pro $)
+
+- Henry on unpaid trial — cannot pay ~$2.5k Pro. Wired free cascade: Pyth (if entitled) → Finnhub free key → Yahoo chart keyless; CoinGecko `*-xstock` secondary.
+- Diverge pass/fail scores on labeled free ref vs Jupiter venue. Never claims Pyth when fallback used.
+- Settings/HENRY_STEPS: Pro optional for bounty only. Goal Empire can go DONE without Pyth Equity.US entitlement.
+
+
+## 2026-09-16 — Privy auto-mint + exact Allowed origins
+
+- Tip live: Yahoo diverge green · Empire DONE · multi-tenant still PARTIAL.
+- PrivySessionMint auto-mints httpOnly folio_session after login; Settings DO NOW lists exact origin (Privy rejects *.vercel.app).
+- Goal open until Henry allowlists origin + Log in + Join folio-demo.
+
+
+## 2026-09-16 — Pyth off ship path · live Yahoo/Finnhub diverge only
+
+- Henry: keep free alternates; remove Pyth from ship diverge; no fake/non-live fallbacks.
+- Diverge = Finnhub→Yahoo (+ CoinGecko xStock) vs Jupiter only. Fail-closed on HTTP miss.
+- Pyth Hermes not called on truth/acquire/network ship path (`pyth_not_on_ship_path`).

@@ -102,3 +102,11 @@ create policy desk_prefs_writer_delete on public.desk_preferences
         and m.role in ('owner', 'trader')
     )
   );
+
+-- PostgREST roles need explicit table privileges (otherwise service_role → 42501).
+grant select, insert, update, delete on public.tenants to service_role;
+grant select, insert, update, delete on public.tenant_members to service_role;
+grant select, insert, update, delete on public.desk_preferences to service_role;
+grant select on public.tenants to anon, authenticated;
+grant select on public.tenant_members to anon, authenticated;
+grant select, insert, update, delete on public.desk_preferences to anon, authenticated;

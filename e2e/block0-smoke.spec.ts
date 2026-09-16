@@ -88,10 +88,13 @@ test.describe("FOLIO Block 0 smoke", () => {
 
   test("lab routes stay approve-gated", async ({ page }) => {
     await page.goto("/lab/shaders");
-    await expect(page.getByText(/awaiting henry|approve/i).first()).toBeVisible();
+    await expect(page.getByText(/awaiting henry|approve|production ·/i).first()).toBeVisible();
     await expect(page.getByText(/ink-ledger|ledger-mist|aurora-grid/i).first()).toBeVisible();
     await page.goto("/lab/ui");
-    await expect(page.getByText(/awaiting henry|approve/i).first()).toBeVisible();
+    // netro-density may already be production-approved via FOLIO_APPROVED_LAB_UI
+    await expect(
+      page.getByText(/awaiting henry|approve|production · netro-density|production chrome live/i).first(),
+    ).toBeVisible();
     await expect(page.getByText(/netro-density/i).first()).toBeVisible();
     await expect(page.getByText(/aionis-brand-plane/i).first()).toBeVisible();
     await expect(page.getByText(/cinematic-landing-21st/i).first()).toBeVisible();
@@ -104,9 +107,12 @@ test.describe("FOLIO Block 0 smoke", () => {
     });
     await pickNetro.scrollIntoViewIfNeeded();
     await pickNetro.click();
-    await expect(
-      page.getByText(/picked netro-density|chat reply ready|approve lab ui: netro-density/i).first(),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(pickNetro).toHaveAttribute("aria-pressed", "true", {
+      timeout: 10_000,
+    });
+    await expect(page.getByText(/Chat reply ready:/i).first()).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByRole("link", { name: /preview on desk/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible({
       timeout: 30_000,
@@ -117,10 +123,96 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(page.locator("[data-testid='desk-lab-netro'] .netro-density-grid")).toBeVisible();
     await expect(page.locator("[data-testid='desk-lab-netro'] #netro-left-column")).toBeVisible();
     await expect(page.locator("[data-testid='desk-lab-netro'] #netro-right-column")).toBeVisible();
-    // Netro IS the desk surface — no stacked overview heading/panels under it
+    // Netro IS the desk overview surface — no stacked overview heading/panels under it
     await expect(page.locator(".desk-content > .desk-heading")).toHaveCount(0);
     await expect(page.locator(".desk-content > .panel")).toHaveCount(0);
     await expect(page.locator(".netro-density-ticker")).toBeVisible();
+    await expect(page.locator("[data-netro-surface='1']")).toHaveCount(1);
+    // Live Empire gates must still paint on Netro surface (not static theater only)
+    await expect(page.getByTestId("netro-live-gates")).toBeVisible();
+    await expect(page.getByTestId("netro-empire-strip")).toBeVisible();
+    // Decorative strip must not claim live candles; live Scaled UI status is labeled
+    await expect(page.getByTestId("netro-truth-strip")).toContainText(
+      /illustrative strip|not live candles/i,
+    );
+    await expect(page.getByTestId("netro-scaled-ui-strip")).toContainText(
+      /API↔chain|Scaled UI|match|mismatch|pending|off/i,
+    );
+    // Empire keys readiness — multi-tenant / wash / Pyth fail-closed until paste
+    await expect(page.getByTestId("netro-keys-readiness")).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByTestId("netro-keys-readiness")).toContainText(
+      /bitquery|pyth|privy|supabase|multi-tenant|fail-closed|broadcast/i,
+    );
+    await expect(
+      page.getByTestId("netro-keys-readiness").getByRole("link", {
+        name: /settings|paste/i,
+      }),
+    ).toHaveAttribute("href", /\/desk\/settings.*empire-readiness|\/desk\/settings#empire-readiness/);
+    const gateText = (
+      await page.getByTestId("netro-live-gates").innerText()
+    ).toLowerCase();
+    expect(gateText).toMatch(/wash/);
+    expect(gateText).toMatch(/fail-closed|live/);
+    expect(gateText).toMatch(/nestusd/);
+    const strip = (
+      await page.getByTestId("netro-empire-strip").innerText()
+    ).toLowerCase();
+    expect(strip).toMatch(/pyth/);
+    expect(strip).toMatch(/scaled ui/);
+    expect(strip).toMatch(/multi-tenant/);
+    expect(strip).toMatch(/raydium|nest\.credit|kamino/);
+    // Live Kamino maxLTV from credit bundle (not hardcoded theater alone)
+    await expect(page.getByText(/Kamino 0\.\d{2} maxLTV/i).first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(
+      page.locator("[data-testid='desk-lab-netro']").getByText(/paper × LTV · no broadcast/i),
+    ).toBeVisible();
+    // Live Jupiter ≤$1 quote-only out amount (never a fill)
+    await expect(page.getByTestId("netro-live-quote")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByTestId("netro-live-quote")).toContainText(/AAPLx/i);
+    await expect(
+      page.getByTestId("netro-live-quote").getByText(/\d+\.\d+ AAPLx|Unavailable|Quote pending/i),
+    ).toBeVisible();
+    await expect(
+      page.locator("[data-testid='desk-lab-netro']").getByRole("link", { name: /inspect quote/i }),
+    ).toHaveAttribute("href", "/desk/acquire");
+    // Paper agent rail — live spine · never fills
+    const agentRail = page.getByTestId("netro-paper-agent");
+    await expect(agentRail).toBeVisible();
+    await agentRail.getByRole("button", { name: /truth pass/i }).click();
+    await expect(agentRail).toContainText(/broadcast=false|nl=/i, {
+      timeout: 60_000,
+    });
+    await expect(agentRail).not.toContainText(/filled on mainnet|unhackable/i);
+    // Netro inspect wallet restores overview ownership with ?inspect=
+    const inspectForm = page.getByTestId("netro-inspect-wallet");
+    await expect(inspectForm).toBeVisible();
+    const inspectPk = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+    await inspectForm.getByLabel(/inspect wallet pubkey/i).fill(inspectPk);
+    await inspectForm.getByRole("button", { name: /inspect qty/i }).click();
+    await expect(page).toHaveURL(new RegExp(`/desk\\?inspect=${inspectPk}`), {
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId("desk-lab-netro")).toBeVisible();
+    await expect(page.getByTestId("netro-ownership")).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByTestId("netro-ownership")).toContainText(
+      /inspect|paper qty|wallet-read|economic/i,
+    );
+    await expect(
+      page.getByRole("link", { name: /open positions ledger/i }),
+    ).toHaveAttribute("href", `/desk/positions?inspect=${inspectPk}`);
+    // Positions stays the ledger — Netro must not replace other desk routes
+    await page.goto("/desk/positions");
+    await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();
+    await expect(page.locator("[data-testid='desk-lab-netro']")).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: /positions/i }).first()).toBeVisible();
+    await page.goto("/desk");
+    await expect(page.locator("[data-testid='desk-lab-netro']")).toBeVisible();
     await page.getByRole("button", { name: /exit preview/i }).click();
     await expect(page.getByText(/lab preview \(opt-in/i)).toHaveCount(0);
 
@@ -163,7 +255,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/watch wallet|watch-wallet/);
     expect(body).toMatch(/not.*privy|not privy|≠ privy|multi-tenant/);
     expect(body).toMatch(/auth fail-closed|keys missing|privy \+ supabase/);
-    expect(body).toMatch(/broadcast off|broadcast.*unavailable|broadcast disabled/);
+    expect(body).toMatch(/broadcast paused|broadcast off|broadcast.*unavailable|broadcast disabled/);
     expect(body).toMatch(
       /watch-wallet secret (set|missing)|secret (ready|missing)|folio_session_secret/,
     );
@@ -176,7 +268,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/supabase_jwt_secret|user-jwt|service-role labeled|rls/);
     expect(body).toMatch(/api_key_21st|21st.*lab|lab mcp/);
     expect(body).toMatch(/shaders_api_key|shaders.*lab|clerk may still gate/);
-    expect(body).toMatch(/folio_approved_lab_ui|production desk stays default|henry chat approve/);
+    expect(body).toMatch(/folio_approved_lab_ui|production desk stays default|henry chat approve|desk chrome netro-density/);
     expect(body).toMatch(/folio_approved_lab_shader/);
     expect(body).toMatch(/jupiter_api_key|public quote\/price|ttl cache/);
     expect(body).toMatch(/solana_rpc_url|public fallback|dedicated/);
@@ -186,6 +278,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/strict fail-closed/);
     expect(body).toMatch(/wash gates|acquire wash|live spine/);
     expect(body).toMatch(/bind wallet|watch |session /i);
+    expect(body).toMatch(/mint blocked|keys missing|mint httpOnly session|privy \+ supabase/);
     expect(body).not.toMatch(/7vf…2ka|7vf\.\.\.2ka/i);
     expect(body).not.toMatch(/unhackable|nation-state/);
   });
@@ -231,9 +324,24 @@ test.describe("FOLIO Block 0 smoke", () => {
   }) => {
     const inspect = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
     await page.goto(`/desk?inspect=${inspect}`);
-    await expect(page.getByText(/prime desk|portfolio|FOLIO/i).first()).toBeVisible({
+    await expect(page.getByText(/prime desk|portfolio|FOLIO|share truth desk/i).first()).toBeVisible({
       timeout: 30_000,
     });
+    // Production Netro overview replaces classic panels — inspect lives on the Netro strip
+    // or deep-links to Positions. Classic overview assertions only when Netro is off.
+    const netro = page.getByTestId("desk-lab-netro");
+    if ((await netro.count()) > 0) {
+      await expect(page.getByTestId("netro-inspect-wallet")).toBeVisible();
+      await expect(page.getByTestId("netro-ownership")).toBeVisible({
+        timeout: 20_000,
+      });
+      await expect(page.getByTestId("netro-ownership")).toContainText(
+        /inspect|paper qty|wallet-read|economic/i,
+      );
+      await expect(page.locator("body")).toContainText(/ephemeral mainnet-read|not auth|no cookie/i);
+      await expect(page.locator("body")).not.toContainText(/unhackable|filled on mainnet/i);
+      return;
+    }
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/inspect|ephemeral|mainnet/);
     expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);
@@ -281,14 +389,20 @@ test.describe("FOLIO Block 0 smoke", () => {
 
   test("prime desk surfaces live Empire gates from network matrix", async ({ page }) => {
     await page.goto("/desk/");
-    await expect(page.getByText(/live empire gates/i).first()).toBeVisible({
-      timeout: 30_000,
-    });
+    // Production Netro paints live gates; classic overview only when Netro not approved
+    const netro = page.getByTestId("netro-live-gates");
+    const classic = page.getByText(/live empire gates/i);
+    await expect(netro.or(classic).first()).toBeVisible({ timeout: 30_000 });
+    if (await netro.count()) {
+      await expect(netro).toContainText(/wash|multiplier/i);
+      // SSR seed: not stuck on defaults forever
+      await expect(netro).toContainText(/live|fail-closed|≤\$1|inspect/i);
+    }
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/wash/);
     expect(body).toMatch(/nestusd/);
     expect(body).toMatch(/broadcast/);
-    expect(body).toMatch(/fail-closed|unavailable|quote-only|mainnet-read/);
+    expect(body).toMatch(/fail-closed|unavailable|quote-only|mainnet-read|paused/);
     expect(body).not.toMatch(/unhackable|filled on mainnet/);
   });
 
@@ -434,7 +548,11 @@ test.describe("FOLIO Block 0 smoke", () => {
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/own the economic truth|live|broadcast/);
     // Supporting copy + lab links sit below the brand plane — not stacked on letterforms
-    expect(body).toMatch(/lab\/ui|lab\/shaders|premium chrome|honest stock desk/);
+    expect(body).toMatch(/lab\/ui|lab\/shaders|premium chrome|honest stock desk|truth before trade/);
+    // Full landing below preserved hero — secondary Netro section is not a second hero
+    await expect(page.getByRole("heading", { name: /truth before trade/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /share truth desk/i })).toBeVisible();
+    await expect(page.locator(".home-section-netro")).toBeVisible();
     // Hero preserved — Empire readiness lives on desk/lab, not a second home hero
     await expect(page.getByRole("heading", { name: /live empire/i })).toHaveCount(0);
   });

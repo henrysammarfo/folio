@@ -4,6 +4,9 @@
  * Never prints secret values. Exit 0 even when keys missing (honesty report).
  * Exit 1 only when a present key's live probe errors unexpectedly.
  */
+import { applyDotEnv } from "./load-dotenv.ts";
+applyDotEnv();
+
 import {
   classifyKeySmokeBaseline,
   readKeySmokeEnv,

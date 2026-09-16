@@ -2,11 +2,35 @@
  * Desk-density canvas — layout/UX extracted from AbdullahBalfaqih/NetroBNB
  * (12-col: left 9 = profile 3 + stack 6 + full market; right 3 = quote + yellow AI).
  * Content + tokens are FOLIO stock-desk; no Binance/Netro brand clone.
+ * Mounted on /desk overview only — never replaces Positions/Acquire routes.
+ * Flow metrics prefer live /network matrix modes (never invent greens).
+ * Optional paper-agent rail: live Block 0 spine · never broadcasts.
  */
-import { useEffect, useState, type CSSProperties } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
+import { runDeskAgent } from "@/lib/desk.functions";
+import {
+  NETRO_LIVE_GATE_DEFAULTS,
+  type NetroLiveGateLabels,
+} from "@/lib/netro-live-gates";
+import type { NetroKeysReadiness } from "@/lib/netro-keys-readiness";
+import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 
 type Props = {
   multiplierLabel: string;
+  /** Live Empire gate labels from /network matrix — defaults are fail-closed. */
+  gates?: NetroLiveGateLabels;
+  /** Live positions honesty — paper vs wallet-read / inspect. */
+  ownership?: NetroOwnershipSummary | null;
+  /** Live Empire key presence — multi-tenant / wash / Pyth paste path. */
+  keysReadiness?: NetroKeysReadiness | null;
+  /** Prefill from `/desk?inspect=` deep-link. */
+  initialInspect?: string | undefined;
+  /** Live API↔on-chain Scaled UI status for the market strip (never fake candles). */
+  scaledUiStripLabel?: string;
+  /** Desk overview only — lab stage stays decorative. */
+  enablePaperAgent?: boolean;
 };
 
 const SHARE_TICKER = [
@@ -20,14 +44,50 @@ const SHARE_TICKER = [
   "SPYx",
 ] as const;
 
+const NETRO_NAV = [
+  { label: "Truth", to: "/desk" as const, on: true },
+  { label: "Acquire", to: "/desk/acquire" as const, on: false },
+  { label: "Positions", to: "/desk/positions" as const, on: false },
+  { label: "Credit", to: "/desk/credit" as const, on: false },
+  { label: "Network", to: "/network" as const, on: false },
+] as const;
+
 /** Stagger ≈ NetroBNB framer staggerChildren 0.06s */
 function delay(i: number): CSSProperties {
   return { ["--netro-delay" as string]: `${0.05 + i * 0.06}s` };
 }
 
-export function NetroDensityCanvas({ multiplierLabel }: Props) {
+export function NetroDensityCanvas({
+  multiplierLabel,
+  gates = NETRO_LIVE_GATE_DEFAULTS,
+  ownership = null,
+  keysReadiness = null,
+  initialInspect = "",
+  scaledUiStripLabel = "Scaled UI pending",
+  enablePaperAgent = false,
+}: Props) {
   const [clock, setClock] = useState({ h: "00", m: "00", s: "00" });
   const [railHeight, setRailHeight] = useState<number | undefined>();
+  const [agentPrompt, setAgentPrompt] = useState("truth AAPLx");
+  const [agentBusy, setAgentBusy] = useState(false);
+  const [agentReply, setAgentReply] = useState<string | null>(null);
+  const [agentMeta, setAgentMeta] = useState<string | null>(null);
+  const [inspectInput, setInspectInput] = useState(initialInspect ?? "");
+  const [ownershipOpen, setOwnershipOpen] = useState(Boolean(initialInspect));
+  const [keysOpen, setKeysOpen] = useState(
+    () => (keysReadiness?.missingCount ?? 0) > 0,
+  );
+  const runAgent = useServerFn(runDeskAgent);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setInspectInput(initialInspect ?? "");
+    if (initialInspect) setOwnershipOpen(true);
+  }, [initialInspect]);
+
+  useEffect(() => {
+    if ((keysReadiness?.missingCount ?? 0) > 0) setKeysOpen(true);
+  }, [keysReadiness?.missingCount]);
 
   useEffect(() => {
     const tick = () => {
@@ -61,6 +121,7 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
     update();
     const t1 = window.setTimeout(update, 150);
     const t2 = window.setTimeout(update, 600);
+    const t3 = window.setTimeout(update, 1200);
     window.addEventListener("resize", update);
     const left = document.getElementById("netro-left-column");
     let ro: ResizeObserver | null = null;
@@ -72,35 +133,103 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
       window.removeEventListener("resize", update);
       window.clearTimeout(t1);
       window.clearTimeout(t2);
+      window.clearTimeout(t3);
       ro?.disconnect();
     };
-  }, [multiplierLabel]);
+  }, [multiplierLabel, enablePaperAgent, agentReply, gates.quoteOut, gates.kaminoLtv]);
+
+  async function submitPaperAgent(prompt: string) {
+    const trimmed = prompt.trim();
+    if (!enablePaperAgent || !trimmed || agentBusy) return;
+    setAgentBusy(true);
+    setAgentMeta(null);
+    try {
+      const res = await runAgent({ data: { prompt: trimmed } });
+      if (!res.ok) {
+        setAgentReply(
+          `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+        );
+        setAgentMeta("nl=failed · broadcast=false · spine unavailable");
+        return;
+      }
+      setAgentReply(res.data.reply);
+      const nl = res.data.nlExpansion ?? "off";
+      const note = res.data.nlExpansionNote
+        ? ` · ${res.data.nlExpansionNote}`
+        : "";
+      setAgentMeta(`nl=${nl}${note} · broadcast=false · paper spine`);
+    } catch (err) {
+      setAgentReply(err instanceof Error ? err.message : "Agent call failed");
+      setAgentMeta("nl=failed · broadcast=false");
+    } finally {
+      setAgentBusy(false);
+    }
+  }
+
+  function onAgentSubmit(e: FormEvent) {
+    e.preventDefault();
+    void submitPaperAgent(agentPrompt);
+  }
+
+  function onInspectSubmit(e: FormEvent) {
+    e.preventDefault();
+    const next = inspectInput.trim();
+    if (!next) return;
+    // Stay on Netro overview with ?inspect= so ownership qty paints live
+    void navigate({
+      to: "/desk",
+      search: { inspect: next },
+    });
+  }
+
+  function onInspectClear() {
+    setInspectInput("");
+    void navigate({
+      to: "/desk",
+      search: {},
+    });
+  }
 
   const tickerLoop = [...SHARE_TICKER, ...SHARE_TICKER];
 
   return (
-    <div className="netro-density" aria-hidden>
+    <div className="netro-density" data-testid="netro-density-surface">
       {/* Header strip — NetroBNB/components/Header.tsx geometry */}
       <div className="netro-density-chrome netro-density-item" style={delay(0)}>
-        <div className="netro-density-brand">
+        <Link to="/" className="netro-density-brand">
           <span className="netro-density-mark">F</span>
           <b>FOLIO</b>
-        </div>
-        <nav className="netro-density-nav">
-          <span className="netro-nav-on">Truth</span>
-          <span>Acquire</span>
-          <span>Credit</span>
-          <span>Network</span>
+        </Link>
+        <nav className="netro-density-nav" aria-label="Share truth desk">
+          {NETRO_NAV.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={item.on ? "netro-nav-on" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
         <div className="netro-density-chrome-actions">
-          <span className="netro-density-new">+ Truth pass</span>
-          <span className="netro-density-connect">Connect</span>
+          <Link to="/truth" className="netro-density-new">
+            + Truth pass
+          </Link>
+          <Link
+            to="/desk/settings"
+            hash="empire-readiness"
+            className="netro-density-connect"
+          >
+            {keysReadiness && keysReadiness.missingCount > 0
+              ? "Paste keys"
+              : "Connect"}
+          </Link>
         </div>
       </div>
 
       <header className="netro-density-title netro-density-item" style={delay(1)}>
         <h3>Share truth desk</h3>
-        <span>Mainnet-read · quote-only · broadcast off</span>
+        <span>Mainnet-read · quote-only · broadcast paused</span>
       </header>
 
       {/* Share ticker — NetroBNB CryptoTickerCard geometry, FOLIO xStocks */}
@@ -115,6 +244,151 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
           ))}
         </div>
       </div>
+
+      {enablePaperAgent ? (
+        <form
+          className="netro-density-inspect netro-density-item"
+          style={delay(2)}
+          data-testid="netro-inspect-wallet"
+          onSubmit={onInspectSubmit}
+        >
+          <div>
+            <strong>Inspect wallet</strong>
+            <span>Ephemeral mainnet-read · not auth · no cookie</span>
+          </div>
+          <input
+            value={inspectInput}
+            onChange={(e) => setInspectInput(e.target.value)}
+            placeholder="Base58 pubkey"
+            autoComplete="off"
+            spellCheck={false}
+            aria-label="Inspect wallet pubkey"
+          />
+          <button type="submit" disabled={!inspectInput.trim()}>
+            Inspect qty
+          </button>
+          {initialInspect ? (
+            <button
+              type="button"
+              className="netro-density-inspect-clear"
+              onClick={onInspectClear}
+            >
+              Clear
+            </button>
+          ) : (
+            <Link to="/desk/settings" className="netro-density-inspect-bind">
+              Or bind watch-wallet
+            </Link>
+          )}
+          {initialInspect ? (
+            <Link
+              to="/desk/positions"
+              search={{ inspect: initialInspect }}
+              className="netro-density-inspect-bind"
+            >
+              Open positions ledger
+            </Link>
+          ) : null}
+        </form>
+      ) : null}
+
+      {enablePaperAgent && ownership ? (
+        <details
+          className="netro-density-collapse netro-density-item"
+          style={delay(2.5)}
+          data-testid="netro-ownership"
+          open={ownershipOpen}
+          onToggle={(e) => setOwnershipOpen((e.target as HTMLDetailsElement).open)}
+        >
+          <summary>
+            <span>Ownership · {ownership.walletSourceLabel}</span>
+            <em>Expand / minimize</em>
+          </summary>
+          <section
+            className="netro-density-ownership"
+            aria-label="Ownership honesty"
+          >
+          <div className="netro-density-ownership-head">
+            <div>
+              <strong>Ownership</strong>
+              <span>{ownership.note}</span>
+            </div>
+            <div className="netro-density-ownership-pills">
+              <em>{ownership.walletSourceLabel}</em>
+              <em>{ownership.qtyLabel}</em>
+              <em>{ownership.verifiedLabel}</em>
+            </div>
+          </div>
+          <div className="netro-density-ownership-metrics">
+            <div>
+              <span>Economic value</span>
+              <b>{ownership.economicValueLabel}</b>
+            </div>
+            {ownership.rows.map((row) => (
+              <div key={row.symbol}>
+                <span>
+                  {row.symbol} · {row.health}
+                </span>
+                <b>{row.qtyLabel}</b>
+                <small>{row.valueLabel}</small>
+              </div>
+            ))}
+          </div>
+          </section>
+        </details>
+      ) : null}
+
+      {enablePaperAgent && keysReadiness ? (
+        <details
+          className="netro-density-collapse netro-density-collapse-dark netro-density-item"
+          style={delay(2.7)}
+          data-testid="netro-keys-readiness"
+          open={keysOpen}
+          onToggle={(e) => setKeysOpen((e.target as HTMLDetailsElement).open)}
+        >
+          <summary>
+            <span>
+              Empire keys
+              {keysReadiness.missingCount > 0
+                ? ` · ${keysReadiness.missingCount} missing`
+                : " · ready"}
+            </span>
+            <em>Expand / minimize</em>
+          </summary>
+          <section
+            className="netro-density-keys"
+            aria-label="Empire keys readiness"
+          >
+          <div className="netro-density-keys-head">
+            <div>
+              <strong>Empire keys</strong>
+              <span>{keysReadiness.multiTenantLabel}</span>
+            </div>
+            <Link
+              to="/desk/settings"
+              hash="empire-readiness"
+              className="netro-density-keys-cta"
+            >
+              {keysReadiness.missingCount > 0
+                ? `Paste ${keysReadiness.missingCount} missing → Settings`
+                : "Settings readiness"}
+            </Link>
+          </div>
+          <div className="netro-density-keys-grid">
+            {keysReadiness.rows.map((row) => (
+              <div
+                key={row.id}
+                data-ok={row.ok ? "1" : "0"}
+                className={row.ok ? "netro-key-ok" : "netro-key-miss"}
+              >
+                <span>{row.label}</span>
+                <b>{row.status}</b>
+              </div>
+            ))}
+          </div>
+          </section>
+        </details>
+      ) : null}
 
       {/* Main Desktop Grid: 9 left / 3 right — NetroBNB app/page.tsx */}
       <div className="netro-density-grid">
@@ -142,9 +416,9 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
                 <em>:</em>
                 <span>{clock.s}</span>
               </div>
-              <button type="button" tabIndex={-1} className="netro-density-cta">
+              <Link to="/truth" className="netro-density-cta">
                 Start truth pass
-              </button>
+              </Link>
             </div>
 
             <div className="netro-density-stack">
@@ -160,27 +434,47 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
                   </div>
                   <span className="netro-density-flow-pill">AAPLx | USDC</span>
                 </div>
-                <div className="netro-density-metrics">
+                <div className="netro-density-metrics" data-testid="netro-live-gates">
                   <div>
                     <span>Multiplier</span>
                     <b>{multiplierLabel}</b>
                   </div>
                   <div>
                     <span>Wash</span>
-                    <b>Fail-closed</b>
+                    <b>{gates.wash}</b>
                   </div>
                   <div>
                     <span>Quote</span>
-                    <b>≤$1 inspect</b>
+                    <b>{gates.quote}</b>
                   </div>
                   <div>
                     <span>Broadcast</span>
-                    <b>Paused</b>
+                    <b>{gates.broadcast}</b>
                   </div>
                   <div>
                     <span>NestUSD</span>
-                    <b>Unavailable</b>
+                    <b>{gates.nestUsd}</b>
                   </div>
+                </div>
+                <div className="netro-density-gate-strip" data-testid="netro-empire-strip">
+                  <span>
+                    Pyth <b>{gates.pyth}</b>
+                  </span>
+                  <span>
+                    Scaled UI <b>{gates.scaledUi}</b>
+                  </span>
+                  <span>
+                    Kamino <b>{gates.kamino}</b>
+                  </span>
+                  <span>
+                    Raydium <b>{gates.raydium}</b>
+                  </span>
+                  <span>
+                    Nest.credit <b>{gates.nestCredit}</b>
+                  </span>
+                  <span>
+                    Multi-tenant <b>{gates.multiTenant}</b>
+                  </span>
                 </div>
               </div>
 
@@ -194,7 +488,7 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
                     <strong>Route</strong>
                   </div>
                   <b>USDC → AAPLx</b>
-                  <small>Jupiter TTL · stale on 429</small>
+                  <small>{gates.quoteMeta}</small>
                 </div>
                 <div
                   className="netro-density-card netro-density-card-dark netro-density-item"
@@ -222,8 +516,14 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
                     <span className="netro-pill">Holding</span>
                     <span className="netro-pill">Liquidity</span>
                   </div>
-                  <b>Kamino 0.40</b>
-                  <small>Borrow CPI unavailable until funded</small>
+                  <b>
+                    {gates.kaminoLtv
+                      ? `Kamino ${gates.kaminoLtv} maxLTV`
+                      : gates.kamino === "Mainnet-read"
+                        ? "Kamino live LTV"
+                        : `Kamino ${gates.kamino}`}
+                  </b>
+                  <small>{gates.creditCapacity}</small>
                 </div>
                 <div
                   className="netro-density-card netro-density-item"
@@ -249,12 +549,16 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
               <span>Share truth strip · mainnet-read</span>
               <em>{multiplierLabel}</em>
             </div>
-            <div className="netro-density-chart netro-density-chart-dark" role="presentation">
+            <div
+              className="netro-density-chart netro-density-chart-dark"
+              role="presentation"
+              data-testid="netro-truth-strip"
+            >
               <div className="netro-density-chart-meta">
-                <b>Truth strip</b>
-                <span>15m · wash fail-closed</span>
+                <b>Illustrative strip</b>
+                <span>Not live candles · geometry only</span>
               </div>
-              <svg viewBox="0 0 640 180" preserveAspectRatio="none">
+              <svg viewBox="0 0 640 180" preserveAspectRatio="none" aria-hidden>
                 <polyline
                   fill="none"
                   stroke="#f4d014"
@@ -270,9 +574,10 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
                 />
               </svg>
               <div className="netro-density-chart-foot">
-                <span>Wash · fail-closed</span>
-                <span>Pyth diverge · key gated</span>
-                <span>Broadcast · paused</span>
+                <span data-testid="netro-scaled-ui-strip">{scaledUiStripLabel}</span>
+                <span>Wash · {gates.wash}</span>
+                <span>Pyth diverge · {gates.pyth}</span>
+                <span>Broadcast · {gates.broadcast}</span>
               </div>
             </div>
           </div>
@@ -288,7 +593,7 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
               <strong>Quote</strong>
               <span>inspect only</span>
             </div>
-            <div className="netro-density-quote-pair">
+            <div className="netro-density-quote-pair" data-testid="netro-live-quote">
               <div>
                 <span>You pay</span>
                 <b>USDC</b>
@@ -300,20 +605,19 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
               <div>
                 <span>You receive</span>
                 <b>AAPLx</b>
-                <em>live quote · TTL</em>
+                <em>{gates.quoteOut}</em>
               </div>
             </div>
-            <button type="button" tabIndex={-1} className="netro-density-quote-cta">
+            <Link to="/desk/acquire" className="netro-density-quote-cta">
               Inspect quote
-            </button>
-            <p className="netro-density-quote-foot">
-              Broadcast paused · no mainnet fill theater
-            </p>
+            </Link>
+            <p className="netro-density-quote-foot">{gates.quoteMeta}</p>
           </div>
 
           <aside
             id="netro-ai-rail"
             className="netro-density-rail netro-density-item"
+            data-testid="netro-paper-agent"
             style={{
               ...delay(10),
               ...(railHeight
@@ -325,27 +629,80 @@ export function NetroDensityCanvas({ multiplierLabel }: Props) {
               <span className="netro-density-rail-avatar">F</span>
               <div>
                 <p className="netro-density-rail-title">FOLIO agent</p>
-                <p className="netro-density-rail-sub">Share truth · paper spine</p>
+                <p className="netro-density-rail-sub">
+                  {enablePaperAgent
+                    ? "Live spine · paper · no broadcast"
+                    : "Share truth · paper spine"}
+                </p>
               </div>
             </div>
             <div className="netro-density-rail-welcome">
               <p>
-                Ask about AAPLx multiplier, wash pressure, or credit LTV. Paper
-                agent keeps the live spine — never fills while broadcast is
-                paused.
+                {agentReply ??
+                  "Ask about AAPLx multiplier, wash pressure, or credit LTV. Paper agent keeps the live spine — never fills while broadcast is paused."}
               </p>
+              {agentMeta ? (
+                <small className="netro-density-rail-meta">{agentMeta}</small>
+              ) : null}
             </div>
-            <div className="netro-density-rail-actions">
-              <span>
-                Truth pass
-                <em>Wash · diverge</em>
-              </span>
-              <span>
-                24h strip
-                <em>Multiplier</em>
-              </span>
-            </div>
-            <div className="netro-density-rail-input">Ask about AAPLx…</div>
+            {enablePaperAgent ? (
+              <>
+                <div className="netro-density-rail-actions">
+                  <button
+                    type="button"
+                    disabled={agentBusy}
+                    onClick={() => {
+                      setAgentPrompt("truth AAPLx");
+                      void submitPaperAgent("truth AAPLx");
+                    }}
+                  >
+                    Truth pass
+                    <em>Live × · Scaled UI</em>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={agentBusy}
+                    onClick={() => {
+                      setAgentPrompt("quote 1 USDC AAPLx");
+                      void submitPaperAgent("quote 1 USDC AAPLx");
+                    }}
+                  >
+                    Quote inspect
+                    <em>≤$1 · no broadcast</em>
+                  </button>
+                </div>
+                <form
+                  className="netro-density-rail-form"
+                  onSubmit={onAgentSubmit}
+                >
+                  <input
+                    className="netro-density-rail-input"
+                    value={agentPrompt}
+                    onChange={(e) => setAgentPrompt(e.target.value)}
+                    placeholder="truth AAPLx · quote 1 USDC AAPLx"
+                    disabled={agentBusy}
+                    aria-label="Paper agent prompt"
+                  />
+                  <button type="submit" disabled={agentBusy || !agentPrompt.trim()}>
+                    {agentBusy ? "…" : "Run"}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <div className="netro-density-rail-actions">
+                  <span>
+                    Truth pass
+                    <em>Wash · diverge</em>
+                  </span>
+                  <span>
+                    24h strip
+                    <em>Multiplier</em>
+                  </span>
+                </div>
+                <div className="netro-density-rail-input">Ask about AAPLx…</div>
+              </>
+            )}
           </aside>
         </div>
       </div>

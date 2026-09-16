@@ -18,7 +18,16 @@ export type DexTradeRow = {
   protocol: string | null;
 };
 
-const BITQUERY_URL = "https://streaming.bitquery.io/eap";
+/**
+ * Bitquery Streaming GraphQL (docs 2026):
+ * Primary V2: https://streaming.bitquery.io/graphql
+ * Legacy EAP: https://streaming.bitquery.io/eap (existing customers only)
+ * Auth: Authorization: Bearer ory_at_… (or ?token= on URL / WSS)
+ */
+const BITQUERY_URLS = [
+  "https://streaming.bitquery.io/graphql",
+  "https://streaming.bitquery.io/eap",
+] as const;
 
 /**
  * Labeling rules adapted from Bitquery Solana wash-trading detector docs:
@@ -166,59 +175,74 @@ export async function evaluateWashGate(params: {
   }
 
   try {
-    const res = await fetch(BITQUERY_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      signal: AbortSignal.timeout(20_000),
-      body: JSON.stringify({
-        query: WASH_QUERY,
-        variables: { mint: params.mint, limit: 50 },
-      }),
+    const payload = JSON.stringify({
+      query: WASH_QUERY,
+      variables: { mint: params.mint, limit: 50 },
     });
+    let lastDetail = "";
 
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      return errResult(
-        source,
-        "bitquery_http_error",
-        `HTTP ${res.status} ${body.slice(0, 180)} — size blocked.`,
-      );
+    for (const url of BITQUERY_URLS) {
+      const hostLabel = url.includes("/eap") ? "eap" : "graphql";
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        signal: AbortSignal.timeout(20_000),
+        body: payload,
+      });
+
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        lastDetail = `HTTP ${res.status} ${body.slice(0, 120)} @ ${hostLabel}`;
+        // Auth failures are terminal — don't mask with EAP fallback theater.
+        if (res.status === 401 || res.status === 403) {
+          return errResult(
+            source,
+            "bitquery_unauthorized",
+            `${lastDetail} — size blocked.`,
+          );
+        }
+        continue;
+      }
+
+      const json = (await res.json()) as BitqueryResponse;
+      if (json.errors?.length) {
+        lastDetail = `${(json.errors[0]?.message ?? "GraphQL error").slice(0, 160)} @ ${hostLabel}`;
+        // Schema/query mismatch on V2 → try EAP; keep last detail if both fail.
+        continue;
+      }
+
+      const trades = json.data?.Solana?.DEXTrades ?? [];
+      const rows: DexTradeRow[] = trades.map((t) => ({
+        buyer: t.Trade?.Buy?.Account?.Address ?? null,
+        seller: t.Trade?.Sell?.Account?.Address ?? null,
+        feePayer: t.Transaction?.FeePayer ?? null,
+        amountUsd:
+          t.Trade?.Buy?.AmountInUSD != null
+            ? Number(t.Trade.Buy.AmountInUSD)
+            : t.Trade?.Sell?.AmountInUSD != null
+              ? Number(t.Trade.Sell.AmountInUSD)
+              : null,
+        signature: t.Transaction?.Signature ?? null,
+        protocol:
+          t.Trade?.Dex?.ProtocolName ?? t.Trade?.Dex?.ProtocolFamily ?? null,
+      }));
+
+      const scored = scoreWashTrades(rows, { notionalUsd: params.notionalUsd });
+      return okResult("mainnet-read", source, {
+        symbol: params.symbol,
+        mint: params.mint,
+        ...scored,
+      });
     }
 
-    const json = (await res.json()) as BitqueryResponse;
-    if (json.errors?.length) {
-      return errResult(
-        source,
-        "bitquery_graphql_error",
-        `${json.errors[0]?.message ?? "GraphQL error"} — size blocked.`,
-      );
-    }
-
-    const trades = json.data?.Solana?.DEXTrades ?? [];
-    const rows: DexTradeRow[] = trades.map((t) => ({
-      buyer: t.Trade?.Buy?.Account?.Address ?? null,
-      seller: t.Trade?.Sell?.Account?.Address ?? null,
-      feePayer: t.Transaction?.FeePayer ?? null,
-      amountUsd:
-        t.Trade?.Buy?.AmountInUSD != null
-          ? Number(t.Trade.Buy.AmountInUSD)
-          : t.Trade?.Sell?.AmountInUSD != null
-            ? Number(t.Trade.Sell.AmountInUSD)
-            : null,
-      signature: t.Transaction?.Signature ?? null,
-      protocol: t.Trade?.Dex?.ProtocolName ?? t.Trade?.Dex?.ProtocolFamily ?? null,
-    }));
-
-    const scored = scoreWashTrades(rows, { notionalUsd: params.notionalUsd });
-
-    return okResult("mainnet-read", source, {
-      symbol: params.symbol,
-      mint: params.mint,
-      ...scored,
-    });
+    return errResult(
+      source,
+      "bitquery_http_error",
+      `${lastDetail || "Bitquery V2+EAP exhausted"} — size blocked.`,
+    );
   } catch (e) {
     return errResult(source, "bitquery_wash_failed", `${String(e)} — size blocked.`);
   }

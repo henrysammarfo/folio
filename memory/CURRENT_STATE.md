@@ -46,18 +46,20 @@ World’s Fair still wins on **working honesty**: live multiplier + wash refuse 
 
 ## Keys
 
-Present in `.env`: Tavily, TinyFish, AgentRouter, 21st, Shaders, Solana RPC.
-Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESSION_SECRET` set locally for watch-wallet + session signing readiness.
-**Rotate all chat-pasted keys after hackathon.**
+Present in `.env` + Vercel (2026-09-16 Henry paste): Tavily, TinyFish, AgentRouter, 21st, Shaders, Solana RPC, `FOLIO_SESSION_SECRET`, `BROADCAST_PAUSED`, `FOLIO_APPROVED_LAB_UI=netro-density`, **Bitquery**, **Pyth**, **Privy**, **Supabase URL/anon/service/JWT**, **Jupiter**.
+JWT ✅ · SQL ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; **Pyth off ship path**) ✅. Still blocked: Privy Allowed origins + Log in (auto-mint) + Join folio-demo.
+**Rotate all chat-pasted keys immediately after hackathon.**
 
 ## UI / lab (approve-gated)
 
 - Production `/` hero: Aionis-parity liquid stencil (`1400×550` / y=465 / horizon 55%).
 - `/lab/ui`: Aionis plane + NetroBNB density + pinned 21st Plasma 24346 + trade journal 27124.
 - `/lab/shaders`: live WebGL Plasma (glacial ink); shaders.com keyed but API gated (HTTP 500).
-- Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; **Vercel** now has `API_KEY_21ST`, `SHADERS_API_KEY`, `AGENTROUTER_*`, `TAVILY_API_KEY`, `TINYFISH_API_KEY` (all targets). Still missing: Bitquery · Jupiter · Pyth · Privy · Supabase.
+- Local `.env` has `API_KEY_21ST` + `SHADERS_API_KEY`; **Vercel** has lab keys + Empire keys (Bitquery/Pyth/Privy/Supabase/Jupiter). Open: Privy mint + Join folio-demo (JWT+SQL+free diverge done). Pyth Pro optional for bounty only.
 - Desk opt-in lab preview mounts live WebGL Plasma for shader / cinematic picks (Exit clears; not production merge).
-- Stocklana live 2026-09-16: **596** regs · **81** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
+- Stocklana live 2026-09-16: **605** regs · **84** subs · **$121k** · hero deadline **SEP 25** (timeline still lists 18 Sep — conservative).
+- Netro overview: live Empire gates + ≤$1 Jupiter quote + paper-agent + **inspect wallet** + **ownership qty strip** + **Empire keys readiness**. **SSR approvals seed**. Truth strip illustrative + live Scaled UI. Home hero preserved. Stocklana **605/84/$121k**.
+- Vercel: `FOLIO_APPROVED_LAB_UI=netro-density` set. Wash **live** via Bitquery V2 `/graphql`. Pyth keyed but Equity/xStock not entitled.
 
 ## Live deltas (do not regress)
 
@@ -404,7 +406,7 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 ## 2026-09-16 — Approved lab env merge path
 - Production desk chrome gated by `FOLIO_APPROVED_LAB_UI` / `FOLIO_APPROVED_LAB_SHADER` after Henry chat approve.
-- Unset today — desk stays default. Goal open.
+- Set `FOLIO_APPROVED_LAB_UI=netro-density` on Vercel (2026-09-16). Overview mounts Netro; hero untouched. Goal open for Empire keys.
 
 ## 2026-09-16 — Netro desk surface parity + keys honesty
 - Netro density is the **desk surface** when active (no stacked overview cards under it); stagger via `--netro-delay`; AI rail height-synced to left column; share ticker; larger profile gears.
@@ -433,3 +435,48 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 
 ## 2026-09-16 — Positions Scaled UI honesty
 - Position Verified requires wallet-read + API↔on-chain Scaled UI match; list shows chain match/mismatch/off.
+
+## 2026-09-16 — Netro overview-only + Henry approve env
+- Home **hero preserved** (Aionis brand-plane). NetroBNB 12-col is **/desk overview only** — does not replace Positions/Acquire/Credit.
+- `FOLIO_APPROVED_LAB_UI=netro-density` set on Vercel (prod/preview/dev). Overview hides FOLIO sidebar so Netro chrome owns the surface; nav links are real routes.
+- Empire keys still empty (Bitquery/Pyth/Privy/Supabase/Jupiter) — cannot invent; paste per KEYS_LANDING. Rotate chat-pasted Vercel token. Goal open.
+
+## 2026-09-16 — Netro live Empire gates on overview
+- Approved Netro surface paints live matrix modes (not static theater). Overview-only; hero untouched. Goal open: Bitquery/Pyth/Privy/Supabase + GG Skip.
+
+## 2026-09-16 — Netro live Kamino LTV + Stocklana 598
+- Netro credit card shows live AAPLx maxLTV + illustrative paper×LTV capacity (borrow broadcast off).
+- Stocklana live: **598** / **82** / **$121k** · deadline SEP 25. Goal open: Bitquery/Pyth/Privy/Supabase + rotate Vercel token.
+
+## 2026-09-16 — Netro live Jupiter quote-only
+- Overview Netro quote rail: live ≤$1 Jupiter out UI amount + TTL/stale honesty. Inspect quote → /desk/acquire. Goal open: Bitquery/Pyth/Privy/Supabase.
+
+## 2026-09-16 — Netro live paper agent
+- Overview Netro rail: Truth pass + Quote inspect → `runDeskAgent` live spine. Never fills. Goal open for Empire keys.
+
+## 2026-09-16 — Soft Netro yellow + decongest + full landing + settings template
+- Sampled NetroBNB yellow remains `#f4d014` for accents; large fills use soft wash (`--netro-yellow-soft` / `--netro-yellow-wash`) so chrome is not bold-yellow. Gaps increased; quote-swap no longer overlaps cards.
+- Ownership / Empire keys strips are collapsible (keys auto-open when missing; ownership opens on inspect).
+- Landing: **Aionis primary hero preserved**; below-fold honesty pillars + secondary Netro desk section + Empire key links. Not a second hero replacement.
+- Settings: rail nav + collapsible panels + step-by-step key links (`docs/KEYS_LANDING.md`). Sidebar minimize on non-Netro desk pages.
+- Vercel still missing Bitquery/Pyth/Privy/Supabase/Jupiter — cannot invent. Rotate chat-pasted Vercel token. Goal open.
+
+## 2026-09-16 — SSR Netro live spine seed
+- `/desk` loader now prefetches truth + network + credit + acquire + positions so Netro first paint shows live × / matrix / LTV / quote (not “live pending” defaults).
+- Broadcast Settings badge says **Paused** (not Unavailable). Lab approve panel shows Production · netro-density when env set. Settings hash scroll + session panel opens when Privy+Supabase present.
+- Empire keys still empty on Vercel — goal open.
+
+## 2026-09-16 — Stocklana 605/84 + Broadcast Paused consistency
+- Live jina scrape: **605** registered · **84** submissions · **$121k** · SEP 25.
+- Docs + desk UI: Broadcast **Paused** (policy), not “off/disabled/unavailable”. Step 0 lab approve marked done. Goal open for Empire keys.
+
+## 2026-09-16 — Multi-tenant cache parity on session mint
+- Settings mint/clear/tenant/watch invalidate session + positions + credit + empire-readiness so wallet qty lights without stale paper cache.
+- Mint button gated until Privy+Supabase+FOLIO_SESSION_SECRET present. Netro positions/credit refetchOnMount always.
+- Empire keys still empty — goal open.
+
+## 2026-09-16 — Inspect/activity honesty gap close
+- Inspect panel meta no longer says **No cookie** when watch-wallet/session/membership is bound (`Inspect idle` / `Bound elsewhere`).
+- Session invalidate also drops `activity-bundle` so CA pref badges refresh after mint/prefs.
+- Classic overview Policy wash/broadcast/NestUSD rows read live network matrix (no hardcoded Bitquery/Disabled theater).
+- Remaining Stocklana blockers: Henry paste Bitquery · Pyth · Privy · Supabase (+ optional Jupiter).

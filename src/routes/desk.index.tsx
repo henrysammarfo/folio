@@ -127,7 +127,7 @@ function Page() {
                   ? "Inspect (ephemeral)"
                   : "Wallet unbound"}
         </ModeBadge>
-        <ModeBadge mode="quote-only">Broadcast off</ModeBadge>
+        <ModeBadge mode="quote-only">Broadcast paused</ModeBadge>
       </div>
 
       <Panel
@@ -163,7 +163,13 @@ function Page() {
         title="Inspect wallet (ephemeral)"
         meta={
           <StatusBadge tone={walletSource === "inspect" ? "green" : "neutral"}>
-            {walletSource === "inspect" ? "Inspect active" : "No cookie"}
+            {walletSource === "inspect"
+              ? "Inspect active"
+              : walletSource === "watch-wallet" ||
+                  walletSource === "membership" ||
+                  walletSource === "session"
+                ? "Bound elsewhere"
+                : "Inspect idle"}
           </StatusBadge>
         }
       >
@@ -174,7 +180,7 @@ function Page() {
             Settings → bind watch wallet
           </Link>{" "}
           when you want a cookie. Inspect is <b>not</b> multi-tenant auth — and broadcast stays
-          off.
+          paused.
         </p>
         <div className="form-grid">
           <label>
@@ -340,15 +346,42 @@ function Page() {
             </p>
             <p>
               <span>NestUSD borrow</span>
-              <b>Fail-closed</b>
+              <b>
+                {(() => {
+                  const nest = (network.data?.rows ?? []).find((r) =>
+                    r.capability.startsWith("NestUSD"),
+                  );
+                  if (!nest) return "Fail-closed";
+                  return nest.mode === "unavailable"
+                    ? "Fail-closed"
+                    : `${nest.mode} · risk-labeled`;
+                })()}
+              </b>
             </p>
             <p>
               <span>Wash pressure</span>
-              <b>Fail-closed until Bitquery</b>
+              <b>
+                {(() => {
+                  const wash = (network.data?.rows ?? []).find((r) =>
+                    r.capability.startsWith("Wash"),
+                  );
+                  if (!wash) return "Unavailable";
+                  if (wash.mode === "unavailable") {
+                    return wash.detail.includes("BITQUERY")
+                      ? "Fail-closed · Bitquery missing"
+                      : "Fail-closed";
+                  }
+                  return `${wash.mode} · ${wash.detail}`;
+                })()}
+              </b>
             </p>
             <p>
               <span>Broadcast</span>
-              <b>Disabled</b>
+              <b>
+                {network.data?.broadcastPaused !== false
+                  ? "Paused · quote-only"
+                  : "Armed · still unfunded"}
+              </b>
             </p>
           </div>
         </Panel>

@@ -1,98 +1,58 @@
 # FOLIO — Henry key steps (one at a time)
 
-Do **one step**, screenshot, reply in chat. Do not skip ahead. I will give the next step after each reply.
-
-Demo (hard-refresh): https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app
+Demo (hard-refresh): https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app
 
 ---
 
-## Step 0 — Approve lab look ← DO THIS NEXT
+## Step 0–1 · Lab + Vercel secrets ✅ DONE
 
-1. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/ui  
-   Tap **Pick** on one id (recommended for Stocklana desk: **`netro-density`** — Preview on desk mounts the full NetroBNB **12-col** canvas with live AAPLx ×).  
-   Other ids: `aionis-brand-plane` (already mirrors production `/` hero) · `cinematic-landing-21st` · `trade-journal-21st`  
-   (optional) **Preview on desk** — opt-in only; Exit preview anytime; not a production merge.
-2. Open https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app/lab/shaders  
-   Tap **Pick** on one: `ink-ledger` · `ledger-mist` · `aurora-grid`
-3. Reply in Cursor chat with the copied line (e.g. `Approve lab UI: netro-density`) + screenshot.
-
-Until you reply in chat, premium chrome stays off production home/desk on purpose.
-
-**After your chat reply**, the agent sets Vercel env (then redeploys):
-
-| Name | Example |
-|------|--------|
-| `FOLIO_APPROVED_LAB_UI` | `netro-density` |
-| `FOLIO_APPROVED_LAB_SHADER` | `ink-ledger` (optional) |
-
-Production `/desk` then mounts that chrome (yellow banner · Netro 12-col when UI=`netro-density`). Local **Pick** alone never merges.
-
-Refs extracted: **Aionis** brand-plane (production `/` already mirrors composition) · **NetroBNB** 12-col desk density (lab + desk preview) · live **21st.dev** MCP (Plasma 24346 + Trade Journal 27124 pinned).
-
-### Optional before Step 2 — Vercel lab keys ✅ DONE
-
-Live-verified 2026-09-16 on branch preview `/lab/ui`: **21st MCP connected**.
-
-| Name | Status |
-|------|--------|
-| `API_KEY_21ST` | ✅ on Vercel (all targets) |
-| `SHADERS_API_KEY` | ✅ on Vercel (Clerk may still 500; WebGL Plasma still ships) |
-| `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` | ✅ on Vercel |
+`FOLIO_APPROVED_LAB_UI=netro-density` · session secret · broadcast paused · RPC.
 
 ---
 
-## Step 1 — Vercel secrets (no paid API) ✅ DONE
+## Step 2 · Bitquery ✅ · Equity diverge ✅ LIVE FREE (Pyth off ship path)
 
-`FOLIO_SESSION_SECRET` + `BROADCAST_PAUSED=true` + `SOLANA_RPC_URL` are set on Vercel and verified live on Settings.
+Wash is **live**. Ship diverge does **not** call Pyth Hermes (no Pro $).
 
-**Rotate** any Vercel token pasted in chat (Account → Tokens). Do not paste tokens in chat again.
+Live cascade (fail-closed on HTTP miss — no invented prices):
 
-What this unlocked: watch-wallet bind on the public demo. Broadcast stays paused.
-
----
-
-## Step 2 — Bitquery (after Step 0 Pick)
-
-Only when I say so. Needed for live wash tape (fail-closed until then).
-
-| Name | Where |
-|------|--------|
-| `BITQUERY_API_KEY` | Bitquery dashboard → API key → paste into Vercel + local `.env` |
-
-Optional same sitting (unlocks Pyth diverge vs Jupiter — Pyth bounty):
-
-| Name | Where |
-|------|--------|
-| `PYTH_API_KEY` | [Pyth Terminal](https://pyth.network/) → API key → Vercel + `.env` (Hermes auth required since Aug 2026) |
+1. **Finnhub** (optional) — [finnhub.io/register](https://finnhub.io/register) → `FINNHUB_API_KEY`
+2. **Yahoo chart** (keyless) — labeled `YAHOO:AAPL`
+3. **CoinGecko** `apple-xstock` secondary
+4. Venue = **Jupiter Price** (already free)
 
 ---
 
-## Step 3 — Privy (after Step 2)
+## Step 3 · Privy ✅ KEYED
 
-| Name | Where |
-|------|--------|
-| `PRIVY_APP_ID` | Privy dashboard → App |
-| `PRIVY_APP_SECRET` | Privy dashboard → App |
+App ID + secret on Vercel. Rotate after chat paste.
 
 ---
 
-## Step 4 — Supabase (after Step 3)
+## Step 4 · Supabase ✅ KEYS + JWT + SCHEMA READY
 
-| Name | Where |
+| Item | Status |
 |------|--------|
-| `SUPABASE_URL` | Project settings → API |
-| `SUPABASE_ANON_KEY` | Project settings → API |
-| `SUPABASE_SERVICE_ROLE_KEY` | Project settings → API (server only — never expose to browser) |
-| `SUPABASE_JWT_SECRET` | Project settings → API → **JWT Secret** (≥16) |
+| URL / anon / service_role / JWT secret | ✅ |
+| Tables + **service_role GRANTs** | ✅ live |
+| `folio-demo` tenant | ✅ seeded |
 
-Full checklist: `docs/KEYS_LANDING.md`.
+### Henry next — mint multi-tenant session (LAST BLOCKER)
+1. Privy Dashboard → **Configuration → App settings → Domains** → Allowed origins → paste exactly:  
+   `https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app`  
+   (Privy rejects `*.vercel.app` wildcards; `https://*.teamtitanlink.vercel.app` OK if you own that suffix.)
+2. Open [Settings](https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk/settings#settings-session)
+3. Click **Log in with Privy (auto-mints)** — session cookie sets after login
+4. If memberships empty → **Join folio-demo as owner**
+5. Confirm Active tenant shows `folio-demo`
+
+**Rotate** every secret pasted in chat.
 
 ---
 
 ## Still paused until funded
-- Mainnet broadcast / swap send
+- Mainnet broadcast / swap send  
 - Custom program deploy (rent ≫ $1)
-- Mentors/judges cold DMs (we draft after product looks premium)
 
-## CI note
-GitGuardian may flag historical public AAPLx mint in old commits — **Skip: false positive** (tip remediates; no Lovable history rewrite).
+## Goal matrix
+`npm run smoke:goal` — Empire DONE with live Yahoo equity ref; multi-tenant PARTIAL until Privy mint + Join.
