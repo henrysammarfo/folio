@@ -332,3 +332,10 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 - Home: first viewport = brand-first FOLIO + one line + CTAs; **footer no longer 40vh overlay** (was burying hero).
 - Lab UI ids: `netro-density` · `aionis-brand-plane` · `trade-journal-21st` (live 21st preview).
 - Still blocked: Henry Pick reply · Bitquery/Pyth/Privy/Supabase · funded broadcast.
+
+## 2026-09-16 — Real extract pass (not postcard fakes)
+- Home rewritten to **Aionis brand-plane pattern**: black void + SVG-masked FOLIO liquid stencil; tagline/CTA in horizon band above letterforms (not footer-buried).
+- Lab `/lab/ui`: full **NetroBNB 12-col density** canvas + live stencil stage + 21st MCP gallery (12 hits).
+- Lab `/lab/shaders`: **21st get_component id 24346** WebGL Plasma adapted to FOLIO palettes; shaders.com REST still Clerk 500 (honest).
+- Tip `cfc0cc2` on `cursor/folio-prefs-agent-honesty-f1ec`. Vitest **100**.
+- Still blocked: Henry Pick · keys · funded broadcast.

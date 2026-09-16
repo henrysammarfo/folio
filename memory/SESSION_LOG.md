@@ -296,3 +296,8 @@
 - Cloned NetroBNB + Aionis; 21st MCP live on lab; shaders key probed (Clerk fail-closed labeled).
 - Home footer unburied (was min-height 40vh on first viewport). New lab ids from real refs.
 - Goal open: Henry Pick + keys.
+
+## 2026-09-16 — Real Aionis/NetroBNB extract + 21st WebGL
+- User called prior lab approve fakes + buried hero; re-analyzed live shots vs clones.
+- Extracted Aionis SVG liquid stencil → production `/`; NetroBNB 12-col density → lab; 21st Plasma WebGL (24346) → shader lab.
+- shaders.com REST still Clerk 500; labeled. Tip `cfc0cc2`. Henry Pick still required.
