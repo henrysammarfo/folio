@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowRight, Github, Linkedin } from "lucide-react";
 import { FolioMark } from "@/components/folio-brand";
+import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
 import { getTruthBundle } from "@/lib/desk.functions";
 
 export const Route = createFileRoute("/")({
@@ -18,21 +20,31 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      {
-        property: "og:image",
-        content:
-          "https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/693205bf-8048-456a-879e-4e0a1b85a098.webp",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/693205bf-8048-456a-879e-4e0a1b85a098.webp",
-      },
     ],
   }),
   loader: async () => getTruthBundle({ data: { symbol: "AAPLx" } }),
   component: Home,
 });
+
+function LocalTime() {
+  const [label, setLabel] = useState("");
+  useEffect(() => {
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const city = zone.split("/").pop()?.replace(/_/g, " ") ?? zone;
+    const tick = () => {
+      const t = new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }).format(new Date());
+      setLabel(`${t} ${city}`);
+    };
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return <span>{label || "—"}</span>;
+}
 
 function Home() {
   const truth = Route.useLoaderData();
@@ -43,27 +55,14 @@ function Home() {
 
   return (
     <div className="cinematic-home">
-      {/* First viewport: brand + headline + one sentence + CTA · full-bleed media */}
+      <div className="home-noise" aria-hidden />
+
       <section className="home-viewport" aria-label="FOLIO hero">
-        <div className="home-media" aria-hidden>
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/693205bf-8048-456a-879e-4e0a1b85a098.webp"
-          >
-            <source
-              src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260826_123836_11a3c5e0-713f-4bef-a8e9-7dd93bdea3b0.mp4"
-              type="video/mp4"
-            />
-          </video>
-        </div>
-        <div className="home-scrim" aria-hidden />
+        <FolioLiquidStencil />
 
         <header className="home-topbar">
           <div className="home-brand-hero">
-            <FolioMark className="size-9" />
+            <FolioMark className="size-8" />
             <span>FOLIO</span>
           </div>
           <div className="home-topbar-actions">
@@ -79,8 +78,15 @@ function Home() {
           </div>
         </header>
 
+        <div className="home-midband">
+          <div className="home-midband-left">
+            <span className="home-live-dot" aria-hidden />
+            <LocalTime />
+          </div>
+          <p className="home-scroll-hint">Scroll to explore ↓</p>
+        </div>
+
         <main className="home-hero">
-          <h1>FOLIO</h1>
           <p className="home-hero-tagline">Own the economic truth.</p>
           <p className="home-copy">
             Honest stock desk on Solana. {liveLine} Broadcast stays off until funded.
@@ -94,13 +100,8 @@ function Home() {
             </Link>
           </div>
         </main>
-
-        <p className="home-scroll-hint" aria-hidden>
-          Scroll
-        </p>
       </section>
 
-      {/* Below fold — never steals first viewport */}
       <footer className="home-footer">
         <div className="home-brand">
           <div className="brand-lockup text-primary-foreground">

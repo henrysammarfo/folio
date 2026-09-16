@@ -1,6 +1,7 @@
 /**
  * Shaders.com probe — lab only. Key format ak_* (SHADERS_API_KEY).
- * Live frame fetch is fail-closed when Clerk/API rejects; lab still shows FOLIO studies.
+ * REST is Clerk-gated (often 500). Live WebGL for approve candidates comes from
+ * 21st.dev MCP get_component (Plasma) adapted in src/components/lab/shader-background.tsx.
  */
 
 export type ShadersStatus = {
