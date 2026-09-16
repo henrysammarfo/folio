@@ -57,51 +57,68 @@ function Home() {
     <div className="cinematic-home">
       <div className="home-noise" aria-hidden />
 
+      {/*
+        Aionis landing composition (extracted):
+        1) full-bleed black plane
+        2) brand stencil owns the lower half (letters ARE the hero)
+        3) top bar = mark + primary CTA only
+        4) thin horizon chrome floats just ABOVE the letterforms (bottom:55%)
+        5) supporting copy lives below the fold — never stacked on the stencil
+      */}
       <section className="home-viewport" aria-label="FOLIO hero">
         <FolioLiquidStencil />
 
-        <header className="home-topbar">
-          <div className="home-brand-hero">
-            <FolioMark className="size-8" />
-            <span>FOLIO</span>
-          </div>
-          <div className="home-topbar-actions">
-            <Link to="/lab/ui" className="home-top-link">
-              Lab UI
-            </Link>
-            <Link to="/lab/shaders" className="home-top-link">
-              Shaders
-            </Link>
-            <Link to="/desk" className="home-top-cta">
-              Open desk
-            </Link>
-          </div>
-        </header>
-
-        {/* Horizon band ABOVE the stencil — copy never sits in the footer zone */}
-        <div className="home-midband">
-          <div className="home-midband-stack">
-            <div className="home-midband-left">
-              <span className="home-live-dot" aria-hidden />
-              <LocalTime />
+        <div className="home-safe">
+          <header className="home-topbar">
+            <div className="home-brand-hero">
+              <FolioMark className="size-8" />
+              <span>FOLIO</span>
             </div>
-            <main className="home-hero">
-              <p className="home-hero-tagline">Own the economic truth.</p>
-              <p className="home-copy">
-                Honest stock desk on Solana. {liveLine} Broadcast stays off until
-                funded.
-              </p>
-              <div className="home-cta-row">
-                <Link to="/desk" className="home-cta">
-                  Open the desk <ArrowRight />
-                </Link>
-                <Link to="/truth" className="home-cta-secondary">
-                  See live truth
-                </Link>
-              </div>
-            </main>
+            <div className="home-topbar-actions">
+              <Link to="/desk" className="home-top-cta">
+                Open desk
+              </Link>
+            </div>
+          </header>
+
+          {/* One line only — upper void, never sitting on the letterforms */}
+          <main className="home-hero-void">
+            <p className="home-hero-tagline">Own the economic truth.</p>
+            <p className="home-copy-tight">{liveLine}</p>
+          </main>
+        </div>
+
+        <div className="home-horizon" aria-label="Status">
+          <div className="home-horizon-left">
+            <span className="home-live-dot" aria-hidden />
+            <LocalTime />
           </div>
-          <p className="home-scroll-hint">Scroll to explore ↓</p>
+          <p className="home-scroll-hint">
+            Scroll to explore <span aria-hidden>↓</span>
+          </p>
+        </div>
+      </section>
+
+      <section className="home-below" aria-label="What FOLIO does">
+        <div className="home-below-copy">
+          <h2>Honest stock desk on Solana.</h2>
+          <p>
+            Corporate-action share truth before trade. Broadcast stays off until
+            funded. Premium chrome stays on the lab until you approve.
+          </p>
+          <div className="home-cta-row">
+            <Link to="/desk" className="home-cta">
+              Open the desk <ArrowRight />
+            </Link>
+            <Link to="/truth" className="home-cta-secondary">
+              See live truth
+            </Link>
+          </div>
+        </div>
+        <div className="home-below-links">
+          <Link to="/lab/ui">Lab UI</Link>
+          <Link to="/lab/shaders">Lab shaders</Link>
+          <Link to="/network">Network</Link>
         </div>
       </section>
 

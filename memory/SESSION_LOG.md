@@ -314,3 +314,9 @@
 - Live Vercel preview: home stencil + live ×1.003269 OK; `/lab/ui` shows API_KEY_21ST missing on Vercel (local has it).
 - keys-readiness lists optional API_KEY_21ST / SHADERS. Full Playwright **21/21** green.
 - Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · Vercel lab keys · funded broadcast.
+
+## 2026-09-16 — Analyze refs + fix buried/dim hero
+- Ran Aionis + NetroBNB + FOLIO; screenshots under `/opt/cursor/artifacts/screenshots/`.
+- Aionis gold stencil is the hero; FOLIO ice stencil was too dark → bumped luminance + soft floor + Aionis horizon CSS.
+- Removed midband stack; supporting copy below fold. 21st MCP confirmed live locally; shaders REST still 500.
+- smoke:keys + unit tests updated. Goal open: Henry Pick + Empire keys + Vercel `API_KEY_21ST`.

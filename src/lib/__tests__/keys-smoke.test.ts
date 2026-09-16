@@ -13,6 +13,8 @@ const allMissing: KeySmokeEnv = {
   supabaseJwt: false,
   sessionSecret: true,
   agentRouter: true,
+  twentyFirst: false,
+  shaders: false,
   broadcastPaused: true,
 };
 
@@ -29,6 +31,8 @@ describe("keys smoke baseline honesty", () => {
     expect(byId.supabase_jwt?.status).toBe("skipped");
     expect(byId.multi_tenant?.status).toBe("fail-closed");
     expect(byId.agentrouter?.status).toBe("ok");
+    expect(byId.twentyfirst?.status).toBe("skipped");
+    expect(byId.shaders?.status).toBe("skipped");
 
     const summary = summarizeKeySmoke(rows);
     expect(summary.blockingMissing).toEqual(
@@ -60,5 +64,15 @@ describe("keys smoke baseline honesty", () => {
       broadcastPaused: false,
     });
     expect(rows.find((r) => r.id === "broadcast")?.status).toBe("fail-closed");
+  });
+
+  it("surfaces lab 21st + shaders when keys present", () => {
+    const rows = classifyKeySmokeBaseline({
+      ...allMissing,
+      twentyFirst: true,
+      shaders: true,
+    });
+    expect(rows.find((r) => r.id === "twentyfirst")?.status).toBe("ok");
+    expect(rows.find((r) => r.id === "shaders")?.status).toBe("ok");
   });
 });

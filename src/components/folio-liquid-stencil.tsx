@@ -27,39 +27,39 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
 
     let raf = 0;
     const start = Date.now();
-    let curX = 320;
-    let curRadius = 220;
-    let curBlur = 48;
+    let curX = 380;
+    let curRadius = 280;
+    let curBlur = 42;
     let curCore = 1;
-    let curEdge = 0.92;
+    let curEdge = 0.95;
 
     const tick = () => {
       const elapsed = (Date.now() - start) % 12000;
-      let targetX = 320;
-      let targetRadius = 220;
-      let targetBlur = 48;
+      let targetX = 380;
+      let targetRadius = 280;
+      let targetBlur = 42;
       let targetCore = 1;
-      let targetEdge = 0.92;
+      let targetEdge = 0.95;
 
       if (elapsed < 2000) {
-        targetX = 320;
+        targetX = 380;
       } else if (elapsed < 5000) {
-        targetX = 980;
+        targetX = 1050;
       } else if (elapsed < 6000) {
-        targetX = 980;
+        targetX = 1050;
       } else if (elapsed < 6200) {
-        targetX = 980;
-        targetRadius = 110;
+        targetX = 1050;
+        targetRadius = 140;
         targetBlur = 22;
-        targetCore = 0;
-        targetEdge = 0;
+        targetCore = 0.15;
+        targetEdge = 0.1;
       } else if (elapsed < 7200) {
         const p = (elapsed - 6200) / 1000;
-        targetX = 320;
-        targetRadius = 560 - p * 340;
-        targetBlur = 150 - p * 102;
+        targetX = 380;
+        targetRadius = 560 - p * 280;
+        targetBlur = 120 - p * 78;
         targetCore = Math.min(1, p * 1.6);
-        targetEdge = Math.min(0.92, p * 1.6);
+        targetEdge = Math.min(0.95, p * 1.6);
       }
 
       curX += (targetX - curX) * 0.022;
@@ -81,15 +81,17 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const fontSize = compact ? 200 : 240;
-  const baseline = compact ? 420 : 455;
+  /* Match Aionis letter scale: ~260 / y=465 on 1400×550 — brand owns lower half */
+  const fontSize = compact ? 200 : 260;
+  const baseline = compact ? 380 : 465;
+  const aspect = compact ? "xMidYMid meet" : "xMidYMax slice";
 
   return (
     <div className={className ?? "folio-stencil"} aria-hidden>
       <svg
         className="folio-stencil-svg"
         viewBox="0 0 1400 550"
-        preserveAspectRatio="xMidYMax slice"
+        preserveAspectRatio={aspect}
       >
         <defs>
           <mask id={maskId} maskUnits="userSpaceOnUse">
@@ -105,21 +107,25 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
             </text>
           </mask>
           <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#f2f6fa" ref={stop1Ref} stopOpacity="1" />
-            <stop offset="40%" stopColor="#b7d0e6" ref={stop2Ref} stopOpacity="0.98" />
-            <stop offset="100%" stopColor="#6e93b4" stopOpacity="0" />
+            {/* High-luminance ledger ice — Aionis pattern uses bright gold; FOLIO stays cool but must READ */}
+            <stop offset="0%" stopColor="#ffffff" ref={stop1Ref} stopOpacity="1" />
+            <stop offset="35%" stopColor="#e8f1fa" ref={stop2Ref} stopOpacity="1" />
+            <stop offset="70%" stopColor="#9ec0dc" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="#5a849f" stopOpacity="0" />
           </radialGradient>
           <filter id={blurId} x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur ref={blurFilterRef} stdDeviation="56" />
+            <feGaussianBlur ref={blurFilterRef} stdDeviation="42" />
           </filter>
         </defs>
         <g mask={`url(#${maskId})`}>
-          <rect width="1400" height="550" fill="#05070a" />
+          <rect width="1400" height="550" fill="#000000" />
+          {/* Soft floor so letterforms stay readable between animation peaks */}
+          <rect width="1400" height="550" fill="#243040" opacity="0.55" />
           <circle
             ref={circleRef}
-            cx="320"
-            cy="250"
-            r="220"
+            cx="380"
+            cy="280"
+            r="280"
             fill={`url(#${gradId})`}
             filter={`url(#${blurId})`}
           />

@@ -353,13 +353,13 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 15_000,
     });
     await expect(page.locator(".folio-stencil, .folio-stencil-svg").first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /open the desk/i }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /^lab ui$/i }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /^shaders$/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /open (the )?desk/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /lab ui/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /lab shaders|shaders/i }).first()).toBeVisible();
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/own the economic truth|live|broadcast/);
-    // Footer lab copy is below fold — not competing with hero brand
-    expect(body).toMatch(/lab\/ui|lab\/shaders|premium chrome/);
+    // Supporting copy + lab links sit below the brand plane — not stacked on letterforms
+    expect(body).toMatch(/lab\/ui|lab\/shaders|premium chrome|honest stock desk/);
   });
 
   test("paper agent keeps live spine and never fills", async ({ page }) => {

@@ -18,6 +18,8 @@ export type KeySmokeEnv = {
   supabaseJwt: boolean;
   sessionSecret: boolean;
   agentRouter: boolean;
+  twentyFirst: boolean;
+  shaders: boolean;
   broadcastPaused: boolean;
 };
 
@@ -39,6 +41,8 @@ export function readKeySmokeEnv(
       (env["SUPABASE_JWT_SECRET"]?.trim().length ?? 0) >= 16,
     sessionSecret: (env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16,
     agentRouter: Boolean(env["AGENTROUTER_API_KEY"]?.trim()),
+    twentyFirst: Boolean(env["API_KEY_21ST"]?.trim()),
+    shaders: Boolean(env["SHADERS_API_KEY"]?.trim()),
     broadcastPaused: (env["BROADCAST_PAUSED"] ?? "true").toLowerCase() !== "false",
   };
 }
@@ -121,6 +125,22 @@ export function classifyKeySmokeBaseline(env: KeySmokeEnv): KeySmokeRow[] {
       detail: env.agentRouter
         ? "AGENTROUTER_API_KEY present — NL optional (WAF → spine-only)"
         : "AgentRouter missing — paper agent live spine only",
+    },
+    {
+      id: "twentyfirst",
+      present: env.twentyFirst,
+      status: env.twentyFirst ? "ok" : "skipped",
+      detail: env.twentyFirst
+        ? "API_KEY_21ST present — will probe 21st.dev MCP search"
+        : "API_KEY_21ST missing — lab UI catalog stays offline",
+    },
+    {
+      id: "shaders",
+      present: env.shaders,
+      status: env.shaders ? "ok" : "skipped",
+      detail: env.shaders
+        ? "SHADERS_API_KEY present — will probe shaders.com (Clerk often gates)"
+        : "SHADERS_API_KEY missing — lab studies use local 21st WebGL only",
     },
   ];
 }

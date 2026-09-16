@@ -15,6 +15,8 @@ import { fetchPythEquityPrice } from "../src/lib/adapters/pyth.ts";
 import { fetchXStockAsset } from "../src/lib/adapters/xstocks.ts";
 import { getAuthProviderStatus } from "../src/lib/auth/session.ts";
 import { verifyPrivyAccessToken } from "../src/lib/auth/privy.ts";
+import { searchTwentyFirstComponents } from "../src/lib/lab/twentyfirst.ts";
+import { probeShadersApi } from "../src/lib/lab/shaders-status.ts";
 
 async function probeWash(): Promise<KeySmokeRow> {
   const asset = await fetchXStockAsset("AAPLx");
@@ -154,6 +156,47 @@ async function probeSupabase(): Promise<KeySmokeRow> {
   }
 }
 
+async function probeTwentyFirst(): Promise<KeySmokeRow> {
+  const res = await searchTwentyFirstComponents(
+    "trade journal table market snapshot desk",
+    3,
+  );
+  if (!res.ok) {
+    return {
+      id: "twentyfirst_live",
+      present: true,
+      status: "error",
+      detail: `21st MCP probe failed — ${res.reason}`,
+    };
+  }
+  return {
+    id: "twentyfirst_live",
+    present: true,
+    status: "ok",
+    detail: `21st MCP live · ${res.hits.length} hits${
+      res.hits[0] ? ` · e.g. ${res.hits[0].name}` : ""
+    }`,
+  };
+}
+
+async function probeShaders(): Promise<KeySmokeRow> {
+  const status = await probeShadersApi();
+  if (!status.keyPresent) {
+    return {
+      id: "shaders_live",
+      present: false,
+      status: "skipped",
+      detail: status.detail,
+    };
+  }
+  return {
+    id: "shaders_live",
+    present: true,
+    status: status.reachable ? "ok" : "fail-closed",
+    detail: status.detail,
+  };
+}
+
 async function main() {
   const env = readKeySmokeEnv();
   const baseline = classifyKeySmokeBaseline(env);
@@ -163,6 +206,8 @@ async function main() {
   if (env.pyth) live.push(await probePyth());
   if (env.privy) live.push(await probePrivy());
   if (env.supabase) live.push(await probeSupabase());
+  if (env.twentyFirst) live.push(await probeTwentyFirst());
+  if (env.shaders) live.push(await probeShaders());
 
   const auth = getAuthProviderStatus();
   live.push({

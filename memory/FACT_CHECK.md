@@ -157,6 +157,10 @@ Do **not** quote stale 145/12 counts. Prefer live page over search-index lag.
 | 21st get_component Plasma id 24346 retrieved | CONFIRMED | free tier 1/2 remaining after fetch; wired as ShaderBackground | 2026-09-16 |
 | shaders.com REST accepts SHADERS_API_KEY | FAIL-CLOSED | HTTP 500 Clerk on /api/v1/me | 2026-09-16 |
 | Home brand plane matches Aionis stencil pattern | CONFIRMED (pattern) | black void + SVG mask + liquid light; FOLIO tokens | 2026-09-16 |
+| FOLIO stencil luminance too low vs Aionis gold | FIXED | side-by-side shots; ice core #fff + soft floor + larger blob | 2026-09-16 |
+| smoke:keys probes 21st MCP when API_KEY_21ST set | CONFIRMED | twentyfirst_live · Trade Journal Table hits | 2026-09-16 |
+| smoke:keys probes shaders.com | FAIL-CLOSED labeled | shaders_live HTTP 500 Clerk | 2026-09-16 |
+| Vercel preview has API_KEY_21ST | MISSING | /lab/ui amber on preview; local green | 2026-09-16 |
 
 ## Live Stocklana re-check (2026-09-16)
 

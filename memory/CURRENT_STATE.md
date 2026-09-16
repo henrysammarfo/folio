@@ -348,3 +348,11 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 ## 2026-09-16 — Preview honesty + e2e lock
 - Preview home ships Aionis stencil + live AAPLx ×. Lab Netro/Aionis extracts live; 21st MCP needs `API_KEY_21ST` on Vercel.
 - `npm run keys` includes lab optional keys. E2E 21/21. Empire keys still empty. Goal open.
+
+## 2026-09-16 — Shot analysis + Aionis composition lock
+- Side-by-side screenshots: Aionis :3110 · NetroBNB :3111 · FOLIO :3000.
+- Gap found: FOLIO liquid light too dim (letters nearly invisible) + midband copy fought the brand plane.
+- Home now mirrors Aionis exactly: top mark+CTA · upper-void one line · horizon at bottom:55% · bright ledger-ice stencil · copy below fold.
+- smoke:keys probes 21st MCP live (Trade Journal + Cinematic Landing hits) + shaders Clerk 500 labeled.
+- Lab ids: `aionis-brand-plane` · `netro-density` · `cinematic-landing-21st` · `trade-journal-21st`.
+- Still blocked: Henry Pick · Bitquery/Pyth/Privy/Supabase · `API_KEY_21ST` on Vercel · funded broadcast.

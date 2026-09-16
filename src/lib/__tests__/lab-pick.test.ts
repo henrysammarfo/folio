@@ -11,10 +11,11 @@ describe("lab-pick", () => {
   it("accepts only known UI candidate ids", () => {
     expect(isLabUiId("netro-density")).toBe(true);
     expect(isLabUiId("aionis-brand-plane")).toBe(true);
+    expect(isLabUiId("cinematic-landing-21st")).toBe(true);
     expect(isLabUiId("trade-journal-21st")).toBe(true);
     expect(isLabUiId("desk-density-a")).toBe(false);
     expect(isLabUiId("")).toBe(false);
-    expect(LAB_UI_IDS).toHaveLength(3);
+    expect(LAB_UI_IDS).toHaveLength(4);
   });
 
   it("accepts only known shader candidate ids", () => {

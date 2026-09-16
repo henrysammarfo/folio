@@ -49,9 +49,18 @@ export const Route = createFileRoute("/lab/ui")({
       }
     }
 
+    const cinematicHero =
+      (heroSearch.ok
+        ? heroSearch.hits.find((h) => /cinematic landing/i.test(h.name))
+        : null) ??
+      (heroSearch.ok ? heroSearch.hits[0] : null) ??
+      null;
+
     const tradeJournal =
-      hits.find((h) => /trade journal/i.test(h.name)) ??
-      hits.find((h) => /financial hero|cinematic landing|dashboard/i.test(h.name)) ??
+      (deskSearch.ok
+        ? deskSearch.hits.find((h) => /trade journal/i.test(h.name))
+        : null) ??
+      hits.find((h) => /trade journal|financial hero|dashboard/i.test(h.name)) ??
       hits[0] ??
       null;
 
@@ -59,7 +68,7 @@ export const Route = createFileRoute("/lab/ui")({
       ? deskSearch.ok || heroSearch.ok
         ? `21st MCP live · ${hits.length} catalog hits (search free; code fetch paid)`
         : `21st MCP error · ${"reason" in deskSearch ? deskSearch.reason : "unknown"}`
-      : "API_KEY_21ST missing";
+      : "API_KEY_21ST missing — set on Vercel preview + local .env for live catalog";
 
     const mult = truth?.multiplier;
     const multiplierLabel = mult?.ok
@@ -69,8 +78,9 @@ export const Route = createFileRoute("/lab/ui")({
     return {
       twentyFirstConfigured: configured,
       twentyFirstNote: note,
+      cinematicHero,
       tradeJournal,
-      gallery: hits.slice(0, 4),
+      gallery: hits.slice(0, 6),
       multiplierLabel,
     };
   },
@@ -98,31 +108,62 @@ function Page() {
 
       <div className="lab-grid lab-grid-tall">
         <article className="lab-card lab-card-span">
-          <StatusBadge tone="amber">netro-density</StatusBadge>
-          <h3>NetroBNB desk density</h3>
-          <NetroDensityCanvas multiplierLabel={data.multiplierLabel} />
+          <StatusBadge tone="amber">aionis-brand-plane</StatusBadge>
+          <h3>Aionis brand plane → production `/`</h3>
+          <div className="lab-aionis-stage lab-aionis-stage-tall">
+            <FolioLiquidStencil />
+          </div>
           <p className="text-sm opacity-80">
-            Extracted from AbdullahBalfaqih/NetroBNB: 12-col bento, soft figma shadows,
-            yellow analysis rail, live clock — FOLIO truth tokens only.
+            Extracted from manovHacksaw/aionis-app/landing: brand stencil owns the lower
+            half (xMidYMax + y≈465), horizon chrome at bottom:55% (time + scroll only),
+            supporting copy below the fold. Production home now mirrors that — not a
+            midband stacked on the letters.
           </p>
         </article>
 
         <article className="lab-card lab-card-span">
-          <StatusBadge tone="amber">aionis-brand-plane</StatusBadge>
-          <h3>Aionis brand plane</h3>
-          <div className="lab-aionis-stage">
-            <FolioLiquidStencil compact />
-          </div>
+          <StatusBadge tone="amber">netro-density</StatusBadge>
+          <h3>NetroBNB desk density</h3>
+          <NetroDensityCanvas multiplierLabel={data.multiplierLabel} />
           <p className="text-sm opacity-80">
-            Pattern from manovHacksaw/aionis-app/landing: brand is the SVG stencil, liquid
-            light drifts through the letterforms, footer never steals the first viewport.
-            Same plane now drives production `/`.
+            Extracted from AbdullahBalfaqih/NetroBNB: grey #E5E7EB canvas, 12-col bento,
+            soft figma shadows, yellow analysis rail + live clock — FOLIO truth tokens
+            only (no Netro/Binance brand).
+          </p>
+        </article>
+
+        <article className="lab-card lab-card-span">
+          <StatusBadge tone={data.twentyFirstConfigured ? "green" : "amber"}>
+            cinematic-landing-21st
+          </StatusBadge>
+          <h3>{data.cinematicHero?.name ?? "21st cinematic landing"}</h3>
+          {data.cinematicHero?.previewUrl ? (
+            <img
+              className="lab-preview-frame lab-preview-frame-lg"
+              src={data.cinematicHero.previewUrl}
+              alt={`${data.cinematicHero.name} preview from 21st.dev`}
+              loading="lazy"
+            />
+          ) : (
+            <div className="lab-desk-preview" aria-hidden>
+              <div>
+                <span>21st MCP</span>
+                <b>catalog offline</b>
+              </div>
+            </div>
+          )}
+          <p className="text-sm opacity-80">
+            {data.cinematicHero
+              ? `Live 21st.dev MCP · id ${data.cinematicHero.id}${
+                  data.cinematicHero.author ? ` · @${data.cinematicHero.author}` : ""
+                }. Reference only — FOLIO production uses the Aionis brand-plane extract, not a SaaS card hero clone.`
+              : "21st MCP unavailable — set API_KEY_21ST on Vercel for live previews."}
           </p>
         </article>
 
         <article className="lab-card lab-card-span">
           <StatusBadge tone="amber">trade-journal-21st</StatusBadge>
-          <h3>{data.tradeJournal?.name ?? "21st catalog pick"}</h3>
+          <h3>{data.tradeJournal?.name ?? "21st desk catalog"}</h3>
           {data.tradeJournal?.previewUrl ? (
             <img
               className="lab-preview-frame lab-preview-frame-lg"
@@ -153,7 +194,7 @@ function Page() {
             <div className="lab-21st-gallery">
               {data.gallery
                 .filter((g) => g.previewUrl)
-                .slice(0, 3)
+                .slice(0, 4)
                 .map((g) => (
                   <figure key={String(g.id)}>
                     <img src={g.previewUrl!} alt="" loading="lazy" />
