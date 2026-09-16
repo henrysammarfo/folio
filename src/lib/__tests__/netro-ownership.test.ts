@@ -48,4 +48,20 @@ describe("buildNetroOwnershipSummary", () => {
     expect(summary.verifiedLabel).toBe("0 / 2 verified");
     expect(summary.note).toMatch(/not auth|Ephemeral/);
   });
+
+  it("labels inspect with paper fallback when no SPL qty", () => {
+    const summary = buildNetroOwnershipSummary({
+      walletSource: "inspect",
+      rows: [
+        {
+          symbol: "AAPLx",
+          qty: 12.5,
+          qtySource: "paper",
+          paperValueUsd: 100,
+          health: "Review",
+        },
+      ],
+    });
+    expect(summary.qtyLabel).toBe("Inspect · paper fallback");
+  });
 });

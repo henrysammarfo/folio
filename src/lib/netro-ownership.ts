@@ -54,9 +54,21 @@ export function buildNetroOwnershipSummary(
   else if (source === "membership") walletSourceLabel = "Membership";
   else if (source === "session") walletSourceLabel = "Session";
 
+  let qtyLabel = walletRead ? "Wallet-read qty" : "Paper qty";
+  if (source === "inspect" && !walletRead) {
+    qtyLabel = "Inspect · paper fallback";
+  } else if (
+    (source === "watch-wallet" ||
+      source === "membership" ||
+      source === "session") &&
+    !walletRead
+  ) {
+    qtyLabel = "Bound · paper fallback";
+  }
+
   return {
     walletSourceLabel,
-    qtyLabel: walletRead ? "Wallet-read qty" : "Paper qty",
+    qtyLabel,
     economicValueLabel: money(paperValue),
     verifiedLabel: `${verified} / ${total} verified`,
     note:
