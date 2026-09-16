@@ -284,3 +284,8 @@ EOF
 - VERIFIED: desk layout loader returns approvedUi/approvedShader from env.
 - VERIFIED e2e intent: netro-truth-strip says illustrative / not live candles; scaled-ui strip labeled.
 - OPEN: Bitquery/Pyth/Privy/Supabase empty.
+
+## 2026-09-16 — Stocklana + Netro keys strip
+- Stocklana jina: **598** registered · **82** submissions · **$121,000** · SEP 25, 2026.
+- VERIFIED unit: keys readiness miss counts; multi-tenant armed only when Privy+Supabase set.
+- OPEN: Empire keys still empty on env.

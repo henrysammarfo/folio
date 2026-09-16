@@ -481,3 +481,7 @@
 - `/desk` layout loader seeds `getLabApprovals` so Henry-approved Netro paints without classic overview flash.
 - Market strip labeled illustrative (not live candles) + live API↔on-chain Scaled UI status.
 - Empire keys still need Henry paste. Goal open.
+
+## 2026-09-16 — Netro Empire keys readiness strip
+- Production Netro overview surfaces live Bitquery/Pyth/Privy/Supabase/session/broadcast readiness from getSessionBundle — paste CTA → Settings.
+- Connect becomes Paste keys when misses > 0. Stocklana still 598/82/$121k (jina). Goal open for key paste.

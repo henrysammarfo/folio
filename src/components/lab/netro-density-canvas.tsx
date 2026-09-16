@@ -14,6 +14,7 @@ import {
   NETRO_LIVE_GATE_DEFAULTS,
   type NetroLiveGateLabels,
 } from "@/lib/netro-live-gates";
+import type { NetroKeysReadiness } from "@/lib/netro-keys-readiness";
 import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 
 type Props = {
@@ -22,6 +23,8 @@ type Props = {
   gates?: NetroLiveGateLabels;
   /** Live positions honesty — paper vs wallet-read / inspect. */
   ownership?: NetroOwnershipSummary | null;
+  /** Live Empire key presence — multi-tenant / wash / Pyth paste path. */
+  keysReadiness?: NetroKeysReadiness | null;
   /** Prefill from `/desk?inspect=` deep-link. */
   initialInspect?: string | undefined;
   /** Live API↔on-chain Scaled UI status for the market strip (never fake candles). */
@@ -58,6 +61,7 @@ export function NetroDensityCanvas({
   multiplierLabel,
   gates = NETRO_LIVE_GATE_DEFAULTS,
   ownership = null,
+  keysReadiness = null,
   initialInspect = "",
   scaledUiStripLabel = "Scaled UI pending",
   enablePaperAgent = false,
@@ -203,7 +207,9 @@ export function NetroDensityCanvas({
             + Truth pass
           </Link>
           <Link to="/desk/settings" className="netro-density-connect">
-            Connect
+            {keysReadiness && keysReadiness.missingCount > 0
+              ? "Paste keys"
+              : "Connect"}
           </Link>
         </div>
       </div>
@@ -303,6 +309,39 @@ export function NetroDensityCanvas({
                 </span>
                 <b>{row.qtyLabel}</b>
                 <small>{row.valueLabel}</small>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {enablePaperAgent && keysReadiness ? (
+        <section
+          className="netro-density-keys netro-density-item"
+          style={delay(2.7)}
+          data-testid="netro-keys-readiness"
+          aria-label="Empire keys readiness"
+        >
+          <div className="netro-density-keys-head">
+            <div>
+              <strong>Empire keys</strong>
+              <span>{keysReadiness.multiTenantLabel}</span>
+            </div>
+            <Link to="/desk/settings" className="netro-density-keys-cta">
+              {keysReadiness.missingCount > 0
+                ? `Paste ${keysReadiness.missingCount} missing → Settings`
+                : "Settings readiness"}
+            </Link>
+          </div>
+          <div className="netro-density-keys-grid">
+            {keysReadiness.rows.map((row) => (
+              <div
+                key={row.id}
+                data-ok={row.ok ? "1" : "0"}
+                className={row.ok ? "netro-key-ok" : "netro-key-miss"}
+              >
+                <span>{row.label}</span>
+                <b>{row.status}</b>
               </div>
             ))}
           </div>

@@ -135,6 +135,18 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(page.getByTestId("netro-scaled-ui-strip")).toContainText(
       /API↔chain|Scaled UI|match|mismatch|pending|off/i,
     );
+    // Empire keys readiness — multi-tenant / wash / Pyth fail-closed until paste
+    await expect(page.getByTestId("netro-keys-readiness")).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByTestId("netro-keys-readiness")).toContainText(
+      /bitquery|pyth|privy|supabase|multi-tenant|fail-closed|broadcast/i,
+    );
+    await expect(
+      page.getByTestId("netro-keys-readiness").getByRole("link", {
+        name: /settings|paste/i,
+      }),
+    ).toHaveAttribute("href", "/desk/settings");
     const gateText = (
       await page.getByTestId("netro-live-gates").innerText()
     ).toLowerCase();

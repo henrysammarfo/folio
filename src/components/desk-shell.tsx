@@ -24,6 +24,7 @@ import {
   getLabApprovals,
   getNetworkBundle,
   getPositionsBundle,
+  getSessionBundle,
   getTruthBundle,
 } from "@/lib/desk.functions";
 import {
@@ -35,6 +36,10 @@ import {
   type LabUiId,
 } from "@/lib/lab-pick";
 import { buildNetroLiveGateLabels } from "@/lib/netro-live-gates";
+import {
+  buildNetroKeysReadiness,
+  type NetroKeysReadiness,
+} from "@/lib/netro-keys-readiness";
 import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 import { buildNetroOwnershipSummary } from "@/lib/netro-ownership";
 
@@ -86,6 +91,7 @@ export function DeskShell({
   const fetchCredit = useServerFn(getCreditBundle);
   const fetchAcquire = useServerFn(getAcquireBundle);
   const fetchPositions = useServerFn(getPositionsBundle);
+  const fetchSession = useServerFn(getSessionBundle);
   /** Parent `/desk` loader — SSR seed so approved Netro paints before client refetch. */
   const approvalsSeed = useLoaderData({ from: "/desk" });
 
@@ -155,6 +161,12 @@ export function DeskShell({
     enabled: showNetroCanvas,
     staleTime: 15_000,
   });
+  const session = useQuery({
+    queryKey: ["session-bundle", "netro-keys"],
+    queryFn: () => fetchSession(),
+    enabled: showNetroCanvas,
+    staleTime: 60_000,
+  });
   const acquire = useQuery({
     queryKey: ["acquire-bundle", "netro-surface", "AAPLx", 1],
     queryFn: () => fetchAcquire({ data: { symbol: "AAPLx", spendUsdc: 1 } }),
@@ -181,6 +193,19 @@ export function DeskShell({
     note: positions.data?.note ?? null,
     rows: positions.data?.rows ?? [],
   });
+  const readiness = session.data?.readiness;
+  const keysReadiness: NetroKeysReadiness | null = readiness
+    ? buildNetroKeysReadiness({
+        bitqueryKeyPresent: readiness.bitqueryKeyPresent,
+        pythApiKeyPresent: readiness.pythApiKeyPresent,
+        privyConfigured: readiness.privyConfigured,
+        supabaseConfigured: readiness.supabaseConfigured,
+        supabaseJwtConfigured: readiness.supabaseJwtConfigured,
+        sessionSecretPresent: readiness.sessionSecretPresent,
+        broadcastPaused: readiness.broadcastPaused,
+        jupiterKeyPresent: readiness.jupiterKeyPresent,
+      })
+    : null;
   const scaledUiCompare = truth.data?.scaledUiCompare;
   const scaledUiStripLabel = scaledUiCompare
     ? scaledUiCompare.status === "match"
@@ -306,6 +331,7 @@ export function DeskShell({
                 multiplierLabel={multiplierLabel}
                 gates={netroGates}
                 ownership={ownership}
+                keysReadiness={keysReadiness}
                 initialInspect={inspectSearch}
                 scaledUiStripLabel={scaledUiStripLabel}
                 enablePaperAgent

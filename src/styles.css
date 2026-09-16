@@ -280,6 +280,19 @@
 .netro-density-ownership-metrics span{display:block;font-size:.65rem;color:#6b7280;margin-bottom:.2rem}
 .netro-density-ownership-metrics b{display:block;font-size:.88rem;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.15}
 .netro-density-ownership-metrics small{display:block;font-size:.68rem;color:#6b7280;margin-top:.15rem}
+.netro-density-keys{margin:0 0 .85rem;padding:.75rem .9rem;background:#111;color:#fff;border:1px solid #1e1e1e;border-radius:14px;box-shadow:0 1px 5px rgba(0,0,0,.08);min-width:0}
+.netro-density-keys-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.55rem 1rem;align-items:flex-start;margin-bottom:.65rem}
+.netro-density-keys-head strong{display:block;font-size:.95rem;font-weight:650}
+.netro-density-keys-head span{display:block;font-size:.68rem;color:#a3a3a3;margin-top:.15rem;max-width:28rem}
+.netro-density-keys-cta{font-size:.72rem;font-weight:700;color:#1c1c1c;background:#f4d014;text-decoration:none;padding:.45rem .75rem;border-radius:999px;white-space:nowrap}
+.netro-density-keys-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem}
+@media(min-width:768px){.netro-density-keys-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1100px){.netro-density-keys-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.netro-density-keys-grid>div{min-width:0;padding:.5rem .6rem;border-radius:10px;border:1px solid #222;background:#141414}
+.netro-density-keys-grid span{display:block;font-size:.62rem;color:#8d8a95;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.04em}
+.netro-density-keys-grid b{display:block;font-size:.78rem;font-weight:650;line-height:1.25;color:#e5e7eb}
+.netro-density-keys-grid .netro-key-ok{border-color:#365314;background:#14532d33}
+.netro-density-keys-grid .netro-key-miss{border-color:#44403c;background:#1c1917}
 /* Netro overview surface: hide FOLIO sidebar so 12-col matches NetroBNB geometry */
 .desk-layout[data-netro-surface="1"]{grid-template-columns:1fr}
 .desk-layout[data-netro-surface="1"] .desk-sidebar{display:none}
