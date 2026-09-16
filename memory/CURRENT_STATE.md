@@ -430,3 +430,6 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 ## 2026-09-16 — Positions on-chain Scaled UI labels
 - `/desk/positions` list shows chain match/mismatch/off under multiplier; detail shows compare note.
 - `positionHealth` Verified requires API↔on-chain match (shared helper + unit tests). Goal open.
+
+## 2026-09-16 — Positions Scaled UI honesty
+- Position Verified requires wallet-read + API↔on-chain Scaled UI match; list shows chain match/mismatch/off.

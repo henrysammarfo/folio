@@ -441,3 +441,6 @@
 - Highest remaining unblocked honesty gap: positions fetched on-chain Scaled UI but list showed API multiplier only; Wallet-verified ignored chain.
 - Shared `positionHealth` — Verified requires wallet-read + live feeds + API↔on-chain match.
 - List + detail surface chain match/mismatch/off. Unit + e2e updated. Goal open.
+
+## 2026-09-16 — Positions Scaled UI honesty
+- Position Verified requires wallet-read + API↔on-chain Scaled UI match; list shows chain match/mismatch/off.
