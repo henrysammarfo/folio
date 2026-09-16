@@ -305,3 +305,7 @@
 ## 2026-09-16 — Desk preview extract + Stocklana 588/79
 - Strengthened opt-in desk preview CSS for netro-density / aionis-brand-plane / trade-journal-21st.
 - Stocklana official page: 588 / 79 / $121k; AAPLx × still ~1.003269. Goal open: Henry Pick + keys.
+
+## 2026-09-16 — Lab readiness + e2e extract locks
+- Settings readiness: API_KEY_21ST + SHADERS_API_KEY. E2E locks stencil home + Netro/Aionis desk preview + WebGL swatches.
+- Vercel preview READY on prior tip; Empire keys still empty. Goal open: Henry Pick + keys.

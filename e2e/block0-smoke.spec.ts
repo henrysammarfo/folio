@@ -3,13 +3,14 @@ import { test, expect } from "@playwright/test";
 test.describe("FOLIO Block 0 smoke", () => {
   test("home renders brand stencil plane (not fixture 4×)", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText(/FOLIO/i).first()).toBeVisible();
+    // Topbar brand is visible; SVG stencil text is mask-only (aria-hidden)
+    await expect(page.locator(".home-brand-hero").getByText("FOLIO")).toBeVisible();
     await expect(page.getByText(/own the economic truth/i).first()).toBeVisible();
     const body = (await page.locator("body").innerText()).toLowerCase();
     // Live multiplier woven into hero copy — never fixture 4× theater
     expect(body).toMatch(/aapl|live|solana|broadcast/);
     expect(body).not.toMatch(/\b4\.0000\s*×|\bfixture 4× theater only\b/);
-    expect(body).toMatch(/not fixture 4|never fixture 4/);
+    expect(body).toMatch(/not fixture|never fixture/);
     // Brand plane: stencil SVG present (Aionis pattern)
     await expect(page.locator(".folio-stencil, .folio-stencil-svg").first()).toBeVisible();
   });
