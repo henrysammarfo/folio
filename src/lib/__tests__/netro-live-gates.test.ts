@@ -49,6 +49,16 @@ describe("buildNetroLiveGateLabels", () => {
           mode: "unavailable",
           detail: "keys missing",
         },
+        {
+          capability: "Raydium pool awareness",
+          mode: "mainnet-read",
+          detail: "awareness only",
+        },
+        {
+          capability: "Nest.credit vault awareness (read)",
+          mode: "mainnet-read",
+          detail: "vault TVL",
+        },
       ],
       broadcastPaused: true,
       kaminoMaxLtv: 0.4,
@@ -63,6 +73,8 @@ describe("buildNetroLiveGateLabels", () => {
     expect(labels.scaledUi).toBe("Mainnet-read");
     expect(labels.kamino).toBe("Mainnet-read");
     expect(labels.multiTenant).toBe("Unavailable");
+    expect(labels.raydium).toBe("Mainnet-read");
+    expect(labels.nestCredit).toBe("Mainnet-read");
     expect(labels.kaminoLtv).toBe("0.40");
     expect(labels.creditCapacity).toMatch(/\$2,382/);
     expect(labels.creditCapacity).toMatch(/paper/);

@@ -146,7 +146,7 @@ test.describe("FOLIO Block 0 smoke", () => {
       page.getByTestId("netro-keys-readiness").getByRole("link", {
         name: /settings|paste/i,
       }),
-    ).toHaveAttribute("href", "/desk/settings");
+    ).toHaveAttribute("href", /\/desk\/settings.*empire-readiness|\/desk\/settings#empire-readiness/);
     const gateText = (
       await page.getByTestId("netro-live-gates").innerText()
     ).toLowerCase();
@@ -159,6 +159,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(strip).toMatch(/pyth/);
     expect(strip).toMatch(/scaled ui/);
     expect(strip).toMatch(/multi-tenant/);
+    expect(strip).toMatch(/raydium|nest\.credit|kamino/);
     // Live Kamino maxLTV from credit bundle (not hardcoded theater alone)
     await expect(page.getByText(/Kamino 0\.\d{2} maxLTV/i).first()).toBeVisible({
       timeout: 15_000,

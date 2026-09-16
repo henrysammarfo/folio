@@ -24,7 +24,7 @@ import {
   getLabApprovals,
   getNetworkBundle,
   getPositionsBundle,
-  getSessionBundle,
+  getEmpireReadiness,
   getTruthBundle,
 } from "@/lib/desk.functions";
 import {
@@ -91,9 +91,11 @@ export function DeskShell({
   const fetchCredit = useServerFn(getCreditBundle);
   const fetchAcquire = useServerFn(getAcquireBundle);
   const fetchPositions = useServerFn(getPositionsBundle);
-  const fetchSession = useServerFn(getSessionBundle);
-  /** Parent `/desk` loader — SSR seed so approved Netro paints before client refetch. */
-  const approvalsSeed = useLoaderData({ from: "/desk" });
+  const fetchEmpireReadiness = useServerFn(getEmpireReadiness);
+  /** Parent `/desk` loader — SSR seed so approved Netro + keys strip paint immediately. */
+  const deskSeed = useLoaderData({ from: "/desk" });
+  const approvalsSeed = deskSeed.approvals;
+  const readinessSeed = deskSeed.readiness;
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -162,9 +164,11 @@ export function DeskShell({
     staleTime: 15_000,
   });
   const session = useQuery({
-    queryKey: ["session-bundle", "netro-keys"],
-    queryFn: () => fetchSession(),
+    queryKey: ["empire-readiness", "netro-keys"],
+    queryFn: () => fetchEmpireReadiness(),
     enabled: showNetroCanvas,
+    initialData: readinessSeed,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 60_000,
   });
   const acquire = useQuery({
@@ -193,7 +197,7 @@ export function DeskShell({
     note: positions.data?.note ?? null,
     rows: positions.data?.rows ?? [],
   });
-  const readiness = session.data?.readiness;
+  const readiness = session.data;
   const keysReadiness: NetroKeysReadiness | null = readiness
     ? buildNetroKeysReadiness({
         bitqueryKeyPresent: readiness.bitqueryKeyPresent,

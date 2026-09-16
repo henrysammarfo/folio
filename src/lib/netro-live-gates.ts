@@ -13,6 +13,10 @@ export type NetroLiveGateLabels = {
   scaledUi: string;
   kamino: string;
   multiTenant: string;
+  /** Raydium pool awareness — mainnet-read when live, never a route guarantee. */
+  raydium: string;
+  /** Nest.credit vault awareness — not NestUSD borrow. */
+  nestCredit: string;
   /** Live AAPLx maxLtv from Kamino when mainnet-read — e.g. "0.40". */
   kaminoLtv: string | null;
   /** Paper/wallet illustrative borrow capacity label. */
@@ -77,6 +81,8 @@ export function buildNetroLiveGateLabels(input: {
   const scaledUi = findMode(input.rows, "On-chain Scaled UI");
   const kamino = findMode(input.rows, "Kamino");
   const multiTenant = findMode(input.rows, "Multi-tenant");
+  const raydium = findMode(input.rows, "Raydium");
+  const nestCredit = findMode(input.rows, "Nest.credit");
 
   const ltv =
     typeof input.kaminoMaxLtv === "number" && Number.isFinite(input.kaminoMaxLtv)
@@ -121,6 +127,8 @@ export function buildNetroLiveGateLabels(input: {
     scaledUi: modeLabel(scaledUi, "Unavailable"),
     kamino: modeLabel(kamino, "Unavailable"),
     multiTenant: modeLabel(multiTenant, "Unavailable"),
+    raydium: modeLabel(raydium, "Unavailable"),
+    nestCredit: modeLabel(nestCredit, "Unavailable"),
     kaminoLtv: ltv,
     creditCapacity,
     quoteOut,
@@ -137,6 +145,8 @@ export const NETRO_LIVE_GATE_DEFAULTS: NetroLiveGateLabels = {
   scaledUi: "Unavailable",
   kamino: "Unavailable",
   multiTenant: "Unavailable",
+  raydium: "Unavailable",
+  nestCredit: "Unavailable",
   kaminoLtv: null,
   creditCapacity: "Illustrative · borrow off",
   quoteOut: "Quote pending",

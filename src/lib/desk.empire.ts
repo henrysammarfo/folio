@@ -213,30 +213,61 @@ export type SessionBundle = {
    */
   rlsNote: string;
   /** Production readiness flags — fail-closed honesty for Henry / Stocklana ops. */
-  readiness: {
-    bitqueryKeyPresent: boolean;
-    privyConfigured: boolean;
-    supabaseConfigured: boolean;
-    sessionSecretPresent: boolean;
-    pythApiKeyPresent: boolean;
-    agentRouterKeyPresent: boolean;
-    /** SUPABASE_JWT_SECRET + anon + URL — user-JWT RLS path armed. */
-    supabaseJwtConfigured: boolean;
-    broadcastPaused: boolean;
-    /** Lab only — 21st.dev MCP catalog (approve gate). */
-    twentyFirstKeyPresent: boolean;
-    /** Lab only — shaders.com probe (often Clerk-gated). */
-    shadersKeyPresent: boolean;
-    /** Production desk chrome after Henry chat approve (FOLIO_APPROVED_LAB_UI). */
-    approvedLabUi: string | null;
-    /** Production desk shader after Henry chat approve (FOLIO_APPROVED_LAB_SHADER). */
-    approvedLabShader: string | null;
-    /** Optional Jupiter auth header — public path works without it. */
-    jupiterKeyPresent: boolean;
-    /** Dedicated SOLANA_RPC_URL (false = labeled public RPC fallback · B004). */
-    solanaRpcDedicated: boolean;
-  };
+  readiness: EmpireReadiness;
 };
+
+/** Env presence flags only — no invented greens. Shared by Settings + Netro. */
+export type EmpireReadiness = {
+  bitqueryKeyPresent: boolean;
+  privyConfigured: boolean;
+  supabaseConfigured: boolean;
+  sessionSecretPresent: boolean;
+  pythApiKeyPresent: boolean;
+  agentRouterKeyPresent: boolean;
+  /** SUPABASE_JWT_SECRET + anon + URL — user-JWT RLS path armed. */
+  supabaseJwtConfigured: boolean;
+  broadcastPaused: boolean;
+  /** Lab only — 21st.dev MCP catalog (approve gate). */
+  twentyFirstKeyPresent: boolean;
+  /** Lab only — shaders.com probe (often Clerk-gated). */
+  shadersKeyPresent: boolean;
+  /** Production desk chrome after Henry chat approve (FOLIO_APPROVED_LAB_UI). */
+  approvedLabUi: string | null;
+  /** Production desk shader after Henry chat approve (FOLIO_APPROVED_LAB_SHADER). */
+  approvedLabShader: string | null;
+  /** Optional Jupiter auth header — public path works without it. */
+  jupiterKeyPresent: boolean;
+  /** Dedicated SOLANA_RPC_URL (false = labeled public RPC fallback · B004). */
+  solanaRpcDedicated: boolean;
+};
+
+export function readEmpireReadiness(
+  env: NodeJS.ProcessEnv = process.env,
+): EmpireReadiness {
+  const sessionSecretPresent = (env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
+  return {
+    bitqueryKeyPresent: Boolean(env["BITQUERY_API_KEY"]?.trim()),
+    privyConfigured: Boolean(
+      env["PRIVY_APP_ID"]?.trim() && env["PRIVY_APP_SECRET"]?.trim(),
+    ),
+    supabaseConfigured: Boolean(
+      env["SUPABASE_URL"]?.trim() &&
+        env["SUPABASE_ANON_KEY"]?.trim() &&
+        env["SUPABASE_SERVICE_ROLE_KEY"]?.trim(),
+    ),
+    sessionSecretPresent,
+    pythApiKeyPresent: Boolean(env["PYTH_API_KEY"]?.trim()),
+    agentRouterKeyPresent: Boolean(env["AGENTROUTER_API_KEY"]?.trim()),
+    supabaseJwtConfigured: isSupabaseUserJwtConfigured(env),
+    broadcastPaused: isBroadcastPaused(env),
+    twentyFirstKeyPresent: Boolean(env["API_KEY_21ST"]?.trim()),
+    shadersKeyPresent: Boolean(env["SHADERS_API_KEY"]?.trim()),
+    approvedLabUi: readApprovedLabUi(env),
+    approvedLabShader: readApprovedLabShader(env),
+    jupiterKeyPresent: Boolean(env["JUPITER_API_KEY"]?.trim()),
+    solanaRpcDedicated: Boolean(env["SOLANA_RPC_URL"]?.trim()),
+  };
+}
 
 const InspectWalletInput = z
   .object({
@@ -676,30 +707,7 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
     const userId = session.ok ? session.data.userId : null;
     const preferences = await loadDeskPreferences(activeTenantId, userId);
     const watch = readWatchWallet();
-    const sessionSecretPresent =
-      (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
-    const bitqueryKeyPresent = Boolean(
-      process.env["BITQUERY_API_KEY"]?.trim(),
-    );
-    const privyConfigured = Boolean(
-      process.env["PRIVY_APP_ID"]?.trim() &&
-        process.env["PRIVY_APP_SECRET"]?.trim(),
-    );
-    const supabaseConfigured = Boolean(
-      process.env["SUPABASE_URL"]?.trim() &&
-        process.env["SUPABASE_ANON_KEY"]?.trim() &&
-        process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim(),
-    );
-    const pythApiKeyPresent = Boolean(process.env["PYTH_API_KEY"]?.trim());
-    const agentRouterKeyPresent = Boolean(
-      process.env["AGENTROUTER_API_KEY"]?.trim(),
-    );
-    const twentyFirstKeyPresent = Boolean(process.env["API_KEY_21ST"]?.trim());
-    const shadersKeyPresent = Boolean(process.env["SHADERS_API_KEY"]?.trim());
-    const approvedLabUi = readApprovedLabUi();
-    const approvedLabShader = readApprovedLabShader();
-    const jupiterKeyPresent = Boolean(process.env["JUPITER_API_KEY"]?.trim());
-    const solanaRpcDedicated = Boolean(process.env["SOLANA_RPC_URL"]?.trim());
+    const readiness = readEmpireReadiness();
     return {
       auth,
       session,
@@ -713,27 +721,17 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
         customProgramDeploy: false,
       },
       watchWallet: watch.ok ? watch.data.wallet : null,
-      sessionSecretPresent,
-      agentRouterKeyPresent,
+      sessionSecretPresent: readiness.sessionSecretPresent,
+      agentRouterKeyPresent: readiness.agentRouterKeyPresent,
       rlsNote: deskRlsHonestyNote(),
-      readiness: {
-        bitqueryKeyPresent,
-        privyConfigured,
-        supabaseConfigured,
-        sessionSecretPresent,
-        pythApiKeyPresent,
-        agentRouterKeyPresent,
-        supabaseJwtConfigured: isSupabaseUserJwtConfigured(),
-        broadcastPaused: isBroadcastPaused(),
-        twentyFirstKeyPresent,
-        shadersKeyPresent,
-        approvedLabUi,
-        approvedLabShader,
-        jupiterKeyPresent,
-        solanaRpcDedicated,
-      },
+      readiness,
     };
   },
+);
+
+/** Lightweight Empire key flags for Netro SSR — no session prefs fetch. */
+export const getEmpireReadiness = createServerFn({ method: "GET" }).handler(
+  async (): Promise<EmpireReadiness> => readEmpireReadiness(),
 );
 
 const AgentInput = z.object({

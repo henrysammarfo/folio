@@ -485,3 +485,7 @@
 ## 2026-09-16 — Netro Empire keys readiness strip
 - Production Netro overview surfaces live Bitquery/Pyth/Privy/Supabase/session/broadcast readiness from getSessionBundle — paste CTA → Settings.
 - Connect becomes Paste keys when misses > 0. Stocklana still 598/82/$121k (jina). Goal open for key paste.
+
+## 2026-09-16 — SSR Empire readiness + Settings deep-link
+- `getEmpireReadiness` + `/desk` loader seed keys strip SSR; Netro Paste keys → `/desk/settings#empire-readiness`.
+- Empire strip adds live Raydium + Nest.credit modes. Goal open for key paste.

@@ -149,9 +149,11 @@ function Page() {
         title="Production readiness"
         meta={<StatusBadge tone="amber">Henry actions</StatusBadge>}
       >
+        <div id="empire-readiness" className="scroll-mt-24" />
         <p className="mb-3 text-sm opacity-80">
           Fail-closed checklist for Stocklana production. Missing keys stay unavailable — we do
-          not invent wash clears, multi-tenant sessions, or broadcast.
+          not invent wash clears, multi-tenant sessions, or broadcast. Paste into Vercel
+          (Preview + Production) then redeploy — Netro Empire keys strip updates live.
         </p>
         <div className="policy-list">
           <p>

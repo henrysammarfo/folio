@@ -489,6 +489,7 @@ export {
   getCreditBundle,
   getActivityBundle,
   getSessionBundle,
+  getEmpireReadiness,
   runDeskAgent,
   updateDeskPreferences,
   setActiveTenant,
@@ -502,6 +503,7 @@ export type {
   CreditBundle,
   ActivityBundle,
   SessionBundle,
+  EmpireReadiness,
   PositionRow,
   ActivityEvent,
 } from "./desk.empire";

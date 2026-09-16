@@ -206,7 +206,11 @@ export function NetroDensityCanvas({
           <Link to="/truth" className="netro-density-new">
             + Truth pass
           </Link>
-          <Link to="/desk/settings" className="netro-density-connect">
+          <Link
+            to="/desk/settings"
+            hash="empire-readiness"
+            className="netro-density-connect"
+          >
             {keysReadiness && keysReadiness.missingCount > 0
               ? "Paste keys"
               : "Connect"}
@@ -327,7 +331,11 @@ export function NetroDensityCanvas({
               <strong>Empire keys</strong>
               <span>{keysReadiness.multiTenantLabel}</span>
             </div>
-            <Link to="/desk/settings" className="netro-density-keys-cta">
+            <Link
+              to="/desk/settings"
+              hash="empire-readiness"
+              className="netro-density-keys-cta"
+            >
               {keysReadiness.missingCount > 0
                 ? `Paste ${keysReadiness.missingCount} missing → Settings`
                 : "Settings readiness"}
@@ -423,6 +431,12 @@ export function NetroDensityCanvas({
                   </span>
                   <span>
                     Kamino <b>{gates.kamino}</b>
+                  </span>
+                  <span>
+                    Raydium <b>{gates.raydium}</b>
+                  </span>
+                  <span>
+                    Nest.credit <b>{gates.nestCredit}</b>
                   </span>
                   <span>
                     Multi-tenant <b>{gates.multiTenant}</b>

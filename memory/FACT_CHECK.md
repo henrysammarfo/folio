@@ -289,3 +289,7 @@ EOF
 - Stocklana jina: **598** registered · **82** submissions · **$121,000** · SEP 25, 2026.
 - VERIFIED unit: keys readiness miss counts; multi-tenant armed only when Privy+Supabase set.
 - OPEN: Empire keys still empty on env.
+
+## 2026-09-16 — Empire readiness SSR
+- VERIFIED unit: readEmpireReadiness fail-closes empty env; arms Privy+Supabase only when both set.
+- VERIFIED: Raydium/Nest.credit map into Netro empire strip from matrix modes.
