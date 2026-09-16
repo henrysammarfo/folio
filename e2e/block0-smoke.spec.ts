@@ -278,6 +278,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/strict fail-closed/);
     expect(body).toMatch(/wash gates|acquire wash|live spine/);
     expect(body).toMatch(/bind wallet|watch |session /i);
+    expect(body).toMatch(/mint blocked|keys missing|mint httpOnly session|privy \+ supabase/);
     expect(body).not.toMatch(/7vf…2ka|7vf\.\.\.2ka/i);
     expect(body).not.toMatch(/unhackable|nation-state/);
   });

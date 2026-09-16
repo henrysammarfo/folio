@@ -100,7 +100,7 @@ function Page() {
       const res = await savePrefs({ data: next });
       if (res.ok) {
         setPrefsMsg("Saved to Supabase desk_preferences.");
-        await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+        await invalidateSessionScopedBundles();
         await refetch();
       } else {
         setPrefsMsg(`${res.reason}${res.detail ? ` — ${res.detail}` : ""}`);
@@ -109,6 +109,22 @@ function Page() {
       setPrefsBusy(false);
     }
   }
+
+  /** After mint/clear/tenant/watch — drop stale paper positions/credit so wallet qty lights up. */
+  async function invalidateSessionScopedBundles() {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["session-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["positions-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["credit-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["empire-readiness"] }),
+    ]);
+  }
+
+  const sessionMintReady = Boolean(
+    data?.readiness.privyConfigured &&
+      data?.readiness.supabaseConfigured &&
+      data?.sessionSecretPresent,
+  );
 
   useEffect(() => {
     setLabUiPick(readLabUiPick());
@@ -555,9 +571,7 @@ function Page() {
                         });
                         if (res.ok) {
                           setTenantMsg(res.data.note);
-                          await queryClient.invalidateQueries({
-                            queryKey: ["session-bundle"],
-                          });
+                          await invalidateSessionScopedBundles();
                           await refetch();
                         } else {
                           setTenantMsg(
@@ -595,6 +609,9 @@ function Page() {
         <p className="mb-3 text-sm opacity-80">
           Paste a Privy access token only after Privy + Supabase + FOLIO_SESSION_SECRET are set.
           FOLIO mints an httpOnly <code>folio_session</code> cookie — never localStorage auth.
+          {!sessionMintReady
+            ? " Mint stays disabled until those three are present on the server."
+            : null}
         </p>
         <div className="form-grid">
           <label>
@@ -604,12 +621,13 @@ function Page() {
               onChange={(e) => setPrivyToken(e.target.value)}
               placeholder="eyJ… (server-verified)"
               autoComplete="off"
+              disabled={!sessionMintReady}
             />
           </label>
           <button
             type="button"
             className="wallet-pill"
-            disabled={sessionBusy || !privyToken.trim()}
+            disabled={sessionBusy || !privyToken.trim() || !sessionMintReady}
             onClick={async () => {
               setSessionBusy(true);
               setSessionMsg("");
@@ -622,7 +640,7 @@ function Page() {
                     `Session bound for ${res.data.session.userId.slice(0, 16)}… — httpOnly cookie set.`,
                   );
                   setPrivyToken("");
-                  await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+                  await invalidateSessionScopedBundles();
                   await refetch();
                 } else {
                   setSessionMsg(
@@ -634,7 +652,11 @@ function Page() {
               }
             }}
           >
-            {sessionBusy ? "Verifying…" : "Mint httpOnly session"}
+            {sessionBusy
+              ? "Verifying…"
+              : sessionMintReady
+                ? "Mint httpOnly session"
+                : "Mint blocked · keys missing"}
           </button>
         </div>
         {sessionMsg ? <p className="mt-3 text-sm">{sessionMsg}</p> : null}
@@ -686,7 +708,7 @@ function Page() {
                     ? res.data.note
                     : "Failed to clear session",
                 );
-                await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+                await invalidateSessionScopedBundles();
                 await refetch();
               } finally {
                 setSessionBusy(false);
@@ -747,8 +769,7 @@ function Page() {
                 if (res.ok) {
                   setWatchMsg(res.data.note);
                   setWatchWalletInput("");
-                  await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
-                  await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
+                  await invalidateSessionScopedBundles();
                   await refetch();
                 } else {
                   setWatchMsg(`${res.reason}${res.detail ? ` — ${res.detail}` : ""}`);
@@ -770,8 +791,7 @@ function Page() {
               try {
                 const res = await clearWatch();
                 setWatchMsg(res.ok ? res.data.note : "Failed to clear watch wallet");
-                await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
-                await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
+                await invalidateSessionScopedBundles();
                 await refetch();
               } finally {
                 setWatchBusy(false);

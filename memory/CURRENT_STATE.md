@@ -469,3 +469,8 @@ Empty / needed later: Privy, Supabase, Bitquery, Jupiter (if gated). `FOLIO_SESS
 ## 2026-09-16 — Stocklana 605/84 + Broadcast Paused consistency
 - Live jina scrape: **605** registered · **84** submissions · **$121k** · SEP 25.
 - Docs + desk UI: Broadcast **Paused** (policy), not “off/disabled/unavailable”. Step 0 lab approve marked done. Goal open for Empire keys.
+
+## 2026-09-16 — Multi-tenant cache parity on session mint
+- Settings mint/clear/tenant/watch invalidate session + positions + credit + empire-readiness so wallet qty lights without stale paper cache.
+- Mint button gated until Privy+Supabase+FOLIO_SESSION_SECRET present. Netro positions/credit refetchOnMount always.
+- Empire keys still empty — goal open.

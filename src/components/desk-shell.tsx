@@ -168,6 +168,7 @@ export function DeskShell({
       showNetroCanvas && !inspectSearch ? creditSeed : undefined,
     initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,
+    refetchOnMount: "always",
   });
   const positions = useQuery({
     queryKey: ["positions-bundle", "netro-surface", inspectSearch ?? ""],
@@ -178,6 +179,7 @@ export function DeskShell({
       showNetroCanvas && !inspectSearch ? positionsSeed : undefined,
     initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
+    refetchOnMount: "always",
   });
   const session = useQuery({
     queryKey: ["empire-readiness", "netro-keys"],

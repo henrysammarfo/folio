@@ -498,3 +498,5 @@
 
 ## 2026-09-16 — Stocklana honesty pack 605/84
 - Refreshed submission/Henry/demo docs to live 605/84; Broadcast Paused label consistency across desk. Empire keys still need Henry paste. Goal open.
+## 2026-09-16 — Multi-tenant cache parity
+- Session mint/clear/tenant switch now invalidates positions/credit caches; mint gated on keys. Goal open for Empire paste.
