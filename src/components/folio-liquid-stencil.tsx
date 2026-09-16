@@ -116,11 +116,11 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
               FOLIO
             </text>
           </mask>
-          {/* Ledger-ice core (FOLIO tokens) — must punch like Aionis gold */}
+          {/* Ledger-ice core — hot white punch like Aionis gold mass */}
           <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#f4f8fc" ref={stop1Ref} stopOpacity="1" />
-            <stop offset="45%" stopColor="#c5daf0" ref={stop2Ref} stopOpacity="0.98" />
-            <stop offset="100%" stopColor="#7a9ec0" stopOpacity="0" />
+            <stop offset="0%" stopColor="#ffffff" ref={stop1Ref} stopOpacity="1" />
+            <stop offset="40%" stopColor="#e8f2fa" ref={stop2Ref} stopOpacity="1" />
+            <stop offset="100%" stopColor="#9bbcda" stopOpacity="0" />
           </radialGradient>
           <filter id={blurId} x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur ref={blurFilterRef} stdDeviation="60" />
@@ -128,13 +128,13 @@ export function FolioLiquidStencil({ className, compact = false }: Props) {
         </defs>
         <g mask={`url(#${maskId})`}>
           <rect width="1400" height={viewH} fill="#000000" />
-          {/* Soft readable floor — bright enough that unlit glyphs still register */}
-          <rect width="1400" height={viewH} fill="#1a2838" opacity="0.85" />
+          {/* Dim silver floor so unlit glyphs still read (Aionis gold does this for free) */}
+          <rect width="1400" height={viewH} fill="#6a7f96" opacity="0.55" />
           <circle
             ref={circleRef}
             cx="380"
             cy={glowCy}
-            r="280"
+            r="300"
             fill={`url(#${gradId})`}
             filter={`url(#${blurId})`}
           />

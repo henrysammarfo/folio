@@ -348,22 +348,23 @@ const BASE: UniformPack = {
 const VARIANTS: Record<ShaderLabVariant, UniformPack> = {
   "ink-ledger": {
     ...BASE,
-    // glacial ink → steel — brightness raised so lab swatches read (not crushed grey)
+    // glacial ink → steel — NO purple hue swing (FOLIO tokens, not AI-slop glow)
     colors: [
       [0.04, 0.07, 0.12],
-      [0.78, 0.88, 0.96],
-      [0.32, 0.48, 0.62],
-      [0.1, 0.16, 0.24],
-      [0.1, 0.16, 0.24],
-      [0.1, 0.16, 0.24],
-      [0.1, 0.16, 0.24],
-      [0.1, 0.16, 0.24],
+      [0.82, 0.9, 0.96],
+      [0.35, 0.5, 0.62],
+      [0.12, 0.2, 0.28],
+      [0.12, 0.2, 0.28],
+      [0.12, 0.2, 0.28],
+      [0.12, 0.2, 0.28],
+      [0.12, 0.2, 0.28],
     ],
-    hue: 3.9,
-    brightness: -0.08,
-    vignette: 0.35,
-    grain: 0.16,
-    contrast: 1.05,
+    hue: 0,
+    brightness: -0.05,
+    vignette: 0.32,
+    grain: 0.14,
+    contrast: 1.08,
+    saturation: 0.7,
   },
   "ledger-mist": {
     ...BASE,
@@ -378,33 +379,33 @@ const VARIANTS: Record<ShaderLabVariant, UniformPack> = {
       [0.08, 0.1, 0.14],
       [0.08, 0.1, 0.14],
     ],
-    hue: 2.4,
-    brightness: 0.02,
-    saturation: 0.8,
-    vignette: 0.28,
-    grain: 0.12,
-    contrast: 1.02,
+    hue: 0,
+    brightness: 0.04,
+    saturation: 0.65,
+    vignette: 0.25,
+    grain: 0.1,
+    contrast: 1.05,
   },
   "aurora-grid": {
     ...BASE,
     colors: [
       [0.06, 0.12, 0.16],
-      [0.5, 0.78, 0.74],
-      [0.22, 0.5, 0.54],
+      [0.45, 0.72, 0.7],
+      [0.2, 0.45, 0.5],
       [0.1, 0.2, 0.26],
       [0.1, 0.2, 0.26],
       [0.1, 0.2, 0.26],
       [0.1, 0.2, 0.26],
       [0.1, 0.2, 0.26],
     ],
-    hue: 1.8,
+    hue: 0,
     drift: 0.42,
-    intensity: 0.58,
-    brightness: -0.05,
-    vignette: 0.3,
+    intensity: 0.55,
+    brightness: -0.02,
+    vignette: 0.28,
     grain: 0.1,
-    saturation: 0.9,
-    contrast: 1.08,
+    saturation: 0.75,
+    contrast: 1.06,
   },
 }
 
@@ -426,9 +427,13 @@ export function ShaderBackground({
     const pendingRelease = pendingContextReleases.get(canvas)
     if (pendingRelease !== undefined) window.clearTimeout(pendingRelease)
     pendingContextReleases.delete(canvas)
-    const gl = canvas.getContext("webgl", { antialias: false })
+    const gl = canvas.getContext("webgl", {
+      antialias: false,
+      preserveDrawingBuffer: true,
+      alpha: false,
+    })
     if (!gl) return
-
+    // Fail closed if the program never linked — leave a visible ink wash, not a dead grey hole.
     const compile = (type: number, src: string) => {
       const s = gl.createShader(type)!
       gl.shaderSource(s, src)
@@ -441,6 +446,14 @@ export function ShaderBackground({
     gl.attachShader(program, vertexShader)
     gl.attachShader(program, fragmentShader)
     gl.linkProgram(program)
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.deleteShader(vertexShader)
+      gl.deleteShader(fragmentShader)
+      gl.deleteProgram(program)
+      canvas.style.background =
+        "radial-gradient(ellipse at 30% 40%, #9eb8d0 0%, #1a2838 45%, #05070a 100%)"
+      return
+    }
     gl.deleteShader(vertexShader)
     gl.deleteShader(fragmentShader)
     gl.useProgram(program)
