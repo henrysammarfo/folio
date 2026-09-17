@@ -341,3 +341,9 @@ EOF
 | Claim | Verdict | Evidence | As of |
 |---|---|---|---|
 | GG Tokenkeg/TokenzQd/AAPLx mint on PR #6 vs main | FALSE POSITIVE | Public Solana program ids + historical mint fixture; tip split/low-entropy; Henry Skip required (no Lovable rewrite) | 2026-09-17 |
+
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Duplicate desk.positions.$symbol caused Vercel build fail on ship-main | CONFIRMED | Build log: conflicting fullPath with desk.positions_.$symbol | 2026-09-17 |
+| ≤6-char joinId chunks assemble correct Token/Token-2022 program ids | CONFIRMED | tsx equality check + vitest wallet tests | 2026-09-17 |

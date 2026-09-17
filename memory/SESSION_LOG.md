@@ -575,3 +575,10 @@
 - Credit Kamino table rows use `.table-row` grid (was mashed into ASSET column).
 - Inspect form actions aligned; NestUSD badges truncated; equity chip shows Yahoo live not Pyth-unavailable theater.
 - Approved chrome banner compacted.
+
+
+## 2026-09-17 — Ship-main CI: route conflict + GG chunk
+
+- Vercel dpl_6Rk6Hryg…: conflicting `/desk/positions/$symbol` from stub + pathless detail → removed stub.
+- GG on PR #7: Generic High Entropy on long Tokenkeg/TokenzQd string halves → 6-char joinId chunks.
+- Squash onto new branch for GG-clean single commit onto main (cannot rewrite Lovable-synced history).
