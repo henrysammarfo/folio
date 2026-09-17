@@ -193,35 +193,37 @@ function Page() {
               spellCheck={false}
             />
           </label>
-          <button
-            type="button"
-            className="wallet-pill"
-            disabled={!inspectInput.trim()}
-            onClick={() => {
-              const next = inspectInput.trim();
-              void navigate({
-                search: (prev) => ({ ...prev, inspect: next || undefined }),
-              });
-            }}
-          >
-            Inspect
-          </button>
-          <button
-            type="button"
-            className="wallet-pill"
-            disabled={!inspect}
-            onClick={() => {
-              setInspectInput("");
-              void navigate({
-                search: (prev) => {
-                  const { inspect: _drop, ...rest } = prev as { inspect?: string };
-                  return rest;
-                },
-              });
-            }}
-          >
-            Clear inspect
-          </button>
+          <div className="form-actions">
+            <button
+              type="button"
+              className="wallet-pill"
+              disabled={!inspectInput.trim()}
+              onClick={() => {
+                const next = inspectInput.trim();
+                void navigate({
+                  search: (prev) => ({ ...prev, inspect: next || undefined }),
+                });
+              }}
+            >
+              Inspect
+            </button>
+            <button
+              type="button"
+              className="wallet-pill"
+              disabled={!inspect}
+              onClick={() => {
+                setInspectInput("");
+                void navigate({
+                  search: (prev) => {
+                    const { inspect: _drop, ...rest } = prev as { inspect?: string };
+                    return rest;
+                  },
+                });
+              }}
+            >
+              Clear inspect
+            </button>
+          </div>
         </div>
         <p className="mt-3 text-sm opacity-70">
           Same <code>?inspect=</code> flows on{" "}

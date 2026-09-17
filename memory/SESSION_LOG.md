@@ -567,3 +567,11 @@
 - Preview READY: folio-git-cursor-folio-bootstrap-demo-sess-78e877-teamtitanlink.vercel.app
 - Truth: live AAPLx 1.003269× · Yahoo diverge · Pyth off ship path.
 - Settings Bootstrap → folio-demo owner active (Playwright + serverFn).
+
+
+## 2026-09-17 — Desk UI sync / layout repair
+
+- Overview no longer hides desk sidebar/topbar (Netro was a separate chrome island).
+- Credit Kamino table rows use `.table-row` grid (was mashed into ASSET column).
+- Inspect form actions aligned; NestUSD badges truncated; equity chip shows Yahoo live not Pyth-unavailable theater.
+- Approved chrome banner compacted.

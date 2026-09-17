@@ -280,26 +280,10 @@ export function DeskShell({
         </div>
       ) : null}
       {productionChrome ? (
-        <div className="lab-approved-banner" role="status">
+        <div className="lab-approved-banner lab-approved-banner-compact" role="status">
           <span>
-            Production lab chrome (Henry-approved)
-            {approvedUi ? (
-              <>
-                {" "}
-                · UI <code>{approvedUi}</code>
-              </>
-            ) : null}
-            {approvedShader ? (
-              <>
-                {" "}
-                · shader <code>{approvedShader}</code>
-              </>
-            ) : null}
-            . Via <code>FOLIO_APPROVED_LAB_*</code>.
+            Desk chrome · <code>{approvedUi ?? approvedShader}</code>
           </span>
-          <Link to="/lab/ui" className="underline">
-            Lab UI
-          </Link>
         </div>
       ) : null}
       <aside className="desk-sidebar">

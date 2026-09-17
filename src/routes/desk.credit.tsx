@@ -13,6 +13,12 @@ const creditSearchSchema = z.object({
   inspect: z.string().max(64).optional().catch(undefined),
 });
 
+function truncateBadge(text: string, max = 64): string {
+  const t = text.trim();
+  if (t.length <= max) return t;
+  return `${t.slice(0, max - 1)}…`;
+}
+
 export const Route = createFileRoute("/desk/credit")({
   head: () => ({
     meta: [
@@ -105,35 +111,37 @@ function Page() {
               spellCheck={false}
             />
           </label>
-          <button
-            type="button"
-            className="wallet-pill"
-            disabled={!inspectInput.trim()}
-            onClick={() => {
-              const next = inspectInput.trim();
-              void navigate({
-                search: (prev) => ({ ...prev, inspect: next || undefined }),
-              });
-            }}
-          >
-            Inspect
-          </button>
-          <button
-            type="button"
-            className="wallet-pill"
-            disabled={!inspect}
-            onClick={() => {
-              setInspectInput("");
-              void navigate({
-                search: (prev) => {
-                  const { inspect: _drop, ...rest } = prev as { inspect?: string };
-                  return rest;
-                },
-              });
-            }}
-          >
-            Clear inspect
-          </button>
+          <div className="form-actions">
+            <button
+              type="button"
+              className="wallet-pill"
+              disabled={!inspectInput.trim()}
+              onClick={() => {
+                const next = inspectInput.trim();
+                void navigate({
+                  search: (prev) => ({ ...prev, inspect: next || undefined }),
+                });
+              }}
+            >
+              Inspect
+            </button>
+            <button
+              type="button"
+              className="wallet-pill"
+              disabled={!inspect}
+              onClick={() => {
+                setInspectInput("");
+                void navigate({
+                  search: (prev) => {
+                    const { inspect: _drop, ...rest } = prev as { inspect?: string };
+                    return rest;
+                  },
+                });
+              }}
+            >
+              Clear inspect
+            </button>
+          </div>
         </div>
       </Panel>
 
@@ -206,7 +214,7 @@ function Page() {
               <span>Nest.credit vaults</span>
               <StatusBadge tone={data?.nestCredit.ok ? "green" : "amber"}>
                 {data?.nestCredit.ok
-                  ? `${data.nestCredit.data.vaultCount} vaults · $${Math.round(data.nestCredit.data.totalTvlUsd).toLocaleString()} TVL · ${data.nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
+                  ? `${data.nestCredit.data.vaultCount} vaults · not NestUSD borrow`
                   : data && !data.nestCredit.ok
                     ? (data.nestCredit.detail ?? data.nestCredit.reason)
                     : "…"}
@@ -214,11 +222,19 @@ function Page() {
             </p>
             <p>
               <span>NestUSD</span>
-              <StatusBadge tone="amber">
+              <StatusBadge
+                tone="amber"
+                {...(data && !data.nestusd.ok
+                  ? {
+                      title:
+                        data.nestusd.detail ?? data.nestusd.reason ?? "unavailable",
+                    }
+                  : {})}
+              >
                 {data?.nestusd.ok
                   ? "Probed · risk-labeled"
                   : data && !data.nestusd.ok
-                    ? (data.nestusd.detail ?? data.nestusd.reason)
+                    ? truncateBadge(data.nestusd.detail ?? data.nestusd.reason)
                     : "Risk / unverified"}
               </StatusBadge>
             </p>
@@ -239,7 +255,7 @@ function Page() {
           </StatusBadge>
         }
       >
-        <div className="data-table">
+        <div className="data-table" data-cols="5">
           <div className="table-head">
             <span>Asset</span>
             <span>Max LTV</span>
@@ -248,7 +264,7 @@ function Page() {
             <span>Borrow</span>
           </div>
           {reserves.slice(0, 12).map((r) => (
-            <div key={r.mint}>
+            <div key={r.mint} className="table-row">
               <span>
                 <b>{r.symbol}</b>
               </span>

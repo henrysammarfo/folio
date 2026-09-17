@@ -78,11 +78,31 @@ export function buildNetroLiveGateLabels(input: {
   const quote = findMode(input.rows, "Jupiter swap quote");
   const nestUsd = findMode(input.rows, "NestUSD");
   const pyth = findMode(input.rows, "Pyth Hermes");
+  const equityRef = findMode(input.rows, "Equity reference");
+  const equityRow = input.rows.find((r) =>
+    r.capability.startsWith("Equity reference"),
+  );
   const scaledUi = findMode(input.rows, "On-chain Scaled UI");
   const kamino = findMode(input.rows, "Kamino");
   const multiTenant = findMode(input.rows, "Multi-tenant");
   const raydium = findMode(input.rows, "Raydium");
   const nestCredit = findMode(input.rows, "Nest.credit");
+
+  /** Prefer live free diverge label over Pyth-unavailable theater. */
+  let pythLabel = modeLabel(pyth, "Off ship path");
+  if (equityRef === "mainnet-read" && equityRow?.detail) {
+    const provider =
+      /yahoo/i.test(equityRow.detail)
+        ? "Yahoo"
+        : /finnhub/i.test(equityRow.detail)
+          ? "Finnhub"
+          : /coingecko/i.test(equityRow.detail)
+            ? "CoinGecko"
+            : "Live ref";
+    pythLabel = `${provider} live`;
+  } else if (pyth === "unavailable" || !pyth) {
+    pythLabel = "Off ship path";
+  }
 
   const ltv =
     typeof input.kaminoMaxLtv === "number" && Number.isFinite(input.kaminoMaxLtv)
@@ -123,7 +143,7 @@ export function buildNetroLiveGateLabels(input: {
         : modeLabel(quote, "≤$1 inspect"),
     broadcast: input.broadcastPaused ? "Paused" : "Armed",
     nestUsd: modeLabel(nestUsd, "Unavailable"),
-    pyth: modeLabel(pyth, "Unavailable"),
+    pyth: pythLabel,
     scaledUi: modeLabel(scaledUi, "Unavailable"),
     kamino: modeLabel(kamino, "Unavailable"),
     multiTenant: modeLabel(multiTenant, "Unavailable"),
@@ -141,7 +161,7 @@ export const NETRO_LIVE_GATE_DEFAULTS: NetroLiveGateLabels = {
   quote: "≤$1 inspect",
   broadcast: "Paused",
   nestUsd: "Unavailable",
-  pyth: "Unavailable",
+  pyth: "Off ship path",
   scaledUi: "Unavailable",
   kamino: "Unavailable",
   multiTenant: "Unavailable",

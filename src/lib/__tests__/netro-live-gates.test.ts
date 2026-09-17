@@ -69,7 +69,7 @@ describe("buildNetroLiveGateLabels", () => {
     expect(labels.quote).toBe("≤$1 inspect");
     expect(labels.broadcast).toBe("Paused");
     expect(labels.nestUsd).toBe("Unavailable");
-    expect(labels.pyth).toBe("Unavailable");
+    expect(labels.pyth).toBe("Off ship path");
     expect(labels.scaledUi).toBe("Mainnet-read");
     expect(labels.kamino).toBe("Mainnet-read");
     expect(labels.multiTenant).toBe("Unavailable");
@@ -113,5 +113,24 @@ describe("buildNetroLiveGateLabels", () => {
     });
     expect(labels.wash).toBe("Live");
     expect(labels.broadcast).toBe("Armed");
+  });
+
+  it("prefers live Yahoo equity ref over Pyth-unavailable theater", () => {
+    const labels = buildNetroLiveGateLabels({
+      rows: [
+        {
+          capability: "Pyth Hermes (optional bounty)",
+          mode: "unavailable",
+          detail: "pyth_not_on_ship_path",
+        },
+        {
+          capability: "Equity reference (diverge)",
+          mode: "mainnet-read",
+          detail: "query1.finance.yahoo.com · YAHOO:AAPL · yahoo-chart",
+        },
+      ],
+      broadcastPaused: true,
+    });
+    expect(labels.pyth).toBe("Yahoo live");
   });
 });

@@ -44,14 +44,6 @@ const SHARE_TICKER = [
   "SPYx",
 ] as const;
 
-const NETRO_NAV = [
-  { label: "Truth", to: "/desk" as const, on: true },
-  { label: "Acquire", to: "/desk/acquire" as const, on: false },
-  { label: "Positions", to: "/desk/positions" as const, on: false },
-  { label: "Credit", to: "/desk/credit" as const, on: false },
-  { label: "Network", to: "/network" as const, on: false },
-] as const;
-
 /** Stagger ≈ NetroBNB framer staggerChildren 0.06s */
 function delay(i: number): CSSProperties {
   return { ["--netro-delay" as string]: `${0.05 + i * 0.06}s` };
@@ -194,27 +186,13 @@ export function NetroDensityCanvas({
 
   return (
     <div className="netro-density" data-testid="netro-density-surface">
-      {/* Header strip — NetroBNB/components/Header.tsx geometry */}
-      <div className="netro-density-chrome netro-density-item" style={delay(0)}>
-        <Link to="/" className="netro-density-brand">
-          <span className="netro-density-mark">F</span>
-          <b>FOLIO</b>
-        </Link>
-        <nav className="netro-density-nav" aria-label="Share truth desk">
-          {NETRO_NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={item.on ? "netro-nav-on" : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+      {/* Compact title only — desk sidebar owns primary nav (no duplicate Truth/Network chrome) */}
+      <header className="netro-density-title netro-density-item" style={delay(0)}>
+        <div>
+          <h3>Share truth desk</h3>
+          <span>Mainnet-read · quote-only · broadcast paused</span>
+        </div>
         <div className="netro-density-chrome-actions">
-          <Link to="/truth" className="netro-density-new">
-            + Truth pass
-          </Link>
           <Link
             to="/desk/settings"
             hash="empire-readiness"
@@ -225,15 +203,10 @@ export function NetroDensityCanvas({
               : "Connect"}
           </Link>
         </div>
-      </div>
-
-      <header className="netro-density-title netro-density-item" style={delay(1)}>
-        <h3>Share truth desk</h3>
-        <span>Mainnet-read · quote-only · broadcast paused</span>
       </header>
 
       {/* Share ticker — NetroBNB CryptoTickerCard geometry, FOLIO xStocks */}
-      <div className="netro-density-ticker netro-density-item" style={delay(2)}>
+      <div className="netro-density-ticker netro-density-item" style={delay(1)}>
         <div className="netro-density-ticker-fade netro-density-ticker-fade-l" />
         <div className="netro-density-ticker-fade netro-density-ticker-fade-r" />
         <div className="netro-density-ticker-track">
@@ -458,7 +431,7 @@ export function NetroDensityCanvas({
                 </div>
                 <div className="netro-density-gate-strip" data-testid="netro-empire-strip">
                   <span>
-                    Pyth <b>{gates.pyth}</b>
+                    Equity ref <b>{gates.pyth}</b>
                   </span>
                   <span>
                     Scaled UI <b>{gates.scaledUi}</b>
@@ -576,7 +549,7 @@ export function NetroDensityCanvas({
               <div className="netro-density-chart-foot">
                 <span data-testid="netro-scaled-ui-strip">{scaledUiStripLabel}</span>
                 <span>Wash · {gates.wash}</span>
-                <span>Pyth diverge · {gates.pyth}</span>
+                <span>Equity diverge · {gates.pyth}</span>
                 <span>Broadcast · {gates.broadcast}</span>
               </div>
             </div>
