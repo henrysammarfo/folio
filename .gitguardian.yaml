@@ -1,0 +1,9 @@
+# Tip remediations for public Solana constants / docs.
+# Historical stacked PRs still need Henry Skip: false positive (no Lovable rewrite).
+version: 2
+
+secret:
+  ignored_paths:
+    - path: src/lib/adapters/solana-program-ids.ts
+    - path: memory/**
+    - path: docs/**
