@@ -21,6 +21,18 @@ export function Wordmark({ to = "/", inverse = false }: { to?: string; inverse?:
 
 export type StatusTone = "green" | "amber" | "blue" | "neutral";
 
-export function StatusBadge({ children, tone = "neutral" }: { children: React.ReactNode; tone?: StatusTone }) {
-  return <span className={`status-badge status-${tone}`}>{children}</span>;
+export function StatusBadge({
+  children,
+  tone = "neutral",
+  title,
+}: {
+  children: React.ReactNode;
+  tone?: StatusTone;
+  title?: string;
+}) {
+  return (
+    <span className={`status-badge status-${tone}`} title={title}>
+      {children}
+    </span>
+  );
 }
