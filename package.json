@@ -1,5 +1,5 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "folio",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -9,13 +9,23 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium",
+    "replay": "npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build",
+    "smoke": "npx tsx scripts/smoke-empire.mts",
+    "smoke:keys": "npx tsx scripts/smoke-keys.mts",
+    "smoke:goal": "npx tsx --env-file=.env scripts/smoke-goal.mts",
+    "keys": "npx tsx scripts/keys-readiness.mts"
   },
   "overrides": {
     "rolldown": "1.2.1"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@privy-io/react-auth": "^3.43.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -70,7 +80,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
-    "@lovable.dev/vite-tanstack-config": "^2.20.0",
+    "@playwright/test": "^1.55.0",
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
@@ -85,6 +95,7 @@
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "8.1.5"
+    "vite": "8.1.5",
+    "vitest": "^3.2.4"
   }
 }

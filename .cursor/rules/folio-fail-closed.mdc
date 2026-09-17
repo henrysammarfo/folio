@@ -1,0 +1,22 @@
+---
+description: FOLIO fail-closed integrations — no mocks or silent fallbacks
+globs: src/lib/**/*.ts,src/routes/**/*.tsx,src/hooks/**/*.ts*
+alwaysApply: false
+---
+
+# Fail-closed integrations
+
+```ts
+// BAD — silent fake
+catch { return { multiplier: 4, price: 234.01 }; }
+
+// GOOD — labeled failure
+catch (e) {
+  return { ok: false as const, mode: "unavailable", reason: "xstocks_multiplier_fetch_failed", detail: String(e) };
+}
+```
+
+- Every adapter returns `{ ok, mode, ... }` where mode ∈ `mainnet-read | quote-only | fork | paper | unavailable`.
+- UI must show mode badges; never imply a broadcast fill from a quote.
+- Yahoo/underlying prices ≠ xStock economic truth — use xStocks API + Pyth for desk truth.
+- If Bitquery key missing, wash gate blocks size (fail-closed), does not invent "green".

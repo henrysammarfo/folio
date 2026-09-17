@@ -7,7 +7,20 @@ const nav = [
   ["Network", "/network"], ["About", "/about"],
 ] as const;
 
-export function PublicShell({ eyebrow, title, intro, children }: { eyebrow: string; title: string; intro: string; children: React.ReactNode }) {
+export function PublicShell({
+  eyebrow,
+  title,
+  intro,
+  children,
+  compactIntro = false,
+}: {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  children: React.ReactNode;
+  /** Lab pages: thin strip so visual stages aren't buried under a marketing hero */
+  compactIntro?: boolean;
+}) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="site-header">
@@ -18,7 +31,7 @@ export function PublicShell({ eyebrow, title, intro, children }: { eyebrow: stri
         <Link to="/desk" className="header-action">Open desk <ArrowUpRight /></Link>
       </header>
       <main>
-        <section className="page-intro">
+        <section className={compactIntro ? "page-intro page-intro-compact" : "page-intro"}>
           <p className="eyebrow-dark">{eyebrow}</p>
           <h1>{title}</h1>
           <p>{intro}</p>
