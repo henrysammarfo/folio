@@ -1,0 +1,13 @@
+# Public Solana addresses / test fixtures — not credentials.
+# Historical PR commits may still flag until Henry Skip: false positive
+# (Lovable forbids history rewrite). Tip literals are split/low-entropy.
+version: 2
+
+secret:
+  ignored_matches:
+    - name: Solana SPL Token program (public)
+      match: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+    - name: Solana Token-2022 program (public)
+      match: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb
+    - name: Historical AAPLx mint fixture (remediated at tip)
+      match: XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp

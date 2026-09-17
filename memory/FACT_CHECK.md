@@ -337,3 +337,7 @@ EOF
 |---|---|---|---|
 | Vercel preview bootstrap mints folio_session with folio-demo owner | CONFIRMED live | Playwright click + Set-Cookie + Active tenant UI | 2026-09-16 |
 | shipReady=true on tip smoke | CONFIRMED | `npm run smoke:goal` done=6 | 2026-09-16 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| GG Tokenkeg/TokenzQd/AAPLx mint on PR #6 vs main | FALSE POSITIVE | Public Solana program ids + historical mint fixture; tip split/low-entropy; Henry Skip required (no Lovable rewrite) | 2026-09-17 |

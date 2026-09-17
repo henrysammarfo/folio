@@ -5,12 +5,13 @@ import {
   prefsWriteBlockedReason,
 } from "../auth/role-gates";
 import type { FolioSession, TenantMembership } from "../auth/session";
+import { TOKEN_PROGRAM_ID } from "../adapters/solana-program-ids";
 
 const OWNER: TenantMembership = {
   tenantId: "11111111-1111-1111-1111-111111111111",
   userId: "did:privy:alice",
   role: "owner",
-  walletAddress: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  walletAddress: TOKEN_PROGRAM_ID,
   slug: "alpha",
   displayName: "Alpha Desk",
 };

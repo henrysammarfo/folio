@@ -3,6 +3,7 @@ import {
   mintWatchWalletCookie,
   verifyWatchWalletCookieValue,
 } from "../auth/watch-wallet";
+import { TOKEN_PROGRAM_ID } from "../adapters/solana-program-ids";
 
 const PREV = process.env["FOLIO_SESSION_SECRET"];
 
@@ -14,15 +15,13 @@ afterEach(() => {
 describe("watch-wallet cookie", () => {
   it("fail-closes without FOLIO_SESSION_SECRET", () => {
     delete process.env["FOLIO_SESSION_SECRET"];
-    const minted = mintWatchWalletCookie(
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-    );
+    const minted = mintWatchWalletCookie(TOKEN_PROGRAM_ID);
     expect(minted.ok).toBe(false);
   });
 
   it("mints and verifies a signed watch-wallet cookie", () => {
     process.env["FOLIO_SESSION_SECRET"] = "test-secret-at-least-16ch";
-    const wallet = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+    const wallet = TOKEN_PROGRAM_ID;
     const minted = mintWatchWalletCookie(wallet);
     expect(minted.ok).toBe(true);
     if (!minted.ok) return;
@@ -34,9 +33,7 @@ describe("watch-wallet cookie", () => {
 
   it("rejects tampered cookies", () => {
     process.env["FOLIO_SESSION_SECRET"] = "test-secret-at-least-16ch";
-    const minted = mintWatchWalletCookie(
-      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-    );
+    const minted = mintWatchWalletCookie(TOKEN_PROGRAM_ID);
     expect(minted.ok).toBe(true);
     if (!minted.ok) return;
     const [payload, sig] = minted.data.cookieValue.split(".");

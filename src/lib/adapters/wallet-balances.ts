@@ -1,9 +1,11 @@
 import { resolveSolanaRpcUrl } from "./solana-rpc";
 import { errResult, okResult, type AdapterResult } from "./types";
+import {
+  TOKEN_2022_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+} from "./solana-program-ids";
 
-/** SPL Token + Token-2022 program ids (Solana mainnet). */
-export const TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-export const TOKEN_2022_PROGRAM_ID = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
+export { TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from "./solana-program-ids";
 
 export type WalletTokenBalance = {
   mint: string;

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { resolveWalletBinding } from "../wallet-binding";
+import { TOKEN_PROGRAM_ID } from "../adapters/solana-program-ids";
 
-const MEMBERSHIP = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+const MEMBERSHIP = TOKEN_PROGRAM_ID;
 const SESSION = "11111111111111111111111111111111";
 const WATCH = "SysvarRent111111111111111111111111111111111";
 const INSPECT = "So11111111111111111111111111111111111111112";

@@ -3,12 +3,11 @@ import {
   isLikelySolanaPubkey,
   mergeTokenAccountRows,
 } from "../adapters/wallet-balances";
+import { TOKEN_PROGRAM_ID } from "../adapters/solana-program-ids";
 
 describe("wallet balance helpers", () => {
   it("accepts likely base58 pubkeys and rejects junk", () => {
-    expect(
-      isLikelySolanaPubkey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
-    ).toBe(true);
+    expect(isLikelySolanaPubkey(TOKEN_PROGRAM_ID)).toBe(true);
     expect(isLikelySolanaPubkey("not-a-key")).toBe(false);
     expect(isLikelySolanaPubkey("")).toBe(false);
   });
