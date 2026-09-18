@@ -505,3 +505,9 @@ JWT ✅ · SQL ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; **Pyth
 ## 2026-09-18 — Consumer UX (post-prod feedback)
 - Desk is buy/hold/borrow first. Operator jargon / Empire keys / honesty theater live in Settings only.
 - Start truth → `/desk/positions/AAPLx`. Sidebar foot = Profile.
+
+
+## 2026-09-18 — Consumer pages (overview unfinished + rest)
+- Overview Netro finished: Trade AAPLx · Share count · Buy path · single Connect · soft agent.
+- Positions / AAPLx / Credit / Activity / Buy / Settings chrome / fallback overview: consumer language; paper→est.; Empire/fail-closed theater off consumer surfaces (Settings keeps keys).
+- Branch: `cursor/folio-consumer-pages-f1ec`.

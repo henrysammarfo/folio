@@ -6,14 +6,24 @@ import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
 import { getActivityBundle } from "@/lib/desk.functions";
 
+function modeLabel(mode: string): string {
+  if (mode === "mainnet-read") return "Live";
+  if (mode === "quote-only") return "Quote";
+  if (mode === "paper") return "Saved";
+  if (mode === "unavailable") return "Pending";
+  return mode;
+}
+
 export const Route = createFileRoute("/desk/activity")({
   head: () => ({
     meta: [
       { title: "Activity — FOLIO" },
-      { name: "description", content: "Live-derived desk events — not a fabricated ledger." },
+      {
+        name: "description",
+        content: "Live desk events from market feeds.",
+      },
     ],
   }),
-  /** Prefetch so event stream honesty paints on first load (not empty flash). */
   loader: async () => getActivityBundle(),
   component: Page,
 });
@@ -30,23 +40,26 @@ function Page() {
   });
 
   return (
-    <DeskShell eyebrow="Immutable context" title="Activity">
+    <DeskShell eyebrow="Updates" title="Activity">
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="quote-only">Recent</ModeBadge>
-        <ModeBadge mode="quote-only">Orders</ModeBadge>
         <ModeBadge
           mode={data?.prefsFromSession ? "paper" : "unavailable"}
         >
           {data?.prefsFromSession
             ? data.corporateActionAlerts
-              ? "CA alerts · on (pref)"
-              : "CA alerts · off (pref)"
+              ? "Alerts on"
+              : "Alerts off"
             : "Alerts"}
         </ModeBadge>
       </div>
       <Panel
         title="Event stream"
-        meta={<StatusBadge tone="neutral">{isFetching ? "Refreshing…" : "UTC · live"}</StatusBadge>}
+        meta={
+          <StatusBadge tone="neutral">
+            {isFetching ? "Refreshing…" : "Live"}
+          </StatusBadge>
+        }
       >
         <p className="mb-3 text-sm opacity-80">{data?.note}</p>
         <div className="event-list">
@@ -58,9 +71,17 @@ function Page() {
                 <small>{e.detail}</small>
               </span>
               <StatusBadge
-                tone={e.tone === "green" ? "green" : e.tone === "blue" ? "blue" : e.tone === "amber" ? "amber" : "neutral"}
+                tone={
+                  e.tone === "green"
+                    ? "green"
+                    : e.tone === "blue"
+                      ? "blue"
+                      : e.tone === "amber"
+                        ? "amber"
+                        : "neutral"
+                }
               >
-                {e.mode}
+                {modeLabel(e.mode)}
               </StatusBadge>
             </div>
           ))}

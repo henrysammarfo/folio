@@ -161,11 +161,11 @@ function Page() {
   );
 
   return (
-    <DeskShell eyebrow="Server preferences" title="Settings">
+    <DeskShell eyebrow="Account" title="Settings">
       <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Mainnet read</ModeBadge>
+        <ModeBadge mode="mainnet-read">Live markets</ModeBadge>
         <ModeBadge mode={data?.networkPolicy.broadcast ? "mainnet-read" : "unavailable"}>
-          {data?.networkPolicy.broadcast ? "Broadcast armed" : "Broadcast paused"}
+          {data?.networkPolicy.broadcast ? "Trading armed" : "Trading paused"}
         </ModeBadge>
         <ModeBadge
           mode={
@@ -177,27 +177,27 @@ function Page() {
           }
         >
           {data?.auth.ok && data.auth.data.sessionReady
-            ? "Session ready"
+            ? "Signed in"
             : data?.auth.ok
-              ? "Auth keys · no session"
-              : "Auth fail-closed"}
+              ? "Keys ready · sign in"
+              : "Sign in required"}
         </ModeBadge>
         <ModeBadge mode={data?.sessionSecretPresent ? "mainnet-read" : "unavailable"}>
           {data?.sessionSecretPresent
-            ? "Watch-wallet secret set"
-            : "Watch-wallet secret missing"}
+            ? "Wallet binding ready"
+            : "Wallet binding unavailable"}
         </ModeBadge>
-        <ModeBadge mode="paper">Paper agent</ModeBadge>
+        <ModeBadge mode="paper">Desk agent</ModeBadge>
       </div>
 
       <div className="settings-layout">
         <nav className="settings-rail" aria-label="Settings sections">
-          <a href="#empire-readiness">Empire readiness</a>
-          <a href="#settings-network">Network + policy</a>
-          <a href="#settings-tenant">Active tenant</a>
-          <a href="#settings-session">Privy session</a>
-          <a href="#settings-watch">Watch wallet</a>
-          <a href="#settings-agent">Paper agent</a>
+          <a href="#empire-readiness">Keys & readiness</a>
+          <a href="#settings-network">Network</a>
+          <a href="#settings-tenant">Account</a>
+          <a href="#settings-session">Sign in</a>
+          <a href="#settings-watch">Wallet</a>
+          <a href="#settings-agent">Desk agent</a>
           <a href="#settings-key-guide">Key links</a>
         </nav>
         <div className="settings-main">

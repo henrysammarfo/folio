@@ -7,6 +7,10 @@ import { z } from "zod";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
+import {
+  WalletLookupPanel,
+  walletSourceBadge,
+} from "@/components/wallet-lookup-panel";
 import { getPositionsBundle } from "@/lib/desk.functions";
 import {
   positionStatusLabel,
@@ -14,7 +18,6 @@ import {
 } from "@/lib/position-health";
 
 const positionsSearchSchema = z.object({
-  /** Ephemeral mainnet-read inspect pubkey — not auth, not persisted. */
   inspect: z.string().max(64).optional().catch(undefined),
 });
 
@@ -24,12 +27,12 @@ export const Route = createFileRoute("/desk/positions")({
       { title: "Positions — FOLIO" },
       {
         name: "description",
-        content: "Paper qty × live xStock multipliers on Solana mainnet.",
+        content: "Your tokenized stock positions with live share counts.",
       },
       { property: "og:title", content: "Positions — FOLIO" },
       {
         property: "og:description",
-        content: "Paper qty × live xStock multipliers on Solana mainnet.",
+        content: "Your tokenized stock positions with live share counts.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -37,7 +40,6 @@ export const Route = createFileRoute("/desk/positions")({
   }),
   validateSearch: (search) => positionsSearchSchema.parse(search),
   loaderDeps: ({ search }) => ({ inspect: search.inspect }),
-  /** Prefetch so wallet-read vs paper qty labels paint on first load. */
   loader: async ({ deps }) =>
     getPositionsBundle({
       data: { inspectWallet: deps.inspect },
@@ -63,14 +65,17 @@ function Page() {
   });
 
   const hasWalletRead = data?.rows.some((r) => r.qtySource === "wallet-read") ?? false;
+  const boundElsewhere =
+    data?.walletSource === "watch-wallet" ||
+    data?.walletSource === "membership" ||
+    data?.walletSource === "session";
 
   return (
-    <DeskShell eyebrow="Ownership ledger" title="Positions">
+    <DeskShell eyebrow="Holdings" title="Positions">
       <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Live multipliers</ModeBadge>
-        <ModeBadge mode="mainnet-read">API ↔ on-chain Scaled UI</ModeBadge>
+        <ModeBadge mode="mainnet-read">Live share counts</ModeBadge>
         <ModeBadge mode={hasWalletRead ? "mainnet-read" : "paper"}>
-          {hasWalletRead ? "Wallet-read qty" : "Paper quantities"}
+          {hasWalletRead ? "Wallet balances" : "Estimated balances"}
         </ModeBadge>
         <ModeBadge
           mode={
@@ -82,91 +87,37 @@ function Page() {
               : "unavailable"
           }
         >
-          {data?.walletSource === "membership"
-            ? "Membership wallet"
-            : data?.walletSource === "session"
-              ? "Session bound"
-              : data?.walletSource === "watch-wallet"
-                ? "Watch-wallet bound"
-                : data?.walletSource === "inspect"
-                  ? "Inspect (ephemeral)"
-                  : data?.auth.ok
-                    ? "Keys present · no session"
-                    : "Wallet unbound"}
+          {walletSourceBadge(data?.walletSource, data?.auth.ok)}
         </ModeBadge>
       </div>
 
-      <Panel
-        title="Inspect wallet (ephemeral)"
-        meta={
-          <StatusBadge tone={data?.walletSource === "inspect" ? "green" : "neutral"}>
-            {data?.walletSource === "inspect"
-              ? "Inspect active"
-              : data?.walletSource === "watch-wallet" ||
-                  data?.walletSource === "membership" ||
-                  data?.walletSource === "session"
-                ? "Bound elsewhere"
-                : "Inspect idle"}
-          </StatusBadge>
-        }
-      >
-        <p className="mb-3 text-sm opacity-80">
-          Mainnet-read token balances for a pubkey without binding a watch-wallet cookie or
-          Privy session. Useful on Vercel before <code>FOLIO_SESSION_SECRET</code> lands.
-          Inspect is <b>not</b> multi-tenant auth.
-        </p>
-        <div className="form-grid">
-          <label>
-            Wallet pubkey
-            <input
-              value={inspectInput}
-              onChange={(e) => setInspectInput(e.target.value)}
-              placeholder="Base58 pubkey"
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </label>
-          <div className="form-actions">
-            <button
-              type="button"
-              className="wallet-pill"
-              disabled={!inspectInput.trim()}
-              onClick={() => {
-                const next = inspectInput.trim();
-                void navigate({
-                  search: (prev) => ({ ...prev, inspect: next || undefined }),
-                });
-              }}
-            >
-              Inspect
-            </button>
-            <button
-              type="button"
-              className="wallet-pill"
-              disabled={!inspect}
-              onClick={() => {
-                setInspectInput("");
-                void navigate({
-                  search: (prev) => {
-                    const { inspect: _drop, ...rest } = prev as {
-                      inspect?: string;
-                    };
-                    return rest;
-                  },
-                });
-              }}
-            >
-              Clear inspect
-            </button>
-          </div>
-        </div>
-      </Panel>
+      <WalletLookupPanel
+        inspectInput={inspectInput}
+        onInspectInput={setInspectInput}
+        inspectActive={Boolean(inspect)}
+        boundElsewhere={boundElsewhere}
+        onLookUp={() => {
+          const next = inspectInput.trim();
+          void navigate({
+            search: (prev) => ({ ...prev, inspect: next || undefined }),
+          });
+        }}
+        onClear={() => {
+          setInspectInput("");
+          void navigate({
+            search: (prev) => {
+              const { inspect: _drop, ...rest } = prev as { inspect?: string };
+              return rest;
+            },
+          });
+        }}
+      />
 
       <Panel
         title="Watchlist"
         meta={
           <StatusBadge tone={isFetching ? "blue" : "neutral"}>
-            {isFetching ? "Refreshing…" : "Live multipliers · qty labeled"}
+            {isFetching ? "Refreshing…" : "Live"}
           </StatusBadge>
         }
       >
@@ -176,7 +127,7 @@ function Page() {
           <div className="table-head">
             <span>Asset</span>
             <span>Qty</span>
-            <span>Multiplier</span>
+            <span>Share count</span>
             <span>Economic</span>
             <span>Value</span>
             <span>Status</span>
@@ -194,7 +145,7 @@ function Page() {
               </span>
               <span>
                 {p.qty.toFixed(4)}
-                <small>{p.qtySource === "wallet-read" ? "wallet" : "paper"}</small>
+                <small>{p.qtySource === "wallet-read" ? "wallet" : "est."}</small>
               </span>
               <span data-testid={`positions-scaled-ui-${p.symbol}`}>
                 {p.multiplier != null ? `${p.multiplier.toFixed(6)}×` : "—"}

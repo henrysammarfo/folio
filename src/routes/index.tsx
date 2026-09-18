@@ -142,12 +142,12 @@ function Home() {
           <div className="home-desk-preview" aria-hidden>
             <div className="home-desk-preview-row">
               <div className="home-desk-preview-card soft">
-                <span>Share truth</span>
+                <span>Share count</span>
                 <b>Live × before trade</b>
               </div>
               <div className="home-desk-preview-card dark">
                 <span>Market</span>
-                <b>AAPLx · wash guarded</b>
+                <b>AAPLx · safe route</b>
               </div>
             </div>
             <div className="home-desk-preview-card">
@@ -175,7 +175,7 @@ function Home() {
           </div>
           <div>
             <strong>LEARN</strong>
-            <Link to="/truth">Share truth</Link>
+            <Link to="/truth">Share counts</Link>
             <Link to="/network">Network</Link>
             <Link to="/about">About</Link>
           </div>

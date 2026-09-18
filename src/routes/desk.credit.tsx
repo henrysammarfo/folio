@@ -6,10 +6,13 @@ import { z } from "zod";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
+import {
+  WalletLookupPanel,
+  walletSourceBadge,
+} from "@/components/wallet-lookup-panel";
 import { getCreditBundle } from "@/lib/desk.functions";
 
 const creditSearchSchema = z.object({
-  /** Ephemeral mainnet-read inspect pubkey — not auth, not persisted. */
   inspect: z.string().max(64).optional().catch(undefined),
 });
 
@@ -23,12 +26,14 @@ export const Route = createFileRoute("/desk/credit")({
   head: () => ({
     meta: [
       { title: "Credit — FOLIO" },
-      { name: "description", content: "Labeled Kamino / Jupiter Lend / NestUSD credit reads." },
+      {
+        name: "description",
+        content: "Borrow against tokenized stocks without selling.",
+      },
     ],
   }),
   validateSearch: (search) => creditSearchSchema.parse(search),
   loaderDeps: ({ search }) => ({ inspect: search.inspect }),
-  /** Prefetch so NestUSD fail-closed + capacity labels show on first paint. */
   loader: async ({ deps }) =>
     getCreditBundle({ data: { inspectWallet: deps.inspect } }),
   component: Page,
@@ -50,14 +55,18 @@ function Page() {
 
   const reserves = data?.kamino.ok ? data.kamino.data.reserves : [];
   const walletRead = data?.paper.label === "wallet-read";
+  const boundElsewhere =
+    data?.walletSource === "watch-wallet" ||
+    data?.walletSource === "membership" ||
+    data?.walletSource === "session";
 
   return (
-    <DeskShell eyebrow="Collateral workspace" title="Credit">
+    <DeskShell eyebrow="Borrow" title="Credit">
       <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Market reads</ModeBadge>
-        <ModeBadge mode="unavailable">Borrow CPI = off</ModeBadge>
+        <ModeBadge mode="mainnet-read">Live markets</ModeBadge>
+        <ModeBadge mode="unavailable">Borrow paused</ModeBadge>
         <ModeBadge mode={walletRead ? "mainnet-read" : "paper"}>
-          {walletRead ? "Wallet-read capacity" : "Paper capacity"}
+          {walletRead ? "Wallet capacity" : "Estimated capacity"}
         </ModeBadge>
         <ModeBadge
           mode={
@@ -69,99 +78,47 @@ function Page() {
               : "unavailable"
           }
         >
-          {data?.walletSource === "membership"
-            ? "Membership wallet"
-            : data?.walletSource === "session"
-              ? "Session bound"
-              : data?.walletSource === "watch-wallet"
-                ? "Watch-wallet bound"
-                : data?.walletSource === "inspect"
-                  ? "Inspect (ephemeral)"
-                  : "Wallet unbound"}
+          {walletSourceBadge(data?.walletSource)}
         </ModeBadge>
       </div>
 
-      <Panel
-        title="Inspect wallet (ephemeral)"
-        meta={
-          <StatusBadge tone={data?.walletSource === "inspect" ? "green" : "neutral"}>
-            {data?.walletSource === "inspect"
-              ? "Inspect active"
-              : data?.walletSource === "watch-wallet" ||
-                  data?.walletSource === "membership" ||
-                  data?.walletSource === "session"
-                ? "Bound elsewhere"
-                : "Inspect idle"}
-          </StatusBadge>
-        }
-      >
-        <p className="mb-3 text-sm opacity-80">
-          Mainnet-read balances for collateral math without a watch-wallet cookie or Privy
-          session. Useful on Vercel before <code>FOLIO_SESSION_SECRET</code> lands. Inspect is{" "}
-          <b>not</b> multi-tenant auth — and borrow broadcast stays paused.
-        </p>
-        <div className="form-grid">
-          <label>
-            Wallet pubkey
-            <input
-              value={inspectInput}
-              onChange={(e) => setInspectInput(e.target.value)}
-              placeholder="Base58 pubkey"
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </label>
-          <div className="form-actions">
-            <button
-              type="button"
-              className="wallet-pill"
-              disabled={!inspectInput.trim()}
-              onClick={() => {
-                const next = inspectInput.trim();
-                void navigate({
-                  search: (prev) => ({ ...prev, inspect: next || undefined }),
-                });
-              }}
-            >
-              Inspect
-            </button>
-            <button
-              type="button"
-              className="wallet-pill"
-              disabled={!inspect}
-              onClick={() => {
-                setInspectInput("");
-                void navigate({
-                  search: (prev) => {
-                    const { inspect: _drop, ...rest } = prev as { inspect?: string };
-                    return rest;
-                  },
-                });
-              }}
-            >
-              Clear inspect
-            </button>
-          </div>
-        </div>
-      </Panel>
+      <WalletLookupPanel
+        inspectInput={inspectInput}
+        onInspectInput={setInspectInput}
+        inspectActive={Boolean(inspect)}
+        boundElsewhere={boundElsewhere}
+        onLookUp={() => {
+          const next = inspectInput.trim();
+          void navigate({
+            search: (prev) => ({ ...prev, inspect: next || undefined }),
+          });
+        }}
+        onClear={() => {
+          setInspectInput("");
+          void navigate({
+            search: (prev) => {
+              const { inspect: _drop, ...rest } = prev as { inspect?: string };
+              return rest;
+            },
+          });
+        }}
+      />
 
       <div className="desk-grid">
         <Panel
-          title="Illustrative capacity"
+          title="Borrowing power"
           meta={
             <StatusBadge tone="blue">
               {isFetching
                 ? "…"
                 : walletRead
-                  ? "Wallet × live LTV"
-                  : "Paper × live LTV"}
+                  ? "From your wallet"
+                  : "Estimate"}
             </StatusBadge>
           }
         >
           <div className="credit-output">
-            <span>
-              {walletRead ? "Wallet-read collateral (live marks)" : "Paper collateral (live marks)"}
-            </span>
+            <span>{walletRead ? "Collateral value" : "Estimated collateral"}</span>
             <b>
               {data?.paper.collateralUsd != null
                 ? data.paper.collateralUsd.toLocaleString("en-US", {
@@ -172,11 +129,11 @@ function Page() {
                 : "—"}
             </b>
             <small>
-              AAPLx maxLtv{" "}
+              AAPLx max LTV{" "}
               {data?.paper.maxLtvUsed != null
                 ? `${(data.paper.maxLtvUsed * 100).toFixed(0)}%`
                 : "—"}{" "}
-              · illustrative borrow{" "}
+              · you could borrow up to{" "}
               {data?.paper.illustrativeBorrowUsd != null
                 ? data.paper.illustrativeBorrowUsd.toLocaleString("en-US", {
                     style: "currency",
@@ -188,40 +145,40 @@ function Page() {
             <small>{data?.paper.note}</small>
           </div>
         </Panel>
-        <Panel title="Provider paths">
+        <Panel title="Where credit comes from">
           <div className="policy-list">
             <p>
               <span>Kamino xStocks</span>
               <StatusBadge tone={data?.kamino.ok ? "green" : "amber"}>
                 {data?.kamino.ok
-                  ? "Mainnet read"
+                  ? "Live"
                   : data && !data.kamino.ok
-                    ? data.kamino.reason
+                    ? "Unavailable"
                     : "…"}
               </StatusBadge>
             </p>
             <p>
-              <span>Jupiter Lend earn</span>
+              <span>Earn vaults</span>
               <StatusBadge tone={data?.jupiterLend.ok ? "blue" : "amber"}>
                 {data?.jupiterLend.ok
-                  ? "Earn vaults"
+                  ? "Available"
                   : data && !data.jupiterLend.ok
-                    ? data.jupiterLend.reason
+                    ? "Unavailable"
                     : "…"}
               </StatusBadge>
             </p>
             <p>
-              <span>Nest.credit vaults</span>
+              <span>Nest credit</span>
               <StatusBadge tone={data?.nestCredit.ok ? "green" : "amber"}>
                 {data?.nestCredit.ok
-                  ? `${data.nestCredit.data.vaultCount} vaults · not NestUSD borrow`
+                  ? `${data.nestCredit.data.vaultCount} vaults`
                   : data && !data.nestCredit.ok
-                    ? (data.nestCredit.detail ?? data.nestCredit.reason)
+                    ? "Unavailable"
                     : "…"}
               </StatusBadge>
             </p>
             <p>
-              <span>NestUSD</span>
+              <span>NestUSD borrow</span>
               <StatusBadge
                 tone="amber"
                 {...(data && !data.nestusd.ok
@@ -232,26 +189,24 @@ function Page() {
                   : {})}
               >
                 {data?.nestusd.ok
-                  ? "Probed · risk-labeled"
+                  ? "Risk-labeled"
                   : data && !data.nestusd.ok
-                    ? truncateBadge(data.nestusd.detail ?? data.nestusd.reason)
-                    : "Risk / unverified"}
+                    ? truncateBadge("Not verified yet")
+                    : "Not verified"}
               </StatusBadge>
             </p>
             <p>
               <span>Borrow execution</span>
-              <StatusBadge tone="neutral">
-                {data?.borrowExecution ?? "unavailable-until-funded"}
-              </StatusBadge>
+              <StatusBadge tone="neutral">Paused</StatusBadge>
             </p>
           </div>
         </Panel>
       </div>
       <Panel
-        title="Kamino reserves (live)"
+        title="Live credit markets"
         meta={
           <StatusBadge tone={data?.kamino.ok ? "green" : "amber"}>
-            {data?.kamino.ok ? "xStocks market" : "Kamino unavailable"}
+            {data?.kamino.ok ? "Kamino" : "Unavailable"}
           </StatusBadge>
         }
       >
