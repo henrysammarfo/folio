@@ -1,6 +1,6 @@
 /**
- * Compact ownership honesty for Netro overview — paper vs wallet-read,
- * inspect/watch binding. Never invents Verified greens.
+ * Compact ownership for Netro overview — wallet vs estimated.
+ * Never invents Verified greens.
  */
 export type NetroOwnershipSummary = {
   walletSourceLabel: string;
@@ -49,21 +49,20 @@ export function buildNetroOwnershipSummary(
   const total = input.rows.length;
 
   let walletSourceLabel = "No wallet";
-  if (source === "inspect") walletSourceLabel = "Inspect · ephemeral";
-  else if (source === "watch-wallet") walletSourceLabel = "Watch-wallet";
-  else if (source === "membership") walletSourceLabel = "Membership";
-  else if (source === "session") walletSourceLabel = "Session";
+  if (source === "inspect") walletSourceLabel = "Lookup";
+  else if (source === "watch-wallet") walletSourceLabel = "Watch wallet";
+  else if (source === "membership") walletSourceLabel = "Connected";
+  else if (source === "session") walletSourceLabel = "Connected";
 
-  let qtyLabel = walletRead ? "Wallet-read qty" : "Paper qty";
-  if (source === "inspect" && !walletRead) {
-    qtyLabel = "Inspect · paper fallback";
-  } else if (
+  let qtyLabel = walletRead ? "Wallet" : "Estimated";
+  if (source === "inspect" && !walletRead) qtyLabel = "Lookup · estimated";
+  else if (
     (source === "watch-wallet" ||
       source === "membership" ||
       source === "session") &&
     !walletRead
   ) {
-    qtyLabel = "Bound · paper fallback";
+    qtyLabel = "Bound · estimated";
   }
 
   return {
@@ -71,16 +70,14 @@ export function buildNetroOwnershipSummary(
     qtyLabel,
     economicValueLabel: money(paperValue),
     verifiedLabel: `${verified} / ${total} verified`,
-    note:
-      input.note?.trim() ||
-      (walletRead
-        ? "Mainnet wallet-read qty · Scaled UI labeled per row"
-        : "Paper qty until bind / inspect · mainnet marks"),
+    note: walletRead
+      ? "Live wallet balances"
+      : "Estimated until you connect a wallet",
     rows: input.rows.slice(0, 3).map((r) => ({
       symbol: r.symbol,
-      qtyLabel: `${r.qty.toFixed(4)} ${r.qtySource}`,
+      qtyLabel: `${r.qty.toFixed(4)}${r.qtySource === "paper" ? " est." : ""}`,
       valueLabel: money(r.paperValueUsd ?? 0),
-      health: r.health,
+      health: r.health === "Verified" ? "Verified" : "Review",
     })),
   };
 }

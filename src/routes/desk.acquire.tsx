@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
-import { ModeBadge } from "@/components/mode-badge";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { Button } from "@/components/ui/button";
 import { getAcquireBundle } from "@/lib/desk.functions";
@@ -59,18 +58,6 @@ function Page() {
 
   return (
     <DeskShell eyebrow="Buy" title={`Buy ${symbol}`}>
-      <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="quote-only">Live quote · fill paused</ModeBadge>
-        <ModeBadge mode={data?.multiplier.ok ? data.multiplier.mode : "unavailable"}>
-          {data?.multiplier.ok
-            ? `${data.multiplier.data.currentMultiplier.toFixed(6)}× live`
-            : "Multiplier pending"}
-        </ModeBadge>
-        <ModeBadge mode={data?.wash.ok ? data.wash.mode : "unavailable"}>
-          {data?.wash.ok && data.wash.data.pass ? "Wash clear" : "Wash checking"}
-        </ModeBadge>
-      </div>
-
       <div className="stepper">
         {["Order", "Checks", "Review"].map((x, i) => (
           <span className={step >= i + 1 ? "step-active" : ""} key={x}>
@@ -80,393 +67,196 @@ function Page() {
       </div>
 
       <div className="acquire-layout">
-        <Panel title={`${symbol.replace(/x$/i, "")} market`} meta={<StatusBadge tone="blue">Live</StatusBadge>}>
+        <Panel
+          title={`${symbol.replace(/x$/i, "")} market`}
+          meta={<StatusBadge tone="blue">Live</StatusBadge>}
+        >
           <TradingViewChart symbol={symbol} height={440} interval="60" theme="light" />
         </Panel>
 
         <div className="acquire-ticket">
-      <Panel
-        title={
-          step === 1 ? "Your order" : step === 2 ? "Safety checks" : "Review quote"
-        }
-        meta={<StatusBadge tone="blue">Live Jupiter</StatusBadge>}
-      >
-        {step === 1 ? (
-          <div className="form-grid">
-            <label>
-              Asset
-              <select
-                value={symbol}
-                onChange={(e) => setSymbol(e.target.value as (typeof SYMBOLS)[number])}
-              >
-                {SYMBOLS.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Spend (USDC) · quote inspection ≤25 · broadcast paused (≤~$1 budget)
-              <input
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                inputMode="decimal"
-                max={25}
-              />
-            </label>
-            <div className="quote-preview">
-              <span>Indicative (after checks)</span>
-              <b>{indicative ? `${indicative} ${symbol}` : "Run checks for live Jupiter quote"}</b>
-              <small>Mainnet quote-only · never a fill</small>
-            </div>
-          </div>
-        ) : null}
-
-        {step === 2 ? (
-          <div className="checks">
-            {isFetching ? <p>Fetching live gates…</p> : null}
-            {isError ? (
-              <p>
-                <span>Bundle error</span>
-                <StatusBadge tone="amber">{String(error)}</StatusBadge>
-              </p>
-            ) : null}
-            {data ? (
-              <div className="desk-gate-grid acquire-gate-grid mb-4">
-                <div className="desk-gate-row">
-                  <div>
-                    <b>Truth (API)</b>
-                    <small>
-                      {data.gates.truthOk
-                        ? data.multiplier.ok
-                          ? `API ${data.multiplier.data.currentMultiplier.toFixed(6)}×`
-                          : "Live multiplier available for review"
-                        : "Corporate-action / asset truth blocked"}
-                    </small>
-                  </div>
-                  <StatusBadge tone={data.gates.truthOk ? "green" : "amber"}>
-                    {data.gates.truthOk ? "pass" : "fail-closed"}
-                  </StatusBadge>
-                </div>
-                <div className="desk-gate-row" data-testid="acquire-scaled-ui-gate">
-                  <div>
-                    <b>On-chain Scaled UI</b>
-                    <small>
-                      {data.scaledUi.ok
-                        ? `${data.scaledUi.data.effectiveMultiplier.toFixed(6)}× · ${data.scaledUiCompare.note}`
-                        : data.scaledUi.reason}
-                    </small>
-                  </div>
-                  <StatusBadge
-                    tone={
-                      data.scaledUiCompare.status === "match"
-                        ? "green"
-                        : data.scaledUiCompare.status === "mismatch"
-                          ? "amber"
-                          : "amber"
-                    }
-                  >
-                    {data.scaledUiCompare.status === "match"
-                      ? "match"
-                      : data.scaledUiCompare.status === "mismatch"
-                        ? "mismatch"
-                        : "off"}
-                  </StatusBadge>
-                </div>
-                <div className="desk-gate-row">
-                  <div>
-                    <b>Wash / linked flow</b>
-                    <small>
-                      {data.wash.ok
-                        ? `pressure=${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
-                        : data.wash.reason}
-                    </small>
-                  </div>
-                  <StatusBadge tone={data.gates.washOk ? "green" : "amber"}>
-                    {data.gates.washOk ? "pass" : "fail-closed"}
-                  </StatusBadge>
-                </div>
-                <div className="desk-gate-row">
-                  <div>
-                    <b>Jupiter quote</b>
-                    <small>
-                      {data.jupiter.ok
-                        ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
-                        : data.jupiter.reason}
-                    </small>
-                  </div>
-                  <StatusBadge tone={data.gates.quoteOk ? "blue" : "amber"}>
-                    {data.gates.quoteOk ? "quote-only" : "fail-closed"}
-                  </StatusBadge>
-                </div>
-                <div className="desk-gate-row">
-                  <div>
-                    <b>Pyth diverge</b>
-                    <small>
-                      {data.pyth.ok
-                        ? "Hermes equity live"
-                        : data.pyth.reason}
-                    </small>
-                  </div>
-                  <StatusBadge
-                    tone={
-                      data.gates.divergeOk === false
-                        ? "amber"
-                        : data.equityRef?.ok
-                          ? "green"
-                          : "amber"
-                    }
-                  >
-                    {data.gates.divergeOk === false
-                      ? "blocked"
-                      : data.equityRef?.ok
-                        ? `ok · ${data.equityRef.data.provider}`
-                        : "equity-ref off"}
-                  </StatusBadge>
-                </div>
-                <div className="desk-gate-row">
-                  <div>
-                    <b>canReview</b>
-                    <small>
-                      Continue stays locked until truth · wash · quote · diverge clear
-                    </small>
-                  </div>
-                  <StatusBadge tone={data.gates.canReview ? "green" : "amber"}>
-                    {data.gates.canReview ? "ready" : "blocked"}
-                  </StatusBadge>
-                </div>
-              </div>
-            ) : null}
-            <p>
-              <span>Corporate-action / asset</span>
-              <StatusBadge tone={data?.gates.truthOk ? "green" : "amber"}>
-                {data?.gates.truthOk
-                  ? data.multiplier.ok && data.multiplier.data.pendingMultiplier != null
-                    ? `Live · pending ${data.multiplier.data.pendingMultiplier.toFixed(6)}×`
-                    : "Verified live · no pending CA"
-                  : data
-                    ? "Blocked"
-                    : "…"}
-              </StatusBadge>
-            </p>
-            <p>
-              <span>Wash / linked flow</span>
-              <StatusBadge tone={data?.gates.washOk ? "green" : "amber"}>
-                {data?.gates.washOk && data.wash.ok
-                  ? `Tape clear · ${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
-                  : data?.wash && data.wash.ok
-                    ? `${data.wash.data.pressure} · n=${data.wash.data.sampleSize}`
-                    : data?.wash && !data.wash.ok
-                      ? data.wash.reason
-                      : "…"}
-              </StatusBadge>
-            </p>
-            {data?.wash.ok && data.wash.data.notes.length > 0 ? (
-              <div className="review-box mt-2">
-                <p>
-                  <b>Wash notes</b>
-                </p>
-                <ul>
-                  {data.wash.data.notes.map((n) => (
-                    <li key={n}>{n}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            <p>
-              <span>Raydium pools</span>
-              <StatusBadge
-                tone={
-                  data?.pools.ok && data.pools.data.raydium.length > 0
-                    ? "blue"
-                    : "amber"
-                }
-              >
-                {data?.pools.ok
-                  ? data.pools.data.raydium.length > 0
-                    ? `${data.pools.data.raydium.length} observed · awareness only`
-                    : "Zero pools · awareness only"
-                  : data?.pools && !data.pools.ok
-                    ? data.pools.reason
-                    : "…"}
-              </StatusBadge>
-            </p>
-            <p>
-              <span>Jupiter route</span>
-              <StatusBadge tone={data?.gates.quoteOk ? "blue" : "amber"}>
-                {data?.gates.quoteOk && data.jupiter.ok
-                  ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol} · ${
-                      data.jupiter.source.includes("stale")
-                        ? "stale-cache"
-                        : data.jupiter.source.includes("cached")
-                          ? "cached"
-                          : "live"
-                    }`
-                  : data?.jupiter && !data.jupiter.ok
-                    ? data.jupiter.reason
-                    : "…"}
-              </StatusBadge>
-            </p>
-            <p>
-              <span>Pyth / venue diverge</span>
-              <StatusBadge
-                tone={
-                  data?.gates.divergeOk === false
-                    ? "amber"
-                    : data?.pyth.ok
-                      ? "green"
-                      : "amber"
-                }
-              >
-                {data?.gates.divergeOk === false
-                  ? "Blocked — outside band"
-                  : data?.pyth.ok
-                    ? "Pyth live · in band or unchecked pair"
-                    : data?.pyth && !data.pyth.ok
-                      ? `Pyth: ${data.pyth.reason}`
-                      : "…"}
-              </StatusBadge>
-            </p>
-            {data && data.gates.blockedReasons.length > 0 ? (
-              <div className="review-box mt-3">
-                <p>
-                  <b>Fail-closed reasons</b>
-                </p>
-                <ul>
-                  {data.gates.blockedReasons.map((r) => (
-                    <li key={r}>{r}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            {data && data.gates.honestyNotes.length > 0 ? (
-              <div className="review-box mt-3">
-                <p>
-                  <b>Honesty labels</b>
-                  <span className="ml-2 text-sm opacity-70">
-                    {data.strictFailClosed
-                      ? "(strict fail-closed on · unresolved required signals also block review)"
-                      : "(do not invent a pass · do not alone block review unless Strict is on)"}
-                  </span>
-                </p>
-                <ul>
-                  {data.gates.honestyNotes.map((r) => (
-                    <li key={r}>{r}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            {data && !data.prefsFromSession ? (
-              <p className="mt-3 text-sm opacity-80">
-                Strict fail-closed prefs apply after Privy + Supabase mint an httpOnly session
-                (active tenant). Public demo stays honesty-labeled for missing Pyth until then.
-              </p>
-            ) : null}
-            {data &&
-            (data.gates.blockedReasons.some((r) => /BITQUERY_API_KEY|PYTH_API_KEY/.test(r)) ||
-              data.gates.honestyNotes.some((r) => /PYTH_API_KEY/.test(r))) ? (
-              <p className="mt-3 text-sm opacity-80">
-                Next:{" "}
-                <Link to="/desk/settings" className="underline">
-                  Settings readiness
-                </Link>{" "}
-                · keys runbook <code>docs/KEYS_LANDING.md</code> ·{" "}
-                <code>npm run keys</code>
-              </p>
-            ) : null}
-            <Button variant="outline" type="button" onClick={() => refetch()} className="mt-2">
-              Refresh live gates
-            </Button>
-          </div>
-        ) : null}
-
-        {step === 3 ? (
-          <div className="review-box">
-            <p>
-              This review is <b>quote-only</b>. FOLIO will not broadcast a swap on the ≤~$1
-              Stocklana budget. Wash remains fail-closed until Bitquery is wired.
-            </p>
-            <div>
-              <span>Spend</span>
-              <b>${spendUsdc.toLocaleString()} USDC</b>
-            </div>
-            <div>
-              <span>Live receive (quote)</span>
-              <b>
-                {data?.jupiter.ok
-                  ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
-                  : "Unavailable"}
-              </b>
-              {data?.jupiter.ok ? (
-                <small>
-                  {data.jupiter.source.includes("stale")
-                    ? "Stale-cache after 429 · not invented"
-                    : data.jupiter.source.includes("cached")
-                      ? "Short TTL cache hit · quote-only"
-                      : "Fresh Jupiter quote · quote-only"}
-                </small>
-              ) : null}
-            </div>
-            <div>
-              <span>Multiplier</span>
-              <b>
-                {data?.multiplier.ok
-                  ? `${data.multiplier.data.currentMultiplier.toFixed(6)}×`
-                  : "—"}
-              </b>
-              {data?.multiplier.ok ? (
-                <small>
-                  {data.multiplier.data.pendingMultiplier != null
-                    ? `Pending CA ${data.multiplier.data.pendingMultiplier.toFixed(6)}×`
-                    : "No pending newMultiplier on live feed"}
-                </small>
-              ) : null}
-            </div>
-            <div>
-              <span>Wash</span>
-              <b>
-                {data?.wash.ok
-                  ? `${data.wash.data.pass ? "Clear" : "Blocked"} · ${data.wash.data.pressure}`
-                  : data?.wash && !data.wash.ok
-                    ? data.wash.reason
-                    : "Unavailable"}
-              </b>
-            </div>
-            <div>
-              <span>Execution</span>
-              <b>Disabled · labeled quote-only</b>
-            </div>
-          </div>
-        ) : null}
-
-        <div className="flow-actions">
-          {step > 1 ? (
-            <Button variant="outline" onClick={() => setStep(step - 1)}>
-              Back
-            </Button>
-          ) : null}
-          <Button
-            type="button"
-            data-testid="acquire-continue"
-            disabled={
-              !ready ||
-              (step === 2 && (isFetching || !data?.gates.canReview)) ||
-              (step === 3 && !data?.gates.canReview)
+          <Panel
+            title={
+              step === 1 ? "Your order" : step === 2 ? "Safety checks" : "Confirm quote"
             }
-            onClick={() => {
-              if (step === 2 && !data?.gates.canReview) return;
-              setStep(Math.min(3, step + 1));
-            }}
+            meta={<StatusBadge tone="blue">Live</StatusBadge>}
           >
-            {step === 3
-              ? "Quote ready"
-              : step === 2 && data && !data.gates.canReview
-                ? "Blocked — fail-closed"
-                : "Continue"}
-          </Button>
-        </div>
-      </Panel>
+            {step === 1 ? (
+              <div className="form-grid">
+                <label>
+                  Asset
+                  <select
+                    value={symbol}
+                    onChange={(e) =>
+                      setSymbol(e.target.value as (typeof SYMBOLS)[number])
+                    }
+                  >
+                    {SYMBOLS.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Amount (USDC)
+                  <input
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    inputMode="decimal"
+                    max={25}
+                  />
+                </label>
+                <div className="quote-preview">
+                  <span>You receive (after checks)</span>
+                  <b>
+                    {indicative
+                      ? `${indicative} ${symbol}`
+                      : "Continue to see live quote"}
+                  </b>
+                  <small>Live Jupiter quote</small>
+                </div>
+              </div>
+            ) : null}
+
+            {step === 2 ? (
+              <div className="checks consumer-checks">
+                {isFetching ? <p>Running checks…</p> : null}
+                {isError ? (
+                  <p>
+                    <span>Something went wrong</span>
+                    <StatusBadge tone="neutral">Retry</StatusBadge>
+                  </p>
+                ) : null}
+                <div className="desk-gate-grid acquire-gate-grid mb-4">
+                  <div className="desk-gate-row">
+                    <div>
+                      <b>Share truth</b>
+                      <small>
+                        {data?.multiplier.ok
+                          ? `${data.multiplier.data.currentMultiplier.toFixed(6)}×`
+                          : "Checking live share count"}
+                      </small>
+                    </div>
+                    <StatusBadge tone={data?.gates.truthOk ? "green" : "neutral"}>
+                      {data?.gates.truthOk ? "OK" : "…"}
+                    </StatusBadge>
+                  </div>
+                  <div className="desk-gate-row" data-testid="acquire-scaled-ui-gate">
+                    <div>
+                      <b>On-chain match</b>
+                      <small>
+                        {data?.scaledUiCompare.status === "match"
+                          ? "Matches the ledger"
+                          : "Confirming…"}
+                      </small>
+                    </div>
+                    <StatusBadge
+                      tone={
+                        data?.scaledUiCompare.status === "match" ? "green" : "neutral"
+                      }
+                    >
+                      {data?.scaledUiCompare.status === "match" ? "OK" : "…"}
+                    </StatusBadge>
+                  </div>
+                  <div className="desk-gate-row">
+                    <div>
+                      <b>Safe route</b>
+                      <small>
+                        {data?.gates.washOk ? "Route looks clean" : "Checking route…"}
+                      </small>
+                    </div>
+                    <StatusBadge tone={data?.gates.washOk ? "green" : "neutral"}>
+                      {data?.gates.washOk ? "OK" : "…"}
+                    </StatusBadge>
+                  </div>
+                  <div className="desk-gate-row">
+                    <div>
+                      <b>Live quote</b>
+                      <small>
+                        {data?.jupiter.ok
+                          ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
+                          : "Fetching quote…"}
+                      </small>
+                    </div>
+                    <StatusBadge tone={data?.gates.quoteOk ? "green" : "neutral"}>
+                      {data?.gates.quoteOk ? "OK" : "…"}
+                    </StatusBadge>
+                  </div>
+                </div>
+                {!data?.gates.canReview && data ? (
+                  <p className="consumer-note">
+                    We need a clear share count, safe route, and live quote before
+                    you continue.{" "}
+                    <button type="button" className="underline" onClick={() => refetch()}>
+                      Refresh
+                    </button>
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+
+            {step === 3 ? (
+              <div className="review-box consumer-review">
+                <p>
+                  Review your live quote. You can buy when fills are enabled for
+                  your account.
+                </p>
+                <div>
+                  <span>You pay</span>
+                  <b>${spendUsdc.toLocaleString()} USDC</b>
+                </div>
+                <div>
+                  <span>You receive</span>
+                  <b>
+                    {data?.jupiter.ok
+                      ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
+                      : "—"}
+                  </b>
+                  <small>Live Jupiter quote</small>
+                </div>
+                <div>
+                  <span>Share count</span>
+                  <b>
+                    {data?.multiplier.ok
+                      ? `${data.multiplier.data.currentMultiplier.toFixed(6)}×`
+                      : "—"}
+                  </b>
+                </div>
+                <div>
+                  <span>Route</span>
+                  <b>{data?.gates.washOk ? "Clear" : "Checking"}</b>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="flow-actions">
+              {step > 1 ? (
+                <Button variant="outline" onClick={() => setStep(step - 1)}>
+                  Back
+                </Button>
+              ) : null}
+              <Button
+                type="button"
+                data-testid="acquire-continue"
+                disabled={
+                  !ready ||
+                  (step === 2 && (isFetching || !data?.gates.canReview)) ||
+                  (step === 3 && !data?.gates.canReview)
+                }
+                onClick={() => {
+                  if (step === 2 && !data?.gates.canReview) return;
+                  setStep(Math.min(3, step + 1));
+                }}
+              >
+                {step === 3
+                  ? "Done"
+                  : step === 2 && data && !data.gates.canReview
+                    ? "Waiting on checks"
+                    : "Continue"}
+              </Button>
+            </div>
+          </Panel>
         </div>
       </div>
     </DeskShell>

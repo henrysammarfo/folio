@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildNetroOwnershipSummary } from "../netro-ownership";
 
 describe("buildNetroOwnershipSummary", () => {
-  it("labels paper qty when no wallet bound", () => {
+  it("labels estimated qty when no wallet bound", () => {
     const summary = buildNetroOwnershipSummary({
       walletSource: null,
       rows: [
@@ -16,13 +16,13 @@ describe("buildNetroOwnershipSummary", () => {
       ],
     });
     expect(summary.walletSourceLabel).toBe("No wallet");
-    expect(summary.qtyLabel).toBe("Paper qty");
+    expect(summary.qtyLabel).toBe("Estimated");
     expect(summary.verifiedLabel).toBe("0 / 1 verified");
     expect(summary.economicValueLabel).toMatch(/\$4,179/);
-    expect(summary.rows[0]?.qtyLabel).toMatch(/paper/);
+    expect(summary.rows[0]?.qtyLabel).toMatch(/est/);
   });
 
-  it("surfaces inspect + wallet-read without inventing Verified", () => {
+  it("surfaces lookup + wallet without inventing Verified", () => {
     const summary = buildNetroOwnershipSummary({
       walletSource: "inspect",
       note: "Ephemeral inspect (not auth / not multi-tenant)",
@@ -43,13 +43,13 @@ describe("buildNetroOwnershipSummary", () => {
         },
       ],
     });
-    expect(summary.walletSourceLabel).toMatch(/Inspect/);
-    expect(summary.qtyLabel).toBe("Wallet-read qty");
+    expect(summary.walletSourceLabel).toBe("Lookup");
+    expect(summary.qtyLabel).toBe("Wallet");
     expect(summary.verifiedLabel).toBe("0 / 2 verified");
-    expect(summary.note).toMatch(/not auth|Ephemeral/);
+    expect(summary.note).toMatch(/not auth|Ephemeral|Live wallet/);
   });
 
-  it("labels inspect with paper fallback when no SPL qty", () => {
+  it("labels lookup with estimated when no SPL qty", () => {
     const summary = buildNetroOwnershipSummary({
       walletSource: "inspect",
       rows: [
@@ -62,6 +62,6 @@ describe("buildNetroOwnershipSummary", () => {
         },
       ],
     });
-    expect(summary.qtyLabel).toBe("Inspect · paper fallback");
+    expect(summary.qtyLabel).toBe("Lookup · estimated");
   });
 });

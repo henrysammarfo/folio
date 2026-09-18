@@ -8,9 +8,10 @@ import {
   LayoutDashboard,
   Settings,
   ShoppingBag,
+  UserRound,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FolioMark, StatusBadge } from "./folio-brand";
+import { FolioMark } from "./folio-brand";
 import { DeskWalletPill } from "./desk-wallet-pill";
 import {
   ShaderBackground,
@@ -45,7 +46,7 @@ import { buildNetroOwnershipSummary } from "@/lib/netro-ownership";
 
 const links = [
   ["Overview", "/desk", LayoutDashboard],
-  ["Acquire", "/desk/acquire", ShoppingBag],
+  ["Buy", "/desk/acquire", ShoppingBag],
   ["Positions", "/desk/positions", BriefcaseBusiness],
   ["Credit", "/desk/credit", CircleDollarSign],
   ["Activity", "/desk/activity", Activity],
@@ -279,13 +280,6 @@ export function DeskShell({
           </span>
         </div>
       ) : null}
-      {productionChrome ? (
-        <div className="lab-approved-banner lab-approved-banner-compact" role="status">
-          <span>
-            Desk chrome · <code>{approvedUi ?? approvedShader}</code>
-          </span>
-        </div>
-      ) : null}
       <aside className="desk-sidebar">
         <Link to="/" className="desk-logo">
           <FolioMark />
@@ -295,9 +289,10 @@ export function DeskShell({
           type="button"
           className="desk-sidebar-collapse"
           aria-pressed={sidebarCollapsed}
+          aria-label={sidebarCollapsed ? "Expand sidebar" : "Minimize sidebar"}
           onClick={() => setSidebarCollapsed((v) => !v)}
         >
-          {sidebarCollapsed ? "Expand" : "Minimize"}
+          {sidebarCollapsed ? "»" : "«"}
         </button>
         <nav aria-label="Desk navigation">
           {links.map(([label, to, Icon]) => {
@@ -310,16 +305,20 @@ export function DeskShell({
                 title={label}
               >
                 <Icon />
-                {label}
+                <span className="desk-nav-label">{label}</span>
               </Link>
             );
           })}
         </nav>
         <div className="desk-sidebar-foot">
-          <StatusBadge tone="blue">Live quotes</StatusBadge>
-          <p className="desk-foot-meta">
-            Mainnet read · broadcast paused until you fund a fill.
-          </p>
+          <Link
+            to="/desk/settings"
+            className="desk-sidebar-profile"
+            title="Profile & settings"
+          >
+            <UserRound size={18} aria-hidden />
+            <span>Profile</span>
+          </Link>
         </div>
       </aside>
       <div className="desk-main">
@@ -332,11 +331,11 @@ export function DeskShell({
           </div>
         ) : null}
         <header className="desk-topbar">
-          <div className="desk-search desk-search-policy" aria-label="Desk policy">
-            Honest share counts · wash fail-closed · live Jupiter quotes
+          <div className="desk-search desk-search-policy" aria-label="Desk">
+            Buy tokenized stocks on Solana
           </div>
           <div className="desk-network">
-            <span className="live-dot" /> Solana mainnet
+            <span className="live-dot" /> Live
           </div>
           <Link to="/desk/acquire" className="desk-topbar-cta">
             Buy
@@ -351,7 +350,7 @@ export function DeskShell({
                 multiplierLabel={multiplierLabel}
                 gates={netroGates}
                 ownership={ownership}
-                keysReadiness={keysReadiness}
+                keysReadiness={null}
                 initialInspect={inspectSearch}
                 scaledUiStripLabel={scaledUiStripLabel}
                 enablePaperAgent
