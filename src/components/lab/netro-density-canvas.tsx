@@ -130,18 +130,14 @@ export function NetroDensityCanvas({
         setAgentReply(
           `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
         );
-        setAgentMeta("nl=failed · broadcast=false · spine unavailable");
+        setAgentMeta("Live answers · trades paused");
         return;
       }
       setAgentReply(res.data.reply);
-      const nl = res.data.nlExpansion ?? "off";
-      const note = res.data.nlExpansionNote
-        ? ` · ${res.data.nlExpansionNote}`
-        : "";
-      setAgentMeta(`nl=${nl}${note} · broadcast=false · paper spine`);
+      setAgentMeta("Live answers · trades paused");
     } catch (err) {
       setAgentReply(err instanceof Error ? err.message : "Agent call failed");
-      setAgentMeta("nl=failed · broadcast=false");
+      setAgentMeta("Try again in a moment");
     } finally {
       setAgentBusy(false);
     }
@@ -182,8 +178,8 @@ export function NetroDensityCanvas({
           <span>Buy · hold · borrow — live markets</span>
         </div>
         <div className="netro-density-chrome-actions">
-          <Link to="/desk/settings" className="netro-density-connect">
-            Connect
+          <Link to="/desk/acquire" className="netro-density-connect">
+            Buy AAPLx
           </Link>
         </div>
       </header>
@@ -233,7 +229,7 @@ export function NetroDensityCanvas({
             </button>
           ) : (
             <Link to="/desk/settings" className="netro-density-inspect-bind">
-              Bind my wallet
+              Connect wallet
             </Link>
           )}
           {initialInspect ? (
@@ -311,9 +307,9 @@ export function NetroDensityCanvas({
                 <span className="netro-density-gear netro-density-gear-inner" />
               </div>
               <h4>
-                Check
+                Trade
                 <br />
-                share truth
+                AAPLx
               </h4>
               <div className="netro-density-clock">
                 <span>{clock.h}</span>
@@ -340,7 +336,7 @@ export function NetroDensityCanvas({
                 <div className="netro-density-flow-head">
                   <div>
                     <strong>Market snapshot</strong>
-                    <p>Live share count · safe route · quote</p>
+                    <p>Share count · route · quote</p>
                   </div>
                   <span className="netro-density-flow-pill">AAPLx</span>
                 </div>
@@ -350,7 +346,7 @@ export function NetroDensityCanvas({
                     <b>{multiplierLabel.replace(/\s*live$/i, "")}</b>
                   </div>
                   <div>
-                    <span>Safe route</span>
+                    <span>Route</span>
                     <b>
                       {/live|clear|pass/i.test(gates.wash) ? "Clear" : "Checking"}
                     </b>
@@ -377,10 +373,10 @@ export function NetroDensityCanvas({
                   style={delay(5)}
                 >
                   <div className="netro-density-card-head">
-                    <strong>Swap path</strong>
+                    <strong>Buy path</strong>
                   </div>
                   <b>USDC → AAPLx</b>
-                  <small>Live Jupiter route</small>
+                  <small>Best live route</small>
                 </div>
                 <div
                   className="netro-density-card netro-density-card-dark netro-density-item"
@@ -390,7 +386,7 @@ export function NetroDensityCanvas({
                     <strong>Price</strong>
                   </div>
                   <b>Live market</b>
-                  <small>Updated from venue quotes</small>
+                  <small>Updated continuously</small>
                 </div>
               </div>
 
@@ -444,7 +440,7 @@ export function NetroDensityCanvas({
           >
             <div className="netro-density-market-head">
               <strong>AAPLx</strong>
-              <span>Share truth</span>
+              <span>Share count</span>
               <em>{multiplierLabel.replace(/\s*live$/i, "")}</em>
             </div>
             <div
@@ -454,7 +450,7 @@ export function NetroDensityCanvas({
             >
               <div className="netro-density-chart-meta">
                 <b>Share count</b>
-                <span>Live multiplier vs on-chain</span>
+                <span>Live vs on-chain</span>
               </div>
               <svg viewBox="0 0 640 180" preserveAspectRatio="none" aria-hidden>
                 <polyline
@@ -554,7 +550,7 @@ export function NetroDensityCanvas({
                       void submitPaperAgent("truth AAPLx");
                     }}
                   >
-                    Share truth
+                    Share count
                     <em>Live ×</em>
                   </button>
                   <button

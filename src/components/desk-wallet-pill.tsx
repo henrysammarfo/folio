@@ -34,16 +34,16 @@ export function DeskWalletPill() {
   if (wallet && source) {
     const prefix =
       source === "membership"
-        ? "Tenant"
+        ? "Wallet"
         : source === "session"
-          ? "Session"
-          : "Watch";
+          ? "Wallet"
+          : "Wallet";
     const title =
       source === "membership"
-        ? "Active-tenant membership wallet (tenant-scoped)"
+        ? "Connected wallet"
         : source === "session"
-          ? "Privy session wallet (httpOnly)"
-          : "Watch-wallet bind — not Privy multi-tenant auth";
+          ? "Connected wallet"
+          : "Connected wallet";
     return (
       <Link to="/desk/settings" className="wallet-pill" title={title}>
         {prefix} {shortPubkey(wallet)}
@@ -55,9 +55,9 @@ export function DeskWalletPill() {
     <Link
       to="/desk/settings"
       className="wallet-pill"
-      title="Bind watch-wallet or mint httpOnly session — no invented demo pubkey"
+      title="Connect your wallet in Settings"
     >
-      Bind wallet
+      Connect wallet
     </Link>
   );
 }

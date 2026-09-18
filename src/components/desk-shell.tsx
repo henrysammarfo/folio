@@ -218,11 +218,11 @@ export function DeskShell({
   const scaledUiCompare = truth.data?.scaledUiCompare;
   const scaledUiStripLabel = scaledUiCompare
     ? scaledUiCompare.status === "match"
-      ? `API↔chain match · ${scaledUiCompare.note}`
+      ? `On-chain OK · ${scaledUiCompare.note}`
       : scaledUiCompare.status === "mismatch"
-        ? `API↔chain mismatch · ${scaledUiCompare.note}`
-        : `Scaled UI ${scaledUiCompare.status} · ${scaledUiCompare.note}`
-    : "Scaled UI pending";
+        ? `On-chain mismatch · ${scaledUiCompare.note}`
+        : `On-chain pending · ${scaledUiCompare.note}`
+    : "On-chain pending";
 
   return (
     <div

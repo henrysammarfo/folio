@@ -13,12 +13,12 @@ const SYMBOLS = ["AAPLx", "NVDAx", "TSLAx"] as const;
 export const Route = createFileRoute("/desk/acquire")({
   head: () => ({
     meta: [
-      { title: "Acquire — FOLIO" },
-      { name: "description", content: "Build a guarded xStock quote on Solana mainnet." },
-      { property: "og:title", content: "Acquire — FOLIO" },
+      { title: "Buy — FOLIO" },
+      { name: "description", content: "Buy tokenized stocks on Solana with live quotes." },
+      { property: "og:title", content: "Buy — FOLIO" },
       {
         property: "og:description",
-        content: "Build a guarded xStock quote on Solana mainnet.",
+        content: "Buy tokenized stocks on Solana with live quotes.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -114,7 +114,7 @@ function Page() {
                       ? `${indicative} ${symbol}`
                       : "Continue to see live quote"}
                   </b>
-                  <small>Live Jupiter quote</small>
+                  <small>Live quote</small>
                 </div>
               </div>
             ) : null}
@@ -131,7 +131,7 @@ function Page() {
                 <div className="desk-gate-grid acquire-gate-grid mb-4">
                   <div className="desk-gate-row">
                     <div>
-                      <b>Share truth</b>
+                      <b>Share count</b>
                       <small>
                         {data?.multiplier.ok
                           ? `${data.multiplier.data.currentMultiplier.toFixed(6)}×`
@@ -144,7 +144,7 @@ function Page() {
                   </div>
                   <div className="desk-gate-row" data-testid="acquire-scaled-ui-gate">
                     <div>
-                      <b>On-chain match</b>
+                      <b>On-chain check</b>
                       <small>
                         {data?.scaledUiCompare.status === "match"
                           ? "Matches the ledger"
@@ -213,7 +213,7 @@ function Page() {
                       ? `${data.jupiter.data.outUiAmount.toFixed(6)} ${symbol}`
                       : "—"}
                   </b>
-                  <small>Live Jupiter quote</small>
+                  <small>Live quote</small>
                 </div>
                 <div>
                   <span>Share count</span>

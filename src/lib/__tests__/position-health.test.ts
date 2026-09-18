@@ -68,10 +68,10 @@ describe("position health honesty", () => {
 });
 
 describe("position Scaled UI labels", () => {
-  it("labels match / mismatch / off without inventing pass", () => {
-    expect(scaledUiHealthLabel("match")).toBe("chain match");
-    expect(scaledUiHealthLabel("mismatch")).toBe("chain mismatch");
-    expect(scaledUiHealthLabel("unavailable")).toBe("chain off");
+  it("labels match / mismatch / pending without inventing pass", () => {
+    expect(scaledUiHealthLabel("match")).toBe("On-chain OK");
+    expect(scaledUiHealthLabel("mismatch")).toBe("On-chain mismatch");
+    expect(scaledUiHealthLabel("unavailable")).toBe("On-chain pending");
   });
 
   it("status copy surfaces chain honesty for wallet-read Review", () => {
@@ -81,27 +81,27 @@ describe("position Scaled UI labels", () => {
         qtySource: "wallet-read",
         scaledUiStatus: "match",
       }),
-    ).toBe("Wallet-verified");
+    ).toBe("Verified");
     expect(
       positionStatusLabel({
         health: "Review",
         qtySource: "wallet-read",
         scaledUiStatus: "mismatch",
       }),
-    ).toBe("Wallet · chain mismatch");
+    ).toBe("Wallet · mismatch");
     expect(
       positionStatusLabel({
         health: "Review",
         qtySource: "wallet-read",
         scaledUiStatus: "unavailable",
       }),
-    ).toBe("Wallet · chain off");
+    ).toBe("Wallet · pending");
     expect(
       positionStatusLabel({
         health: "Review",
         qtySource: "paper",
         scaledUiStatus: "match",
       }),
-    ).toBe("Live · paper");
+    ).toBe("Live · est.");
   });
 });

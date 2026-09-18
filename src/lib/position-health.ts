@@ -30,13 +30,13 @@ export function positionHealth(input: {
   return "Unavailable";
 }
 
-/** Short list/detail badge for Scaled UI honesty. */
+/** Short list/detail badge for API ↔ on-chain share count. */
 export function scaledUiHealthLabel(
   status: ScaledUiHealthStatus,
-): "chain match" | "chain mismatch" | "chain off" {
-  if (status === "match") return "chain match";
-  if (status === "mismatch") return "chain mismatch";
-  return "chain off";
+): "On-chain OK" | "On-chain mismatch" | "On-chain pending" {
+  if (status === "match") return "On-chain OK";
+  if (status === "mismatch") return "On-chain mismatch";
+  return "On-chain pending";
 }
 
 /** Status column copy — never soft-sells wallet-read without chain agreement. */
@@ -45,10 +45,10 @@ export function positionStatusLabel(input: {
   qtySource: "wallet-read" | "paper";
   scaledUiStatus: ScaledUiHealthStatus;
 }): string {
-  if (input.health === "Verified") return "Wallet-verified";
+  if (input.health === "Verified") return "Verified";
   if (input.health === "Unavailable") return "Unavailable";
-  if (input.qtySource === "paper") return "Live · paper";
-  if (input.scaledUiStatus === "mismatch") return "Wallet · chain mismatch";
-  if (input.scaledUiStatus === "unavailable") return "Wallet · chain off";
+  if (input.qtySource === "paper") return "Live · est.";
+  if (input.scaledUiStatus === "mismatch") return "Wallet · mismatch";
+  if (input.scaledUiStatus === "unavailable") return "Wallet · pending";
   return "Review";
 }

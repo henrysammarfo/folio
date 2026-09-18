@@ -105,21 +105,6 @@ function resolveDisplayWallet(
   });
 }
 
-function walletSourceHonestyTag(source: WalletBindingSource): string {
-  switch (source) {
-    case "membership":
-      return "Active-tenant membership wallet (tenant-scoped)";
-    case "session":
-      return "Privy session wallet";
-    case "watch-wallet":
-      return "Watch-wallet ≠ Privy multi-tenant auth";
-    case "inspect":
-      return "Ephemeral inspect (not auth / not multi-tenant)";
-    default:
-      return "No wallet bound";
-  }
-}
-
 export type PositionRow = {
   symbol: string;
   name: string;
@@ -483,11 +468,11 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
     let note: string;
     if (!displayWallet) {
       note =
-        "Quantities are paper labels until membership wallet, Privy session wallet, watch-wallet bind, or ephemeral inspect. Multipliers are live API reads compared to on-chain Scaled UI — Wallet-verified requires a match.";
+        "Estimated quantities until you connect a wallet. Share counts are live and checked against the Solana ledger.";
     } else if (walletBalances?.ok) {
-      note = `Qty from mainnet wallet read (${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}). API ↔ on-chain Scaled UI labeled per row. ${walletSourceHonestyTag(walletSource)}.`;
+      note = `Live balances for ${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}. Share counts verified on-chain when they match.`;
     } else {
-      note = `Wallet selected for read but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing paper qty. API ↔ on-chain Scaled UI still labeled.`;
+      note = `Wallet connected but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing estimates. Share counts still live.`;
     }
 
     return {
@@ -576,11 +561,11 @@ export const getCreditBundle = createServerFn({ method: "GET" })
     const inspectActive = walletSource === "inspect" ? displayWallet : null;
     let note: string;
     if (usedWalletQty) {
-      note = `Illustrative — wallet-read qty × live Kamino maxLtv. No borrow broadcast. ${walletSourceHonestyTag(walletSource)}.`;
+      note = `Estimate from your wallet balances × live max LTV. Borrowing is not enabled yet.`;
     } else if (displayWallet && walletBalances && !walletBalances.ok) {
-      note = `Wallet selected but balances unavailable (${walletBalances.reason}) — paper qty × live Kamino maxLtv. No borrow broadcast.`;
+      note = `Wallet connected but balances unavailable — showing estimates × live max LTV. Borrowing is not enabled yet.`;
     } else {
-      note = "Illustrative only — paper qty × live Kamino maxLtv. No borrow broadcast.";
+      note = "Estimate until you connect a wallet. Borrowing is not enabled yet.";
     }
 
     return {
@@ -659,9 +644,9 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
       {
         at: now,
         title: multiplier.ok
-          ? `${symbol} multiplier ${multiplier.data.currentMultiplier.toFixed(6)}×`
-          : `${symbol} multiplier unavailable`,
-        detail: multiplier.ok ? multiplier.source : multiplier.reason,
+          ? `${symbol} share count ${multiplier.data.currentMultiplier.toFixed(6)}×`
+          : `${symbol} share count unavailable`,
+        detail: multiplier.ok ? "Live market feed" : multiplier.reason,
         tone: multiplier.ok ? "green" : "amber",
         mode: multiplier.ok ? multiplier.mode : "unavailable",
       },
@@ -674,10 +659,10 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           at: now,
           title:
             compare.status === "match"
-              ? `On-chain Scaled UI match · ${compare.onchainEffective?.toFixed(6)}×`
+              ? `On-chain share count OK · ${compare.onchainEffective?.toFixed(6)}×`
               : compare.status === "mismatch"
-                ? `On-chain Scaled UI mismatch · ${compare.deltaBps?.toFixed(1)} bps`
-                : "On-chain Scaled UI unavailable",
+                ? `On-chain share count mismatch`
+                : "On-chain share count pending",
           detail: compare.note,
           tone:
             compare.status === "match"
@@ -694,17 +679,17 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           multiplier.ok && multiplier.data.pendingMultiplier != null
             ? `Corporate action pending · ${multiplier.data.pendingMultiplier.toFixed(6)}×`
             : multiplier.ok
-              ? "Corporate action · no pending multiplier"
-              : "Corporate action · multiplier unavailable",
+              ? "No pending corporate action"
+              : "Corporate action unavailable",
         detail: multiplier.ok
           ? multiplier.data.pendingMultiplier != null
-            ? `Live xStocks pending · activation ${
+            ? `Pending activation ${
                 multiplier.data.activationDateTime
                   ? new Date(multiplier.data.activationDateTime * 1000).toISOString()
                   : "n/a"
-              } · reason ${multiplier.data.reason ?? "none"}`
-            : `Current ${multiplier.data.currentMultiplier.toFixed(6)}× · reason ${multiplier.data.reason ?? "none"} · no separate CA calendar feed`
-          : "Cannot label CA pending without live multiplier",
+              }`
+            : `Current ${multiplier.data.currentMultiplier.toFixed(6)}×`
+          : "Waiting on live share count",
         tone:
           multiplier.ok && multiplier.data.pendingMultiplier != null ? "amber" : "neutral",
         mode: multiplier.ok ? multiplier.mode : "unavailable",
@@ -715,41 +700,40 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           ? corporateActionAlerts
             ? "Corporate-action alerts · on"
             : "Corporate-action alerts · off"
-          : "Corporate-action alerts · no session prefs",
+          : "Corporate-action alerts · connect to save",
         detail: prefsFromSession
-          ? "Preference only — live CA signal = xStocks multiplier pending/current (above)."
-          : "Mint httpOnly session (Privy + Supabase) to persist CA alert preference per active tenant.",
+          ? "Preference saved for your account."
+          : "Connect in Settings to save alert preferences.",
         tone: prefsFromSession && corporateActionAlerts ? "blue" : "neutral",
-        /** Pref ≠ mainnet feed — paper until session prefs backed by live CA calendar (none). */
         mode: prefsFromSession ? "paper" : "unavailable",
       },
       {
         at: now,
         title: jupiterQuote.ok
-          ? `Jupiter route inspected · ${jupiterCacheLabel}`
-          : "Jupiter quote unavailable",
+          ? `Buy quote ready · ${jupiterCacheLabel}`
+          : "Buy quote unavailable",
         detail: jupiterQuote.ok
-          ? `out ${jupiterQuote.data.outUiAmount.toFixed(6)} · quote-only · $1 USDC · ${jupiterCacheLabel}`
+          ? `You receive ~${jupiterQuote.data.outUiAmount.toFixed(6)} for $1 USDC`
           : jupiterQuote.reason,
         tone: jupiterQuote.ok ? "blue" : "amber",
         mode: jupiterQuote.ok ? jupiterQuote.mode : "unavailable",
       },
       {
         at: now,
-        title: wash.ok && wash.data.pass ? "Wash clear" : "Wash fail-closed",
+        title: wash.ok && wash.data.pass ? "Route looks clean" : "Checking route…",
         detail: wash.ok
-          ? `${wash.data.pressure} · n=${wash.data.sampleSize} · ${wash.data.notes.join("; ") || "pass"}`
-          : wash.reason,
+          ? wash.data.notes.join("; ") || "Clear"
+          : "Route check unavailable",
         tone: wash.ok && wash.data.pass ? "green" : "amber",
         mode: wash.ok ? wash.mode : "unavailable",
       },
       {
         at: now,
         title: kamino.ok
-          ? "Kamino xStocks market read"
-          : "Kamino read unavailable",
+          ? "Credit markets live"
+          : "Credit markets unavailable",
         detail: kamino.ok
-          ? `${kamino.data.reserves.length} reserves · borrow CPI unavailable (no broadcast)`
+          ? `${kamino.data.reserves.length} reserves · borrow not enabled yet`
           : kamino.reason,
         tone: kamino.ok ? "blue" : "amber",
         mode: kamino.ok ? kamino.mode : "unavailable",
@@ -757,28 +741,28 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
       {
         at: now,
         title: nestCredit.ok
-          ? "Nest.credit vault awareness"
-          : "Nest.credit unavailable",
+          ? "Earn vaults available"
+          : "Earn vaults unavailable",
         detail: nestCredit.ok
-          ? `${nestCredit.data.vaultCount} vaults · ${nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
+          ? `${nestCredit.data.vaultCount} vaults observed`
           : nestCredit.reason,
         tone: nestCredit.ok ? "blue" : "amber",
         mode: nestCredit.ok ? nestCredit.mode : "unavailable",
       },
       {
         at: now,
-        title: "NestUSD borrow capacity",
+        title: "Borrow capacity",
         detail: nestusd.ok
-          ? "Unexpected NestUSD ok — still risk-labeled"
-          : `${nestusd.reason} — fail-closed (≠ Nest.credit)`,
+          ? "Borrow path risk-labeled"
+          : "Borrow capacity not verified yet",
         tone: "amber",
         mode: "unavailable",
       },
       {
         at: now,
         title: pools.ok
-          ? `Raydium pools for ${symbol}`
-          : "Pool awareness unavailable",
+          ? `Pools for ${symbol}`
+          : "Pool data unavailable",
         detail: pools.ok
           ? `${pools.data.raydium.length} pools observed`
           : pools.reason,
@@ -789,7 +773,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
 
     return {
       events,
-      note: "Live-derived activity — not a fabricated ledger. Broadcast remains disabled.",
+      note: "Live desk events from market feeds. Buying and borrowing stay paused until enabled for your account.",
       corporateActionAlerts,
       prefsFromSession,
     };

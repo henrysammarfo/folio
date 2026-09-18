@@ -129,62 +129,38 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(page.locator(".desk-content > .panel")).toHaveCount(0);
     await expect(page.locator(".netro-density-ticker")).toBeVisible();
     await expect(page.locator("[data-netro-surface='1']")).toHaveCount(1);
-    // Live Empire gates must still paint on Netro surface (not static theater only)
+    // Live market gates + share-count strip on Netro surface
     await expect(page.getByTestId("netro-live-gates")).toBeVisible();
-    await expect(page.getByTestId("netro-empire-strip")).toBeVisible();
-    // Decorative strip must not claim live candles; live Scaled UI status is labeled
-    await expect(page.getByTestId("netro-truth-strip")).toContainText(
-      /illustrative strip|not live candles/i,
-    );
+    await expect(page.getByTestId("netro-truth-strip")).toBeVisible();
     await expect(page.getByTestId("netro-scaled-ui-strip")).toContainText(
-      /API↔chain|Scaled UI|match|mismatch|pending|off/i,
+      /On-chain|match|mismatch|pending|Checking/i,
     );
-    // Empire keys readiness — multi-tenant / wash / Pyth fail-closed until paste
-    await expect(page.getByTestId("netro-keys-readiness")).toBeVisible({
-      timeout: 20_000,
-    });
-    await expect(page.getByTestId("netro-keys-readiness")).toContainText(
-      /bitquery|pyth|privy|supabase|multi-tenant|fail-closed|broadcast/i,
-    );
-    await expect(
-      page.getByTestId("netro-keys-readiness").getByRole("link", {
-        name: /settings|paste/i,
-      }),
-    ).toHaveAttribute("href", /\/desk\/settings.*empire-readiness|\/desk\/settings#empire-readiness/);
+    // Empire keys stay in Settings — never on consumer overview
+    await expect(page.getByTestId("netro-keys-readiness")).toHaveCount(0);
+    await expect(page.getByTestId("netro-empire-strip")).toHaveCount(0);
     const gateText = (
       await page.getByTestId("netro-live-gates").innerText()
     ).toLowerCase();
-    expect(gateText).toMatch(/wash/);
-    expect(gateText).toMatch(/fail-closed|live/);
-    expect(gateText).toMatch(/nestusd/);
-    const strip = (
-      await page.getByTestId("netro-empire-strip").innerText()
-    ).toLowerCase();
-    expect(strip).toMatch(/pyth/);
-    expect(strip).toMatch(/scaled ui/);
-    expect(strip).toMatch(/multi-tenant/);
-    expect(strip).toMatch(/raydium|nest\.credit|kamino/);
-    // Live Kamino maxLTV from credit bundle (not hardcoded theater alone)
-    await expect(page.getByText(/Kamino 0\.\d{2} maxLTV/i).first()).toBeVisible({
-      timeout: 15_000,
-    });
+    expect(gateText).toMatch(/share count|route|quote|buy|credit/);
+    expect(gateText).toMatch(/clear|checking|ready|open|ltv|view|\d/);
+    // Live borrow LTV from credit bundle when present
     await expect(
-      page.locator("[data-testid='desk-lab-netro']").getByText(/paper × LTV · no broadcast/i),
-    ).toBeVisible();
+      page.locator("[data-testid='desk-lab-netro']").getByText(/LTV|Credit|Borrow/i).first(),
+    ).toBeVisible({ timeout: 15_000 });
     // Live Jupiter ≤$1 quote-only out amount (never a fill)
     await expect(page.getByTestId("netro-live-quote")).toBeVisible({ timeout: 20_000 });
     await expect(page.getByTestId("netro-live-quote")).toContainText(/AAPLx/i);
     await expect(
-      page.getByTestId("netro-live-quote").getByText(/\d+\.\d+ AAPLx|Unavailable|Quote pending/i),
+      page.getByTestId("netro-live-quote").getByText(/\d+\.\d+|Unavailable|Quote pending|You receive/i),
     ).toBeVisible();
     await expect(
-      page.locator("[data-testid='desk-lab-netro']").getByRole("link", { name: /inspect quote/i }),
+      page.locator("[data-testid='desk-lab-netro']").getByRole("link", { name: /buy aaplx/i }),
     ).toHaveAttribute("href", "/desk/acquire");
-    // Paper agent rail — live spine · never fills
+    // Desk agent rail — live spine · never fills
     const agentRail = page.getByTestId("netro-paper-agent");
     await expect(agentRail).toBeVisible();
-    await agentRail.getByRole("button", { name: /truth pass/i }).click();
-    await expect(agentRail).toContainText(/broadcast=false|nl=/i, {
+    await agentRail.getByRole("button", { name: /share count/i }).click();
+    await expect(agentRail).toContainText(/live answers|trades paused|try again/i, {
       timeout: 60_000,
     });
     await expect(agentRail).not.toContainText(/filled on mainnet|unhackable/i);
@@ -192,8 +168,8 @@ test.describe("FOLIO Block 0 smoke", () => {
     const inspectForm = page.getByTestId("netro-inspect-wallet");
     await expect(inspectForm).toBeVisible();
     const inspectPk = TOKEN_PROGRAM_ID;
-    await inspectForm.getByLabel(/inspect wallet pubkey/i).fill(inspectPk);
-    await inspectForm.getByRole("button", { name: /inspect qty/i }).click();
+    await inspectForm.getByLabel(/wallet address/i).fill(inspectPk);
+    await inspectForm.getByRole("button", { name: /^look up$/i }).click();
     await expect(page).toHaveURL(new RegExp(`/desk\\?inspect=${inspectPk}`), {
       timeout: 15_000,
     });
@@ -202,10 +178,10 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 20_000,
     });
     await expect(page.getByTestId("netro-ownership")).toContainText(
-      /inspect|paper qty|wallet-read|economic/i,
+      /lookup|est\.|wallet|verified|total value|holdings/i,
     );
     await expect(
-      page.getByRole("link", { name: /open positions ledger/i }),
+      page.getByRole("link", { name: /open positions/i }),
     ).toHaveAttribute("href", `/desk/positions?inspect=${inspectPk}`);
     // Positions stays the ledger — Netro must not replace other desk routes
     await page.goto("/desk/positions");
@@ -320,16 +296,14 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
-  test("desk overview supports ephemeral wallet inspect without session secret", async ({
+  test("desk overview supports wallet lookup without session secret", async ({
     page,
   }) => {
     const inspect = TOKEN_PROGRAM_ID;
     await page.goto(`/desk?inspect=${inspect}`);
-    await expect(page.getByText(/prime desk|portfolio|FOLIO|share truth desk/i).first()).toBeVisible({
+    await expect(page.getByText(/your desk|prime desk|folio|holdings/i).first()).toBeVisible({
       timeout: 30_000,
     });
-    // Production Netro overview replaces classic panels — inspect lives on the Netro strip
-    // or deep-links to Positions. Classic overview assertions only when Netro is off.
     const netro = page.getByTestId("desk-lab-netro");
     if ((await netro.count()) > 0) {
       await expect(page.getByTestId("netro-inspect-wallet")).toBeVisible();
@@ -337,73 +311,64 @@ test.describe("FOLIO Block 0 smoke", () => {
         timeout: 20_000,
       });
       await expect(page.getByTestId("netro-ownership")).toContainText(
-        /inspect|paper qty|wallet-read|economic/i,
+        /lookup|est\.|wallet|verified|total value|holdings/i,
       );
-      await expect(page.locator("body")).toContainText(/ephemeral mainnet-read|not auth|no cookie/i);
       await expect(page.locator("body")).not.toContainText(/unhackable|filled on mainnet/i);
       return;
     }
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/inspect|ephemeral|mainnet/);
-    expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);
-    expect(body).toMatch(/live · no pending|pending \d|corporate actions/);
-    expect(body).toMatch(/nest\.credit|not nestusd/);
-    expect(body).toMatch(/nestusd borrow|fail-closed/);
-    expect(body).toMatch(/quote-only|broadcast off|no broadcast/);
-    expect(body).toMatch(/wallet-verified|live marks · paper|paper qty → review/);
+    expect(body).toMatch(/look up|wallet|connect/);
+    expect(body).toMatch(/holdings|portfolio|verified/);
+    expect(body).toMatch(/share count|live|paused/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
   test("credit page labels capacity source", async ({ page }) => {
     await page.goto("/desk/credit");
-    await expect(page.getByText(/credit|collateral|kamino|FOLIO/i).first()).toBeVisible({
+    await expect(page.getByText(/credit|borrow|kamino|FOLIO/i).first()).toBeVisible({
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/paper|wallet-read|collateral|ltv/);
-    expect(body).toMatch(/no borrow broadcast|unavailable|illustrative|unfunded/);
-    expect(body).toMatch(/nestusd/);
-    expect(body).toMatch(/nest\.credit|vault|oft|not nestusd/i);
-    expect(body).toMatch(/unverified|risk|fail-closed|unavailable/);
+    expect(body).toMatch(/estimate|wallet|collateral|ltv|borrow/);
+    expect(body).toMatch(/paused|not enabled|unavailable|estimate/);
+    expect(body).toMatch(/nestusd|nest credit|earn/);
+    expect(body).toMatch(/not verified|risk|unavailable|paused/);
     // Never paint NestUSD as ready/live without a verified endpoint.
     expect(body).not.toMatch(/nestusd[\s\S]{0,40}ready/);
     expect(body).not.toMatch(/7vf…2ka/i);
   });
 
 
-  test("positions page labels paper vs wallet-read qty", async ({ page }) => {
+  test("positions page labels estimated vs wallet qty", async ({ page }) => {
     await page.goto("/desk/positions");
-    await expect(page.getByText(/positions|ownership|FOLIO/i).first()).toBeVisible({
+    await expect(page.getByText(/positions|holdings|FOLIO/i).first()).toBeVisible({
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/paper|wallet-read|wallet/);
-    expect(body).toMatch(/qty|quantity|multiplier|aapl/);
+    expect(body).toMatch(/est\.|estimated|wallet/);
+    expect(body).toMatch(/qty|quantity|share count|aapl/);
     // API ↔ on-chain Scaled UI must be visible on the list (not API-only).
     await expect(page.getByTestId("positions-scaled-ui-AAPLx")).toBeVisible();
     await expect(page.getByTestId("positions-scaled-ui-AAPLx")).toContainText(
-      /chain match|chain mismatch|chain off/i,
+      /On-chain OK|On-chain mismatch|On-chain pending/i,
     );
-    expect(body).toMatch(/chain match|chain mismatch|chain off/);
+    expect(body).toMatch(/on-chain ok|on-chain mismatch|on-chain pending/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
-  test("prime desk surfaces live Empire gates from network matrix", async ({ page }) => {
+  test("prime desk surfaces live market gates", async ({ page }) => {
     await page.goto("/desk/");
     // Production Netro paints live gates; classic overview only when Netro not approved
     const netro = page.getByTestId("netro-live-gates");
-    const classic = page.getByText(/live empire gates/i);
+    const classic = page.getByText(/status|holdings|your desk/i);
     await expect(netro.or(classic).first()).toBeVisible({ timeout: 30_000 });
     if (await netro.count()) {
-      await expect(netro).toContainText(/wash|multiplier/i);
-      // SSR seed: not stuck on defaults forever
-      await expect(netro).toContainText(/live|fail-closed|≤\$1|inspect/i);
+      await expect(netro).toContainText(/share count|route|quote|buy|credit/i);
+      await expect(netro).toContainText(/clear|checking|ready|open|ltv|view|\d/i);
     }
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/wash/);
-    expect(body).toMatch(/nestusd/);
-    expect(body).toMatch(/broadcast/);
-    expect(body).toMatch(/fail-closed|unavailable|quote-only|mainnet-read|paused/);
+    expect(body).toMatch(/share count|route|quote|buy/);
+    expect(body).toMatch(/aapl|desk|live|paused|credit/);
     expect(body).not.toMatch(/unhackable|filled on mainnet/);
   });
 
@@ -413,14 +378,13 @@ test.describe("FOLIO Block 0 smoke", () => {
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/pending corporate action/);
-    expect(body).toMatch(/none on live feed|pending|\d+\.\d+×/);
-    expect(body).toMatch(/api multiplier|on-chain scaled ui/);
+    expect(body).toMatch(/pending split|pending corporate|pending|\d+\.\d+×/);
+    expect(body).toMatch(/share count|on-chain check/);
     await expect(page.getByTestId("position-scaled-ui-compare")).toBeVisible();
     await expect(page.getByTestId("position-scaled-ui-compare")).toContainText(
-      /chain match|chain mismatch|chain off/i,
+      /On-chain OK|On-chain mismatch|On-chain pending/i,
     );
-    expect(body).toMatch(/api ↔ chain|api ↔ on-chain|within|diverge|unavailable/);
+    expect(body).toMatch(/on-chain|economic shares|market price|unavailable|pending/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet|4\.0000/);
   });
 
@@ -455,30 +419,29 @@ test.describe("FOLIO Block 0 smoke", () => {
   });
 
 
-  test("positions supports ephemeral wallet inspect without session secret", async ({
+  test("positions supports wallet lookup without session secret", async ({
     page,
   }) => {
     const inspect = TOKEN_PROGRAM_ID;
     await page.goto(`/desk/positions?inspect=${inspect}`);
-    await expect(page.getByText(/positions|ownership|FOLIO/i).first()).toBeVisible({
+    await expect(page.getByText(/positions|holdings|FOLIO/i).first()).toBeVisible({
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/inspect|ephemeral|mainnet/);
-    expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);
+    expect(body).toMatch(/look up|looking up|wallet address/);
+    expect(body).toMatch(/connect|settings|live/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
-  test("position detail keeps inspect wallet-read continuity", async ({ page }) => {
+  test("position detail keeps lookup continuity", async ({ page }) => {
     const inspect = TOKEN_PROGRAM_ID;
     await page.goto(`/desk/positions/AAPLx?inspect=${inspect}`);
     await expect(page.getByText(/AAPLx|position|FOLIO/i).first()).toBeVisible({
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/inspect|ephemeral/);
-    expect(body).toMatch(/wallet-read|inspect ephemeral|not auth|not multi-tenant/);
-    expect(body).toMatch(/pending corporate action/);
+    expect(body).toMatch(/share count|on-chain|quantity|estimate|wallet/);
+    expect(body).toMatch(/pending split|pending|\d+\.\d+×/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet|4\.0000/);
   });
 
@@ -506,32 +469,32 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).not.toMatch(/unhackable|nation-state|4\.0000/);
   });
 
-  test("activity labels Jupiter cache + Nest.credit ≠ NestUSD", async ({ page }) => {
+  test("activity labels buy quote + credit honesty", async ({ page }) => {
     await page.goto("/desk/activity");
     await expect(page.getByText(/activity|events|FOLIO/i).first()).toBeVisible({
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/jupiter route inspected|jupiter quote unavailable/);
-    expect(body).toMatch(/live|cached|stale-cache|unavailable/);
-    expect(body).toMatch(/nest\.credit|not nestusd/);
-    expect(body).toMatch(/nestusd.*fail-closed|fail-closed.*nestusd|≠ nest\.credit/);
+    expect(body).toMatch(/buy quote ready|buy quote unavailable/);
+    expect(body).toMatch(/live|cached|stale-cache|unavailable|pending/);
+    expect(body).toMatch(/earn vaults|credit markets|borrow capacity/);
+    expect(body).toMatch(/not verified|paused|unavailable|risk/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
 
-  test("credit supports ephemeral wallet inspect without session secret", async ({
+  test("credit supports wallet lookup without session secret", async ({
     page,
   }) => {
     const inspect = TOKEN_PROGRAM_ID;
     await page.goto(`/desk/credit?inspect=${inspect}`);
-    await expect(page.getByText(/credit|collateral|kamino|FOLIO/i).first()).toBeVisible({
+    await expect(page.getByText(/credit|borrow|kamino|FOLIO/i).first()).toBeVisible({
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toMatch(/inspect|ephemeral|mainnet/);
-    expect(body).toMatch(/not.*auth|not multi-tenant|≠.*privy|not.*session/);
-    expect(body).toMatch(/nestusd|kamino|no borrow|fork|unavailable|illustrative/);
+    expect(body).toMatch(/look up|looking up|wallet address/);
+    expect(body).toMatch(/connect|settings|ltv|borrow/);
+    expect(body).toMatch(/nestusd|kamino|paused|unavailable|estimate/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 

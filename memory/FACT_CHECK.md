@@ -353,3 +353,9 @@ EOF
 |---|---|---|---|
 | TradingView Advanced Chart widget needs no API key | CONFIRMED | tradingview.com/widget-docs | 2026-09-18 |
 | Signal azure replaces Netro yellow in tip CSS/TSX | CONFIRMED | no `#f4d014` in src; `#0EA5C9` present | 2026-09-18 |
+
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Consumer desk pages no longer lead with Empire/fail-closed/paper theater | CONFIRMED in-repo | netro + positions/credit/activity/acquire/settings chrome; Empire strip absent on overview | 2026-09-18 |
+| position-health labels are On-chain OK / Live · est. | CONFIRMED | position-health.ts + vitest | 2026-09-18 |

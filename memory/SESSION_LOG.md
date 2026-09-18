@@ -610,3 +610,12 @@
 
 - Production ReferenceError: `keysReadiness is not defined` in NetroDensityCanvas (leftover effect after Empire keys removed from overview).
 - Removed broken effect + prop. Vercel token stored in gitignored `.env` only (not committed).
+
+
+## 2026-09-18 — Consumer pages pass (overview + rest)
+
+- User: overview still unfinished; fix other pages too (not just overview).
+- Overview Netro: Trade AAPLx, Share count (not share truth), Buy path, Connect wallet once, agent meta softened.
+- Positions / detail / Credit / Activity / Acquire / Settings chrome / fallback desk.index: consumer copy; shared WalletLookupPanel; est. not paper theater.
+- Activity events + positions/credit notes softened at source. Empire keys stay Settings-only.
+- position-health labels → On-chain OK / Live · est.; e2e updated. Vitest 147 green.
