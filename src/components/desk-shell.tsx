@@ -316,13 +316,9 @@ export function DeskShell({
           })}
         </nav>
         <div className="desk-sidebar-foot">
-          <StatusBadge tone="blue">Quote-only</StatusBadge>
-          <p>Broadcast paused</p>
-          <p>
-            <Link to="/lab/ui">
-              {approvedUi ? `Lab UI (${approvedUi})` : "Approve lab UI"}
-            </Link>{" "}
-            · <Link to="/lab/shaders">shaders</Link>
+          <StatusBadge tone="blue">Live quotes</StatusBadge>
+          <p className="desk-foot-meta">
+            Mainnet read · broadcast paused until you fund a fill.
           </p>
         </div>
       </aside>
@@ -337,11 +333,14 @@ export function DeskShell({
         ) : null}
         <header className="desk-topbar">
           <div className="desk-search desk-search-policy" aria-label="Desk policy">
-            Quote-only · broadcast paused · ≤~$1
+            Honest share counts · wash fail-closed · live Jupiter quotes
           </div>
           <div className="desk-network">
-            <span className="live-dot" /> Mainnet read · no broadcast
+            <span className="live-dot" /> Solana mainnet
           </div>
+          <Link to="/desk/acquire" className="desk-topbar-cta">
+            Buy
+          </Link>
           <DeskWalletPill />
         </header>
         <main className="desk-content">

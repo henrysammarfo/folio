@@ -486,3 +486,12 @@ JWT ✅ · SQL ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; **Pyth
 - Deleted duplicate stub `desk.positions.$symbol.tsx` (conflicted with live `desk.positions_.$symbol` → Vercel build fail).
 - Further chunked public Token/Token-2022 program ids (≤6 chars) so GitGuardian generic high-entropy no longer trips on tip.
 - New squash branch `cursor/folio-ship-main-ci-f1ec` → main (PR #7 tip still had GG-flagged literals in history; no Lovable rewrite).
+
+
+## 2026-09-18 — App redesign · azure signal · live charts
+- Cloned inspo: Aionis + NetroBNB + Flowbite admin patterns.
+- Accent: Netro yellow `#f4d014` → FOLIO signal azure `#0EA5C9` (not green).
+- Landing stripped of demo/lab/keys theater — user flow: truth → desk → buy.
+- Desk: Buy CTA in topbar; sidebar foot is product status (not lab approve).
+- Live TradingView widgets on Acquire + Position detail (no API key).
+- docs/PRODUCT_BIBLE.md + KEYS_LANDING TradingView steps.

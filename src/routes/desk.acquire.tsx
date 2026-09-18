@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
+import { TradingViewChart } from "@/components/tradingview-chart";
 import { Button } from "@/components/ui/button";
 import { getAcquireBundle } from "@/lib/desk.functions";
 
@@ -57,31 +58,16 @@ function Page() {
   }, [data, spendUsdc]);
 
   return (
-    <DeskShell eyebrow="Guarded acquisition" title="Build a quote">
+    <DeskShell eyebrow="Buy" title={`Buy ${symbol}`}>
       <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="quote-only">Broadcast paused</ModeBadge>
+        <ModeBadge mode="quote-only">Live quote · fill paused</ModeBadge>
         <ModeBadge mode={data?.multiplier.ok ? data.multiplier.mode : "unavailable"}>
           {data?.multiplier.ok
-            ? `Multiplier ${data.multiplier.data.currentMultiplier.toFixed(6)}×`
+            ? `${data.multiplier.data.currentMultiplier.toFixed(6)}× live`
             : "Multiplier pending"}
         </ModeBadge>
         <ModeBadge mode={data?.wash.ok ? data.wash.mode : "unavailable"}>
-          {data?.wash.ok && data.wash.data.pass ? "Wash clear" : "Wash fail-closed"}
-        </ModeBadge>
-        <ModeBadge
-          mode={
-            data?.prefsFromSession && data.strictFailClosed
-              ? "mainnet-read"
-              : data?.prefsFromSession
-                ? "paper"
-                : "unavailable"
-          }
-        >
-          {data?.prefsFromSession
-            ? data.strictFailClosed
-              ? "Strict fail-closed · session prefs"
-              : "Strict off · session prefs"
-            : "Strict prefs · no session"}
+          {data?.wash.ok && data.wash.data.pass ? "Wash clear" : "Wash checking"}
         </ModeBadge>
       </div>
 
@@ -93,11 +79,17 @@ function Page() {
         ))}
       </div>
 
+      <div className="acquire-layout">
+        <Panel title={`${symbol.replace(/x$/i, "")} market`} meta={<StatusBadge tone="blue">Live</StatusBadge>}>
+          <TradingViewChart symbol={symbol} height={440} interval="60" theme="light" />
+        </Panel>
+
+        <div className="acquire-ticket">
       <Panel
         title={
-          step === 1 ? "Describe the order" : step === 2 ? "Policy checks" : "Quote-only review"
+          step === 1 ? "Your order" : step === 2 ? "Safety checks" : "Review quote"
         }
-        meta={<StatusBadge tone="blue">No broadcast</StatusBadge>}
+        meta={<StatusBadge tone="blue">Live Jupiter</StatusBadge>}
       >
         {step === 1 ? (
           <div className="form-grid">
@@ -468,13 +460,15 @@ function Page() {
             }}
           >
             {step === 3
-              ? "Quote reviewed"
+              ? "Quote ready"
               : step === 2 && data && !data.gates.canReview
                 ? "Blocked — fail-closed"
                 : "Continue"}
           </Button>
         </div>
       </Panel>
+        </div>
+      </div>
     </DeskShell>
   );
 }

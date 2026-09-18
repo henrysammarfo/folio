@@ -5,6 +5,7 @@ import { z } from "zod";
 import { DeskShell, Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 import { ModeBadge } from "@/components/mode-badge";
+import { TradingViewChart } from "@/components/tradingview-chart";
 import { getPositionsBundle } from "@/lib/desk.functions";
 import { scaledUiHealthLabel } from "@/lib/position-health";
 
@@ -65,37 +66,22 @@ function Page() {
       <div className="mb-3 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Live multipliers</ModeBadge>
         <ModeBadge mode={row?.qtySource === "wallet-read" ? "mainnet-read" : "paper"}>
-          {row?.qtySource === "wallet-read" ? "Wallet-read qty" : "Paper qty"}
-        </ModeBadge>
-        <ModeBadge
-          mode={
-            walletSource === "membership" ||
-            walletSource === "session" ||
-            walletSource === "watch-wallet" ||
-            walletSource === "inspect"
-              ? "mainnet-read"
-              : "unavailable"
-          }
-        >
-          {walletSource === "membership"
-            ? "Membership wallet"
-            : walletSource === "session"
-              ? "Session bound"
-              : walletSource === "watch-wallet"
-                ? "Watch-wallet"
-                : walletSource === "inspect"
-                  ? "Inspect ephemeral"
-                  : "No wallet bind"}
+          {row?.qtySource === "wallet-read" ? "Wallet qty" : "Paper qty"}
         </ModeBadge>
       </div>
-      <Panel
-        title={row?.name ?? symbol}
-        meta={
-          <StatusBadge tone={isFetching ? "blue" : row?.qtySource === "wallet-read" ? "green" : "neutral"}>
-            {isFetching ? "…" : row?.qtySource === "wallet-read" ? "Wallet-read" : "Paper"}
-          </StatusBadge>
-        }
-      >
+
+      <div className="acquire-layout mb-4">
+        <Panel title="Market" meta={<StatusBadge tone="blue">Live</StatusBadge>}>
+          <TradingViewChart symbol={symbol} height={380} interval="D" theme="light" />
+        </Panel>
+        <Panel
+          title={row?.name ?? symbol}
+          meta={
+            <StatusBadge tone={isFetching ? "blue" : row?.qtySource === "wallet-read" ? "green" : "neutral"}>
+              {isFetching ? "…" : row?.qtySource === "wallet-read" ? "Wallet" : "Paper"}
+            </StatusBadge>
+          }
+        >
         {!row ? (
           <p>No live row for {symbol}. Open from the positions list.</p>
         ) : (
@@ -183,6 +169,16 @@ function Page() {
           </div>
         )}
       </Panel>
+      </div>
+      <div className="mt-3">
+        <Link
+          to="/desk/acquire"
+          className="desk-topbar-cta"
+          style={{ display: "inline-flex" }}
+        >
+          Buy {symbol}
+        </Link>
+      </div>
     </DeskShell>
   );
 }

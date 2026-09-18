@@ -347,3 +347,9 @@ EOF
 |---|---|---|---|
 | Duplicate desk.positions.$symbol caused Vercel build fail on ship-main | CONFIRMED | Build log: conflicting fullPath with desk.positions_.$symbol | 2026-09-17 |
 | ≤6-char joinId chunks assemble correct Token/Token-2022 program ids | CONFIRMED | tsx equality check + vitest wallet tests | 2026-09-17 |
+
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| TradingView Advanced Chart widget needs no API key | CONFIRMED | tradingview.com/widget-docs | 2026-09-18 |
+| Signal azure replaces Netro yellow in tip CSS/TSX | CONFIRMED | no `#f4d014` in src; `#0EA5C9` present | 2026-09-18 |

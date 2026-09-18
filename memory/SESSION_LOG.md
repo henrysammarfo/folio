@@ -582,3 +582,10 @@
 - Vercel dpl_6Rk6Hryg…: conflicting `/desk/positions/$symbol` from stub + pathless detail → removed stub.
 - GG on PR #7: Generic High Entropy on long Tokenkeg/TokenzQd string halves → 6-char joinId chunks.
 - Squash onto new branch for GG-clean single commit onto main (cannot rewrite Lovable-synced history).
+
+
+## 2026-09-18 — Script whole thing · redesign pass
+
+- User: clone three repos, change yellow→another color, rebuild layouts, strip demos/writing, live charts/buy, research GTM/retention.
+- Accent azure `#0EA5C9`. TradingView free widget wired. PRODUCT_BIBLE for design/GTM.
+- Broadcast still paused (honest) — quotes live. Option B Charting Library documented if Henry wants license.

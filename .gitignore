@@ -1,46 +1,42 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
+/blob-report/
+.dev.vars
 dist
 dist-ssr
-.output
-.vinxi
-.tanstack/**
-.nitro
-*.local
-
-# Wrangler / Cloudflare
-.wrangler/
-.dev.vars
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Secrets & agent memory local
+# Editor directories and files
 .env
 .env.*
 !.env.example
-.dev.vars
+.idea
+lerna-debug.log*
+*.local
+*.log
+logs
+# Logs
 memory/SESSION_LOG.local.md
-
+NetroBNB/
+.nitro
+*.njsproj
+node_modules
+npm-debug.log*
+*.ntvs*
+.output
 # Playwright
-/test-results/
-/playwright-report/
-/blob-report/
 /playwright/.cache/
+/playwright-report/
+pnpm-debug.log*
+# Secrets & agent memory local
+*.sln
+*.suo
+*.sw?
+.tanstack/**
+/test-results/
 .vercel/
+.vinxi
+.vscode/*
+!.vscode/extensions.json
+.wrangler/
+# Wrangler / Cloudflare
+yarn-debug.log*
+yarn-error.log*

@@ -108,6 +108,33 @@ After Henry replies `Approve lab UI: …` in chat, set on Vercel (Preview + Prod
 
 Empire trading keys still need Henry paste (Bitquery · Pyth · Privy · Supabase · optional Jupiter) — agents cannot invent provider secrets.
 
+---
+
+## TradingView (live charts)
+
+### Option A — Free widget (shipped · no key)
+
+FOLIO embeds TradingView’s **Advanced Chart** widget on Acquire + Position detail.
+
+1. No API key. No Vercel env.
+2. Underlying equities: AAPLx → `NASDAQ:AAPL`, NVDAx → `NASDAQ:NVDA`, TSLAx → `NASDAQ:TSLA`.
+3. Keep the TradingView attribution link (required by widget terms).
+4. Widget data is display-only — not for automated trading / order generation.
+
+Docs: https://www.tradingview.com/widget-docs/widgets/charts/advanced-chart/
+
+### Option B — Charting Library (optional · license)
+
+Only if we need full self-host / custom Solana xStock candles:
+
+1. Apply for TradingView Charting Library access (company / public web project).
+2. Wait for GitHub invite to the private library repo.
+3. Host `charting_library/` privately (not redistributable publicly).
+4. Implement a UDF/datafeed against FOLIO price spine (Yahoo / Jupiter / Bitquery) — never invent candles.
+5. Store any license tokens only in Vercel env — never commit.
+
+You do **not** need Option B for Stocklana ship. Say the word if you want Option B and I will walk the application form fields.
+
 ## Honesty rules (do not regress)
 
 - No wash clear without Bitquery success

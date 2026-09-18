@@ -534,7 +534,7 @@ export function NetroDensityCanvas({
               <svg viewBox="0 0 640 180" preserveAspectRatio="none" aria-hidden>
                 <polyline
                   fill="none"
-                  stroke="#f4d014"
+                  stroke="#0EA5C9"
                   strokeWidth="2.2"
                   points="0,140 40,132 80,128 120,118 160,122 200,108 240,98 280,104 320,86 360,92 400,74 440,80 480,62 520,70 560,52 600,58 640,44"
                 />
