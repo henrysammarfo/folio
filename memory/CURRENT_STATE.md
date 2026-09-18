@@ -505,3 +505,8 @@ JWT ✅ · SQL ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; **Pyth
 ## 2026-09-18 — Consumer UX (post-prod feedback)
 - Desk is buy/hold/borrow first. Operator jargon / Empire keys / honesty theater live in Settings only.
 - Start truth → `/desk/positions/AAPLx`. Sidebar foot = Profile.
+
+## 2026-09-18 — /desk crash fixed · prod verified
+- Cause: dangling `keysReadiness` after Empire keys removed from overview → error boundary.
+- Fix on main (`2966d7e`). Prod Ready; browser + SSR show Your desk / Open AAPLx / Buy.
+- Runtime errors (24h): none. New Vercel token in gitignored `.env` only — **rotate chat-pasted token**.

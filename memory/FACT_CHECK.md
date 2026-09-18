@@ -353,3 +353,8 @@ EOF
 |---|---|---|---|
 | TradingView Advanced Chart widget needs no API key | CONFIRMED | tradingview.com/widget-docs | 2026-09-18 |
 | Signal azure replaces Netro yellow in tip CSS/TSX | CONFIRMED | no `#f4d014` in src; `#0EA5C9` present | 2026-09-18 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Prod `/desk` error page was `keysReadiness` ReferenceError | CONFIRMED fixed | main `2966d7e`; browser 2026-09-18 shows desk UI | 2026-09-18 |
+| folio-tawny-one `/desk` serves consumer desk (not error boundary) | CONFIRMED live | SSR HTML + browser screenshot; Vercel runtime errors 0/24h | 2026-09-18 |
