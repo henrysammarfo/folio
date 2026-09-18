@@ -500,3 +500,8 @@ JWT ✅ · SQL ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; **Pyth
 ## 2026-09-18 — Merged to main · production READY
 - Merged `cursor/folio-app-redesign-f1ec` → `main` (`33f41b9`).
 - Vercel production READY: https://folio-tawny-one.vercel.app
+
+
+## 2026-09-18 — Consumer UX (post-prod feedback)
+- Desk is buy/hold/borrow first. Operator jargon / Empire keys / honesty theater live in Settings only.
+- Start truth → `/desk/positions/AAPLx`. Sidebar foot = Profile.

@@ -203,7 +203,7 @@ function Page() {
         <div className="settings-main">
       <Panel
         title="Production readiness"
-        meta={<StatusBadge tone="amber">Henry actions</StatusBadge>}
+        meta={<StatusBadge tone="blue">Operator</StatusBadge>}
         collapsible
         defaultOpen
       >
@@ -671,7 +671,7 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
       <div id="settings-session" className="scroll-mt-24">
       <Panel
         title="Bind Privy → httpOnly session"
-        meta={<StatusBadge tone="amber">Fail-closed without keys</StatusBadge>}
+        meta={<StatusBadge tone="neutral">Keys required</StatusBadge>}
         collapsible
         defaultOpen={empireKeysReady}
       >

@@ -595,3 +595,12 @@
 - User: commit, push, merge to main, deploy.
 - Merged redesign (incl. ship tip) to main; closed PRs #8/#9.
 - Production dpl_MvJG5Dp… READY · folio-tawny-one.vercel.app
+
+
+## 2026-09-18 — Consumer desk pass (kill tutorial chrome)
+
+- User screenshots: Live Quotes foot, wash-fail jargon, Empire keys on overview, Start truth pass → marketing /truth, yellow honesty boxes, paper/fixture theater.
+- Overview: consumer copy · Open AAPLx (not /truth) · Buy CTA · Empire keys removed from desk · holdings language softened.
+- Sidebar: Profile link (no Live Quotes badge); collapsed shows avatar only.
+- Acquire: simple Order/Checks/Review — gates behind quiet OK checklist.
+- Yellow warning-soft → azure wash.
