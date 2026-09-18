@@ -610,3 +610,10 @@
 
 - Production ReferenceError: `keysReadiness is not defined` in NetroDensityCanvas (leftover effect after Empire keys removed from overview).
 - Removed broken effect + prop. Vercel token stored in gitignored `.env` only (not committed).
+
+
+## 2026-09-18 — Re-verify prod /desk + new Vercel token
+
+- User pasted new Vercel token; stored in gitignored `.env` only (not committed).
+- Production Ready (folio-tawny-one); `/desk` SSR + browser: Your desk / Open AAPLx / Buy — no error boundary.
+- Vercel runtime errors MCP: none in last 24h. `keysReadiness` gone from src.
