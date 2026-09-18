@@ -604,3 +604,9 @@
 - Sidebar: Profile link (no Live Quotes badge); collapsed shows avatar only.
 - Acquire: simple Order/Checks/Review — gates behind quiet OK checklist.
 - Yellow warning-soft → azure wash.
+
+
+## 2026-09-18 — /desk crash fix
+
+- Production ReferenceError: `keysReadiness is not defined` in NetroDensityCanvas (leftover effect after Empire keys removed from overview).
+- Removed broken effect + prop. Vercel token stored in gitignored `.env` only (not committed).
