@@ -14,7 +14,6 @@ import {
   NETRO_LIVE_GATE_DEFAULTS,
   type NetroLiveGateLabels,
 } from "@/lib/netro-live-gates";
-import type { NetroKeysReadiness } from "@/lib/netro-keys-readiness";
 import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 
 type Props = {
@@ -23,8 +22,6 @@ type Props = {
   gates?: NetroLiveGateLabels;
   /** Live positions honesty — paper vs wallet-read / inspect. */
   ownership?: NetroOwnershipSummary | null;
-  /** Live Empire key presence — multi-tenant / wash / Pyth paste path. */
-  keysReadiness?: NetroKeysReadiness | null;
   /** Prefill from `/desk?inspect=` deep-link. */
   initialInspect?: string | undefined;
   /** Live API↔on-chain Scaled UI status for the market strip (never fake candles). */
@@ -53,7 +50,6 @@ export function NetroDensityCanvas({
   multiplierLabel,
   gates = NETRO_LIVE_GATE_DEFAULTS,
   ownership = null,
-  keysReadiness: _keysReadiness = null,
   initialInspect = "",
   scaledUiStripLabel = "Scaled UI pending",
   enablePaperAgent = false,
@@ -73,10 +69,6 @@ export function NetroDensityCanvas({
     setInspectInput(initialInspect ?? "");
     if (initialInspect) setOwnershipOpen(true);
   }, [initialInspect]);
-
-  useEffect(() => {
-    if ((keysReadiness?.missingCount ?? 0) > 0) setKeysOpen(true);
-  }, [keysReadiness?.missingCount]);
 
   useEffect(() => {
     const tick = () => {

@@ -37,10 +37,6 @@ import {
   type LabUiId,
 } from "@/lib/lab-pick";
 import { buildNetroLiveGateLabels } from "@/lib/netro-live-gates";
-import {
-  buildNetroKeysReadiness,
-  type NetroKeysReadiness,
-} from "@/lib/netro-keys-readiness";
 import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 import { buildNetroOwnershipSummary } from "@/lib/netro-ownership";
 
@@ -219,19 +215,6 @@ export function DeskShell({
     rows: positions.data?.rows ?? [],
   });
   const readiness = session.data;
-  const keysReadiness: NetroKeysReadiness | null = readiness
-    ? buildNetroKeysReadiness({
-        bitqueryKeyPresent: readiness.bitqueryKeyPresent,
-        pythApiKeyPresent: readiness.pythApiKeyPresent,
-        privyConfigured: readiness.privyConfigured,
-        supabaseConfigured: readiness.supabaseConfigured,
-        supabaseJwtConfigured: readiness.supabaseJwtConfigured,
-        supabaseSchemaReady: readiness.supabaseSchemaReady,
-        sessionSecretPresent: readiness.sessionSecretPresent,
-        broadcastPaused: readiness.broadcastPaused,
-        jupiterKeyPresent: readiness.jupiterKeyPresent,
-      })
-    : null;
   const scaledUiCompare = truth.data?.scaledUiCompare;
   const scaledUiStripLabel = scaledUiCompare
     ? scaledUiCompare.status === "match"
@@ -350,7 +333,6 @@ export function DeskShell({
                 multiplierLabel={multiplierLabel}
                 gates={netroGates}
                 ownership={ownership}
-                keysReadiness={null}
                 initialInspect={inspectSearch}
                 scaledUiStripLabel={scaledUiStripLabel}
                 enablePaperAgent
