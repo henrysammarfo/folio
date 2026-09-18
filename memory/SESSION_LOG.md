@@ -589,3 +589,9 @@
 - User: clone three repos, change yellow→another color, rebuild layouts, strip demos/writing, live charts/buy, research GTM/retention.
 - Accent azure `#0EA5C9`. TradingView free widget wired. PRODUCT_BIBLE for design/GTM.
 - Broadcast still paused (honest) — quotes live. Option B Charting Library documented if Henry wants license.
+
+
+## 2026-09-18 — Merge + deploy
+- User: commit, push, merge to main, deploy.
+- Merged redesign (incl. ship tip) to main; closed PRs #8/#9.
+- Production dpl_MvJG5Dp… READY · folio-tawny-one.vercel.app

@@ -495,3 +495,8 @@ JWT ✅ · SQL ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; **Pyth
 - Desk: Buy CTA in topbar; sidebar foot is product status (not lab approve).
 - Live TradingView widgets on Acquire + Position detail (no API key).
 - docs/PRODUCT_BIBLE.md + KEYS_LANDING TradingView steps.
+
+
+## 2026-09-18 — Merged to main · production READY
+- Merged `cursor/folio-app-redesign-f1ec` → `main` (`33f41b9`).
+- Vercel production READY: https://folio-tawny-one.vercel.app
