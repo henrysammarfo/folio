@@ -1,0 +1,17 @@
+---
+description: FOLIO doctrine — honest stock desk, fail-closed, no unhackable claims
+alwaysApply: true
+---
+
+# FOLIO doctrine
+
+- Product job: honest share counts → refuse wash → buy on Solana → borrow without selling → guarded agent.
+- Soft pitch only in user-facing copy; never lead with "corporate-action prime desk" jargon.
+- Accra = build base, not beachhead ICP (EU/APAC non-US).
+- Architecture docs + `memory/*` are binding. Update `memory/CURRENT_STATE.md`, `SESSION_LOG.md`, `FACT_CHECK.md` on material changes.
+- Never claim unhackable / nation-state-proof. Document residual risk in `memory/THREAT_MODEL.md`.
+- No mocks, no silent fallbacks, no fake xStock mints/fills. Missing dependency → fail-closed + labeled mode.
+- Multi-tenant: httpOnly server sessions — no auth secrets in localStorage.
+- Broadcast / mentor outreach paused while `BROADCAST_PAUSED=true` or Block 0 demo missing.
+- Mainnet deploy of custom programs out of ≤~$1 budget — use mainnet READ + quote-only + local fork proofs.
+- Secrets only in gitignored `.env` — never commit or re-echo keys from chat.
