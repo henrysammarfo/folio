@@ -1,4 +1,11 @@
 
+## 2026-09-19 — Landing templates (benefits / glow / glass / falcon)
+
+- Wired BenefitsSection (3-card + video), glowing FeatureCards (motion), liquid-glass video footer on `/`.
+- Added `public/falcon-ops.html` Falcon AI ops triptych (standalone).
+- Installed `motion`. FOLIO copy on marketing sections; template structure preserved.
+
+
 ## 2026-09-19 — Landing + marketing polish
 
 - Horizontal slide-through on `/` (auto-advance + snap + arrows).
