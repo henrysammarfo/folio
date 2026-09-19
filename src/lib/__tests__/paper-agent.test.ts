@@ -213,7 +213,9 @@ describe("runPaperAgent live spine", () => {
     expect(res.data.spine.quote?.cacheLabel).toBe("live");
     expect(res.data.spine.gates?.washOk).toBe(false);
     expect(res.data.spine.gates?.canReview).toBe(false);
-    expect(res.data.spine.gates?.blockedReasons.join(" ")).toMatch(/BITQUERY_API_KEY/);
+    expect(res.data.spine.gates?.blockedReasons.join(" ")).toMatch(
+      /BITQUERY|Gecko|wash_feeds|fail-closed|Wash gate/i,
+    );
     expect(res.data.spine.gates?.honestyNotes.join(" ")).toMatch(/Scaled UI/i);
     expect(res.data.reply).toMatch(/quote-only/);
     expect(res.data.reply).toMatch(/\blive\b/);

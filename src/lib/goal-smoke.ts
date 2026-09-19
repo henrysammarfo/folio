@@ -57,9 +57,7 @@ export function classifyGoalRequirements(
       const waiting: string[] = [];
       if (!input.washLive) {
         waiting.push(
-          input.bitqueryKey
-            ? "wash keyed but not live"
-            : "BITQUERY_API_KEY (wash fail-closed)",
+          "wash tape dark (Bitquery quota or Gecko free path)",
         );
       }
       if (!input.pythLive) {

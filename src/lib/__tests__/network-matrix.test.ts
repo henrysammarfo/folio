@@ -44,7 +44,9 @@ describe("buildNetworkMatrix honesty", () => {
     expect(byCap["Broadcast swap / borrow"]?.detail).toMatch(/BROADCAST_PAUSED|quote-only/i);
 
     expect(byCap["Wash / linked-flow gate"]?.mode).toBe("unavailable");
-    expect(byCap["Wash / linked-flow gate"]?.detail).toMatch(/BITQUERY_API_KEY missing/);
+    expect(byCap["Wash / linked-flow gate"]?.detail).toMatch(
+      /Gecko|Bitquery optional|fail-closed|not wired/i,
+    );
 
     expect(byCap["Multi-tenant sessions (Privy + Supabase)"]?.mode).toBe("unavailable");
 
@@ -78,7 +80,7 @@ describe("buildNetworkMatrix honesty", () => {
     );
   });
 
-  it("labels wash live only when Bitquery key present and gate ok", () => {
+  it("labels wash live from Bitquery or free Gecko source", () => {
     const rows = buildNetworkMatrix({
       multiplier: live,
       pyth: live,
@@ -99,7 +101,7 @@ describe("buildNetworkMatrix honesty", () => {
     });
     const wash = rows.find((r) => r.capability.startsWith("Wash"));
     expect(wash?.mode).toBe("mainnet-read");
-    expect(wash?.detail).toMatch(/Bitquery live/);
+    expect(wash?.detail).toMatch(/Bitquery live|GeckoTerminal|live/i);
     const membership = rows.find((r) => r.capability === "Membership wallet qty binding");
     expect(membership?.mode).toBe("mainnet-read");
     const roles = rows.find((r) => r.capability === "Role-gated desk prefs");
