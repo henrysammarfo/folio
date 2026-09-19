@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Github, Linkedin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { FolioMark } from "@/components/folio-brand";
 import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
+import { BenefitsSection } from "@/components/landing-benefits";
+import { LandingGlassFooter } from "@/components/landing-glass-footer";
+import { GlowingFeaturesSection } from "@/components/landing-glow-features";
 import { LandingSlideThrough } from "@/components/landing-slide";
 import { getTruthBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
@@ -117,6 +120,8 @@ function Home() {
       </section>
 
       <LandingSlideThrough />
+      <BenefitsSection />
+      <GlowingFeaturesSection />
 
       <section className="home-section home-section-signal" aria-label="Desk">
         <div className="home-desk-tease">
@@ -150,60 +155,7 @@ function Home() {
         </div>
       </section>
 
-      <footer className="home-footer">
-        <div className="home-brand">
-          <div className="brand-lockup text-primary-foreground">
-            <FolioMark className="size-7" />
-            <span>FOLIO</span>
-          </div>
-          <p>Truth before trade. Credit without compromise.</p>
-        </div>
-        <nav className="home-nav">
-          <div>
-            <strong>PRODUCT</strong>
-            <Link to="/desk">Desk</Link>
-            <Link to="/desk/acquire">Buy</Link>
-            <Link to="/desk/credit">Borrow</Link>
-          </div>
-          <div>
-            <strong>LEARN</strong>
-            <Link to="/truth">Share counts</Link>
-            <Link to="/network">Network</Link>
-            <Link to="/about">About</Link>
-          </div>
-          <div>
-            <strong>CONNECT</strong>
-            <a href="https://github.com/henrysammarfo">GitHub</a>
-            <a href="https://x.com/henrysammarfo">@henrysammarfo</a>
-            <Link to="/privacy">Privacy</Link>
-          </div>
-        </nav>
-        <div className="home-bottom">
-          <p>
-            © 2026 FOLIO ·{" "}
-            <Link to="/privacy">Privacy</Link> ·{" "}
-            <Link to="/terms">Terms</Link>
-          </p>
-          <div>
-            <a
-              href="https://www.linkedin.com/in/henrysammarfo"
-              aria-label="LinkedIn"
-              rel="noreferrer"
-              target="_blank"
-            >
-              <Linkedin />
-            </a>
-            <a
-              href="https://github.com/henrysammarfo"
-              aria-label="GitHub"
-              rel="noreferrer"
-              target="_blank"
-            >
-              <Github />
-            </a>
-          </div>
-        </div>
-      </footer>
+      <LandingGlassFooter />
     </div>
   );
 }
