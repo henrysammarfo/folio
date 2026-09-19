@@ -700,3 +700,10 @@
 - User: document everything + whitepaper; fix rough edges; Stocklana → Colosseum feedback → beta → socials → Colosseum with traction.
 - Added `docs/FOLIO_WHITEPAPER.md`, `FOUNDER_OPERATING_PLAN.md`, `LAUNCH_AND_SOCIALS.md`; refreshed Stocklana paste pack + Colosseum outreach.
 - Product: `/whitepaper`, `/beta` waitlist, humanize wash notes, footer socials cleaned, mission links to whitepaper/beta.
+
+
+## 2026-09-19 — PR #15 merged to main (production live)
+
+- Marked PR #15 ready · merged `d854340` · Vercel production READY.
+- Verified HTTP 200: /desk/markets · /desk/preipo · /desk/tessera · /whitepaper · /beta (+ marketing /markets /preipo /pairs).
+- Judges can use https://folio-tawny-one.vercel.app directly.
