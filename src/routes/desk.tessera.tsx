@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { getTesseraBundle } from "@/lib/desk.functions";
+import { humanizeWashNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/desk/tessera")({
@@ -171,7 +172,10 @@ function Page() {
               <b>{isFetching ? "…" : out ? `${out} ${selected?.symbol}` : "—"}</b>
             </p>
             <p className="fx-checks">
-              Wash: {data?.washOk ? "clear" : data?.washNote ?? "…"}
+              Wash:{" "}
+              {data?.washOk
+                ? "clear"
+                : humanizeWashNote(data?.washNote)}
               {" · "}
               {data?.note}
             </p>

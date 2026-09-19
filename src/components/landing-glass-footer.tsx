@@ -1,14 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import {
-  Facebook,
   Github,
-  Instagram,
   Linkedin,
-  Music2,
   Twitter,
-  Youtube,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { primaryXUrl, SOCIALS } from "@/lib/socials";
 
 const VIDEO_SRC =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260429_114316_1c7889ad-2885-410e-b493-98119fee0ddb.mp4";
@@ -24,8 +21,8 @@ const discover = [
 
 const mission = [
   { label: "About", to: "/about" as const },
-  { label: "Execution", to: "/execution" as const },
-  { label: "Credit", to: "/credit" as const },
+  { label: "Whitepaper", to: "/whitepaper" as const },
+  { label: "Closed beta", to: "/beta" as const },
   { label: "Network", to: "/network" as const },
   { label: "Open desk", to: "/desk" as const },
 ];
@@ -165,7 +162,7 @@ export function LandingGlassFooter() {
               </span>
               <div className="flex items-center gap-3">
                 <a
-                  href="https://x.com/henrysammarfo"
+                  href={primaryXUrl()}
                   className="opacity-70 hover:opacity-100 transition-colors hover:text-white"
                   aria-label="X / Twitter"
                   target="_blank"
@@ -174,7 +171,7 @@ export function LandingGlassFooter() {
                   <Twitter size={16} />
                 </a>
                 <a
-                  href="https://github.com/henrysammarfo"
+                  href={SOCIALS.github}
                   className="opacity-70 hover:opacity-100 transition-colors hover:text-white"
                   aria-label="GitHub"
                   target="_blank"
@@ -183,7 +180,7 @@ export function LandingGlassFooter() {
                   <Github size={16} />
                 </a>
                 <a
-                  href="https://www.linkedin.com/in/henrysammarfo"
+                  href={SOCIALS.linkedin}
                   className="opacity-70 hover:opacity-100 transition-colors hover:text-white"
                   aria-label="LinkedIn"
                   target="_blank"
@@ -191,18 +188,6 @@ export function LandingGlassFooter() {
                 >
                   <Linkedin size={16} />
                 </a>
-                <span className="opacity-40" aria-hidden>
-                  <Music2 size={16} />
-                </span>
-                <span className="opacity-40" aria-hidden>
-                  <Facebook size={16} />
-                </span>
-                <span className="opacity-40" aria-hidden>
-                  <Youtube size={16} />
-                </span>
-                <span className="opacity-40" aria-hidden>
-                  <Instagram size={16} />
-                </span>
               </div>
             </div>
           </div>

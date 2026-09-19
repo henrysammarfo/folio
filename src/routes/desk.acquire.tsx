@@ -355,7 +355,9 @@ function Page() {
                     <>
                       <AssetLogo
                         symbol={pay}
-                        underlying={payItem?.underlying}
+                        {...(payItem?.underlying
+                          ? { underlying: payItem.underlying }
+                          : {})}
                         size={28}
                       />
                       {pay}

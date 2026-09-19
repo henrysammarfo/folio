@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as BetaRouteImport } from './routes/beta'
 import { Route as CreditRouteImport } from './routes/credit'
 import { Route as DeskRouteImport } from './routes/desk'
 import { Route as ExecutionRouteImport } from './routes/execution'
@@ -21,6 +22,7 @@ import { Route as PreipoRouteImport } from './routes/preipo'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TruthRouteImport } from './routes/truth'
+import { Route as WhitepaperRouteImport } from './routes/whitepaper'
 import { Route as DeskIndexRouteImport } from './routes/desk.index'
 import { Route as DeskAcquireRouteImport } from './routes/desk.acquire'
 import { Route as DeskActivityRouteImport } from './routes/desk.activity'
@@ -42,6 +44,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BetaRoute = BetaRouteImport.update({
+  id: '/beta',
+  path: '/beta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreditRoute = CreditRouteImport.update({
@@ -92,6 +99,11 @@ const TermsRoute = TermsRouteImport.update({
 const TruthRoute = TruthRouteImport.update({
   id: '/truth',
   path: '/truth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhitepaperRoute = WhitepaperRouteImport.update({
+  id: '/whitepaper',
+  path: '/whitepaper',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeskIndexRoute = DeskIndexRouteImport.update({
@@ -158,6 +170,7 @@ const DeskPositionsSymbolRoute = DeskPositionsSymbolRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/beta': typeof BetaRoute
   '/credit': typeof CreditRoute
   '/desk': typeof DeskRouteWithChildren
   '/execution': typeof ExecutionRoute
@@ -168,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/truth': typeof TruthRoute
+  '/whitepaper': typeof WhitepaperRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
   '/desk/credit': typeof DeskCreditRoute
@@ -184,6 +198,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/beta': typeof BetaRoute
   '/credit': typeof CreditRoute
   '/execution': typeof ExecutionRoute
   '/markets': typeof MarketsRoute
@@ -193,6 +208,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/truth': typeof TruthRoute
+  '/whitepaper': typeof WhitepaperRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
   '/desk/credit': typeof DeskCreditRoute
@@ -210,6 +226,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/beta': typeof BetaRoute
   '/credit': typeof CreditRoute
   '/desk': typeof DeskRouteWithChildren
   '/execution': typeof ExecutionRoute
@@ -220,6 +237,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/truth': typeof TruthRoute
+  '/whitepaper': typeof WhitepaperRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
   '/desk/credit': typeof DeskCreditRoute
@@ -238,6 +256,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/beta'
     | '/credit'
     | '/desk'
     | '/execution'
@@ -248,6 +267,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/truth'
+    | '/whitepaper'
     | '/desk/acquire'
     | '/desk/activity'
     | '/desk/credit'
@@ -264,6 +284,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/beta'
     | '/credit'
     | '/execution'
     | '/markets'
@@ -273,6 +294,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/truth'
+    | '/whitepaper'
     | '/desk/acquire'
     | '/desk/activity'
     | '/desk/credit'
@@ -289,6 +311,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/beta'
     | '/credit'
     | '/desk'
     | '/execution'
@@ -299,6 +322,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/truth'
+    | '/whitepaper'
     | '/desk/acquire'
     | '/desk/activity'
     | '/desk/credit'
@@ -316,6 +340,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BetaRoute: typeof BetaRoute
   CreditRoute: typeof CreditRoute
   DeskRoute: typeof DeskRouteWithChildren
   ExecutionRoute: typeof ExecutionRoute
@@ -326,6 +351,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   TruthRoute: typeof TruthRoute
+  WhitepaperRoute: typeof WhitepaperRoute
   LabShadersRoute: typeof LabShadersRoute
   LabUiRoute: typeof LabUiRoute
 }
@@ -344,6 +370,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/beta': {
+      id: '/beta'
+      path: '/beta'
+      fullPath: '/beta'
+      preLoaderRoute: typeof BetaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/credit': {
@@ -414,6 +447,13 @@ declare module '@tanstack/react-router' {
       path: '/truth'
       fullPath: '/truth'
       preLoaderRoute: typeof TruthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/whitepaper': {
+      id: '/whitepaper'
+      path: '/whitepaper'
+      fullPath: '/whitepaper'
+      preLoaderRoute: typeof WhitepaperRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/desk/': {
@@ -534,6 +574,7 @@ const DeskRouteWithChildren = DeskRoute._addFileChildren(DeskRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BetaRoute: BetaRoute,
   CreditRoute: CreditRoute,
   DeskRoute: DeskRouteWithChildren,
   ExecutionRoute: ExecutionRoute,
@@ -544,6 +585,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   TruthRoute: TruthRoute,
+  WhitepaperRoute: WhitepaperRoute,
   LabShadersRoute: LabShadersRoute,
   LabUiRoute: LabUiRoute,
 }

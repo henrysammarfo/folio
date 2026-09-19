@@ -16,6 +16,14 @@
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
 - Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).
 - Soft access banner; Account tenant switcher; agent session-gated.
+- **/whitepaper** · **/beta** waitlist · docs: `FOLIO_WHITEPAPER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
+- Human wash copy (no raw `bitquery_*` in PreStocks/Tessera consumer UI).
+
+## Launch path (Stocklana → Colosseum → beta)
+
+1. Submit Stocklana (SEP 25 hero — re-check form) with PR #15 preview if markets routes not on main yet.
+2. Claim Folio X · judge feedback · closed beta invites.
+3. Traction → Colosseum / World’s Fair submit.
 
 ## Stocklana (live)
 

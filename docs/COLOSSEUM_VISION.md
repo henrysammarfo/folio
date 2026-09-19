@@ -53,11 +53,12 @@ Beats: `/truth` live multiplier · `/network` fail-closed wash/NestUSD/broadcast
 - `/lab/shaders` → `ink-ledger` · `ledger-mist` · `aurora-grid`  
 Henry replies with one id; only then merge to marketing/desk.
 
-## Outreach (later — after product looks premium)
-1. Henry creates a dedicated X account when ready (not now).
-2. We list Colosseum mentors/judges + recent posts.
-3. Draft **replies** (teach the problem in plain language) and short DMs — no spray, no validate-me energy.
-4. Goal: advice + relationship, then interest — not cold pitch spam.
+## Outreach (NOW — after Stocklana submit)
+1. Claim Folio X handle · update `src/lib/socials.ts` (`docs/LAUNCH_AND_SOCIALS.md`).
+2. List Colosseum / World’s Fair mentors/judges + recent posts.
+3. Use reply + DM templates in `docs/LAUNCH_AND_SOCIALS.md` — advice first, no spray.
+4. Goal: ≥10 thoughtful touches · ≥3 written feedback notes before Colosseum submit.
+5. Bring beta traction (`/beta`) + whitepaper (`/whitepaper`) into the conversation.
 
 ## Keys (step-by-step)
 See `docs/HENRY_STEPS.md` — one step, screenshot, reply.

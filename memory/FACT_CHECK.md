@@ -413,3 +413,9 @@ EOF
 | PreStocks catalog is separate from Tessera T-tokens | CONFIRMED live | prestocks.com/api/prestocks (8) vs rest-api.tessera.pe (3) | 2026-09-19 |
 | Tessera T-tokens are loan-participation, not SPV shares | CONFIRMED docs | docs.tessera.pe + blog.tessera.pe structure posts | 2026-09-19 |
 | Markets board shows Jupiter venue + liq (peer pattern) | CONFIRMED in-repo | desk.screener getMarketsBoard + desk.markets | 2026-09-19 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| FOLIO whitepaper + founder operating plan + launch kit exist | CONFIRMED in-repo | docs/FOLIO_WHITEPAPER.md · FOUNDER_OPERATING_PLAN.md · LAUNCH_AND_SOCIALS.md | 2026-09-19 |
+| Public /whitepaper and /beta routes ship | CONFIRMED in-repo | src/routes/whitepaper.tsx · beta.tsx · routeTree.gen.ts | 2026-09-19 |
+| xStocks ~$800M AUM / Solana dominant on-chain equity volume (2026) | CONFIRMED public reports | Crypto Briefing / Solana Compass cites in whitepaper | 2026-09-19 |

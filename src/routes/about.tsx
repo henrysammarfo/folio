@@ -76,6 +76,14 @@ function Page() {
           </li>
         </ol>
         <p className="mt-4 text-sm opacity-80">
+          <Link to="/whitepaper" className="underline">
+            Whitepaper
+          </Link>
+          {" · "}
+          <Link to="/beta" className="underline">
+            Closed beta
+          </Link>
+          {" · "}
           <Link to="/network" className="underline">
             Network honesty
           </Link>

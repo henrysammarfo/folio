@@ -62,16 +62,22 @@ export const getMarketsBoard = createServerFn({ method: "GET" })
         const openNow = asset.ok ? asset.data.openNow : null;
         const tradingPeriod = asset.ok ? asset.data.tradingPeriod : null;
 
+        const base = {
+          symbol: item.symbol,
+          name: item.name,
+          underlying: item.underlying,
+          lane: item.lane,
+          buyable: item.buyable,
+          logo,
+          mint,
+          openNow,
+          tradingPeriod,
+          ...(item.blurb ? { blurb: item.blurb } : {}),
+        };
+
         if (!mint || !item.buyable) {
           return {
-            symbol: item.symbol,
-            name: item.name,
-            underlying: item.underlying,
-            lane: item.lane,
-            buyable: item.buyable,
-            blurb: item.blurb,
-            logo,
-            mint,
+            ...base,
             usdPrice: null,
             stockRefPrice: null,
             liquidity: null,
@@ -80,40 +86,22 @@ export const getMarketsBoard = createServerFn({ method: "GET" })
               : asset.ok
                 ? "Mint missing"
                 : asset.reason,
-            openNow,
-            tradingPeriod,
           };
         }
 
         const price = await fetchJupiterTokenPrice(mint);
         if (!price.ok) {
           return {
-            symbol: item.symbol,
-            name: item.name,
-            underlying: item.underlying,
-            lane: item.lane,
-            buyable: item.buyable,
-            blurb: item.blurb,
-            logo,
-            mint,
+            ...base,
             usdPrice: null,
             stockRefPrice: null,
             liquidity: null,
             priceNote: price.reason,
-            openNow,
-            tradingPeriod,
           };
         }
 
         return {
-          symbol: item.symbol,
-          name: item.name,
-          underlying: item.underlying,
-          lane: item.lane,
-          buyable: item.buyable,
-          blurb: item.blurb,
-          logo,
-          mint,
+          ...base,
           usdPrice: price.data.usdPrice,
           stockRefPrice: price.data.stockRefPrice,
           liquidity: price.data.liquidity,
@@ -122,8 +110,6 @@ export const getMarketsBoard = createServerFn({ method: "GET" })
             : price.source.includes("cached")
               ? "cached"
               : "live",
-          openNow,
-          tradingPeriod,
         };
       }),
     );

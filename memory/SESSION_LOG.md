@@ -693,3 +693,10 @@
 - Peers (Solflare stocks board): venue price + liquidity + session honesty — mirrored on /desk/markets (not a screener clone).
 - PreStocks desk: AssetLogo + token/mark/premium/implied val. Tessera: AssetLogo + mark/holders/val; copy clarifies loan-participation vs SPV.
 - logo-resolve + AssetLogo idx reset; vitest 159 green incl. logo-resolve.
+
+
+## 2026-09-19 — Whitepaper + operating plan + launch kit
+
+- User: document everything + whitepaper; fix rough edges; Stocklana → Colosseum feedback → beta → socials → Colosseum with traction.
+- Added `docs/FOLIO_WHITEPAPER.md`, `FOUNDER_OPERATING_PLAN.md`, `LAUNCH_AND_SOCIALS.md`; refreshed Stocklana paste pack + Colosseum outreach.
+- Product: `/whitepaper`, `/beta` waitlist, humanize wash notes, footer socials cleaned, mission links to whitepaper/beta.

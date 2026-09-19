@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { getPreipoBundle } from "@/lib/desk.functions";
+import { humanizeWashNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/desk/preipo")({
@@ -104,7 +105,7 @@ function Page() {
                       >
                         <AssetLogo
                           symbol={row.symbol}
-                          logo={row.image}
+                          logo={row.image ?? null}
                           size={36}
                         />
                         <span>
@@ -130,7 +131,7 @@ function Page() {
             <div className="fx-ticket-brand">
               <AssetLogo
                 symbol={selected?.symbol ?? "—"}
-                logo={selected?.image}
+                logo={selected?.image ?? null}
                 size={44}
               />
               <div>
@@ -191,7 +192,10 @@ function Page() {
               <b>{isFetching ? "…" : out ? `${out} ${selected?.symbol}` : "—"}</b>
             </p>
             <p className="fx-checks">
-              Wash: {data?.washOk ? "clear" : data?.washNote ?? "…"}
+              Wash:{" "}
+              {data?.washOk
+                ? "clear"
+                : humanizeWashNote(data?.washNote)}
               {" · "}
               Decimals assumed {data?.assumedDecimals ?? 9} (labeled)
             </p>
