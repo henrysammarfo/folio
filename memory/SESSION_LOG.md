@@ -626,3 +626,11 @@
 - User: desk pages still unfinished; 20 web tasks.
 - Desk: Positions cards, Credit hero, Activity timeline, Buy validation, Settings Connect wallet first / keys advanced collapsed.
 - Launch: Privacy + Terms, cookie banner, consent analytics, OG/favicon/sitemap/robots, HSTS, custom 404, form validation + honeypot, contrast, legal footer links, single home CTA, frontend secrets scan.
+
+
+## 2026-09-19 — From-scratch product desk UI
+
+- User rejected prior desk as AI-slop cards/badges; demanded market-ready product pages + Settings hide ops.
+- New `app-desk` shell (rail Home/Buy/Holdings/Borrow/Activity/Account) + hairline `prod-*` pages (no white card grids).
+- Consumer Account = wallet / Privy / alerts only. Empire keys + paper agent → `/desk/settings?ops=1` (`DeskOpsSettings`).
+- e2e ops tests retargeted to `?ops=1`. Honesty labels kept (Scaled UI, Nest.credit, NestUSD, acquire Policy checks).

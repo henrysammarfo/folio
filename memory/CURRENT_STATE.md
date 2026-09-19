@@ -1,7 +1,13 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-16 · Stocklana deadline **2026-09-18 20:00 UTC**
+> Updated: 2026-09-19 · Stocklana deadline **2026-09-18 20:00 UTC**
 > Doctrine: honest security only — **never claim unhackable / NK-proof**.
+
+## Desk UI (product)
+
+- Branch `cursor/folio-desk-product-ui-f1ec`: from-scratch consumer chrome (`app-desk` + `prod-*`).
+- Default Settings = Account only. Operator wall: `/desk/settings?ops=1`.
+- Holdings / Borrow / Buy / Activity: hero numbers + hairline lists (not badge-card dashboard).
 
 ## Product lock
 

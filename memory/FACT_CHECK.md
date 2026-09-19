@@ -366,3 +366,5 @@ EOF
 | No VITE_ secret keys in client code | CONFIRMED | grep + check:secrets (value scan) | 2026-09-19 |
 | Privacy + Terms routes ship | CONFIRMED | privacy.tsx terms.tsx | 2026-09-19 |
 | Cookie analytics gated on Accept | CONFIRMED | ConsentAnalytics + CookieConsentBanner | 2026-09-19 |
+| Consumer Settings hides Empire/keys/paper agent | CONFIRMED in-repo | desk.settings.tsx consumer path; ops behind ?ops=1 | 2026-09-19 |
+| Product desk pages drop white card chrome | CONFIRMED in-repo | prod-list/feed hairlines; app-desk rail | 2026-09-19 |
