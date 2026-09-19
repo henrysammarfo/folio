@@ -187,7 +187,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     await page.goto("/desk/positions");
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();
     await expect(page.locator("[data-testid='desk-lab-netro']")).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: /positions/i }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /positions|holdings/i }).first()).toBeVisible();
     await page.goto("/desk");
     await expect(page.locator("[data-testid='desk-lab-netro']")).toBeVisible();
     await page.getByRole("button", { name: /exit preview/i }).click();

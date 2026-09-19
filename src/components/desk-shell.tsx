@@ -5,9 +5,9 @@ import {
   Activity,
   BriefcaseBusiness,
   CircleDollarSign,
-  LayoutDashboard,
+  House,
   Settings,
-  ShoppingBag,
+  ArrowUpRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FolioMark } from "./folio-brand";
@@ -39,10 +39,11 @@ import { buildNetroLiveGateLabels } from "@/lib/netro-live-gates";
 import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 import { buildNetroOwnershipSummary } from "@/lib/netro-ownership";
 
+/** Web2 consumer IA — Cash App / Robinhood style primary destinations */
 const links = [
-  ["Home", "/desk", LayoutDashboard],
-  ["Buy", "/desk/acquire", ShoppingBag],
+  ["Home", "/desk", House],
   ["Holdings", "/desk/positions", BriefcaseBusiness],
+  ["Buy", "/desk/acquire", ArrowUpRight],
   ["Borrow", "/desk/credit", CircleDollarSign],
   ["Activity", "/desk/activity", Activity],
   ["Account", "/desk/settings", Settings],
@@ -63,7 +64,6 @@ export function DeskShell({
   actions,
 }: {
   title: string;
-  /** @deprecated ignored — product pages own their own page titles */
   eyebrow?: string;
   children: React.ReactNode;
   actions?: React.ReactNode;
@@ -216,7 +216,7 @@ export function DeskShell({
 
   return (
     <div
-      className="app-desk"
+      className="fx-desk"
       data-lab-ui={effectiveUi ?? undefined}
       data-lab-shader={effectiveShader ?? undefined}
       data-lab-plasma={liveShader ? "1" : undefined}
@@ -246,73 +246,103 @@ export function DeskShell({
         </div>
       ) : null}
 
-      <aside className="app-rail" aria-label="Desk">
-        <Link to="/" className="app-rail-brand">
-          <FolioMark className="app-rail-mark" title="FOLIO" />
+      <header className="fx-top">
+        <Link to="/" className="fx-brand" aria-label="FOLIO home">
+          <FolioMark className="fx-brand-mark" title="FOLIO" />
           <span>FOLIO</span>
         </Link>
-        <nav className="app-rail-nav">
-          {links.map(([label, to, Icon]) => {
-            const active = to === "/desk" ? path === to || path === "/desk/" : path.startsWith(to);
-            return (
-              <Link
-                key={to}
-                to={to}
-                className={`app-rail-link${active ? " is-active" : ""}`}
-              >
-                <Icon size={18} strokeWidth={1.75} aria-hidden />
-                <span>{label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
+        <div className="fx-top-actions">
+          {actions}
+          <Link to="/desk/acquire" className="fx-btn fx-btn-primary fx-btn-sm">
+            Buy
+          </Link>
+          <DeskWalletPill />
+        </div>
+      </header>
 
-      <div className="app-stage">
-        {liveShader ? (
-          <div className="desk-plasma-layer" aria-hidden>
-            <ShaderBackground variant={liveShader} className="desk-plasma-canvas" />
-          </div>
-        ) : null}
-        <header className="app-top">
-          <p className="app-top-title">{showNetroCanvas ? "Home" : title}</p>
-          <div className="app-top-actions">
-            <Link to="/desk/acquire" className="app-buy">
-              Buy
-            </Link>
-            <DeskWalletPill />
-          </div>
-        </header>
-        <main className="app-main">
-          {showNetroCanvas ? (
-            <div className="desk-lab-netro" data-testid="desk-lab-netro">
-              <NetroDensityCanvas
-                multiplierLabel={multiplierLabel}
-                gates={netroGates}
-                ownership={ownership}
-                initialInspect={inspectSearch}
-                scaledUiStripLabel={scaledUiStripLabel}
-                enablePaperAgent
+      <div className="fx-body">
+        <aside className="fx-side" aria-label="Desk">
+          <nav className="fx-side-nav">
+            {links.map(([label, to, Icon]) => {
+              const active =
+                to === "/desk"
+                  ? path === to || path === "/desk/"
+                  : path.startsWith(to);
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`fx-side-link${active ? " is-active" : ""}`}
+                >
+                  <Icon size={18} strokeWidth={1.85} aria-hidden />
+                  <span>{label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+
+        <div className="fx-stage">
+          {liveShader ? (
+            <div className="desk-plasma-layer" aria-hidden>
+              <ShaderBackground
+                variant={liveShader}
+                className="desk-plasma-canvas"
               />
             </div>
-          ) : (
-            <>
-              {showJournal ? (
-                <div className="desk-lab-journal" data-testid="desk-lab-journal">
-                  <FolioTradeJournalLab />
-                </div>
-              ) : null}
-              {actions ? <div className="app-page-actions">{actions}</div> : null}
-              {children}
-            </>
-          )}
-        </main>
+          ) : null}
+          <main className="fx-main" aria-label={title}>
+            {showNetroCanvas ? (
+              <div className="desk-lab-netro" data-testid="desk-lab-netro">
+                <NetroDensityCanvas
+                  multiplierLabel={multiplierLabel}
+                  gates={netroGates}
+                  ownership={ownership}
+                  initialInspect={inspectSearch}
+                  scaledUiStripLabel={scaledUiStripLabel}
+                  enablePaperAgent
+                />
+              </div>
+            ) : (
+              <>
+                {showJournal ? (
+                  <div
+                    className="desk-lab-journal"
+                    data-testid="desk-lab-journal"
+                  >
+                    <FolioTradeJournalLab />
+                  </div>
+                ) : null}
+                {children}
+              </>
+            )}
+          </main>
+        </div>
       </div>
+
+      <nav className="fx-tabs" aria-label="Desk">
+        {links.map(([label, to, Icon]) => {
+          const active =
+            to === "/desk"
+              ? path === to || path === "/desk/"
+              : path.startsWith(to);
+          return (
+            <Link
+              key={to}
+              to={to}
+              className={`fx-tab${active ? " is-active" : ""}`}
+            >
+              <Icon size={20} strokeWidth={1.85} aria-hidden />
+              <span>{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
 
-/** Minimal section frame — prefer bare lists over heavy panels on product pages. */
+/** Soft section used on ops wall and nested blocks */
 export function Panel({
   title,
   meta,
@@ -331,18 +361,18 @@ export function Panel({
   const [open, setOpen] = useState(defaultOpen);
   if (!collapsible) {
     return (
-      <section className={`app-block ${className}`}>
-        <header className="app-block-head">
+      <section className={`fx-panel ${className}`}>
+        <header className="fx-panel-head">
           <h2>{title}</h2>
           {meta}
         </header>
-        <div className="app-block-body">{children}</div>
+        <div className="fx-panel-body">{children}</div>
       </section>
     );
   }
   return (
     <section
-      className={`app-block app-block-fold ${className}`}
+      className={`fx-panel fx-panel-fold ${className}`}
       data-open={open ? "1" : "0"}
     >
       <header
@@ -356,13 +386,13 @@ export function Panel({
             setOpen((v) => !v);
           }
         }}
-        className="app-block-head"
+        className="fx-panel-head"
       >
         <h2>{title}</h2>
         {meta}
-        <span className="app-block-toggle">{open ? "Hide" : "Show"}</span>
+        <span className="fx-panel-toggle">{open ? "Hide" : "Show"}</span>
       </header>
-      <div className="app-block-body">{children}</div>
+      <div className="fx-panel-body">{children}</div>
     </section>
   );
 }

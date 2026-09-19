@@ -28,14 +28,14 @@ export function DeskWalletPill() {
 
   if (wallet) {
     return (
-      <Link to="/desk/settings" className="app-pill" title="Account">
+      <Link to="/desk/settings" className="fx-btn fx-btn-ghost fx-btn-sm" title="Account">
         {shortPubkey(wallet)}
       </Link>
     );
   }
 
   return (
-    <Link to="/desk/settings" className="app-pill" title="Connect wallet">
+    <Link to="/desk/settings" className="fx-btn fx-btn-ghost fx-btn-sm" title="Connect wallet">
       Connect
     </Link>
   );

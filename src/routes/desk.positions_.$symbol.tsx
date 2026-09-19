@@ -27,6 +27,14 @@ export const Route = createFileRoute("/desk/positions_/$symbol")({
   component: Page,
 });
 
+function money(n: number) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}
+
 function Page() {
   const { symbol } = Route.useParams();
   const { inspect } = Route.useSearch();
@@ -50,30 +58,29 @@ function Page() {
         <Link
           to="/desk/positions"
           search={inspect ? { inspect } : {}}
-          className="prod-text-btn"
+          className="fx-text-btn"
         >
           All holdings
         </Link>
       }
     >
-      <section className="prod-buy">
-        <div className="prod-buy-chart">
-          <TradingViewChart symbol={symbol} height={380} interval="D" theme="light" />
+      <section className="fx-buy fx-page">
+        <div className="fx-card fx-buy-chart">
+          <TradingViewChart
+            symbol={symbol}
+            height={380}
+            interval="D"
+            theme="light"
+          />
         </div>
-        <aside className="prod-ticket">
-          <p className="prod-kicker">{row?.name ?? symbol}</p>
-          <h1 className="prod-value sm">
-            {row?.paperValueUsd != null
-              ? row.paperValueUsd.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 0,
-                })
-              : "—"}
+        <aside className="fx-card fx-ticket">
+          <p className="fx-hero-kicker">{row?.name ?? symbol}</p>
+          <h1 className="fx-hero-value" style={{ fontSize: "2.4rem" }}>
+            {row?.paperValueUsd != null ? money(row.paperValueUsd) : "—"}
           </h1>
-          <ul className="prod-kv">
+          <ul className="fx-kv">
             <li>
-              <span>Qty</span>
+              <span>Shares</span>
               <b>
                 {row ? row.qty.toFixed(4) : "—"}{" "}
                 {row?.qtySource === "wallet-read" ? "" : "est."}
@@ -104,7 +111,7 @@ function Page() {
               </b>
             </li>
           </ul>
-          <Link to="/desk/acquire" className="prod-cta">
+          <Link to="/desk/acquire" className="fx-btn fx-btn-primary fx-btn-block">
             Buy {symbol}
           </Link>
         </aside>

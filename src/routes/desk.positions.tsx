@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
+import { AllocationChart, paletteFor } from "@/components/allocation-chart";
 import { DeskShell } from "@/components/desk-shell";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { getPositionsBundle } from "@/lib/desk.functions";
@@ -28,6 +29,14 @@ export const Route = createFileRoute("/desk/positions")({
   component: Page,
 });
 
+function money(n: number) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}
+
 function Page() {
   const initial = Route.useLoaderData();
   const { inspect } = Route.useSearch();
@@ -47,86 +56,101 @@ function Page() {
   const rows = data?.rows ?? [];
   const total = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
   const walletRead = rows.some((r) => r.qtySource === "wallet-read");
+  const parts = rows
+    .filter((r) => (r.paperValueUsd ?? 0) > 0)
+    .map((r, i) => ({
+      label: r.symbol,
+      value: r.paperValueUsd ?? 0,
+      color: paletteFor(i),
+    }));
 
   return (
     <DeskShell title="Holdings">
-      <section className="prod-page">
-        <header className="prod-lead">
-          <p className="prod-kicker">
-            {walletRead ? "From your wallet" : "Estimated · connect to verify"}
-          </p>
-          <h1 className="prod-value">
-            {total > 0
-              ? total.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 0,
-                })
-              : "—"}
+      <section className="fx-page">
+        <header className="fx-hero">
+          <h1 className="fx-hero-kicker">
+            {walletRead ? "Holdings" : "Holdings · estimated"}
           </h1>
-          <p className="prod-sub">
-            Live share counts on Solana.{" "}
-            <Link to="/desk/acquire">Buy</Link>
-            {" · "}
-            <Link to="/desk/settings">Connect wallet</Link>
+          <p className="fx-hero-value">{total > 0 ? money(total) : "—"}</p>
+          <p className="fx-hero-sub">
+            {walletRead
+              ? "Live balances from your wallet"
+              : "Connect a wallet to verify holdings"}
           </p>
         </header>
 
-        <ul className="prod-list" aria-label="Holdings">
-          {rows.map((p) => {
-            const chain = scaledUiHealthLabel(p.scaledUiCompare.status);
-            return (
-              <li key={p.symbol}>
-                <Link
-                  to="/desk/positions/$symbol"
-                  params={{ symbol: p.symbol }}
-                  search={inspect ? { inspect } : {}}
-                  className="prod-row"
-                >
-                  <span className="prod-row-mark" aria-hidden>
-                    {p.symbol[0]}
-                  </span>
-                  <span className="prod-row-main">
-                    <strong>{p.symbol}</strong>
-                    <small>
-                      {p.qty.toFixed(4)}{" "}
-                      {p.qtySource === "wallet-read" ? "qty" : "est. qty"} ·{" "}
-                      {p.multiplier != null
-                        ? `${p.multiplier.toFixed(4)}× share count`
-                        : "—"}
-                      {" · "}
-                      <span data-testid={`positions-scaled-ui-${p.symbol}`}>
-                        {chain}
-                      </span>
-                    </small>
-                  </span>
-                  <span className="prod-row-value">
-                    {p.paperValueUsd != null
-                      ? p.paperValueUsd.toLocaleString("en-US", {
-                          style: "currency",
-                          currency: "USD",
-                          maximumFractionDigits: 0,
-                        })
-                      : "—"}
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="fx-actions">
+          <Link to="/desk/acquire" className="fx-btn fx-btn-primary">
+            Buy stocks
+          </Link>
+          <Link to="/desk/credit" className="fx-btn fx-btn-ghost">
+            Borrow
+          </Link>
+        </div>
 
-        <div className="prod-foot">
+        {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
+
+        <h2 className="fx-section-title">Your stocks</h2>
+        <div className="fx-card">
+          <ul className="fx-list" aria-label="Holdings">
+            {rows.map((p, i) => {
+              const chain = scaledUiHealthLabel(p.scaledUiCompare.status);
+              return (
+                <li key={p.symbol}>
+                  <Link
+                    to="/desk/positions/$symbol"
+                    params={{ symbol: p.symbol }}
+                    search={inspect ? { inspect } : {}}
+                    className="fx-asset"
+                  >
+                    <span
+                      className="fx-asset-mark"
+                      style={{ background: paletteFor(i) }}
+                      aria-hidden
+                    >
+                      {p.symbol[0]}
+                    </span>
+                    <span className="fx-asset-main">
+                      <strong>{p.symbol}</strong>
+                      <small>
+                        {p.name} ·{" "}
+                        {p.qty.toFixed(4)}{" "}
+                        {p.qtySource === "wallet-read" ? "shares" : "est. shares"}
+                      </small>
+                    </span>
+                    <span className="fx-asset-right">
+                      <strong>
+                        {p.paperValueUsd != null ? money(p.paperValueUsd) : "—"}
+                      </strong>
+                      <small>
+                        {p.usdPrice != null
+                          ? `$${p.usdPrice.toFixed(2)}`
+                          : "—"}
+                        {" · "}
+                        <span data-testid={`positions-scaled-ui-${p.symbol}`}>
+                          {chain}
+                        </span>
+                      </small>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="fx-foot">
           {!openLookup ? (
             <button
               type="button"
-              className="prod-text-btn"
+              className="fx-text-btn"
               onClick={() => setOpenLookup(true)}
             >
               Look up any wallet
             </button>
           ) : (
             <form
-              className="prod-inline-form"
+              className="fx-inline-form"
               data-testid="netro-inspect-wallet"
               onSubmit={(e) => {
                 e.preventDefault();
@@ -168,7 +192,7 @@ function Page() {
                   Clear
                 </button>
               ) : null}
-              {err ? <p className="prod-err">{err}</p> : null}
+              {err ? <p className="fx-err">{err}</p> : null}
             </form>
           )}
         </div>

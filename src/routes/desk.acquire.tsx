@@ -8,6 +8,7 @@ import { getAcquireBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
 
 const SYMBOLS = ["AAPLx", "NVDAx", "TSLAx"] as const;
+const CHIPS = ["1", "5", "10", "25"] as const;
 
 export const Route = createFileRoute("/desk/acquire")({
   head: () => ({
@@ -68,8 +69,8 @@ function Page() {
 
   return (
     <DeskShell title="Buy">
-      <section className="prod-buy">
-        <div className="prod-buy-chart">
+      <section className="fx-buy fx-page">
+        <div className="fx-card fx-buy-chart">
           <TradingViewChart
             symbol={symbol}
             height={420}
@@ -78,29 +79,34 @@ function Page() {
           />
         </div>
 
-        <aside className="prod-ticket">
-          <h1 className="prod-page-title">Buy {symbol}</h1>
-          <p className="prod-sub">Live quote · fills pause until enabled.</p>
+        <aside className="fx-card fx-ticket">
+          <div>
+            <h1>Buy {symbol}</h1>
+            <p className="fx-ticket-sub">Live quote · fills pause until enabled</p>
+          </div>
 
-          <label className="prod-field">
-            Asset
-            <select
-              value={symbol}
-              onChange={(e) => {
-                setSymbol(e.target.value as (typeof SYMBOLS)[number]);
-                setReviewed(false);
-              }}
-            >
+          <div>
+            <p className="fx-field">Asset</p>
+            <div className="fx-chip-row">
               {SYMBOLS.map((s) => (
-                <option key={s} value={s}>
+                <button
+                  key={s}
+                  type="button"
+                  className={`fx-chip${symbol === s ? " is-on" : ""}`}
+                  onClick={() => {
+                    setSymbol(s);
+                    setReviewed(false);
+                  }}
+                >
                   {s}
-                </option>
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+          </div>
 
-          <label className="prod-field">
+          <label className="fx-field">
             Amount (USDC)
+            <div className="fx-amount-big">${amount || "0"}</div>
             <input
               value={amount}
               inputMode="decimal"
@@ -109,8 +115,26 @@ function Page() {
                 setErr(null);
                 setReviewed(false);
               }}
+              aria-label="Amount in USDC"
             />
           </label>
+
+          <div className="fx-chip-row">
+            {CHIPS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                className={`fx-chip${amount === c ? " is-on" : ""}`}
+                onClick={() => {
+                  setAmount(c);
+                  setErr(null);
+                  setReviewed(false);
+                }}
+              >
+                ${c}
+              </button>
+            ))}
+          </div>
 
           <label className="hp-field" aria-hidden="true">
             Website
@@ -122,19 +146,19 @@ function Page() {
             />
           </label>
 
-          <div className="prod-quote">
+          <div className="fx-quote-row">
             <span>You receive</span>
             <strong>
               {isFetching ? "…" : out ? `${out} ${symbol}` : "—"}
             </strong>
           </div>
 
-          {err ? <p className="prod-err">{err}</p> : null}
+          {err ? <p className="fx-err">{err}</p> : null}
 
           {!reviewed ? (
             <button
               type="button"
-              className="prod-cta"
+              className="fx-btn fx-btn-primary fx-btn-block"
               data-testid="acquire-continue"
               disabled={!ready}
               onClick={() => {
@@ -154,7 +178,7 @@ function Page() {
               Review quote
             </button>
           ) : (
-            <div className="prod-review">
+            <div className="fx-review">
               <h2>Policy checks</h2>
               <ul>
                 <li>
@@ -189,11 +213,11 @@ function Page() {
                 </li>
               </ul>
               {checkLines.length > 0 ? (
-                <p className="prod-checks">{checkLines.join("\n")}</p>
+                <p className="fx-checks">{checkLines.join("\n")}</p>
               ) : null}
               <button
                 type="button"
-                className="prod-cta"
+                className="fx-btn fx-btn-primary fx-btn-block"
                 disabled={!canBuy}
               >
                 {canBuy
@@ -206,7 +230,7 @@ function Page() {
               </button>
               <button
                 type="button"
-                className="prod-text-btn"
+                className="fx-text-btn"
                 onClick={() => setReviewed(false)}
               >
                 Edit order
@@ -214,7 +238,7 @@ function Page() {
             </div>
           )}
 
-          <p className="prod-ticket-foot">
+          <p className="fx-ticket-sub">
             Prefer credit? <Link to="/desk/credit">Borrow</Link>
           </p>
         </aside>

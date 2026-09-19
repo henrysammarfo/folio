@@ -30,10 +30,6 @@ const DeskOpsSettings = lazy(() =>
 );
 
 const searchSchema = z.object({
-  /**
-   * Operator wall. Must not be a bare numeric query value — TanStack coerces
-   * `?x=1` to number, which fails z.string() and gets stripped via redirect.
-   */
   wall: z.enum(["ops"]).optional().catch(undefined),
 });
 
@@ -56,7 +52,7 @@ function Page() {
   if (wall === "ops") {
     return (
       <DeskShell title="Operator">
-        <Suspense fallback={<p className="prod-sub">Loading…</p>}>
+        <Suspense fallback={<p className="fx-sub">Loading…</p>}>
           <DeskOpsSettings initial={initial} />
         </Suspense>
       </DeskShell>
@@ -101,6 +97,9 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
     : false;
   const signedIn = Boolean(data?.auth.ok && data.auth.data.sessionReady);
   const appId = data?.readiness.privyAppId ?? "";
+  const shortWallet = data?.watchWallet
+    ? `${data.watchWallet.slice(0, 4)}…${data.watchWallet.slice(-4)}`
+    : null;
 
   async function refresh() {
     await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
@@ -111,137 +110,146 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
 
   return (
     <DeskShell title="Account">
-      <section className="prod-page narrow">
-        <header className="prod-lead compact">
-          <h1 className="prod-page-title">Account</h1>
-          <p className="prod-sub">
+      <section className="fx-page" style={{ maxWidth: 520 }}>
+        <header className="fx-hero" style={{ marginBottom: "1.15rem" }}>
+          <div
+            className="fx-asset-mark"
+            style={{
+              width: "3.25rem",
+              height: "3.25rem",
+              fontSize: "1.25rem",
+              background: "#0EA5C9",
+              marginBottom: ".85rem",
+            }}
+            aria-hidden
+          >
+            {shortWallet ? shortWallet[0]!.toUpperCase() : "F"}
+          </div>
+          <h1 className="fx-title">Account</h1>
+          <p className="fx-sub">
             {signedIn
               ? "Signed in · wallet prefs save to your desk."
               : "Connect a wallet to see verified holdings."}
           </p>
         </header>
 
-        <div className="prod-account-block">
-          <h2>Wallet</h2>
-          <p>
-            {data?.watchWallet
-              ? `${data.watchWallet.slice(0, 4)}…${data.watchWallet.slice(-4)}`
-              : "No wallet connected"}
-          </p>
-          <form
-            className="prod-inline-form"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const next = wallet.trim();
-              if (!isPlausibleSolanaAddress(next)) {
-                setMsg("Enter a valid Solana address.");
-                return;
-              }
-              setBusy(true);
-              setMsg("");
-              try {
-                const res = await bindWatch({ data: { wallet: next } });
-                setMsg(res.ok ? "Wallet saved." : res.reason);
-                if (res.ok) {
-                  setWallet("");
-                  await refresh();
+        <div className="fx-card">
+          <div className="fx-account-block">
+            <h2>Wallet</h2>
+            <p>{shortWallet ?? "No wallet connected"}</p>
+            <form
+              className="fx-inline-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const next = wallet.trim();
+                if (!isPlausibleSolanaAddress(next)) {
+                  setMsg("Enter a valid Solana address.");
+                  return;
                 }
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <input
-              value={wallet}
-              onChange={(e) => setWallet(e.target.value)}
-              placeholder="Paste wallet address"
-              autoComplete="off"
-              spellCheck={false}
-              aria-label="Wallet address"
-            />
-            <button
-              type="submit"
-              disabled={busy || !data?.sessionSecretPresent}
-            >
-              {busy ? "…" : "Save"}
-            </button>
-          </form>
-          {data?.watchWallet ? (
-            <button
-              type="button"
-              className="prod-text-btn"
-              disabled={busy}
-              onClick={async () => {
                 setBusy(true);
+                setMsg("");
                 try {
-                  await clearWatch();
-                  await refresh();
-                  setMsg("Wallet disconnected.");
+                  const res = await bindWatch({ data: { wallet: next } });
+                  setMsg(res.ok ? "Wallet saved." : res.reason);
+                  if (res.ok) {
+                    setWallet("");
+                    await refresh();
+                  }
                 } finally {
                   setBusy(false);
                 }
               }}
             >
-              Disconnect wallet
-            </button>
-          ) : null}
-        </div>
-
-        <div className="prod-account-block">
-          <h2>Sign in</h2>
-          {privyClient && appId ? (
-            <Suspense fallback={null}>
-              <PrivySessionMint
-                appId={appId}
-                mintReady={Boolean(data?.auth.ok)}
-                allowedOrigin={
-                  typeof window !== "undefined" ? window.location.origin : ""
-                }
-                onMinted={refresh}
-                variant="consumer"
+              <input
+                value={wallet}
+                onChange={(e) => setWallet(e.target.value)}
+                placeholder="Paste wallet address"
+                autoComplete="off"
+                spellCheck={false}
+                aria-label="Wallet address"
               />
-            </Suspense>
-          ) : (
-            <p className="prod-sub">Sign-in opens when Privy is configured.</p>
-          )}
-          {signedIn ? (
-            <button
-              type="button"
-              className="prod-text-btn"
-              onClick={async () => {
-                await clearSession();
-                await refresh();
-                setMsg("Signed out.");
-              }}
-            >
-              Sign out
-            </button>
-          ) : null}
-        </div>
-
-        <div className="prod-account-block row">
-          <div>
-            <h2>Corporate-action alerts</h2>
-            <p>Notify when a pending multiplier appears.</p>
+              <button
+                type="submit"
+                disabled={busy || !data?.sessionSecretPresent}
+              >
+                {busy ? "…" : "Save"}
+              </button>
+            </form>
+            {data?.watchWallet ? (
+              <button
+                type="button"
+                className="fx-text-btn"
+                style={{ marginTop: ".75rem" }}
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    await clearWatch();
+                    await refresh();
+                    setMsg("Wallet disconnected.");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                Disconnect wallet
+              </button>
+            ) : null}
           </div>
-          <Switch
-            checked={Boolean(alertsOn)}
-            disabled={!prefsEditable}
-            onCheckedChange={async (v) => {
-              if (!prefsEditable) return;
-              await savePrefs({ data: { corporateActionAlerts: v } });
-              await refresh();
-            }}
-          />
+
+          <div className="fx-account-block">
+            <h2>Sign in</h2>
+            {privyClient && appId ? (
+              <Suspense fallback={null}>
+                <PrivySessionMint
+                  appId={appId}
+                  mintReady={Boolean(data?.auth.ok)}
+                  allowedOrigin={
+                    typeof window !== "undefined" ? window.location.origin : ""
+                  }
+                  onMinted={refresh}
+                  variant="consumer"
+                />
+              </Suspense>
+            ) : (
+              <p className="fx-sub">Sign-in opens when Privy is configured.</p>
+            )}
+            {signedIn ? (
+              <button
+                type="button"
+                className="fx-text-btn"
+                style={{ marginTop: ".75rem" }}
+                onClick={async () => {
+                  await clearSession();
+                  await refresh();
+                  setMsg("Signed out.");
+                }}
+              >
+                Sign out
+              </button>
+            ) : null}
+          </div>
+
+          <div className="fx-account-block row">
+            <div>
+              <h2>Corporate-action alerts</h2>
+              <p>Notify when a pending multiplier appears.</p>
+            </div>
+            <Switch
+              checked={Boolean(alertsOn)}
+              disabled={!prefsEditable}
+              onCheckedChange={async (v) => {
+                if (!prefsEditable) return;
+                await savePrefs({ data: { corporateActionAlerts: v } });
+                await refresh();
+              }}
+            />
+          </div>
         </div>
 
-        {msg ? (
-          <p className="prod-err" style={{ color: "inherit" }}>
-            {msg}
-          </p>
-        ) : null}
+        {msg ? <p className="fx-sub" style={{ marginTop: ".85rem" }}>{msg}</p> : null}
 
-        <p className="prod-legal">
+        <p className="fx-legal">
           <Link to="/privacy">Privacy</Link>
           {" · "}
           <Link to="/terms">Terms</Link>

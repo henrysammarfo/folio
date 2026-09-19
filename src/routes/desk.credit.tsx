@@ -27,6 +27,14 @@ export const Route = createFileRoute("/desk/credit")({
   component: Page,
 });
 
+function money(n: number) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}
+
 function Page() {
   const initial = Route.useLoaderData();
   const { inspect } = Route.useSearch();
@@ -45,6 +53,7 @@ function Page() {
   const reserves = data?.kamino.ok ? data.kamino.data.reserves.slice(0, 6) : [];
   const borrow = data?.paper.illustrativeBorrowUsd;
   const ltv = data?.paper.maxLtvUsed;
+  const collateral = data?.paper.collateralUsd;
   const nestusdNote = data?.nestusd?.ok
     ? "NestUSD risk-labeled · not verified ready"
     : "NestUSD capacity unavailable · not verified";
@@ -54,71 +63,93 @@ function Page() {
 
   return (
     <DeskShell title="Borrow">
-      <section className="prod-page">
-        <header className="prod-lead">
-          <p className="prod-kicker">Available to borrow</p>
-          <h1 className="prod-value">
-            {borrow != null
-              ? borrow.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 0,
-                })
-              : "—"}
+      <section className="fx-page">
+        <header className="fx-hero">
+          <p className="fx-hero-kicker">Available to borrow</p>
+          <h1 className="fx-hero-value">
+            {borrow != null ? money(borrow) : "—"}
           </h1>
-          <p className="prod-sub">
-            {ltv != null
-              ? `Estimate · up to ${(ltv * 100).toFixed(0)}% LTV on AAPLx collateral. `
-              : "Estimate from holdings. "}
-            Borrowing is paused — not enabled yet. Holdings stay yours.{" "}
-            <Link to="/desk/settings">Connect wallet</Link>
+          <p className="fx-hero-sub">
+            Keep your stocks. Borrow cash when we turn borrowing on.
           </p>
         </header>
 
-        <div className="prod-cta-row">
-          <button type="button" className="prod-cta" disabled>
+        {ltv != null ? (
+          <div className="fx-card fx-card-pad" style={{ marginBottom: "1rem" }}>
+            <p className="fx-section-title" style={{ marginBottom: ".35rem" }}>
+              Loan-to-value
+            </p>
+            <div className="fx-meter">
+              <div className="fx-meter-track">
+                <div
+                  className="fx-meter-fill"
+                  style={{ width: `${Math.min(100, ltv * 100)}%` }}
+                />
+              </div>
+              <div className="fx-meter-meta">
+                <span>Up to {(ltv * 100).toFixed(0)}% on AAPLx</span>
+                <span>
+                  {collateral != null ? `Collateral ${money(collateral)}` : "Estimate"}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="fx-actions">
+          <button type="button" className="fx-btn fx-btn-primary" disabled>
             Borrow — coming soon
           </button>
-          <Link to="/desk/positions" className="prod-ghost">
+          <Link to="/desk/positions" className="fx-btn fx-btn-ghost">
             View holdings
           </Link>
         </div>
 
         {reserves.length > 0 ? (
-          <div className="prod-section">
-            <h2 className="prod-section-title">Market rates</h2>
-            <ul className="prod-list">
-              {reserves.map((r) => (
-                <li key={r.mint} className="prod-row static">
-                  <span className="prod-row-main">
-                    <strong>{r.symbol}</strong>
-                    <small>{(r.maxLtv * 100).toFixed(0)}% max LTV</small>
-                  </span>
-                  <span className="prod-row-value muted">
-                    {(r.borrowApy * 100).toFixed(2)}% APY
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <>
+            <h2 className="fx-section-title">Market rates</h2>
+            <div className="fx-card">
+              <ul className="fx-list">
+                {reserves.map((r, i) => (
+                  <li key={r.mint} className="fx-asset" style={{ cursor: "default" }}>
+                    <span
+                      className="fx-asset-mark"
+                      style={{ background: i % 2 ? "#0B1220" : "#0EA5C9" }}
+                      aria-hidden
+                    >
+                      {r.symbol[0]}
+                    </span>
+                    <span className="fx-asset-main">
+                      <strong>{r.symbol}</strong>
+                      <small>{(r.maxLtv * 100).toFixed(0)}% max LTV</small>
+                    </span>
+                    <span className="fx-asset-right">
+                      <strong>{(r.borrowApy * 100).toFixed(2)}%</strong>
+                      <small>APY</small>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
         ) : null}
 
-        <p className="prod-sub" style={{ marginTop: "1.75rem" }}>
-          {nestEarn}. {nestusdNote}.
+        <p className="fx-sub" style={{ marginTop: "1.25rem" }}>
+          {nestEarn}. {nestusdNote}. Borrowing is paused — not enabled yet.
         </p>
 
-        <div className="prod-foot">
+        <div className="fx-foot">
           {!openLookup ? (
             <button
               type="button"
-              className="prod-text-btn"
+              className="fx-text-btn"
               onClick={() => setOpenLookup(true)}
             >
               Look up any wallet
             </button>
           ) : (
             <form
-              className="prod-inline-form"
+              className="fx-inline-form"
               onSubmit={(e) => {
                 e.preventDefault();
                 const next = inspectInput.trim();

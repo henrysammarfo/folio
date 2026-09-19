@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { AllocationChart, paletteFor } from "@/components/allocation-chart";
 import { DeskShell } from "@/components/desk-shell";
 import {
   getCreditBundle,
@@ -33,7 +34,14 @@ export const Route = createFileRoute("/desk/")({
   component: Page,
 });
 
-/** Fallback overview when Netro chrome is not approved — still product-clean. */
+function money(n: number) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}
+
 function Page() {
   const initial = Route.useLoaderData();
   const { inspect } = Route.useSearch();
@@ -57,69 +65,76 @@ function Page() {
   const rows = positions.data?.rows ?? [];
   const total = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
   const borrow = credit.data?.paper.illustrativeBorrowUsd;
+  const parts = rows
+    .filter((r) => (r.paperValueUsd ?? 0) > 0)
+    .map((r, i) => ({
+      label: r.symbol,
+      value: r.paperValueUsd ?? 0,
+      color: paletteFor(i),
+    }));
 
   return (
     <DeskShell title="Home">
-      <section className="prod-page">
-        <header className="prod-lead">
-          <p className="prod-kicker">Your desk</p>
-          <h1 className="prod-value">
-            {total > 0
-              ? total.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 0,
-                })
-              : "—"}
-          </h1>
-          <p className="prod-sub">
-            Holdings estimate ·{" "}
+      <section className="fx-page">
+        <header className="fx-hero">
+          <p className="fx-hero-kicker">Your portfolio</p>
+          <h1 className="fx-hero-value">{total > 0 ? money(total) : "—"}</h1>
+          <p className="fx-hero-sub">
             {borrow != null
-              ? `borrow up to ${borrow.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 0,
-                })}`
-              : "borrow opens soon"}
+              ? `Borrowing power up to ${money(borrow)}`
+              : "Borrowing opens soon"}
           </p>
         </header>
-        <div className="prod-cta-row">
-          <Link to="/desk/acquire" className="prod-cta">
-            Buy AAPLx
+
+        <div className="fx-actions">
+          <Link to="/desk/acquire" className="fx-btn fx-btn-primary">
+            Buy
           </Link>
-          <Link to="/desk/positions" className="prod-ghost">
+          <Link to="/desk/credit" className="fx-btn fx-btn-ghost">
+            Borrow
+          </Link>
+          <Link to="/desk/positions" className="fx-btn fx-btn-ghost">
             Holdings
           </Link>
         </div>
-        <ul className="prod-list" aria-label="Holdings">
-          {rows.slice(0, 3).map((p) => (
-            <li key={p.symbol}>
-              <Link
-                to="/desk/positions/$symbol"
-                params={{ symbol: p.symbol }}
-                search={inspect ? { inspect } : {}}
-                className="prod-row"
-              >
-                <span className="prod-row-mark" aria-hidden>
-                  {p.symbol[0]}
-                </span>
-                <span className="prod-row-main">
-                  <strong>{p.symbol}</strong>
-                  <small>{p.name}</small>
-                </span>
-                <span className="prod-row-value">
-                  {p.paperValueUsd != null
-                    ? p.paperValueUsd.toLocaleString("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                        maximumFractionDigits: 0,
-                      })
-                    : "—"}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+
+        {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
+
+        <h2 className="fx-section-title">Holdings</h2>
+        <div className="fx-card">
+          <ul className="fx-list">
+            {rows.slice(0, 4).map((p, i) => (
+              <li key={p.symbol}>
+                <Link
+                  to="/desk/positions/$symbol"
+                  params={{ symbol: p.symbol }}
+                  search={inspect ? { inspect } : {}}
+                  className="fx-asset"
+                >
+                  <span
+                    className="fx-asset-mark"
+                    style={{ background: paletteFor(i) }}
+                    aria-hidden
+                  >
+                    {p.symbol[0]}
+                  </span>
+                  <span className="fx-asset-main">
+                    <strong>{p.symbol}</strong>
+                    <small>{p.name}</small>
+                  </span>
+                  <span className="fx-asset-right">
+                    <strong>
+                      {p.paperValueUsd != null ? money(p.paperValueUsd) : "—"}
+                    </strong>
+                    <small>
+                      {p.usdPrice != null ? `$${p.usdPrice.toFixed(2)}` : "Live"}
+                    </small>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
     </DeskShell>
   );

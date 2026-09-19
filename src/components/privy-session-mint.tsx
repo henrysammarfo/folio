@@ -105,11 +105,11 @@ function PrivyMintInner({
 
   if (variant === "consumer") {
     return (
-      <div className="prod-signin">
+      <div className="fx-signin">
         {!authenticated ? (
           <button
             type="button"
-            className="prod-cta"
+            className="fx-btn fx-btn-primary"
             disabled={!ready || !mintReady || busy}
             onClick={() => login()}
           >
@@ -124,7 +124,7 @@ function PrivyMintInner({
         ) : (
           <button
             type="button"
-            className="prod-text-btn"
+            className="fx-text-btn"
             disabled={busy}
             onClick={() => {
               autoMintedFor.current = null;
@@ -134,7 +134,7 @@ function PrivyMintInner({
             Disconnect sign-in
           </button>
         )}
-        {msg ? <p className="prod-sub">{msg}</p> : null}
+        {msg ? <p className="fx-sub">{msg}</p> : null}
       </div>
     );
   }

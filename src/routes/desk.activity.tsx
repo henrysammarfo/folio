@@ -30,30 +30,35 @@ function Page() {
 
   return (
     <DeskShell title="Activity">
-      <section className="prod-page">
-        <header className="prod-lead compact">
-          <h1 className="prod-page-title">Activity</h1>
-          <p className="prod-sub">Live market checks for your desk.</p>
+      <section className="fx-page">
+        <header className="fx-hero" style={{ marginBottom: "1rem" }}>
+          <h1 className="fx-title">Activity</h1>
+          <p className="fx-sub">Live market checks for your desk.</p>
         </header>
 
-        <ul className="prod-feed" aria-label="Activity">
-          {(data?.events ?? []).map((e) => (
-            <li key={`${e.title}-${e.at}`}>
-              <time dateTime={e.at}>
-                {new Date(e.at).toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </time>
-              <div>
-                <strong>{e.title}</strong>
-                <p>{e.detail}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="fx-card">
+          <ul className="fx-feed" aria-label="Activity">
+            {(data?.events ?? []).map((e) => (
+              <li key={`${e.title}-${e.at}`}>
+                <span className="fx-feed-dot" aria-hidden>
+                  {e.title.slice(0, 1)}
+                </span>
+                <div>
+                  <strong>{e.title}</strong>
+                  <p>{e.detail}</p>
+                </div>
+                <time dateTime={e.at}>
+                  {new Date(e.at).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </time>
+              </li>
+            ))}
+          </ul>
+        </div>
         {data?.note ? (
-          <p className="prod-sub" style={{ marginTop: "1.5rem" }}>
+          <p className="fx-sub" style={{ marginTop: "1rem" }}>
             {data.note}
           </p>
         ) : null}
