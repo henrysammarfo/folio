@@ -5,7 +5,7 @@
 
 ## Desk UI (product)
 
-- Branch `cursor/folio-desk-product-ui-f1ec`: from-scratch consumer chrome (`app-desk` + `prod-*`).
+- Branch `cursor/folio-desk-product-ui-f1ec`: from-scratch consumer chrome (`fx-desk` Web2 brokerage chrome).
 - Default Settings = Account only. Operator wall: `/desk/settings?wall=ops`.
 - Holdings / Borrow / Buy / Activity: hero numbers + hairline lists (not badge-card dashboard).
 

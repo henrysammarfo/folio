@@ -369,3 +369,7 @@ EOF
 | Consumer Settings hides Empire/keys/paper agent | CONFIRMED in-repo + preview | desk.settings.tsx consumer path; ops behind ?wall=ops | 2026-09-19 |
 | Product desk pages drop white card chrome | CONFIRMED in-repo + screenshots | prod-list/feed hairlines; app-desk rail | 2026-09-19 |
 | Numeric ?ops=1 search is stripped by TanStack | CONFIRMED | coerce number → z.string fail → 307 strip; use ?wall=ops | 2026-09-19 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Desk UI follows Web2 brokerage patterns (light shell, tabs, hero, allocation) | CONFIRMED in-repo + screenshots | fx-desk CSS + holdings/buy pages | 2026-09-19 |
