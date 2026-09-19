@@ -1,4 +1,12 @@
 
+## 2026-09-19 — Landing + marketing polish
+
+- Horizontal slide-through on `/` (auto-advance + snap + arrows).
+- PublicShell → Netro-style top pills + sharp Open desk; atmospheric intros.
+- About copy cleaned; live multiplier chip under hero.
+- Build green.
+
+
 ## 2026-09-19 — Desk polish (logos / swap / nav / chart / account)
 
 - NetroBNB-style top nav pills + dark Connect; sidebar Minimize/Expand persisted.
