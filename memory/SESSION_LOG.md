@@ -720,3 +720,9 @@
 - User: skip Pyth Pro (no budget); Bitquery alternate; Finnhub key landed privately.
 - Wash: Bitquery if healthy → else GeckoTerminal free signer/thin-tape; still fail-closed on empty.
 - FINNHUB_API_KEY on .env + Vercel; smoke:goal shipReady=true locally.
+
+
+## 2026-09-19 — Privy production origin allowlisted
+
+- Henry confirmed Allowed origin `https://folio-tawny-one.vercel.app`.
+- smoke:goal shipReady=true · next: browser Log in with Privy on /desk/settings.

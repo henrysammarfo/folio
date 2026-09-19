@@ -23,8 +23,8 @@
 
 ## Still do once (free)
 
-1. **Privy Allowed origin** — add `https://folio-tawny-one.vercel.app` in dashboard.privy.io  
-2. Redeploy production after Finnhub env land (so diverge prefers Finnhub)
+1. ~~**Privy Allowed origin**~~ ✅ Henry added `https://folio-tawny-one.vercel.app`
+2. On production Account: **Log in with Privy** (or **Bootstrap folio-demo session** on ops wall) to confirm cookie mint
 
 ## Optional later (only if you get budget)
 
