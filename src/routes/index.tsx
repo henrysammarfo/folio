@@ -3,10 +3,8 @@ import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { FolioMark } from "@/components/folio-brand";
 import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
-import { BenefitsSection } from "@/components/landing-benefits";
 import { LandingGlassFooter } from "@/components/landing-glass-footer";
-import { GlowingFeaturesSection } from "@/components/landing-glow-features";
-import { LandingSlideThrough } from "@/components/landing-slide";
+import { LandingProductTriptych } from "@/components/landing-product-triptych";
 import { getTruthBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
 
@@ -91,7 +89,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="home-below" aria-label="What FOLIO does">
+      <section className="home-below home-below-light" aria-label="What FOLIO does">
         <div className="home-below-copy">
           <p className="home-eyebrow">Stock desk on Solana</p>
           <h2>Own the economic truth.</h2>
@@ -100,15 +98,15 @@ function Home() {
             quotes a live Solana route before you buy.
           </p>
           <div className="home-cta-row">
-            <Link to="/desk" className="home-cta">
+            <Link to="/desk" className="home-cta home-cta-ink">
               Open the desk <ArrowRight />
             </Link>
-            <Link to="/desk/acquire" className="home-cta-secondary">
+            <Link to="/desk/acquire" className="home-cta-ghost">
               Buy AAPLx
             </Link>
           </div>
         </div>
-        <aside className="home-live-chip" aria-label="Live signal">
+        <aside className="home-live-chip home-live-chip-light" aria-label="Live signal">
           <span>Live</span>
           <strong>
             {mult?.ok
@@ -119,18 +117,16 @@ function Home() {
         </aside>
       </section>
 
-      <LandingSlideThrough />
-      <BenefitsSection />
-      <GlowingFeaturesSection />
+      <LandingProductTriptych />
 
-      <section className="home-section home-section-signal" aria-label="Desk">
+      <section className="home-section home-section-soft-light" aria-label="Desk">
         <div className="home-desk-tease">
           <div>
-            <p className="home-eyebrow dark">Product</p>
-            <h2>Your desk. Not a dashboard of badges.</h2>
+            <p className="home-eyebrow">Product</p>
+            <h2>Your desk. Not a badge wall.</h2>
             <p>
-              Holdings, live charts, quotes, and credit — sized for phones and
-              wide screens. Logos, swap ticket, honest labels.
+              Holdings, charts, quotes, and credit — logos, swap ticket, honest
+              labels. Built for phones and wide screens.
             </p>
             <Link to="/desk" className="home-desk-preview-cta">
               Enter the desk <ArrowRight size={16} />
