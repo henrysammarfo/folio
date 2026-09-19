@@ -1,4 +1,26 @@
 
+## 2026-09-19 — Stock pairs + Pre-IPO claims
+
+| Claim | Status |
+|---|---|
+| Stock↔stock is true Jupiter input→output mint | Verified — `getAcquireBundle` paySymbol + live AAPLx→MSFTx quote |
+| IPO lane = public recent listings (not private) | Verified — copy + PreStocks/Tessera separate desks |
+| PreStocks catalog live | Verified — prestocks.com/api/prestocks |
+| Tessera T-tokens live | Verified — rest-api.tessera.pe token-details |
+| Stocklana deadline 25 Sep 2026 4pm ET | CONFIRMED — hackathon site / Gate news extension |
+| PreStocks bounty forbids non-PreStocks pre-IPO mix | Honored — PreStocks desk only |
+
+## 2026-09-19 — Routes / tenancy / depth claims
+
+| Claim | Status |
+|---|---|
+| Paper agent requires signed session | Verified — `agentBlockedReason` + `runDeskAgent` gate |
+| Bootstrap demo opt-in flag | Verified — `FOLIO_ALLOW_BOOTSTRAP_DEMO=1` |
+| Buy has IPO / meme lanes + pairs | Verified — `XSTOCK_CATALOG` lanes + `XSTOCK_COMPARE_PAIRS` UI |
+| Marketing pages use distinct tones + glass footer | Verified — `PublicShell` tone + `LandingGlassFooter` |
+| Agent compare/credit/network/positions intents | Verified — `parsePaperIntent` + spine fetch |
+| Never unhackable | Policy unchanged |
+
 ## 2026-09-19 — Desk polish claims
 
 | Claim | Status |
@@ -383,3 +405,17 @@ EOF
 | Claim | Verdict | Evidence | As of |
 |---|---|---|---|
 | Desk UI follows Web2 brokerage patterns (light shell, tabs, hero, allocation) | CONFIRMED in-repo + screenshots | fx-desk CSS + holdings/buy pages | 2026-09-19 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Backed logo CDN uses single trailing x (ARMx/GMEx/DJTx) | CONFIRMED live | HTTP 200; ARMXx/GMEXx → 403 | 2026-09-19 |
+| NFLXx AMDx SPYx QQQx live on api.xstocks.fi Solana | CONFIRMED live | v2/public/assets?network=Solana mint+trading | 2026-09-19 |
+| PreStocks catalog is separate from Tessera T-tokens | CONFIRMED live | prestocks.com/api/prestocks (8) vs rest-api.tessera.pe (3) | 2026-09-19 |
+| Tessera T-tokens are loan-participation, not SPV shares | CONFIRMED docs | docs.tessera.pe + blog.tessera.pe structure posts | 2026-09-19 |
+| Markets board shows Jupiter venue + liq (peer pattern) | CONFIRMED in-repo | desk.screener getMarketsBoard + desk.markets | 2026-09-19 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| FOLIO whitepaper + founder operating plan + launch kit exist | CONFIRMED in-repo | docs/FOLIO_WHITEPAPER.md · FOUNDER_OPERATING_PLAN.md · LAUNCH_AND_SOCIALS.md | 2026-09-19 |
+| Public /whitepaper and /beta routes ship | CONFIRMED in-repo | src/routes/whitepaper.tsx · beta.tsx · routeTree.gen.ts | 2026-09-19 |
+| xStocks ~$800M AUM / Solana dominant on-chain equity volume (2026) | CONFIRMED public reports | Crypto Briefing / Solana Compass cites in whitepaper | 2026-09-19 |

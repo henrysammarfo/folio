@@ -1,4 +1,21 @@
 
+## 2026-09-19 — Stock↔stock pairs + PreStocks/Tessera + missing routes
+
+- Buy Pairs tab: true Jupiter stock↔stock (pay mint → receive mint), lane explainers for Mega/IPO/Meme.
+- New desk: `/desk/markets`, `/desk/preipo` (PreStocks-only), `/desk/tessera`.
+- New marketing: `/markets`, `/preipo`, `/pairs`.
+- Stocklana deadline corrected to **2026-09-25 16:00 ET**; PreStocks + Tessera bounty paths separated.
+- Agent `swap A → B` parses as stock↔stock compare spine.
+
+## 2026-09-19 — Routes / tenancy / depth (IPO · meme · pairs · agent · templates)
+
+- Soft desk READ stays public; hard-gate paper agent (session) + bootstrap (`FOLIO_ALLOW_BOOTSTRAP_DEMO=1`).
+- `getDeskAccess` + desk chrome banner; Account tenant switcher via `setActiveTenant`.
+- Catalog lanes mega/ipo/meme + `XSTOCK_COMPARE_PAIRS` on Buy; watchlist `buyable=false` honesty.
+- Paper agent intents: compare / credit / network / positions (+ truth/quote).
+- Marketing: PublicShell tones + LandingGlassFooter; landing Benefits + Glow templates wired.
+- Vitest 154 green.
+
 ## 2026-09-19 — Landing templates (benefits / glow / glass / falcon)
 
 - Wired BenefitsSection (3-card + video), glowing FeatureCards (motion), liquid-glass video footer on `/`.
@@ -667,3 +684,19 @@
 - Researched Robinhood / Cash App / Coinbase patterns.
 - Rebuilt desk as `fx-*` system: light shell, bottom tabs, allocation bar, asset cards, amount chips on Buy, LTV meter, profile Account.
 - Operator wall unchanged at `?wall=ops`.
+
+
+## 2026-09-19 — Peer-grounded markets + logos (no primer)
+
+- User rejected Investopedia/Finviz clone; asked to research/confirm peers and ship real improvements.
+- Confirmed live: Backed CDN ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx = 200; ARMXx/GMEXx = 403. PreStocks API 8 rows; Tessera 3 T-tokens.
+- Peers (Solflare stocks board): venue price + liquidity + session honesty — mirrored on /desk/markets (not a screener clone).
+- PreStocks desk: AssetLogo + token/mark/premium/implied val. Tessera: AssetLogo + mark/holders/val; copy clarifies loan-participation vs SPV.
+- logo-resolve + AssetLogo idx reset; vitest 159 green incl. logo-resolve.
+
+
+## 2026-09-19 — Whitepaper + operating plan + launch kit
+
+- User: document everything + whitepaper; fix rough edges; Stocklana → Colosseum feedback → beta → socials → Colosseum with traction.
+- Added `docs/FOLIO_WHITEPAPER.md`, `FOUNDER_OPERATING_PLAN.md`, `LAUNCH_AND_SOCIALS.md`; refreshed Stocklana paste pack + Colosseum outreach.
+- Product: `/whitepaper`, `/beta` waitlist, humanize wash notes, footer socials cleaned, mission links to whitepaper/beta.

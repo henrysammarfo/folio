@@ -6,12 +6,22 @@ import {
   compareApiOnchainMultiplier,
   fetchScaledUiOnchain,
 } from "../adapters/scaled-ui";
+import { fetchKaminoXStocksMarket } from "../adapters/kamino";
 import { buildAcquireGateMessages } from "../acquire-gates";
 import { isBroadcastPaused } from "../broadcast";
+import {
+  XSTOCK_COMPARE_PAIRS,
+  findCatalogItem,
+  isBuyableXStock,
+} from "../xstock-catalog";
 
 export type AgentIntent =
   | { kind: "quote"; symbol: string; spendUsdc: number }
   | { kind: "truth"; symbol: string }
+  | { kind: "credit" }
+  | { kind: "network" }
+  | { kind: "positions" }
+  | { kind: "compare"; left: string; right: string; spendUsdc: number }
   | { kind: "unknown"; raw: string };
 
 export type AgentSpineEvidence = {
@@ -35,6 +45,28 @@ export type AgentSpineEvidence = {
     mode: string;
     /** Jupiter source honesty: live | cached | stale-cache | fail reason. */
     cacheLabel: "live" | "cached" | "stale-cache" | "unavailable";
+    note: string;
+  };
+  credit?: {
+    aaplMaxLtv: number | null;
+    reserveCount: number | null;
+    mode: string;
+    note: string;
+  };
+  network?: {
+    broadcastPaused: boolean;
+    washMode: string;
+    note: string;
+  };
+  positions?: {
+    note: string;
+  };
+  compare?: {
+    left: string;
+    right: string;
+    spendUsdc: number;
+    leftOut: number | null;
+    rightOut: number | null;
     note: string;
   };
   /** Same acquire-desk discipline — quote path never soft-sells a blocked wash. */
@@ -61,10 +93,36 @@ export type AgentTurn = {
 
 const MAX_SPEND = 25;
 
+function normalizeXSymbol(raw: string): string {
+  const s = raw.trim();
+  if (/x$/i.test(s)) {
+    return `${s.slice(0, -1).toUpperCase()}x`;
+  }
+  return `${s.toUpperCase()}x`;
+}
+
 export function parsePaperIntent(raw: string): AgentIntent {
   const text = raw.trim();
+
+  const compare =
+    text.match(
+      /(?:compare|swap|pair)\s+([A-Za-z]{1,6}x?)\s+(?:vs|versus|and|\/|for|to|→|->)\s+([A-Za-z]{1,6}x?)(?:\s+(\d+(?:\.\d+)?))?/i,
+    ) ??
+    text.match(
+      /([A-Za-z]{1,6}x)\s*(?:→|->|to)\s*([A-Za-z]{1,6}x)(?:\s+(\d+(?:\.\d+)?))?/i,
+    );
+  if (compare?.[1] && compare[2]) {
+    const spend = compare[3] ? Math.min(Number(compare[3]), MAX_SPEND) : 0.01;
+    return {
+      kind: "compare",
+      left: normalizeXSymbol(compare[1]),
+      right: normalizeXSymbol(compare[2]),
+      spendUsdc: Number.isFinite(spend) && spend > 0 ? spend : 0.01,
+    };
+  }
+
   const quote = text.match(
-    /quote\s+(\d+(?:\.\d+)?)\s*(?:usdc)?\s*(?:of|for)?\s*([A-Z]{1,6}x)/i,
+    /quote\s+(\d+(?:\.\d+)?)\s*(?:usdc)?\s*(?:of|for)?\s*([A-Za-z]{1,6}x)/i,
   );
   const quoteAmt = quote?.[1];
   const quoteSym = quote?.[2];
@@ -72,22 +130,145 @@ export function parsePaperIntent(raw: string): AgentIntent {
     return {
       kind: "quote",
       spendUsdc: Math.min(Number(quoteAmt), MAX_SPEND),
-      symbol: quoteSym.toUpperCase().endsWith("X")
-        ? `${quoteSym.slice(0, -1).toUpperCase()}x`
-        : `${quoteSym.toUpperCase()}x`,
+      symbol: normalizeXSymbol(quoteSym),
     };
   }
-  const truth = text.match(/(?:truth|multiplier)\s+([A-Z]{1,6}x)/i);
+
+  const truth = text.match(/(?:truth|multiplier)\s+([A-Za-z]{1,6}x)/i);
   const truthSym = truth?.[1];
   if (truthSym) {
     return {
       kind: "truth",
-      symbol: truthSym.toUpperCase().endsWith("X")
-        ? `${truthSym.slice(0, -1).toUpperCase()}x`
-        : `${truthSym.toUpperCase()}x`,
+      symbol: normalizeXSymbol(truthSym),
     };
   }
+
+  if (/\b(credit|borrow|ltv|kamino)\b/i.test(text)) {
+    return { kind: "credit" };
+  }
+  if (/\b(network|broadcast|wash|matrix)\b/i.test(text)) {
+    return { kind: "network" };
+  }
+  if (/\b(positions?|holdings?|wallet)\b/i.test(text)) {
+    return { kind: "positions" };
+  }
+
+  // Suggested pair shorthand: "mega tech" / "ai semis"
+  const pairHint = XSTOCK_COMPARE_PAIRS.find((p) =>
+    text.toLowerCase().includes(p.label.toLowerCase()),
+  );
+  if (pairHint) {
+    return {
+      kind: "compare",
+      left: pairHint.left,
+      right: pairHint.right,
+      spendUsdc: 1,
+    };
+  }
+
   return { kind: "unknown", raw: text };
+}
+
+async function quoteStockPair(
+  paySymbol: string,
+  receiveSymbol: string,
+  payAmount: number,
+): Promise<{ out: number | null; note: string }> {
+  if (!isBuyableXStock(paySymbol) && findCatalogItem(paySymbol)) {
+    return {
+      out: null,
+      note: `${paySymbol} watchlist-only (cannot pay)`,
+    };
+  }
+  if (!isBuyableXStock(receiveSymbol) && findCatalogItem(receiveSymbol)) {
+    return {
+      out: null,
+      note: `${receiveSymbol} watchlist-only (cannot receive)`,
+    };
+  }
+  const [payAsset, recvAsset] = await Promise.all([
+    fetchXStockAsset(paySymbol),
+    fetchXStockAsset(receiveSymbol),
+  ]);
+  if (!payAsset.ok || !payAsset.data.solanaMint) {
+    return {
+      out: null,
+      note: `pay mint missing for ${paySymbol}`,
+    };
+  }
+  if (!recvAsset.ok || !recvAsset.data.solanaMint) {
+    return {
+      out: null,
+      note: `receive mint missing for ${receiveSymbol}`,
+    };
+  }
+  const payDecimals = payAsset.data.decimals ?? 8;
+  const recvDecimals = recvAsset.data.decimals ?? 8;
+  const quote = await fetchJupiterQuote({
+    inputMint: payAsset.data.solanaMint,
+    outputMint: recvAsset.data.solanaMint,
+    amountRaw: Math.round(payAmount * 10 ** payDecimals),
+    outputDecimals: recvDecimals,
+    inputDecimals: payDecimals,
+  });
+  if (!quote.ok) {
+    return {
+      out: null,
+      note: `${quote.reason}${quote.detail ? ` — ${quote.detail}` : ""}`,
+    };
+  }
+  const cacheLabel = quote.source.includes("stale")
+    ? "stale-cache"
+    : quote.source.includes("cached")
+      ? "cached"
+      : "live";
+  return {
+    out: quote.data.outUiAmount,
+    note: `${payAmount} ${paySymbol} → ≈${quote.data.outUiAmount.toFixed(6)} ${receiveSymbol} · ${cacheLabel} · never a fill`,
+  };
+}
+
+async function quoteLeg(
+  symbol: string,
+  spendUsdc: number,
+): Promise<{ out: number | null; note: string; cacheLabel: string }> {
+  const catalog = findCatalogItem(symbol);
+  if (catalog && !catalog.buyable) {
+    return {
+      out: null,
+      note: `${symbol} watchlist-only (mint not confirmed)`,
+      cacheLabel: "unavailable",
+    };
+  }
+  const asset = await fetchXStockAsset(symbol);
+  if (!asset.ok || !asset.data.solanaMint) {
+    const note = !asset.ok
+      ? `${asset.reason}${asset.detail ? ` — ${asset.detail}` : ""}`
+      : "xstock_mint_missing";
+    return { out: null, note, cacheLabel: "unavailable" };
+  }
+  const quote = await fetchJupiterQuote({
+    outputMint: asset.data.solanaMint,
+    amountRaw: Math.round(spendUsdc * 1_000_000),
+    outputDecimals: asset.data.decimals ?? 8,
+  });
+  if (!quote.ok) {
+    return {
+      out: null,
+      note: `${quote.reason}${quote.detail ? ` — ${quote.detail}` : ""}`,
+      cacheLabel: "unavailable",
+    };
+  }
+  const cacheLabel = quote.source.includes("stale")
+    ? "stale-cache"
+    : quote.source.includes("cached")
+      ? "cached"
+      : "live";
+  return {
+    out: quote.data.outUiAmount,
+    note: `${cacheLabel} out≈${quote.data.outUiAmount.toFixed(6)}`,
+    cacheLabel,
+  };
 }
 
 /** Live Block 0 reads for paper agent — never broadcasts; quote path shares acquire wash gates. */
@@ -101,7 +282,89 @@ export async function fetchPaperAgentSpine(
   if (intent.kind === "unknown") {
     return {
       spine: {},
-      facts: `No live spine for free text. Caps: ≤$${MAX_SPEND}, ${broadcastNote}.`,
+      facts: `No live spine for free text. Caps: ≤$${MAX_SPEND}, ${broadcastNote}. Try: truth AAPLx · quote 1 USDC NVDAx · compare AAPLx vs MSFTx · credit · network · positions.`,
+    };
+  }
+
+  if (intent.kind === "credit") {
+    const kamino = await fetchKaminoXStocksMarket();
+    if (!kamino.ok) {
+      const note = `${kamino.reason}${kamino.detail ? ` — ${kamino.detail}` : ""}`;
+      return {
+        spine: {
+          credit: {
+            aaplMaxLtv: null,
+            reserveCount: null,
+            mode: "unavailable",
+            note,
+          },
+        },
+        facts: `Credit fail-closed (${note}). Borrow broadcast off. ${broadcastNote}.`,
+      };
+    }
+    const aapl = kamino.data.reserves.find((r) => r.symbol === "AAPLx");
+    const note = `${kamino.data.reserves.length} reserves · AAPLx maxLtv ${
+      aapl?.maxLtv != null ? `${(aapl.maxLtv * 100).toFixed(0)}%` : "—"
+    } · borrow execution unavailable`;
+    return {
+      spine: {
+        credit: {
+          aaplMaxLtv: aapl?.maxLtv ?? null,
+          reserveCount: kamino.data.reserves.length,
+          mode: kamino.mode,
+          note,
+        },
+      },
+      facts: `Credit: ${note}. NestUSD capacity stays hidden until verified. ${broadcastNote}.`,
+    };
+  }
+
+  if (intent.kind === "network") {
+    const wash = await evaluateWashGate({
+      symbol: "AAPLx",
+      mint: null,
+      notionalUsd: 1,
+    });
+    const note = `wash ${wash.ok ? wash.mode : wash.reason} · ${broadcastNote} · quote-only swaps · custom deploy out of ≤~$1 budget`;
+    return {
+      spine: {
+        network: {
+          broadcastPaused: isBroadcastPaused(),
+          washMode: wash.ok ? wash.mode : wash.reason,
+          note,
+        },
+      },
+      facts: `Network: ${note}.`,
+    };
+  }
+
+  if (intent.kind === "positions") {
+    const note =
+      "Holdings use watch-wallet mainnet-read when bound on Account; otherwise labeled estimates. Connect wallet for verified qty.";
+    return {
+      spine: { positions: { note } },
+      facts: `Positions: ${note} ${broadcastNote}.`,
+    };
+  }
+
+  if (intent.kind === "compare") {
+    const leg = await quoteStockPair(
+      intent.left,
+      intent.right,
+      intent.spendUsdc,
+    );
+    return {
+      spine: {
+        compare: {
+          left: intent.left,
+          right: intent.right,
+          spendUsdc: intent.spendUsdc,
+          leftOut: null,
+          rightOut: leg.out,
+          note: leg.note,
+        },
+      },
+      facts: `Stock↔stock ${intent.left} → ${intent.right}: ${leg.note}. ${broadcastNote}.`,
     };
   }
 
@@ -129,9 +392,7 @@ export async function fetchPaperAgentSpine(
       };
     }
     const mint = asset.ok ? asset.data.solanaMint : null;
-    const scaledUi = mint
-      ? await fetchScaledUiOnchain(mint)
-      : null;
+    const scaledUi = mint ? await fetchScaledUiOnchain(mint) : null;
     const compare = compareApiOnchainMultiplier(
       mult.data.currentMultiplier,
       scaledUi?.ok ? scaledUi.data.effectiveMultiplier : null,
@@ -141,7 +402,9 @@ export async function fetchPaperAgentSpine(
       pending != null
         ? `pending CA ${pending.toFixed(6)}×`
         : "no pending newMultiplier on live feed";
-    const note = `live ×${mult.data.currentMultiplier.toFixed(6)} · ${caNote} · on-chain ${compare.status} · ${mult.source}`;
+    const lane = findCatalogItem(intent.symbol)?.lane;
+    const laneNote = lane ? ` · lane=${lane}` : "";
+    const note = `live ×${mult.data.currentMultiplier.toFixed(6)} · ${caNote} · on-chain ${compare.status} · ${mult.source}${laneNote}`;
     return {
       spine: {
         truth: {
@@ -156,6 +419,30 @@ export async function fetchPaperAgentSpine(
         },
       },
       facts: `Truth ${intent.symbol}: ${note}. Scaled UI: ${compare.note}. ${broadcastNote}.`,
+    };
+  }
+
+  // quote
+  if (!isBuyableXStock(intent.symbol) && findCatalogItem(intent.symbol)) {
+    const item = findCatalogItem(intent.symbol)!;
+    return {
+      spine: {
+        quote: {
+          symbol: intent.symbol,
+          spendUsdc: intent.spendUsdc,
+          outUiAmount: null,
+          mode: "unavailable",
+          cacheLabel: "unavailable",
+          note: item.blurb ?? "watchlist-only",
+        },
+        gates: {
+          canReview: false,
+          washOk: false,
+          blockedReasons: [`${intent.symbol} is watchlist-only until mint is confirmed`],
+          honestyNotes: item.blurb ? [item.blurb] : [],
+        },
+      },
+      facts: `Quote ${intent.symbol} refuse — watchlist-only (buyable=false). ${broadcastNote}.`,
     };
   }
 
@@ -222,7 +509,6 @@ export async function fetchPaperAgentSpine(
       : { kind: "adapter", reason: wash.reason },
     quoteOk: quote.ok,
     quoteReason: quote.ok ? null : quote.reason,
-    // Paper agent does not invent a Pyth pass on this path.
     diverge: { kind: "unavailable" },
     scaledUi: scaledUiGate,
   });
@@ -304,7 +590,7 @@ export async function runPaperAgent(
       nlExpansion: "off",
       nlExpansionNote: null,
       reply:
-        "Paper agent only. Try: `truth AAPLx` or `quote 25 USDC AAPLx`. Broadcast is disabled.",
+        "Paper agent only. Try: `truth AAPLx` · `quote 25 USDC AAPLx` · `swap AAPLx to MSFTx` · `credit` · `network` · `positions`. Broadcast is disabled.",
     });
   }
 

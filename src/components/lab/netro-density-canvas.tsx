@@ -131,7 +131,11 @@ export function NetroDensityCanvas({
         setAgentReply(
           `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
         );
-        setAgentMeta("Live answers · trades paused");
+        setAgentMeta(
+          res.reason === "agent_requires_session"
+            ? "Sign in on Account to ask"
+            : "Live answers · trades paused",
+        );
         return;
       }
       setAgentReply(res.data.reply);

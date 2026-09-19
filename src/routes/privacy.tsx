@@ -22,6 +22,8 @@ export const Route = createFileRoute("/privacy")({
 function Page() {
   return (
     <PublicShell
+      tone="legal"
+      compactIntro
       eyebrow="Legal"
       title="Privacy Policy"
       intro="Last updated September 19, 2026. FOLIO is built to keep share counts honest — and your data minimal."

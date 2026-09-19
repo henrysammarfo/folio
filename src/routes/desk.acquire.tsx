@@ -8,15 +8,26 @@ import { DeskShell } from "@/components/desk-shell";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { getAcquireBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
-import { XSTOCK_CATALOG, findCatalogItem } from "@/lib/xstock-catalog";
+import {
+  XSTOCK_CATALOG,
+  XSTOCK_SWAP_PAIRS,
+  catalogByLane,
+  findCatalogItem,
+  laneMeta,
+  type XStockLane,
+} from "@/lib/xstock-catalog";
 
-const CHIPS = ["1", "5", "10", "25"] as const;
+const USDC_CHIPS = ["1", "5", "10", "25"] as const;
+const PAIR_CHIPS = ["0.01", "0.05", "0.1", "0.25"] as const;
+
+type Tab = XStockLane | "all" | "pairs";
 
 export const Route = createFileRoute("/desk/acquire")({
   head: () => ({
     meta: siteMeta({
       title: "Buy — FOLIO",
-      description: "Swap USDC for tokenized stocks on Solana with live quotes.",
+      description:
+        "Buy xStocks with USDC or swap stock↔stock on Solana — mega, IPO, meme lanes.",
       path: "/desk/acquire",
     }),
   }),
@@ -27,44 +38,75 @@ export const Route = createFileRoute("/desk/acquire")({
 
 function Page() {
   const initial = Route.useLoaderData();
-  const [symbol, setSymbol] = useState("AAPLx");
+  const [tab, setTab] = useState<Tab>("all");
+  const [receive, setReceive] = useState("AAPLx");
+  const [pay, setPay] = useState<"USDC" | string>("USDC");
   const [amount, setAmount] = useState("1");
   const [query, setQuery] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [reviewed, setReviewed] = useState(false);
-  const spendUsdc = Number(amount);
-  const ready = Number.isFinite(spendUsdc) && spendUsdc > 0 && spendUsdc <= 25;
-  const selected = findCatalogItem(symbol) ?? XSTOCK_CATALOG[0];
+
+  const isPair = pay !== "USDC";
+  const payAmount = Number(amount);
+  const ready =
+    Number.isFinite(payAmount) && payAmount > 0 && payAmount <= 25;
+  const selected = findCatalogItem(receive) ?? XSTOCK_CATALOG[0]!;
+  const payItem = isPair ? findCatalogItem(pay) : null;
+  const meta = laneMeta(tab);
 
   const filtered = useMemo(() => {
+    if (tab === "pairs") return catalogByLane("all");
+    const base = catalogByLane(tab === "all" ? "all" : tab);
     const q = query.trim().toLowerCase();
-    if (!q) return XSTOCK_CATALOG;
-    return XSTOCK_CATALOG.filter(
+    if (!q) return base;
+    return base.filter(
       (item) =>
         item.symbol.toLowerCase().includes(q) ||
         item.name.toLowerCase().includes(q) ||
         item.underlying.toLowerCase().includes(q),
     );
-  }, [query]);
+  }, [query, tab]);
+
+  const pairGroups = useMemo(() => {
+    const groups: Record<string, typeof XSTOCK_SWAP_PAIRS> = {
+      mega: [],
+      ipo: [],
+      meme: [],
+      cross: [],
+    };
+    for (const p of XSTOCK_SWAP_PAIRS) {
+      groups[p.group] = [...(groups[p.group] ?? []), p];
+    }
+    return groups;
+  }, []);
 
   const fetchAcquire = useServerFn(getAcquireBundle);
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ["acquire", symbol, spendUsdc],
-    queryFn: () => fetchAcquire({ data: { symbol, spendUsdc } }),
-    enabled: ready,
-    initialData: symbol === "AAPLx" && spendUsdc === 1 ? initial : undefined,
+    queryKey: ["acquire", receive, pay, payAmount],
+    queryFn: () =>
+      fetchAcquire({
+        data: isPair
+          ? { symbol: receive, paySymbol: pay, amount: payAmount }
+          : { symbol: receive, spendUsdc: payAmount },
+      }),
+    enabled: ready && Boolean(selected?.buyable !== false || isPair),
+    initialData:
+      receive === "AAPLx" && pay === "USDC" && payAmount === 1
+        ? initial
+        : undefined,
     initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
 
-  const out = useMemo(() => {
-    if (data?.jupiter.ok) return data.jupiter.data.outUiAmount.toFixed(6);
-    return null;
-  }, [data]);
-
+  const out = data?.jupiter.ok ? data.jupiter.data.outUiAmount.toFixed(6) : null;
   const canBuy =
-    Boolean(data?.gates.canReview) && !isFetching && ready && !honeypot.trim();
+    Boolean(data?.gates.canReview) &&
+    !isFetching &&
+    ready &&
+    !honeypot.trim() &&
+    Boolean(selected?.buyable) &&
+    (!isPair || Boolean(payItem?.buyable));
 
   const scaledStatus =
     data?.scaledUiCompare.status === "match"
@@ -76,11 +118,38 @@ function Page() {
   const checkLines = [
     ...(data?.gates.blockedReasons ?? []),
     ...(data?.gates.honestyNotes ?? []),
-    data?.prefsFromSession
-      ? null
-      : "Strict prefs · no session — public demo fail-closed labels apply",
-    data?.strictFailClosed ? "Strict fail-closed on" : null,
+    !selected?.buyable
+      ? selected?.blurb ?? "Watchlist only — mint not confirmed"
+      : null,
+    isPair && !payItem?.buyable
+      ? "Pay side is watchlist-only — cannot size a stock↔stock quote"
+      : null,
   ].filter(Boolean) as string[];
+
+  function pickReceive(symbol: string) {
+    setReceive(symbol);
+    setReviewed(false);
+    setErr(null);
+    if (pay === symbol) setPay("USDC");
+  }
+
+  function applyPair(paySym: string, recvSym: string) {
+    setTab("pairs");
+    setPay(paySym);
+    setReceive(recvSym);
+    setAmount("0.01");
+    setReviewed(false);
+    setErr(null);
+  }
+
+  function flipPair() {
+    if (!isPair) return;
+    const nextPay = receive;
+    const nextRecv = pay;
+    setPay(nextPay);
+    setReceive(nextRecv);
+    setReviewed(false);
+  }
 
   return (
     <DeskShell title="Buy">
@@ -88,8 +157,8 @@ function Page() {
         <div className="fx-buy-stack">
           <div className="fx-card fx-buy-chart">
             <TradingViewChart
-              symbol={symbol}
-              height={420}
+              symbol={receive}
+              height={380}
               interval="60"
               theme="light"
             />
@@ -97,43 +166,137 @@ function Page() {
 
           <div className="fx-card fx-picker">
             <div className="fx-picker-head">
-              <h2>Choose a stock</h2>
+              <h2>Markets</h2>
               <input
                 className="fx-picker-search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search AAPL, NVIDIA…"
+                placeholder="Search AAPL, GME, Arm…"
                 aria-label="Search tokenized stocks"
+                disabled={tab === "pairs"}
               />
             </div>
-            <ul className="fx-picker-grid" role="listbox" aria-label="Tokenized stocks">
-              {filtered.map((item) => {
-                const on = item.symbol === symbol;
-                return (
-                  <li key={item.symbol}>
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={on}
-                      className={`fx-picker-item${on ? " is-on" : ""}`}
-                      onClick={() => {
-                        setSymbol(item.symbol);
-                        setReviewed(false);
-                      }}
-                    >
-                      <AssetLogo symbol={item.symbol} size={36} />
-                      <span className="fx-picker-copy">
-                        <strong>{item.underlying}</strong>
-                        <small>{item.symbol}</small>
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-            {filtered.length === 0 ? (
+
+            <div className="fx-lane-row" role="tablist" aria-label="Market lane">
+              {(
+                [
+                  ["all", "All"],
+                  ["mega", "Mega"],
+                  ["ipo", "IPO"],
+                  ["meme", "Meme"],
+                  ["pairs", "Pairs"],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === id}
+                  className={`fx-lane${tab === id ? " is-on" : ""}`}
+                  onClick={() => {
+                    setTab(id);
+                    if (id === "pairs" && pay === "USDC") {
+                      setPay("AAPLx");
+                      setReceive("MSFTx");
+                      setAmount("0.01");
+                    }
+                    if (id !== "pairs" && pay !== "USDC") {
+                      setPay("USDC");
+                      setAmount("1");
+                    }
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="fx-lane-explain">
+              <strong>{meta.title}</strong>
+              <p>{meta.body}</p>
+              <p className="fx-lane-links">
+                Private pre-IPO?{" "}
+                <Link to="/desk/preipo">PreStocks</Link>
+                {" · "}
+                <Link to="/desk/tessera">Tessera</Link>
+                {" · "}
+                <Link to="/desk/markets">All markets</Link>
+              </p>
+            </div>
+
+            {tab === "pairs" ? (
+              <div className="fx-pair-board">
+                {(
+                  [
+                    ["mega", "Mega rotations"],
+                    ["ipo", "IPO ↔ mega"],
+                    ["meme", "Meme ↔ mega"],
+                    ["cross", "Cross-lane"],
+                  ] as const
+                ).map(([group, title]) => (
+                  <div key={group} className="fx-pair-group">
+                    <h3>{title}</h3>
+                    <ul>
+                      {(pairGroups[group] ?? []).map((p) => {
+                        const on = pay === p.pay && receive === p.receive;
+                        return (
+                          <li key={`${p.pay}-${p.receive}`}>
+                            <button
+                              type="button"
+                              className={`fx-pair-card${on ? " is-on" : ""}`}
+                              onClick={() => applyPair(p.pay, p.receive)}
+                            >
+                              <span className="fx-pair-card-title">{p.label}</span>
+                              <span className="fx-pair-card-blurb">{p.blurb}</span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <ul
+                className="fx-picker-grid"
+                role="listbox"
+                aria-label="Tokenized stocks"
+              >
+                {filtered.map((item) => {
+                  const on = item.symbol === receive;
+                  return (
+                    <li key={item.symbol}>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={on}
+                        className={`fx-picker-item${on ? " is-on" : ""}${
+                          !item.buyable ? " is-watch" : ""
+                        }`}
+                        onClick={() => pickReceive(item.symbol)}
+                      >
+                        <AssetLogo
+                          symbol={item.symbol}
+                          underlying={item.underlying}
+                          size={36}
+                        />
+                        <span className="fx-picker-copy">
+                          <strong>{item.underlying}</strong>
+                          <small>
+                            {item.symbol}
+                            {item.lane !== "mega" ? ` · ${item.lane}` : ""}
+                            {!item.buyable ? " · watch" : ""}
+                          </small>
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            {tab !== "pairs" && filtered.length === 0 ? (
               <p className="fx-ticket-sub" style={{ padding: "0 1rem 1rem" }}>
-                No matches — try another ticker.
+                No matches in this lane.
               </p>
             ) : null}
           </div>
@@ -141,11 +304,46 @@ function Page() {
 
         <aside className="fx-card fx-ticket">
           <div>
-            <p className="fx-hero-kicker">Swap</p>
-            <h1>USDC → {selected.symbol}</h1>
-            <p className="fx-ticket-sub">
-              Live Jupiter quote · fills pause until enabled
+            <p className="fx-hero-kicker">
+              {isPair ? "Stock ↔ stock" : "Swap"}
             </p>
+            <h1>
+              {isPair ? `${pay} → ${selected.symbol}` : `USDC → ${selected.symbol}`}
+            </h1>
+            <p className="fx-ticket-sub">
+              {isPair
+                ? "True Jupiter pair route · fills paused"
+                : selected.blurb ??
+                  "Live Jupiter quote · fills pause until enabled"}
+            </p>
+          </div>
+
+          <div className="fx-mode-row" role="group" aria-label="Pay with">
+            <button
+              type="button"
+              className={`fx-mode${pay === "USDC" ? " is-on" : ""}`}
+              onClick={() => {
+                setPay("USDC");
+                setAmount("1");
+                setTab(tab === "pairs" ? "all" : tab);
+                setReviewed(false);
+              }}
+            >
+              Pay USDC
+            </button>
+            <button
+              type="button"
+              className={`fx-mode${isPair ? " is-on" : ""}`}
+              onClick={() => {
+                setTab("pairs");
+                setPay(receive === "AAPLx" ? "MSFTx" : "AAPLx");
+                if (receive === "AAPLx") setReceive("MSFTx");
+                setAmount("0.01");
+                setReviewed(false);
+              }}
+            >
+              Pay stock
+            </button>
           </div>
 
           <div className="fx-swap">
@@ -153,10 +351,28 @@ function Page() {
               <span>You pay</span>
               <div className="fx-swap-row">
                 <strong className="fx-swap-token">
-                  <span className="fx-logo fx-logo-fallback fx-logo-usdc" aria-hidden>
-                    $
-                  </span>
-                  USDC
+                  {isPair ? (
+                    <>
+                      <AssetLogo
+                        symbol={pay}
+                        {...(payItem?.underlying
+                          ? { underlying: payItem.underlying }
+                          : {})}
+                        size={28}
+                      />
+                      {pay}
+                    </>
+                  ) : (
+                    <>
+                      <span
+                        className="fx-logo fx-logo-fallback fx-logo-usdc"
+                        aria-hidden
+                      >
+                        $
+                      </span>
+                      USDC
+                    </>
+                  )}
                 </strong>
                 <input
                   className="fx-swap-amt"
@@ -167,20 +383,30 @@ function Page() {
                     setErr(null);
                     setReviewed(false);
                   }}
-                  aria-label="Amount in USDC"
+                  aria-label={isPair ? "Amount in pay stock" : "Amount in USDC"}
                 />
               </div>
             </div>
 
-            <div className="fx-swap-mid" aria-hidden>
+            <button
+              type="button"
+              className="fx-swap-mid"
+              aria-label="Flip pair"
+              disabled={!isPair}
+              onClick={flipPair}
+            >
               <ArrowDownUp size={16} strokeWidth={2.2} />
-            </div>
+            </button>
 
             <div className="fx-swap-leg">
               <span>You receive</span>
               <div className="fx-swap-row">
                 <strong className="fx-swap-token">
-                  <AssetLogo symbol={selected.symbol} size={28} />
+                  <AssetLogo
+                    symbol={selected.symbol}
+                    underlying={selected.underlying}
+                    size={28}
+                  />
                   {selected.symbol}
                 </strong>
                 <b className="fx-swap-out">
@@ -191,7 +417,7 @@ function Page() {
           </div>
 
           <div className="fx-chip-row">
-            {CHIPS.map((c) => (
+            {(isPair ? PAIR_CHIPS : USDC_CHIPS).map((c) => (
               <button
                 key={c}
                 type="button"
@@ -202,7 +428,7 @@ function Page() {
                   setReviewed(false);
                 }}
               >
-                ${c}
+                {isPair ? c : `$${c}`}
               </button>
             ))}
           </div>
@@ -219,20 +445,29 @@ function Page() {
 
           {err ? <p className="fx-err">{err}</p> : null}
 
+          {!selected?.buyable ? (
+            <p className="fx-checks">
+              Receive side is watchlist-only until the Backed mint is confirmed.
+            </p>
+          ) : null}
+
           {!reviewed ? (
             <button
               type="button"
               className="fx-btn fx-btn-primary fx-btn-block"
               data-testid="acquire-continue"
-              disabled={!ready}
+              disabled={!ready || !selected?.buyable}
               onClick={() => {
-                const n = Number(amount);
-                if (!Number.isFinite(n) || n <= 0) {
-                  setErr("Enter an amount greater than 0.");
+                if (!ready) {
+                  setErr("Enter an amount greater than 0 (max 25).");
                   return;
                 }
-                if (n > 25) {
-                  setErr("Max $25 while fills stay paused.");
+                if (!selected?.buyable) {
+                  setErr("Receive side is watchlist-only.");
+                  return;
+                }
+                if (isPair && !payItem?.buyable) {
+                  setErr("Pay side is watchlist-only.");
                   return;
                 }
                 setErr(null);
@@ -245,6 +480,10 @@ function Page() {
             <div className="fx-review">
               <h2>Policy checks</h2>
               <ul>
+                <li>
+                  <span>Mode</span>
+                  <b>{isPair ? "stock↔stock" : "USDC buy"}</b>
+                </li>
                 <li>
                   <span>Truth (API)</span>
                   <b>
@@ -285,12 +524,10 @@ function Page() {
                 disabled={!canBuy}
               >
                 {canBuy
-                  ? "Swap — fills paused"
-                  : data?.gates.blockedReasons.some((r) =>
-                        /BITQUERY|fail-closed|wash/i.test(r),
-                      )
-                    ? "Blocked · fail-closed"
-                    : "Waiting on checks"}
+                  ? isPair
+                    ? "Swap stocks — fills paused"
+                    : "Swap — fills paused"
+                  : "Blocked · fail-closed"}
               </button>
               <button
                 type="button"
@@ -304,6 +541,8 @@ function Page() {
 
           <p className="fx-ticket-sub">
             Prefer credit? <Link to="/desk/credit">Borrow</Link>
+            {" · "}
+            <Link to="/desk/preipo">Pre-IPO</Link>
           </p>
         </aside>
       </section>

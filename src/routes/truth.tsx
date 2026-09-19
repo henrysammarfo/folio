@@ -48,6 +48,7 @@ function Page() {
 
   return (
     <PublicShell
+      tone="truth"
       eyebrow="Corporate-action ledger"
       title="One balance. Every truth behind it."
       intro="Token balances alone can lie after dividends and splits. FOLIO reads the live xStocks Scaled UI multiplier on Solana mainnet and shows raw vs economic ownership — no fixture 4.0× theater."

@@ -64,6 +64,31 @@ describe("parsePaperIntent", () => {
   it("parses truth intents", () => {
     expect(parsePaperIntent("truth NVDAx")).toEqual({ kind: "truth", symbol: "NVDAx" });
   });
+  it("parses compare / pair intents", () => {
+    expect(parsePaperIntent("compare AAPLx vs MSFTx")).toEqual({
+      kind: "compare",
+      left: "AAPLx",
+      right: "MSFTx",
+      spendUsdc: 0.01,
+    });
+    expect(parsePaperIntent("swap NVDAx to AVGOx 0.05")).toEqual({
+      kind: "compare",
+      left: "NVDAx",
+      right: "AVGOx",
+      spendUsdc: 0.05,
+    });
+    expect(parsePaperIntent("pair NVDAx / AVGOx 5")).toEqual({
+      kind: "compare",
+      left: "NVDAx",
+      right: "AVGOx",
+      spendUsdc: 5,
+    });
+  });
+  it("parses credit / network / positions keywords", () => {
+    expect(parsePaperIntent("show credit LTV")).toEqual({ kind: "credit" });
+    expect(parsePaperIntent("network matrix")).toEqual({ kind: "network" });
+    expect(parsePaperIntent("my holdings")).toEqual({ kind: "positions" });
+  });
   it("returns unknown for free text", () => {
     expect(parsePaperIntent("buy everything")).toMatchObject({ kind: "unknown" });
   });

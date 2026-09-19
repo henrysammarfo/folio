@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { FolioMark } from "@/components/folio-brand";
 import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
+import { BenefitsSection } from "@/components/landing-benefits";
 import { LandingGlassFooter } from "@/components/landing-glass-footer";
+import { GlowingFeaturesSection } from "@/components/landing-glow-features";
 import { LandingProductTriptych } from "@/components/landing-product-triptych";
 import { getTruthBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
@@ -64,7 +66,8 @@ function Home() {
             </div>
             <nav className="home-top-nav" aria-label="Marketing">
               <Link to="/truth">Truth</Link>
-              <Link to="/execution">Execution</Link>
+              <Link to="/markets">Markets</Link>
+              <Link to="/preipo">Pre-IPO</Link>
               <Link to="/credit">Credit</Link>
               <Link to="/about">About</Link>
             </nav>
@@ -119,6 +122,10 @@ function Home() {
 
       <LandingProductTriptych />
 
+      <BenefitsSection />
+
+      <GlowingFeaturesSection />
+
       <section className="home-section home-section-soft-light" aria-label="Desk">
         <div className="home-desk-tease">
           <div>
@@ -126,7 +133,7 @@ function Home() {
             <h2>Your desk. Not a badge wall.</h2>
             <p>
               Holdings, charts, quotes, and credit — logos, swap ticket, honest
-              labels. Built for phones and wide screens.
+              labels. Mega, IPO, and meme lanes with pair compares on Buy.
             </p>
             <Link to="/desk" className="home-desk-preview-cta">
               Enter the desk <ArrowRight size={16} />

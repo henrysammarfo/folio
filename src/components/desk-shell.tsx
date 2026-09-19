@@ -6,6 +6,7 @@ import {
   BriefcaseBusiness,
   CircleDollarSign,
   House,
+  LayoutGrid,
   PanelLeftClose,
   PanelLeft,
   Settings,
@@ -23,6 +24,7 @@ import { FolioTradeJournalLab } from "@/components/lab/folio-trade-journal-lab";
 import {
   getAcquireBundle,
   getCreditBundle,
+  getDeskAccess,
   getLabApprovals,
   getNetworkBundle,
   getPositionsBundle,
@@ -48,6 +50,7 @@ const links = [
   ["Home", "/desk", House],
   ["Holdings", "/desk/positions", BriefcaseBusiness],
   ["Buy", "/desk/acquire", ArrowUpRight],
+  ["Markets", "/desk/markets", LayoutGrid],
   ["Borrow", "/desk/credit", CircleDollarSign],
   ["Activity", "/desk/activity", Activity],
   ["Account", "/desk/settings", Settings],
@@ -98,6 +101,7 @@ export function DeskShell({
   const fetchAcquire = useServerFn(getAcquireBundle);
   const fetchPositions = useServerFn(getPositionsBundle);
   const fetchEmpireReadiness = useServerFn(getEmpireReadiness);
+  const fetchDeskAccess = useServerFn(getDeskAccess);
   const deskSeed = useLoaderData({ from: "/desk" });
   const approvalsSeed = deskSeed.approvals;
   const readinessSeed = deskSeed.readiness;
@@ -106,6 +110,12 @@ export function DeskShell({
   const creditSeed = deskSeed.credit;
   const acquireSeed = deskSeed.acquire;
   const positionsSeed = deskSeed.positions;
+
+  const { data: deskAccess } = useQuery({
+    queryKey: ["desk-access"],
+    queryFn: () => fetchDeskAccess(),
+    staleTime: 30_000,
+  });
 
   useEffect(() => {
     const active = isLabPreviewActive();
@@ -275,6 +285,18 @@ export function DeskShell({
           <button type="button" onClick={exitPreview}>
             Exit
           </button>
+        </div>
+      ) : null}
+
+      {deskAccess && !deskAccess.signedIn ? (
+        <div className="fx-access-banner" role="status">
+          <span>{deskAccess.note}</span>
+          <Link to="/desk/settings">Account</Link>
+        </div>
+      ) : deskAccess?.signedIn && deskAccess.tenantCount > 0 ? (
+        <div className="fx-access-banner fx-access-banner-in" role="status">
+          <span>{deskAccess.note}</span>
+          <Link to="/desk/settings">Manage</Link>
         </div>
       ) : null}
 

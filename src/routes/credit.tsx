@@ -78,6 +78,7 @@ function Page() {
 
   return (
     <PublicShell
+      tone="credit"
       eyebrow="Credit without selling"
       title="Keep the shares. Test the liquidity."
       intro="Credit capacity uses live Kamino reads against paper or wallet-read quantities — never hardcoded dollar theater. NestUSD stays hidden until a verified public metrics endpoint exists. Borrow broadcast stays off on the ≤~$1 Stocklana budget."

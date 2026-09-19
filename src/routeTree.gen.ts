@@ -11,19 +11,27 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as BetaRouteImport } from './routes/beta'
 import { Route as CreditRouteImport } from './routes/credit'
 import { Route as DeskRouteImport } from './routes/desk'
 import { Route as ExecutionRouteImport } from './routes/execution'
+import { Route as MarketsRouteImport } from './routes/markets'
 import { Route as NetworkRouteImport } from './routes/network'
+import { Route as PairsRouteImport } from './routes/pairs'
+import { Route as PreipoRouteImport } from './routes/preipo'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TruthRouteImport } from './routes/truth'
+import { Route as WhitepaperRouteImport } from './routes/whitepaper'
 import { Route as DeskIndexRouteImport } from './routes/desk.index'
 import { Route as DeskAcquireRouteImport } from './routes/desk.acquire'
 import { Route as DeskActivityRouteImport } from './routes/desk.activity'
 import { Route as DeskCreditRouteImport } from './routes/desk.credit'
+import { Route as DeskMarketsRouteImport } from './routes/desk.markets'
 import { Route as DeskPositionsRouteImport } from './routes/desk.positions'
+import { Route as DeskPreipoRouteImport } from './routes/desk.preipo'
 import { Route as DeskSettingsRouteImport } from './routes/desk.settings'
+import { Route as DeskTesseraRouteImport } from './routes/desk.tessera'
 import { Route as LabShadersRouteImport } from './routes/lab.shaders'
 import { Route as LabUiRouteImport } from './routes/lab.ui'
 import { Route as DeskPositionsSymbolRouteImport } from './routes/desk.positions_.$symbol'
@@ -36,6 +44,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BetaRoute = BetaRouteImport.update({
+  id: '/beta',
+  path: '/beta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreditRoute = CreditRouteImport.update({
@@ -53,9 +66,24 @@ const ExecutionRoute = ExecutionRouteImport.update({
   path: '/execution',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketsRoute = MarketsRouteImport.update({
+  id: '/markets',
+  path: '/markets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NetworkRoute = NetworkRouteImport.update({
   id: '/network',
   path: '/network',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PairsRoute = PairsRouteImport.update({
+  id: '/pairs',
+  path: '/pairs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreipoRoute = PreipoRouteImport.update({
+  id: '/preipo',
+  path: '/preipo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -71,6 +99,11 @@ const TermsRoute = TermsRouteImport.update({
 const TruthRoute = TruthRouteImport.update({
   id: '/truth',
   path: '/truth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhitepaperRoute = WhitepaperRouteImport.update({
+  id: '/whitepaper',
+  path: '/whitepaper',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeskIndexRoute = DeskIndexRouteImport.update({
@@ -93,14 +126,29 @@ const DeskCreditRoute = DeskCreditRouteImport.update({
   path: '/credit',
   getParentRoute: () => DeskRoute,
 } as any)
+const DeskMarketsRoute = DeskMarketsRouteImport.update({
+  id: '/markets',
+  path: '/markets',
+  getParentRoute: () => DeskRoute,
+} as any)
 const DeskPositionsRoute = DeskPositionsRouteImport.update({
   id: '/positions',
   path: '/positions',
   getParentRoute: () => DeskRoute,
 } as any)
+const DeskPreipoRoute = DeskPreipoRouteImport.update({
+  id: '/preipo',
+  path: '/preipo',
+  getParentRoute: () => DeskRoute,
+} as any)
 const DeskSettingsRoute = DeskSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => DeskRoute,
+} as any)
+const DeskTesseraRoute = DeskTesseraRouteImport.update({
+  id: '/tessera',
+  path: '/tessera',
   getParentRoute: () => DeskRoute,
 } as any)
 const LabShadersRoute = LabShadersRouteImport.update({
@@ -122,18 +170,26 @@ const DeskPositionsSymbolRoute = DeskPositionsSymbolRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/beta': typeof BetaRoute
   '/credit': typeof CreditRoute
   '/desk': typeof DeskRouteWithChildren
   '/execution': typeof ExecutionRoute
+  '/markets': typeof MarketsRoute
   '/network': typeof NetworkRoute
+  '/pairs': typeof PairsRoute
+  '/preipo': typeof PreipoRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/truth': typeof TruthRoute
+  '/whitepaper': typeof WhitepaperRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
   '/desk/credit': typeof DeskCreditRoute
+  '/desk/markets': typeof DeskMarketsRoute
   '/desk/positions': typeof DeskPositionsRoute
+  '/desk/preipo': typeof DeskPreipoRoute
   '/desk/settings': typeof DeskSettingsRoute
+  '/desk/tessera': typeof DeskTesseraRoute
   '/lab/shaders': typeof LabShadersRoute
   '/lab/ui': typeof LabUiRoute
   '/desk/': typeof DeskIndexRoute
@@ -142,17 +198,25 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/beta': typeof BetaRoute
   '/credit': typeof CreditRoute
   '/execution': typeof ExecutionRoute
+  '/markets': typeof MarketsRoute
   '/network': typeof NetworkRoute
+  '/pairs': typeof PairsRoute
+  '/preipo': typeof PreipoRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/truth': typeof TruthRoute
+  '/whitepaper': typeof WhitepaperRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
   '/desk/credit': typeof DeskCreditRoute
+  '/desk/markets': typeof DeskMarketsRoute
   '/desk/positions': typeof DeskPositionsRoute
+  '/desk/preipo': typeof DeskPreipoRoute
   '/desk/settings': typeof DeskSettingsRoute
+  '/desk/tessera': typeof DeskTesseraRoute
   '/lab/shaders': typeof LabShadersRoute
   '/lab/ui': typeof LabUiRoute
   '/desk': typeof DeskIndexRoute
@@ -162,18 +226,26 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/beta': typeof BetaRoute
   '/credit': typeof CreditRoute
   '/desk': typeof DeskRouteWithChildren
   '/execution': typeof ExecutionRoute
+  '/markets': typeof MarketsRoute
   '/network': typeof NetworkRoute
+  '/pairs': typeof PairsRoute
+  '/preipo': typeof PreipoRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/truth': typeof TruthRoute
+  '/whitepaper': typeof WhitepaperRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
   '/desk/credit': typeof DeskCreditRoute
+  '/desk/markets': typeof DeskMarketsRoute
   '/desk/positions': typeof DeskPositionsRoute
+  '/desk/preipo': typeof DeskPreipoRoute
   '/desk/settings': typeof DeskSettingsRoute
+  '/desk/tessera': typeof DeskTesseraRoute
   '/lab/shaders': typeof LabShadersRoute
   '/lab/ui': typeof LabUiRoute
   '/desk/': typeof DeskIndexRoute
@@ -184,18 +256,26 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/beta'
     | '/credit'
     | '/desk'
     | '/execution'
+    | '/markets'
     | '/network'
+    | '/pairs'
+    | '/preipo'
     | '/privacy'
     | '/terms'
     | '/truth'
+    | '/whitepaper'
     | '/desk/acquire'
     | '/desk/activity'
     | '/desk/credit'
+    | '/desk/markets'
     | '/desk/positions'
+    | '/desk/preipo'
     | '/desk/settings'
+    | '/desk/tessera'
     | '/lab/shaders'
     | '/lab/ui'
     | '/desk/'
@@ -204,17 +284,25 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/beta'
     | '/credit'
     | '/execution'
+    | '/markets'
     | '/network'
+    | '/pairs'
+    | '/preipo'
     | '/privacy'
     | '/terms'
     | '/truth'
+    | '/whitepaper'
     | '/desk/acquire'
     | '/desk/activity'
     | '/desk/credit'
+    | '/desk/markets'
     | '/desk/positions'
+    | '/desk/preipo'
     | '/desk/settings'
+    | '/desk/tessera'
     | '/lab/shaders'
     | '/lab/ui'
     | '/desk'
@@ -223,18 +311,26 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/beta'
     | '/credit'
     | '/desk'
     | '/execution'
+    | '/markets'
     | '/network'
+    | '/pairs'
+    | '/preipo'
     | '/privacy'
     | '/terms'
     | '/truth'
+    | '/whitepaper'
     | '/desk/acquire'
     | '/desk/activity'
     | '/desk/credit'
+    | '/desk/markets'
     | '/desk/positions'
+    | '/desk/preipo'
     | '/desk/settings'
+    | '/desk/tessera'
     | '/lab/shaders'
     | '/lab/ui'
     | '/desk/'
@@ -244,13 +340,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BetaRoute: typeof BetaRoute
   CreditRoute: typeof CreditRoute
   DeskRoute: typeof DeskRouteWithChildren
   ExecutionRoute: typeof ExecutionRoute
+  MarketsRoute: typeof MarketsRoute
   NetworkRoute: typeof NetworkRoute
+  PairsRoute: typeof PairsRoute
+  PreipoRoute: typeof PreipoRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   TruthRoute: typeof TruthRoute
+  WhitepaperRoute: typeof WhitepaperRoute
   LabShadersRoute: typeof LabShadersRoute
   LabUiRoute: typeof LabUiRoute
 }
@@ -269,6 +370,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/beta': {
+      id: '/beta'
+      path: '/beta'
+      fullPath: '/beta'
+      preLoaderRoute: typeof BetaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/credit': {
@@ -292,11 +400,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExecutionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/markets': {
+      id: '/markets'
+      path: '/markets'
+      fullPath: '/markets'
+      preLoaderRoute: typeof MarketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/network': {
       id: '/network'
       path: '/network'
       fullPath: '/network'
       preLoaderRoute: typeof NetworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pairs': {
+      id: '/pairs'
+      path: '/pairs'
+      fullPath: '/pairs'
+      preLoaderRoute: typeof PairsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preipo': {
+      id: '/preipo'
+      path: '/preipo'
+      fullPath: '/preipo'
+      preLoaderRoute: typeof PreipoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -318,6 +447,13 @@ declare module '@tanstack/react-router' {
       path: '/truth'
       fullPath: '/truth'
       preLoaderRoute: typeof TruthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/whitepaper': {
+      id: '/whitepaper'
+      path: '/whitepaper'
+      fullPath: '/whitepaper'
+      preLoaderRoute: typeof WhitepaperRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/desk/': {
@@ -348,6 +484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeskCreditRouteImport
       parentRoute: typeof DeskRoute
     }
+    '/desk/markets': {
+      id: '/desk/markets'
+      path: '/markets'
+      fullPath: '/desk/markets'
+      preLoaderRoute: typeof DeskMarketsRouteImport
+      parentRoute: typeof DeskRoute
+    }
     '/desk/positions': {
       id: '/desk/positions'
       path: '/positions'
@@ -355,11 +498,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeskPositionsRouteImport
       parentRoute: typeof DeskRoute
     }
+    '/desk/preipo': {
+      id: '/desk/preipo'
+      path: '/preipo'
+      fullPath: '/desk/preipo'
+      preLoaderRoute: typeof DeskPreipoRouteImport
+      parentRoute: typeof DeskRoute
+    }
     '/desk/settings': {
       id: '/desk/settings'
       path: '/settings'
       fullPath: '/desk/settings'
       preLoaderRoute: typeof DeskSettingsRouteImport
+      parentRoute: typeof DeskRoute
+    }
+    '/desk/tessera': {
+      id: '/desk/tessera'
+      path: '/tessera'
+      fullPath: '/desk/tessera'
+      preLoaderRoute: typeof DeskTesseraRouteImport
       parentRoute: typeof DeskRoute
     }
     '/lab/shaders': {
@@ -390,8 +547,11 @@ interface DeskRouteChildren {
   DeskAcquireRoute: typeof DeskAcquireRoute
   DeskActivityRoute: typeof DeskActivityRoute
   DeskCreditRoute: typeof DeskCreditRoute
+  DeskMarketsRoute: typeof DeskMarketsRoute
   DeskPositionsRoute: typeof DeskPositionsRoute
+  DeskPreipoRoute: typeof DeskPreipoRoute
   DeskSettingsRoute: typeof DeskSettingsRoute
+  DeskTesseraRoute: typeof DeskTesseraRoute
   DeskIndexRoute: typeof DeskIndexRoute
   DeskPositionsSymbolRoute: typeof DeskPositionsSymbolRoute
 }
@@ -400,8 +560,11 @@ const DeskRouteChildren: DeskRouteChildren = {
   DeskAcquireRoute: DeskAcquireRoute,
   DeskActivityRoute: DeskActivityRoute,
   DeskCreditRoute: DeskCreditRoute,
+  DeskMarketsRoute: DeskMarketsRoute,
   DeskPositionsRoute: DeskPositionsRoute,
+  DeskPreipoRoute: DeskPreipoRoute,
   DeskSettingsRoute: DeskSettingsRoute,
+  DeskTesseraRoute: DeskTesseraRoute,
   DeskIndexRoute: DeskIndexRoute,
   DeskPositionsSymbolRoute: DeskPositionsSymbolRoute,
 }
@@ -411,13 +574,18 @@ const DeskRouteWithChildren = DeskRoute._addFileChildren(DeskRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BetaRoute: BetaRoute,
   CreditRoute: CreditRoute,
   DeskRoute: DeskRouteWithChildren,
   ExecutionRoute: ExecutionRoute,
+  MarketsRoute: MarketsRoute,
   NetworkRoute: NetworkRoute,
+  PairsRoute: PairsRoute,
+  PreipoRoute: PreipoRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   TruthRoute: TruthRoute,
+  WhitepaperRoute: WhitepaperRoute,
   LabShadersRoute: LabShadersRoute,
   LabUiRoute: LabUiRoute,
 }

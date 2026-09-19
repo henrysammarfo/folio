@@ -1,0 +1,207 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useMemo, useState } from "react";
+import { AssetLogo } from "@/components/asset-logo";
+import { DeskShell } from "@/components/desk-shell";
+import { getMarketsBoard } from "@/lib/desk.functions";
+import { siteMeta } from "@/lib/site-meta";
+import { LANE_META, type XStockLane } from "@/lib/xstock-catalog";
+
+type LaneFilter = "all" | XStockLane;
+
+export const Route = createFileRoute("/desk/markets")({
+  head: () => ({
+    meta: siteMeta({
+      title: "Markets — FOLIO",
+      description:
+        "Live Jupiter venue prices for mega, IPO, and meme xStocks on Solana.",
+      path: "/desk/markets",
+    }),
+  }),
+  loader: async () => getMarketsBoard({ data: { lane: "all" } }),
+  component: Page,
+});
+
+function money(n: number) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: n >= 100 ? 2 : 4,
+  });
+}
+
+function shortLiq(n: number) {
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+  if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
+  return money(n);
+}
+
+function Page() {
+  const initial = Route.useLoaderData();
+  const [lane, setLane] = useState<LaneFilter>("all");
+  const fetchBoard = useServerFn(getMarketsBoard);
+  const { data, isFetching } = useQuery({
+    queryKey: ["markets-board", lane],
+    queryFn: () => fetchBoard({ data: { lane } }),
+    initialData: lane === "all" ? initial : undefined,
+    initialDataUpdatedAt: Date.now(),
+    staleTime: 20_000,
+    refetchInterval: 45_000,
+  });
+
+  const rows = data?.rows ?? [];
+  const priced = useMemo(
+    () => rows.filter((r) => r.usdPrice != null).length,
+    [rows],
+  );
+
+  return (
+    <DeskShell title="Markets">
+      <section className="fx-page fx-markets">
+        <header className="fx-markets-hero">
+          <div>
+            <p className="fx-hero-kicker">Live board</p>
+            <h1>Markets</h1>
+            <p className="fx-sub">
+              {data?.note ?? "Jupiter venue prices for the desk catalog."}
+              {isFetching ? " · refreshing…" : ""}
+            </p>
+          </div>
+          <div className="fx-markets-stats">
+            <span>
+              <b>{priced}</b> priced
+            </span>
+            <span>
+              <b>{rows.length}</b> listed
+            </span>
+          </div>
+        </header>
+
+        <div className="fx-lane-row fx-markets-tabs" role="tablist">
+          {(["all", "mega", "ipo", "meme"] as const).map((id) => {
+            const meta = LANE_META.find((l) => l.id === id);
+            return (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={lane === id}
+                className={`fx-lane${lane === id ? " is-on" : ""}`}
+                onClick={() => setLane(id)}
+              >
+                {meta?.label ?? id}
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="fx-markets-explain">
+          {LANE_META.find((l) => l.id === lane)?.body}
+          {" "}
+          Private pre-IPO stays on{" "}
+          <Link to="/desk/preipo">PreStocks</Link> /{" "}
+          <Link to="/desk/tessera">Tessera</Link>.
+        </p>
+
+        <div className="fx-board">
+          <div className="fx-board-head" aria-hidden>
+            <span>Asset</span>
+            <span>Lane</span>
+            <span>Session</span>
+            <span>Liq</span>
+            <span>Venue</span>
+          </div>
+          <ul className="fx-board-list">
+            {rows.map((row) => {
+              const vsRef =
+                row.usdPrice != null &&
+                row.stockRefPrice != null &&
+                row.stockRefPrice > 0
+                  ? ((row.usdPrice - row.stockRefPrice) / row.stockRefPrice) *
+                    100
+                  : null;
+              return (
+                <li key={row.symbol}>
+                  <Link
+                    to="/desk/acquire"
+                    className="fx-board-row"
+                    aria-label={`Trade ${row.symbol}`}
+                  >
+                    <span className="fx-board-asset">
+                      <AssetLogo
+                        symbol={row.symbol}
+                        logo={row.logo}
+                        underlying={row.underlying}
+                        size={36}
+                      />
+                      <span>
+                        <strong>{row.underlying}</strong>
+                        <small>
+                          {row.symbol}
+                          {!row.buyable ? " · watch" : ""}
+                        </small>
+                      </span>
+                    </span>
+                    <span className={`fx-board-lane lane-${row.lane}`}>
+                      {row.lane}
+                    </span>
+                    <span className="fx-board-session">
+                      {row.openNow === true
+                        ? "Open"
+                        : row.openNow === false
+                          ? "Closed"
+                          : "—"}
+                      {row.tradingPeriod ? (
+                        <small>{row.tradingPeriod}</small>
+                      ) : null}
+                    </span>
+                    <span className="fx-board-liq">
+                      {row.liquidity != null ? (
+                        <strong>{shortLiq(row.liquidity)}</strong>
+                      ) : (
+                        <small>—</small>
+                      )}
+                    </span>
+                    <span className="fx-board-price">
+                      {row.usdPrice != null ? (
+                        <>
+                          <strong>{money(row.usdPrice)}</strong>
+                          <small>
+                            {row.priceNote}
+                            {vsRef != null
+                              ? ` · ${vsRef >= 0 ? "+" : ""}${vsRef.toFixed(1)}% vs ref`
+                              : ""}
+                          </small>
+                        </>
+                      ) : (
+                        <small>{row.priceNote}</small>
+                      )}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="fx-markets-extra">
+          <article className="fx-card">
+            <h2>Stock ↔ stock</h2>
+            <p>Rotate without cashing to USDC first — pairs on Buy.</p>
+            <Link to="/desk/acquire" className="fx-btn fx-btn-sm">
+              Open pairs
+            </Link>
+          </article>
+          <article className="fx-card">
+            <h2>Pre-IPO</h2>
+            <p>PreStocks private names · Tessera T-tokens on their own desks.</p>
+            <Link to="/desk/preipo" className="fx-btn fx-btn-sm">
+              PreStocks
+            </Link>
+          </article>
+        </div>
+      </section>
+    </DeskShell>
+  );
+}

@@ -1,6 +1,7 @@
 # FOLIO — Product Bible (design · GTM · retention)
 
-> Living doc. Updated 2026-09-18. Research-backed; never claim unhackable.
+> Living doc. Updated 2026-09-19. Research-backed; never claim unhackable.
+> Business docs: `FOLIO_WHITEPAPER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
 
 ## Design system (ship)
 

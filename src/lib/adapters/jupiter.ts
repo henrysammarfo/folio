@@ -66,11 +66,14 @@ export async function fetchJupiterQuote(params: {
   slippageBps?: number;
   /** xStocks AAPLx verified at 8 decimals (2026-09-15). */
   outputDecimals?: number;
+  /** Input token decimals — USDC=6; xStocks often 8; PreStocks/Tessera often 9. */
+  inputDecimals?: number;
 }): Promise<AdapterResult<JupiterQuote>> {
   const source = "api.jup.ag/swap/v1/quote";
   const inputMint = params.inputMint ?? USDC_MINT;
   const slippageBps = params.slippageBps ?? 50;
   const outputDecimals = params.outputDecimals ?? 8;
+  const inputDecimals = params.inputDecimals ?? 6;
   const cacheKey = quoteCacheKey({
     inputMint,
     outputMint: params.outputMint,
@@ -143,7 +146,7 @@ export async function fetchJupiterQuote(params: {
       priceImpactPct: json.priceImpactPct ?? null,
       routePlanLength: Array.isArray(json.routePlan) ? json.routePlan.length : 0,
       outUiAmount: Number(json.outAmount) / 10 ** outputDecimals,
-      inUiAmount: Number(json.inAmount) / 1_000_000,
+      inUiAmount: Number(json.inAmount) / 10 ** inputDecimals,
     });
     cacheSet(cacheKey, ok, QUOTE_TTL_MS);
     return ok;

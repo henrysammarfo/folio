@@ -1,15 +1,34 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-19 · Stocklana deadline **2026-09-18 20:00 UTC**
+> Updated: 2026-09-19 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
 > Doctrine: honest security only — **never claim unhackable / NK-proof**.
 
 ## Marketing / landing (product)
 
-- Branch `cursor/folio-landing-marketing-f1ec`: landing slide-through (Truth/Route/Buy/Borrow), Netro-style marketing chrome (`mkt-*`), sharper CTAs, live AAPLx chip on home. Liquid stencil hero preserved.
+- Landing: liquid stencil hero + Falcon-style triptych + **BenefitsSection** + **GlowingFeaturesSection** + **LandingGlassFooter**.
+- Marketing PublicShell tones + glass footer; new routes **/markets**, **/preipo**, **/pairs**.
 
 ## Desk UI (product)
 
-- Branch `cursor/folio-desk-polish-f1ec`: NetroBNB top pills + sharp CTAs; **collapsible** `fx-side` (localStorage); xStock logos; Buy = catalog picker + USDC→xStock swap ticket; Home/Netro TradingView (same as Buy); Account cards; responsive/zoom CSS.
+- Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
+- **/desk/markets** live Jupiter board (venue + liq + session + vs-ref) — not a Finviz clone.
+- **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
+- **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
+- Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).
+- Soft access banner; Account tenant switcher; agent session-gated.
+- **/whitepaper** · **/beta** waitlist · docs: `FOLIO_WHITEPAPER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
+- Human wash copy (no raw `bitquery_*` in PreStocks/Tessera consumer UI).
+
+## Launch path (Stocklana → Colosseum → beta)
+
+1. Submit Stocklana (SEP 25 hero — re-check form) with PR #15 preview if markets routes not on main yet.
+2. Claim Folio X · judge feedback · closed beta invites.
+3. Traction → Colosseum / World’s Fair submit.
+
+## Stocklana (live)
+
+- Deadline extended to **25 Sep 2026 16:00 ET**; prize pool ~$126k; tracks include PreStocks, Tessera, Clawpump, Meteora DBC, Pyth.
+- FOLIO wedge: honest share counts + safe routes + credit + stock pairs + PreStocks/Tessera desks.
 
 ## Product lock
 
