@@ -224,8 +224,9 @@ test.describe("FOLIO Block 0 smoke", () => {
   });
 
   test("settings exposes watch-wallet bind (not Privy auth)", async ({ page }) => {
-    await page.goto("/desk/settings");
-    await expect(page.getByText(/settings|session|FOLIO/i).first()).toBeVisible({
+    // Operator wall is opt-in (?ops=1) — consumer Account stays wallet/alerts only
+    await page.goto("/desk/settings?ops=1");
+    await expect(page.getByText(/settings|session|FOLIO|operator|production readiness/i).first()).toBeVisible({
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
@@ -538,7 +539,7 @@ test.describe("FOLIO Block 0 smoke", () => {
   });
 
   test("paper agent keeps live spine and never fills", async ({ page }) => {
-    await page.goto("/desk/settings", { waitUntil: "networkidle" });
+    await page.goto("/desk/settings?ops=1", { waitUntil: "networkidle" });
     await expect(page.getByText(/paper agent/i).first()).toBeVisible({
       timeout: 30_000,
     });

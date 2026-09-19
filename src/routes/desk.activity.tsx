@@ -1,19 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { DeskShell, Panel } from "@/components/desk-shell";
-import { DeskStatusLine } from "@/components/desk-status-line";
-import { StatusBadge } from "@/components/folio-brand";
+import { DeskShell } from "@/components/desk-shell";
 import { getActivityBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
-
-function modeLabel(mode: string): string {
-  if (mode === "mainnet-read") return "Live";
-  if (mode === "quote-only") return "Quote";
-  if (mode === "paper") return "Saved";
-  if (mode === "unavailable") return "Pending";
-  return mode;
-}
 
 export const Route = createFileRoute("/desk/activity")({
   head: () => ({
@@ -30,7 +20,7 @@ export const Route = createFileRoute("/desk/activity")({
 function Page() {
   const initial = Route.useLoaderData();
   const fetchActivity = useServerFn(getActivityBundle);
-  const { data, isFetching } = useQuery({
+  const { data } = useQuery({
     queryKey: ["activity-bundle"],
     queryFn: () => fetchActivity(),
     initialData: initial,
@@ -39,58 +29,35 @@ function Page() {
   });
 
   return (
-    <DeskShell eyebrow="Updates" title="Activity">
-      <DeskStatusLine
-        items={[
-          { label: "Live feed", tone: "live" },
-          {
-            label: data?.prefsFromSession
-              ? data.corporateActionAlerts
-                ? "Alerts on"
-                : "Alerts off"
-              : "Alerts optional",
-            tone: data?.prefsFromSession ? "live" : "muted",
-          },
-        ]}
-      />
+    <DeskShell title="Activity">
+      <section className="prod-page">
+        <header className="prod-lead compact">
+          <h1 className="prod-page-title">Activity</h1>
+          <p className="prod-sub">Live market checks for your desk.</p>
+        </header>
 
-      <Panel
-        title="What’s happening"
-        className="desk-card-lift"
-        meta={
-          <StatusBadge tone="neutral">
-            {isFetching ? "Refreshing…" : "Live"}
-          </StatusBadge>
-        }
-      >
-        <p className="desk-panel-note">{data?.note}</p>
-        <ol className="activity-timeline">
+        <ul className="prod-feed" aria-label="Activity">
           {(data?.events ?? []).map((e) => (
             <li key={`${e.title}-${e.at}`}>
               <time dateTime={e.at}>
-                {new Date(e.at).toISOString().slice(11, 19)} UTC
+                {new Date(e.at).toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </time>
               <div>
-                <b>{e.title}</b>
-                <small>{e.detail}</small>
+                <strong>{e.title}</strong>
+                <p>{e.detail}</p>
               </div>
-              <StatusBadge
-                tone={
-                  e.tone === "green"
-                    ? "green"
-                    : e.tone === "blue"
-                      ? "blue"
-                      : e.tone === "amber"
-                        ? "amber"
-                        : "neutral"
-                }
-              >
-                {modeLabel(e.mode)}
-              </StatusBadge>
             </li>
           ))}
-        </ol>
-      </Panel>
+        </ul>
+        {data?.note ? (
+          <p className="prod-sub" style={{ marginTop: "1.5rem" }}>
+            {data.note}
+          </p>
+        ) : null}
+      </section>
     </DeskShell>
   );
 }

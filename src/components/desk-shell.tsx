@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Settings,
   ShoppingBag,
-  UserRound,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FolioMark } from "./folio-brand";
@@ -41,12 +40,12 @@ import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 import { buildNetroOwnershipSummary } from "@/lib/netro-ownership";
 
 const links = [
-  ["Overview", "/desk", LayoutDashboard],
+  ["Home", "/desk", LayoutDashboard],
   ["Buy", "/desk/acquire", ShoppingBag],
-  ["Positions", "/desk/positions", BriefcaseBusiness],
-  ["Credit", "/desk/credit", CircleDollarSign],
+  ["Holdings", "/desk/positions", BriefcaseBusiness],
+  ["Borrow", "/desk/credit", CircleDollarSign],
   ["Activity", "/desk/activity", Activity],
-  ["Settings", "/desk/settings", Settings],
+  ["Account", "/desk/settings", Settings],
 ] as const;
 
 function previewShaderVariant(
@@ -54,19 +53,18 @@ function previewShaderVariant(
   labUi: LabUiId | null,
 ): ShaderLabVariant | null {
   if (labShader) return labShader;
-  // Cinematic 21st UI pick → live Plasma 24346 (ink-ledger), not a CSS fake
   if (labUi === "cinematic-landing-21st") return "ink-ledger";
   return null;
 }
 
 export function DeskShell({
   title,
-  eyebrow,
   children,
   actions,
 }: {
   title: string;
-  eyebrow: string;
+  /** @deprecated ignored — product pages own their own page titles */
+  eyebrow?: string;
   children: React.ReactNode;
   actions?: React.ReactNode;
 }) {
@@ -82,7 +80,6 @@ export function DeskShell({
   const [labUi, setLabUi] = useState<LabUiId | null>(null);
   const [labShader, setLabShader] = useState<LabShaderId | null>(null);
   const [previewOn, setPreviewOn] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const fetchTruth = useServerFn(getTruthBundle);
   const fetchApprovals = useServerFn(getLabApprovals);
   const fetchNetwork = useServerFn(getNetworkBundle);
@@ -90,7 +87,6 @@ export function DeskShell({
   const fetchAcquire = useServerFn(getAcquireBundle);
   const fetchPositions = useServerFn(getPositionsBundle);
   const fetchEmpireReadiness = useServerFn(getEmpireReadiness);
-  /** Parent `/desk` loader — SSR seed so approved Netro + keys strip paint immediately. */
   const deskSeed = useLoaderData({ from: "/desk" });
   const approvalsSeed = deskSeed.approvals;
   const readinessSeed = deskSeed.readiness;
@@ -130,11 +126,9 @@ export function DeskShell({
   const approvedShader = approvals.data?.approvedShader ?? null;
 
   const previewing = previewOn && (labUi != null || labShader != null);
-  // Opt-in preview wins while active; else Henry-approved production chrome via env
   const effectiveUi = previewing ? labUi : approvedUi;
   const effectiveShader = previewing ? labShader : approvedShader;
   const liveShader = previewShaderVariant(effectiveShader, effectiveUi);
-  // NetroBNB 12-col is the OVERVIEW surface only — never replace Acquire/Positions/etc.
   const isDeskOverview = path === "/desk" || path === "/desk/";
   const showNetroCanvas = effectiveUi === "netro-density" && isDeskOverview;
   const showJournal = effectiveUi === "trade-journal-21st" && isDeskOverview;
@@ -161,24 +155,21 @@ export function DeskShell({
     queryKey: ["credit-bundle", "netro-surface", inspectSearch ?? ""],
     queryFn: () => fetchCredit({ data: { inspectWallet: inspectSearch } }),
     enabled: showNetroCanvas,
-    initialData:
-      showNetroCanvas && !inspectSearch ? creditSeed : undefined,
+    initialData: showNetroCanvas && !inspectSearch ? creditSeed : undefined,
     initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,
     refetchOnMount: "always",
   });
   const positions = useQuery({
     queryKey: ["positions-bundle", "netro-surface", inspectSearch ?? ""],
-    queryFn: () =>
-      fetchPositions({ data: { inspectWallet: inspectSearch } }),
+    queryFn: () => fetchPositions({ data: { inspectWallet: inspectSearch } }),
     enabled: showNetroCanvas,
-    initialData:
-      showNetroCanvas && !inspectSearch ? positionsSeed : undefined,
+    initialData: showNetroCanvas && !inspectSearch ? positionsSeed : undefined,
     initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
     refetchOnMount: "always",
   });
-  const session = useQuery({
+  useQuery({
     queryKey: ["empire-readiness", "netro-keys"],
     queryFn: () => fetchEmpireReadiness(),
     enabled: showNetroCanvas,
@@ -214,7 +205,6 @@ export function DeskShell({
     note: positions.data?.note ?? null,
     rows: positions.data?.rows ?? [],
   });
-  const readiness = session.data;
   const scaledUiCompare = truth.data?.scaledUiCompare;
   const scaledUiStripLabel = scaledUiCompare
     ? scaledUiCompare.status === "match"
@@ -226,13 +216,12 @@ export function DeskShell({
 
   return (
     <div
-      className="desk-layout"
+      className="app-desk"
       data-lab-ui={effectiveUi ?? undefined}
       data-lab-shader={effectiveShader ?? undefined}
       data-lab-plasma={liveShader ? "1" : undefined}
       data-lab-approved={productionChrome ? "1" : undefined}
       data-netro-surface={showNetroCanvas ? "1" : undefined}
-      data-sidebar-collapsed={sidebarCollapsed ? "1" : undefined}
     >
       {previewing ? (
         <div className="lab-preview-banner" role="status">
@@ -250,84 +239,52 @@ export function DeskShell({
                 · shader <code>{labShader}</code>
               </>
             ) : null}
-            {liveShader ? <> · live WebGL Plasma</> : null}. Reply in chat with
-            the id to approve a merge.
           </span>
-          <span className="lab-preview-banner-actions">
-            <Link to="/lab/ui" className="underline">
-              Lab UI
-            </Link>
-            <button type="button" onClick={exitPreview}>
-              Exit preview
-            </button>
-          </span>
+          <button type="button" onClick={exitPreview}>
+            Exit
+          </button>
         </div>
       ) : null}
-      <aside className="desk-sidebar">
-        <Link to="/" className="desk-logo">
-          <FolioMark />
+
+      <aside className="app-rail" aria-label="Desk">
+        <Link to="/" className="app-rail-brand">
+          <FolioMark className="app-rail-mark" title="FOLIO" />
           <span>FOLIO</span>
         </Link>
-        <button
-          type="button"
-          className="desk-sidebar-collapse"
-          aria-pressed={sidebarCollapsed}
-          aria-label={sidebarCollapsed ? "Expand sidebar" : "Minimize sidebar"}
-          onClick={() => setSidebarCollapsed((v) => !v)}
-        >
-          {sidebarCollapsed ? "»" : "«"}
-        </button>
-        <nav aria-label="Desk navigation">
+        <nav className="app-rail-nav">
           {links.map(([label, to, Icon]) => {
-            const active = to === "/desk" ? path === to : path.startsWith(to);
+            const active = to === "/desk" ? path === to || path === "/desk/" : path.startsWith(to);
             return (
               <Link
                 key={to}
                 to={to}
-                className={`desk-nav-link ${active ? "desk-nav-active" : ""}`}
-                title={label}
+                className={`app-rail-link${active ? " is-active" : ""}`}
               >
-                <Icon />
-                <span className="desk-nav-label">{label}</span>
+                <Icon size={18} strokeWidth={1.75} aria-hidden />
+                <span>{label}</span>
               </Link>
             );
           })}
         </nav>
-        <div className="desk-sidebar-foot">
-          <Link
-            to="/desk/settings"
-            className="desk-sidebar-profile"
-            title="Profile & settings"
-          >
-            <UserRound size={18} aria-hidden />
-            <span>Profile</span>
-          </Link>
-        </div>
       </aside>
-      <div className="desk-main">
+
+      <div className="app-stage">
         {liveShader ? (
           <div className="desk-plasma-layer" aria-hidden>
-            <ShaderBackground
-              variant={liveShader}
-              className="desk-plasma-canvas"
-            />
+            <ShaderBackground variant={liveShader} className="desk-plasma-canvas" />
           </div>
         ) : null}
-        <header className="desk-topbar">
-          <div className="desk-search desk-search-policy" aria-label="Desk">
-            Buy tokenized stocks on Solana
+        <header className="app-top">
+          <p className="app-top-title">{showNetroCanvas ? "Home" : title}</p>
+          <div className="app-top-actions">
+            <Link to="/desk/acquire" className="app-buy">
+              Buy
+            </Link>
+            <DeskWalletPill />
           </div>
-          <div className="desk-network">
-            <span className="live-dot" /> Live
-          </div>
-          <Link to="/desk/acquire" className="desk-topbar-cta">
-            Buy
-          </Link>
-          <DeskWalletPill />
         </header>
-        <main className="desk-content">
+        <main className="app-main">
           {showNetroCanvas ? (
-            /* Netro 12-col IS the desk surface — do not stack overview cards under it */
             <div className="desk-lab-netro" data-testid="desk-lab-netro">
               <NetroDensityCanvas
                 multiplierLabel={multiplierLabel}
@@ -340,18 +297,12 @@ export function DeskShell({
             </div>
           ) : (
             <>
-              <div className="desk-heading">
-                <div>
-                  <p>{eyebrow}</p>
-                  <h1>{title}</h1>
-                </div>
-                {actions}
-              </div>
               {showJournal ? (
                 <div className="desk-lab-journal" data-testid="desk-lab-journal">
                   <FolioTradeJournalLab />
                 </div>
               ) : null}
+              {actions ? <div className="app-page-actions">{actions}</div> : null}
               {children}
             </>
           )}
@@ -361,6 +312,7 @@ export function DeskShell({
   );
 }
 
+/** Minimal section frame — prefer bare lists over heavy panels on product pages. */
 export function Panel({
   title,
   meta,
@@ -373,25 +325,24 @@ export function Panel({
   meta?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
-  /** Settings / dense pages — maximize / minimize without losing content. */
   collapsible?: boolean;
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   if (!collapsible) {
     return (
-      <section className={`panel ${className}`}>
-        <header>
+      <section className={`app-block ${className}`}>
+        <header className="app-block-head">
           <h2>{title}</h2>
           {meta}
         </header>
-        <div className="panel-body">{children}</div>
+        <div className="app-block-body">{children}</div>
       </section>
     );
   }
   return (
     <section
-      className={`panel panel-collapsible ${className}`}
+      className={`app-block app-block-fold ${className}`}
       data-open={open ? "1" : "0"}
     >
       <header
@@ -405,12 +356,13 @@ export function Panel({
             setOpen((v) => !v);
           }
         }}
+        className="app-block-head"
       >
         <h2>{title}</h2>
         {meta}
-        <span className="panel-toggle">{open ? "Minimize" : "Maximize"}</span>
+        <span className="app-block-toggle">{open ? "Hide" : "Show"}</span>
       </header>
-      <div className="panel-body">{children}</div>
+      <div className="app-block-body">{children}</div>
     </section>
   );
 }
