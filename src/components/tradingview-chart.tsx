@@ -13,7 +13,13 @@ export function equityTvSymbol(xStock: string): string {
     MSFT: "NASDAQ:MSFT",
     META: "NASDAQ:META",
     GOOG: "NASDAQ:GOOGL",
+    GOOGL: "NASDAQ:GOOGL",
     AMZN: "NASDAQ:AMZN",
+    COIN: "NASDAQ:COIN",
+    HOOD: "NASDAQ:HOOD",
+    CRWD: "NASDAQ:CRWD",
+    PLTR: "NASDAQ:PLTR",
+    AVGO: "NASDAQ:AVGO",
   };
   return map[base] ?? `NASDAQ:${base}`;
 }

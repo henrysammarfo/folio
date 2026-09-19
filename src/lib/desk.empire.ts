@@ -109,6 +109,8 @@ export type PositionRow = {
   symbol: string;
   name: string;
   mint: string | null;
+  /** Backed / xStocks logo URL when available. */
+  logo: string | null;
   /** Display qty: wallet UI amount when bound, else paper. */
   qty: number;
   paperRaw: number;
@@ -446,6 +448,7 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
         symbol,
         name: asset.ok ? asset.data.name : symbol,
         mint,
+        logo: asset.ok ? asset.data.logo : null,
         qty,
         paperRaw,
         qtySource,
