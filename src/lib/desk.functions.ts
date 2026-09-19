@@ -582,6 +582,7 @@ export {
   clearWatchWallet,
 } from "./desk.empire";
 export { getPreipoBundle, getTesseraBundle } from "./desk.markets";
+export { getMarketsBoard, getScreenerBundle } from "./desk.screener";
 export type {
   PositionsBundle,
   CreditBundle,
@@ -593,3 +594,9 @@ export type {
 } from "./desk.empire";
 export type { DeskAccess } from "./auth/desk-access";
 export type { PreipoBundle, TesseraBundle } from "./desk.markets";
+export type {
+  MarketsBoardBundle,
+  MarketsBoardRow,
+  ScreenerBundle,
+  ScreenerRow,
+} from "./desk.screener";

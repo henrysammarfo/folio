@@ -275,7 +275,11 @@ function Page() {
                         }`}
                         onClick={() => pickReceive(item.symbol)}
                       >
-                        <AssetLogo symbol={item.symbol} size={36} />
+                        <AssetLogo
+                          symbol={item.symbol}
+                          underlying={item.underlying}
+                          size={36}
+                        />
                         <span className="fx-picker-copy">
                           <strong>{item.underlying}</strong>
                           <small>
@@ -349,7 +353,11 @@ function Page() {
                 <strong className="fx-swap-token">
                   {isPair ? (
                     <>
-                      <AssetLogo symbol={pay} size={28} />
+                      <AssetLogo
+                        symbol={pay}
+                        underlying={payItem?.underlying}
+                        size={28}
+                      />
                       {pay}
                     </>
                   ) : (
@@ -392,7 +400,11 @@ function Page() {
               <span>You receive</span>
               <div className="fx-swap-row">
                 <strong className="fx-swap-token">
-                  <AssetLogo symbol={selected.symbol} size={28} />
+                  <AssetLogo
+                    symbol={selected.symbol}
+                    underlying={selected.underlying}
+                    size={28}
+                  />
                   {selected.symbol}
                 </strong>
                 <b className="fx-swap-out">

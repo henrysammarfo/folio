@@ -43,7 +43,7 @@ export const LANE_META: readonly LaneMeta[] = [
     id: "meme",
     label: "Meme",
     title: "Meme & high-beta",
-    body: "Retail-driven names (GME…). Same wash + Scaled UI gates as mega — never a soft-sold fill. Watchlist rows stay non-buyable until mint is confirmed.",
+    body: "Retail-driven names (GME, DJT…). Same wash + Scaled UI gates as mega — never a soft-sold fill. Watchlist rows stay non-buyable until mint is confirmed.",
   },
   {
     id: "pairs",
@@ -53,7 +53,9 @@ export const LANE_META: readonly LaneMeta[] = [
   },
 ] as const;
 
-/** Popular + labeled IPO / meme lanes — logos at xstocks-metadata.backed.fi when present. */
+/**
+ * Symbols must match Backed / xStocks mint names (ARMx not ARMXx) so logos resolve.
+ */
 export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
   { symbol: "AAPLx", name: "Apple xStock", underlying: "AAPL", lane: "mega", buyable: true },
   { symbol: "NVDAx", name: "NVIDIA xStock", underlying: "NVDA", lane: "mega", buyable: true },
@@ -67,8 +69,12 @@ export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
   { symbol: "CRWDx", name: "CrowdStrike xStock", underlying: "CRWD", lane: "mega", buyable: true },
   { symbol: "PLTRx", name: "Palantir xStock", underlying: "PLTR", lane: "mega", buyable: true },
   { symbol: "AVGOx", name: "Broadcom xStock", underlying: "AVGO", lane: "mega", buyable: true },
+  { symbol: "NFLXx", name: "Netflix xStock", underlying: "NFLX", lane: "mega", buyable: true },
+  { symbol: "AMDx", name: "AMD xStock", underlying: "AMD", lane: "mega", buyable: true },
+  { symbol: "SPYx", name: "SPDR S&P 500 xStock", underlying: "SPY", lane: "mega", buyable: true },
+  { symbol: "QQQx", name: "Invesco QQQ xStock", underlying: "QQQ", lane: "mega", buyable: true },
   {
-    symbol: "ARMXx",
+    symbol: "ARMx",
     name: "Arm xStock",
     underlying: "ARM",
     lane: "ipo",
@@ -84,15 +90,7 @@ export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
     blurb: "IPO-era public name · quote-only until fill gate opens",
   },
   {
-    symbol: "CMBGx",
-    name: "Compass xStock",
-    underlying: "COMP",
-    lane: "ipo",
-    buyable: false,
-    blurb: "Watchlist · mint not confirmed on desk",
-  },
-  {
-    symbol: "GMEXx",
+    symbol: "GMEx",
     name: "GameStop xStock",
     underlying: "GME",
     lane: "meme",
@@ -100,26 +98,17 @@ export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
     blurb: "High-beta meme · wash gate still fail-closed",
   },
   {
-    symbol: "AMCXx",
-    name: "AMC xStock",
-    underlying: "AMC",
-    lane: "meme",
-    buyable: false,
-    blurb: "Watchlist · no confirmed Backed mint on desk",
-  },
-  {
-    symbol: "DJTXx",
+    symbol: "DJTx",
     name: "Trump Media xStock",
     underlying: "DJT",
     lane: "meme",
-    buyable: false,
-    blurb: "Watchlist · not buyable until mint verified",
+    buyable: true,
+    blurb: "High-beta media · verify size against wash gate",
   },
 ] as const;
 
 /**
- * True stock↔stock swap presets — Jupiter inputMint = left, outputMint = right.
- * Distinct from side-by-side USDC compares.
+ * True stock↔stock swap presets — Jupiter inputMint = pay, outputMint = receive.
  */
 export const XSTOCK_SWAP_PAIRS: readonly {
   pay: string;
@@ -157,7 +146,14 @@ export const XSTOCK_SWAP_PAIRS: readonly {
     blurb: "Brokerage lane: Coinbase into Robinhood",
   },
   {
-    pay: "ARMXx",
+    pay: "SPYx",
+    receive: "QQQx",
+    label: "SPY → QQQ",
+    group: "mega",
+    blurb: "Broad market into Nasdaq-100 basket",
+  },
+  {
+    pay: "ARMx",
     receive: "NVDAx",
     label: "ARM → NVDA",
     group: "ipo",
@@ -171,45 +167,50 @@ export const XSTOCK_SWAP_PAIRS: readonly {
     blurb: "Social IPO into Meta mega-cap",
   },
   {
-    pay: "GMEXx",
+    pay: "GMEx",
     receive: "AAPLx",
     label: "GME → AAPL",
     group: "meme",
     blurb: "Meme high-beta into mega Apple — gates still apply",
   },
   {
-    pay: "GMEXx",
+    pay: "GMEx",
     receive: "TSLAx",
     label: "GME → TSLA",
     group: "meme",
     blurb: "Meme into Tesla retail beta",
   },
   {
+    pay: "DJTx",
+    receive: "METAx",
+    label: "DJT → META",
+    group: "meme",
+    blurb: "Media beta into Meta",
+  },
+  {
     pay: "AAPLx",
-    receive: "GMEXx",
+    receive: "GMEx",
     label: "AAPL → GME",
     group: "cross",
     blurb: "Mega into meme — labeled high-beta receive side",
   },
   {
     pay: "NVDAx",
-    receive: "ARMXx",
+    receive: "ARMx",
     label: "NVDA → ARM",
     group: "cross",
     blurb: "Mega into IPO-era Arm",
   },
 ] as const;
 
-/** @deprecated Use XSTOCK_SWAP_PAIRS — kept for agent pair-hint shorthand. */
+/** @deprecated Prefer XSTOCK_SWAP_PAIRS — agent pair-hint shorthand. */
 export const XSTOCK_COMPARE_PAIRS = XSTOCK_SWAP_PAIRS.map((p) => ({
   left: p.pay,
   right: p.receive,
   label: p.label,
 }));
 
-export function xStockLogoUrl(symbol: string): string {
-  return `https://xstocks-metadata.backed.fi/logos/tokens/${encodeURIComponent(symbol)}.png`;
-}
+export { xStockLogoUrl } from "./logo-resolve";
 
 export function findCatalogItem(symbol: string): XStockCatalogItem | undefined {
   const key = symbol.trim().toLowerCase();

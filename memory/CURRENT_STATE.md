@@ -11,7 +11,10 @@
 ## Desk UI (product)
 
 - Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
-- **/desk/markets** map · **/desk/preipo** PreStocks-only · **/desk/tessera** T-tokens (bounty tracks separated).
+- **/desk/markets** live Jupiter board (venue + liq + session + vs-ref) — not a Finviz clone.
+- **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
+- **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
+- Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).
 - Soft access banner; Account tenant switcher; agent session-gated.
 
 ## Stocklana (live)

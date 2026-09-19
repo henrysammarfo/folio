@@ -684,3 +684,12 @@
 - Researched Robinhood / Cash App / Coinbase patterns.
 - Rebuilt desk as `fx-*` system: light shell, bottom tabs, allocation bar, asset cards, amount chips on Buy, LTV meter, profile Account.
 - Operator wall unchanged at `?wall=ops`.
+
+
+## 2026-09-19 — Peer-grounded markets + logos (no primer)
+
+- User rejected Investopedia/Finviz clone; asked to research/confirm peers and ship real improvements.
+- Confirmed live: Backed CDN ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx = 200; ARMXx/GMEXx = 403. PreStocks API 8 rows; Tessera 3 T-tokens.
+- Peers (Solflare stocks board): venue price + liquidity + session honesty — mirrored on /desk/markets (not a screener clone).
+- PreStocks desk: AssetLogo + token/mark/premium/implied val. Tessera: AssetLogo + mark/holders/val; copy clarifies loan-participation vs SPV.
+- logo-resolve + AssetLogo idx reset; vitest 159 green incl. logo-resolve.

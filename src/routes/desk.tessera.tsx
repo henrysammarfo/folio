@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
+import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { getTesseraBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
@@ -18,6 +19,21 @@ export const Route = createFileRoute("/desk/tessera")({
   loader: async () => getTesseraBundle({ data: { spendUsdc: 1 } }),
   component: Page,
 });
+
+function money(n: number) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  });
+}
+
+function shortVal(n: number) {
+  if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(0)}M`;
+  return money(n);
+}
 
 function Page() {
   const initial = Route.useLoaderData();
@@ -50,10 +66,10 @@ function Page() {
       <section className="fx-page fx-preipo">
         <header className="fx-preipo-hero">
           <p className="fx-hero-kicker">Tessera T-tokens</p>
-          <h1>SpaceX, OpenAI, Kalshi — permissionless quotes.</h1>
+          <h1>SpaceX, OpenAI, Kalshi — loan-participation quotes.</h1>
           <p className="fx-sub">
-            Stocklana Tessera bounty path — kept separate from PreStocks so each
-            track stays eligible. Quote-only · fills paused.{" "}
+            Stocklana Tessera bounty path — economic exposure via loan
+            participation, not PreStocks SPV shares. Quote-only · fills paused.{" "}
             <Link to="/desk/preipo">PreStocks desk →</Link>
           </p>
         </header>
@@ -78,15 +94,13 @@ function Page() {
                         className={`fx-preipo-item${on ? " is-on" : ""}`}
                         onClick={() => setSymbol(row.symbol)}
                       >
-                        <span className="fx-logo fx-logo-fallback" aria-hidden>
-                          {row.symbol.replace(/^T-?/i, "").slice(0, 2)}
-                        </span>
+                        <AssetLogo symbol={row.symbol} size={36} />
                         <span>
                           <strong>{row.symbol}</strong>
                           <small>
                             {row.sector ?? "—"}
                             {row.markPrice != null
-                              ? ` · $${row.markPrice.toFixed(2)}`
+                              ? ` · ${money(row.markPrice)}`
                               : ""}
                           </small>
                         </span>
@@ -99,14 +113,51 @@ function Page() {
           </div>
 
           <aside className="fx-card fx-ticket">
-            <p className="fx-hero-kicker">Buy</p>
-            <h2>USDC → {selected?.symbol ?? "—"}</h2>
+            <div className="fx-ticket-brand">
+              <AssetLogo symbol={selected?.symbol ?? "T-"} size={44} />
+              <div>
+                <p className="fx-hero-kicker">Buy</p>
+                <h2>USDC → {selected?.symbol ?? "—"}</h2>
+              </div>
+            </div>
             <p className="fx-ticket-sub">
               {selected?.name ?? "Select a T-token"}
               {selected?.holders != null
                 ? ` · ${selected.holders.toLocaleString()} holders`
                 : ""}
             </p>
+            {selected ? (
+              <dl className="fx-preipo-marks">
+                <div>
+                  <dt>Mark</dt>
+                  <dd>
+                    {selected.markPrice != null
+                      ? money(selected.markPrice)
+                      : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Mark val</dt>
+                  <dd>
+                    {selected.markValuation != null
+                      ? shortVal(selected.markValuation)
+                      : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Sector</dt>
+                  <dd>{selected.sector ?? "—"}</dd>
+                </div>
+                <div>
+                  <dt>Holders</dt>
+                  <dd>
+                    {selected.holders != null
+                      ? selected.holders.toLocaleString()
+                      : "—"}
+                  </dd>
+                </div>
+              </dl>
+            ) : null}
             <label className="fx-field">
               Amount (USDC)
               <input

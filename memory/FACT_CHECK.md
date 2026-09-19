@@ -405,3 +405,11 @@ EOF
 | Claim | Verdict | Evidence | As of |
 |---|---|---|---|
 | Desk UI follows Web2 brokerage patterns (light shell, tabs, hero, allocation) | CONFIRMED in-repo + screenshots | fx-desk CSS + holdings/buy pages | 2026-09-19 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Backed logo CDN uses single trailing x (ARMx/GMEx/DJTx) | CONFIRMED live | HTTP 200; ARMXx/GMEXx → 403 | 2026-09-19 |
+| NFLXx AMDx SPYx QQQx live on api.xstocks.fi Solana | CONFIRMED live | v2/public/assets?network=Solana mint+trading | 2026-09-19 |
+| PreStocks catalog is separate from Tessera T-tokens | CONFIRMED live | prestocks.com/api/prestocks (8) vs rest-api.tessera.pe (3) | 2026-09-19 |
+| Tessera T-tokens are loan-participation, not SPV shares | CONFIRMED docs | docs.tessera.pe + blog.tessera.pe structure posts | 2026-09-19 |
+| Markets board shows Jupiter venue + liq (peer pattern) | CONFIRMED in-repo | desk.screener getMarketsBoard + desk.markets | 2026-09-19 |
