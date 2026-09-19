@@ -359,3 +359,10 @@ EOF
 |---|---|---|---|
 | Consumer desk pages no longer lead with Empire/fail-closed/paper theater | CONFIRMED in-repo | netro + positions/credit/activity/acquire/settings chrome; Empire strip absent on overview | 2026-09-18 |
 | position-health labels are On-chain OK / Live · est. | CONFIRMED | position-health.ts + vitest | 2026-09-18 |
+
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| No VITE_ secret keys in client code | CONFIRMED | grep + check:secrets (value scan) | 2026-09-19 |
+| Privacy + Terms routes ship | CONFIRMED | privacy.tsx terms.tsx | 2026-09-19 |
+| Cookie analytics gated on Accept | CONFIRMED | ConsentAnalytics + CookieConsentBanner | 2026-09-19 |

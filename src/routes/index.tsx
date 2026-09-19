@@ -4,23 +4,15 @@ import { ArrowRight, Github, Linkedin } from "lucide-react";
 import { FolioMark } from "@/components/folio-brand";
 import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
 import { getTruthBundle } from "@/lib/desk.functions";
+import { siteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "FOLIO — Own the economic truth" },
-      {
-        name: "description",
-        content: "Buy tokenized stocks on Solana with honest share counts.",
-      },
-      { property: "og:title", content: "FOLIO — Own the economic truth" },
-      {
-        property: "og:description",
-        content: "Buy tokenized stocks on Solana with honest share counts.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
+    meta: siteMeta({
+      title: "FOLIO — Buy tokenized stocks on Solana",
+      description: "Honest share counts, safe routes, and credit without selling.",
+      path: "/",
+    }),
   }),
   loader: async () => getTruthBundle({ data: { symbol: "AAPLx" } }),
   component: Home,
@@ -97,9 +89,6 @@ function Home() {
           <div className="home-cta-row">
             <Link to="/desk" className="home-cta">
               Open the desk <ArrowRight />
-            </Link>
-            <Link to="/desk/acquire" className="home-cta-secondary">
-              Buy AAPLx
             </Link>
           </div>
         </div>
@@ -187,12 +176,26 @@ function Home() {
           </div>
         </nav>
         <div className="home-bottom">
-          <p>© 2026 FOLIO</p>
+          <p>
+            © 2026 FOLIO ·{" "}
+            <Link to="/privacy">Privacy</Link> ·{" "}
+            <Link to="/terms">Terms</Link>
+          </p>
           <div>
-            <a href="https://www.linkedin.com" aria-label="LinkedIn">
+            <a
+              href="https://www.linkedin.com/in/henrysammarfo"
+              aria-label="LinkedIn"
+              rel="noreferrer"
+              target="_blank"
+            >
               <Linkedin />
             </a>
-            <a href="https://github.com/henrysammarfo" aria-label="GitHub">
+            <a
+              href="https://github.com/henrysammarfo"
+              aria-label="GitHub"
+              rel="noreferrer"
+              target="_blank"
+            >
               <Github />
             </a>
           </div>

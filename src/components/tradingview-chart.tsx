@@ -92,6 +92,8 @@ export function TradingViewChart({
       style={{ height }}
       data-testid="tradingview-chart"
       data-symbol={tvSymbol}
+      role="img"
+      aria-label={`${tvSymbol} live price chart`}
     >
       {!mounted ? (
         <div className="folio-tv-chart-skeleton" aria-hidden>

@@ -619,3 +619,10 @@
 - Positions / detail / Credit / Activity / Acquire / Settings chrome / fallback desk.index: consumer copy; shared WalletLookupPanel; est. not paper theater.
 - Activity events + positions/credit notes softened at source. Empire keys stay Settings-only.
 - position-health labels → On-chain OK / Live · est.; e2e updated. Vitest 147 green.
+
+
+## 2026-09-19 — Web launch polish + desk redesign
+
+- User: desk pages still unfinished; 20 web tasks.
+- Desk: Positions cards, Credit hero, Activity timeline, Buy validation, Settings Connect wallet first / keys advanced collapsed.
+- Launch: Privacy + Terms, cookie banner, consent analytics, OG/favicon/sitemap/robots, HSTS, custom 404, form validation + honeypot, contrast, legal footer links, single home CTA, frontend secrets scan.
