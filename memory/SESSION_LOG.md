@@ -707,3 +707,9 @@
 - Marked PR #15 ready · merged `d854340` · Vercel production READY.
 - Verified HTTP 200: /desk/markets · /desk/preipo · /desk/tessera · /whitepaper · /beta (+ marketing /markets /preipo /pairs).
 - Judges can use https://folio-tawny-one.vercel.app directly.
+
+
+## 2026-09-19 — Keys fully-active runbook
+
+- Live probe: all Empire key *names* present on Vercel; Bitquery live = 402 quota; Pyth = 403 not entitled; diverge via Yahoo OK; multi-tenant DONE.
+- Added docs/KEYS_FULLY_ACTIVE.md — Henry must top up Bitquery + new token, Privy allowlist production URL.

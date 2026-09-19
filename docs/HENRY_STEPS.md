@@ -55,9 +55,19 @@ App ID + secret on Vercel. Rotate after chat paste.
 
 ---
 
+## Still blocked for “fully active” (2026-09-19 probe)
+
+Keys are **present** on Vercel. Live gaps:
+
+1. **Bitquery 402 quota** — top up / upgrade + **new token** → replace `BITQUERY_API_KEY` (see `docs/KEYS_FULLY_ACTIVE.md`)
+2. **Privy Allowed origin** — add `https://folio-tawny-one.vercel.app`
+3. **Pyth 403 not entitled** — optional; ship diverge uses Yahoo (live)
+4. **Broadcast** — stay paused until funded
+
 ## Still paused until funded
 - Mainnet broadcast / swap send  
 - Custom program deploy (rent ≫ $1)
 
 ## Goal matrix
-`npm run smoke:goal` — Empire DONE with live Yahoo equity ref; multi-tenant DONE when bootstrap mint+verify succeeds (or Privy login + Join).
+`npm run smoke:goal` — Empire PARTIAL until wash live; multi-tenant DONE when bootstrap mint+verify succeeds (or Privy login + Join).
+
