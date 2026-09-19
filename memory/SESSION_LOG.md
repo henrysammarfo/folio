@@ -713,3 +713,10 @@
 
 - Live probe: all Empire key *names* present on Vercel; Bitquery live = 402 quota; Pyth = 403 not entitled; diverge via Yahoo OK; multi-tenant DONE.
 - Added docs/KEYS_FULLY_ACTIVE.md — Henry must top up Bitquery + new token, Privy allowlist production URL.
+
+
+## 2026-09-19 — Free wash fallback + Finnhub (no Pyth Pro)
+
+- User: skip Pyth Pro (no budget); Bitquery alternate; Finnhub key landed privately.
+- Wash: Bitquery if healthy → else GeckoTerminal free signer/thin-tape; still fail-closed on empty.
+- FINNHUB_API_KEY on .env + Vercel; smoke:goal shipReady=true locally.

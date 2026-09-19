@@ -108,12 +108,16 @@ export function buildNetworkMatrix(input: {
     },
     {
       capability: "Wash / linked-flow gate",
-      mode: input.bitqueryKeyPresent ? modeOf(input.wash) : "unavailable",
-      detail: input.bitqueryKeyPresent
-        ? input.wash.ok
-          ? "Bitquery live"
-          : detailOf(input.wash)
-        : "BITQUERY_API_KEY missing · fail-closed",
+      mode: modeOf(input.wash),
+      detail: input.wash.ok
+        ? input.wash.source.includes("gecko")
+          ? "GeckoTerminal free tape · signer/thin-tape heuristic"
+          : input.bitqueryKeyPresent
+            ? "Bitquery live · self-trade / thin-tape heuristic"
+            : `${input.wash.source} · live`
+        : input.bitqueryKeyPresent
+          ? detailOf(input.wash)
+          : `${detailOf(input.wash)} · Bitquery optional (quota) · free Gecko fallback`,
     },
     {
       capability: "Kamino xStocks market (read)",

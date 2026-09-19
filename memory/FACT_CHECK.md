@@ -419,3 +419,9 @@ EOF
 | FOLIO whitepaper + founder operating plan + launch kit exist | CONFIRMED in-repo | docs/FOLIO_WHITEPAPER.md · FOUNDER_OPERATING_PLAN.md · LAUNCH_AND_SOCIALS.md | 2026-09-19 |
 | Public /whitepaper and /beta routes ship | CONFIRMED in-repo | src/routes/whitepaper.tsx · beta.tsx · routeTree.gen.ts | 2026-09-19 |
 | xStocks ~$800M AUM / Solana dominant on-chain equity volume (2026) | CONFIRMED public reports | Crypto Briefing / Solana Compass cites in whitepaper | 2026-09-19 |
+
+| Claim | Verdict | Evidence | As of |
+|---|---|---|---|
+| Wash works without paid Bitquery via GeckoTerminal | CONFIRMED live | evaluateWashGate fallback + vitest live AAPLx | 2026-09-19 |
+| Ship equity diverge uses Finnhub then Yahoo (no Pyth Pro) | CONFIRMED | smoke:goal FINNHUB:AAPL · Pyth skipped | 2026-09-19 |
+| smoke:goal shipReady=true with free wash + Finnhub | CONFIRMED local | done=6 partial=0 | 2026-09-19 |
