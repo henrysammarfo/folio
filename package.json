@@ -18,7 +18,8 @@
     "smoke": "npx tsx scripts/smoke-empire.mts",
     "smoke:keys": "npx tsx scripts/smoke-keys.mts",
     "smoke:goal": "npx tsx --env-file=.env scripts/smoke-goal.mts",
-    "keys": "npx tsx scripts/keys-readiness.mts"
+    "keys": "npx tsx scripts/keys-readiness.mts",
+    "check:secrets": "npx tsx scripts/check-frontend-secrets.mts"
   },
   "overrides": {
     "rolldown": "1.2.1"
@@ -57,6 +58,7 @@
     "@tanstack/react-router": "1.170.18",
     "@tanstack/react-start": "1.168.32",
     "@tanstack/router-plugin": "1.168.23",
+    "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

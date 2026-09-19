@@ -511,3 +511,10 @@ JWT ✅ · SQL ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; **Pyth
 - Overview Netro finished: Trade AAPLx · Share count · Buy path · single Connect · soft agent.
 - Positions / AAPLx / Credit / Activity / Buy / Settings chrome / fallback overview: consumer language; paper→est.; Empire/fail-closed theater off consumer surfaces (Settings keeps keys).
 - Branch: `cursor/folio-consumer-pages-f1ec`.
+
+
+## 2026-09-19 — Launch checklist + desk redesign
+- Privacy `/privacy`, Terms `/terms`, cookie consent + Vercel Analytics (opt-in).
+- OG `/og.png`, sitemap, robots, HSTS headers, branded 404.
+- Desk pages redesigned (cards / credit hero / timeline) — not copy-only.
+- Branch: `cursor/folio-web-launch-polish-f1ec`.

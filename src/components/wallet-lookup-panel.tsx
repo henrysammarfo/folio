@@ -1,8 +1,16 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
 
-/** Consumer wallet lookup — no ephemeral/pubkey/session jargon. */
+const BASE58_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
+export function isPlausibleSolanaAddress(value: string): boolean {
+  const v = value.trim();
+  return BASE58_RE.test(v);
+}
+
+/** Consumer wallet lookup — validated address + honeypot spam trap. */
 export function WalletLookupPanel({
   inspectInput,
   onInspectInput,
@@ -18,9 +26,28 @@ export function WalletLookupPanel({
   onClear: () => void;
   boundElsewhere?: boolean;
 }) {
+  const [error, setError] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState("");
+
+  function submit() {
+    if (honeypot.trim()) return; // bot filled hidden field
+    const next = inspectInput.trim();
+    if (!next) {
+      setError("Paste a wallet address.");
+      return;
+    }
+    if (!isPlausibleSolanaAddress(next)) {
+      setError("That doesn’t look like a Solana address.");
+      return;
+    }
+    setError(null);
+    onLookUp();
+  }
+
   return (
     <Panel
       title="Look up a wallet"
+      className="desk-card-lift"
       meta={
         <StatusBadge tone={inspectActive ? "green" : "neutral"}>
           {inspectActive ? "Looking up" : boundElsewhere ? "Connected" : "Optional"}
@@ -34,23 +61,49 @@ export function WalletLookupPanel({
         </Link>{" "}
         to save yours.
       </p>
-      <div className="form-grid">
+      <div className="form-grid form-grid-single">
         <label>
           Wallet address
           <input
             value={inspectInput}
-            onChange={(e) => onInspectInput(e.target.value)}
+            onChange={(e) => {
+              onInspectInput(e.target.value);
+              if (error) setError(null);
+            }}
             placeholder="Paste wallet address"
             autoComplete="off"
             spellCheck={false}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? "wallet-lookup-error" : undefined}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                submit();
+              }
+            }}
           />
         </label>
+        {/* Honeypot — hidden from users */}
+        <label className="hp-field" aria-hidden="true">
+          Company
+          <input
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+          />
+        </label>
+        {error ? (
+          <p id="wallet-lookup-error" className="form-error" role="alert">
+            {error}
+          </p>
+        ) : null}
         <div className="form-actions">
           <button
             type="button"
-            className="wallet-pill"
+            className="wallet-pill wallet-pill-primary"
             disabled={!inspectInput.trim()}
-            onClick={onLookUp}
+            onClick={submit}
           >
             Look up
           </button>
@@ -58,7 +111,10 @@ export function WalletLookupPanel({
             type="button"
             className="wallet-pill"
             disabled={!inspectActive}
-            onClick={onClear}
+            onClick={() => {
+              setError(null);
+              onClear();
+            }}
           >
             Clear
           </button>

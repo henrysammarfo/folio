@@ -3,8 +3,11 @@ import { ArrowUpRight } from "lucide-react";
 import { Wordmark } from "./folio-brand";
 
 const nav = [
-  ["Truth", "/truth"], ["Execution", "/execution"], ["Credit", "/credit"],
-  ["Network", "/network"], ["About", "/about"],
+  ["Truth", "/truth"],
+  ["Execution", "/execution"],
+  ["Credit", "/credit"],
+  ["Network", "/network"],
+  ["About", "/about"],
 ] as const;
 
 export function PublicShell({
@@ -18,7 +21,6 @@ export function PublicShell({
   title: string;
   intro: string;
   children: React.ReactNode;
-  /** Lab pages: thin strip so visual stages aren't buried under a marketing hero */
   compactIntro?: boolean;
 }) {
   return (
@@ -26,23 +28,58 @@ export function PublicShell({
       <header className="site-header">
         <Wordmark />
         <nav className="hidden items-center gap-7 md:flex" aria-label="Main navigation">
-          {nav.map(([label, to]) => <Link key={to} to={to} className="nav-link" activeProps={{ className: "nav-link nav-link-active" }}>{label}</Link>)}
+          {nav.map(([label, to]) => (
+            <Link
+              key={to}
+              to={to}
+              className="nav-link"
+              activeProps={{ className: "nav-link nav-link-active" }}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
-        <Link to="/desk" className="header-action">Open desk <ArrowUpRight /></Link>
+        <Link to="/desk" className="header-action">
+          Open desk <ArrowUpRight />
+        </Link>
       </header>
       <main>
-        <section className={compactIntro ? "page-intro page-intro-compact" : "page-intro"}>
+        <section
+          className={compactIntro ? "page-intro page-intro-compact" : "page-intro"}
+        >
           <p className="eyebrow-dark">{eyebrow}</p>
           <h1>{title}</h1>
           <p>{intro}</p>
         </section>
         <div className="page-content">{children}</div>
       </main>
-      <footer className="site-footer"><Wordmark /><p>Corporate-action truth for Solana xStocks.</p><p>Built by Henry Sam Marfo · Accra</p></footer>
+      <footer className="site-footer">
+        <Wordmark />
+        <p>Honest share counts for Solana xStocks.</p>
+        <nav className="site-footer-legal" aria-label="Legal">
+          <Link to="/privacy">Privacy</Link>
+          <Link to="/terms">Terms</Link>
+        </nav>
+        <p>Built by Henry Sam Marfo · Accra</p>
+      </footer>
     </div>
   );
 }
 
-export function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return <article className="metric"><p>{label}</p><strong>{value}</strong><span>{detail}</span></article>;
+export function Metric({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <article className="metric">
+      <p>{label}</p>
+      <strong>{value}</strong>
+      <span>{detail}</span>
+    </article>
+  );
 }

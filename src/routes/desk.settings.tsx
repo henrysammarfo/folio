@@ -3,8 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { DeskShell, Panel } from "@/components/desk-shell";
+import { DeskStatusLine } from "@/components/desk-status-line";
 import { StatusBadge } from "@/components/folio-brand";
-import { ModeBadge } from "@/components/mode-badge";
 import { Switch } from "@/components/ui/switch";
 import {
   attachDemoTenantMembership,
@@ -20,6 +20,8 @@ import {
 } from "@/lib/desk.functions";
 import { readLabShaderPick, readLabUiPick } from "@/lib/lab-pick";
 import { canWriteDeskPrefs } from "@/lib/auth/role-gates";
+import { siteMeta } from "@/lib/site-meta";
+import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 
 const PrivySessionMint = lazy(() =>
   import("@/components/privy-session-mint").then((m) => ({
@@ -29,15 +31,12 @@ const PrivySessionMint = lazy(() =>
 
 export const Route = createFileRoute("/desk/settings")({
   head: () => ({
-    meta: [
-      { title: "Settings — FOLIO" },
-      {
-        name: "description",
-        content: "Server session status and paper agent — no localStorage auth.",
-      },
-    ],
+    meta: siteMeta({
+      title: "Settings — FOLIO",
+      description: "Connect your wallet, manage alerts, and desk preferences.",
+      path: "/desk/settings",
+    }),
   }),
-  /** Prefetch session/auth/broadcast honesty for first paint. */
   loader: async () => getSessionBundle(),
   component: Page,
 });
@@ -162,50 +161,40 @@ function Page() {
 
   return (
     <DeskShell eyebrow="Account" title="Settings">
-      <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Live markets</ModeBadge>
-        <ModeBadge mode={data?.networkPolicy.broadcast ? "mainnet-read" : "unavailable"}>
-          {data?.networkPolicy.broadcast ? "Trading armed" : "Trading paused"}
-        </ModeBadge>
-        <ModeBadge
-          mode={
-            data?.auth.ok && data.auth.data.sessionReady
-              ? "mainnet-read"
-              : data?.auth.ok
-                ? "paper"
-                : "unavailable"
-          }
-        >
-          {data?.auth.ok && data.auth.data.sessionReady
-            ? "Signed in"
-            : data?.auth.ok
-              ? "Keys ready · sign in"
-              : "Sign in required"}
-        </ModeBadge>
-        <ModeBadge mode={data?.sessionSecretPresent ? "mainnet-read" : "unavailable"}>
-          {data?.sessionSecretPresent
-            ? "Wallet binding ready"
-            : "Wallet binding unavailable"}
-        </ModeBadge>
-        <ModeBadge mode="paper">Desk agent</ModeBadge>
-      </div>
+      <DeskStatusLine
+        items={[
+          { label: "Live markets", tone: "live" },
+          {
+            label: data?.networkPolicy.broadcast ? "Trading armed" : "Trading paused",
+            tone: data?.networkPolicy.broadcast ? "live" : "warn",
+          },
+          {
+            label:
+              data?.auth.ok && data.auth.data.sessionReady
+                ? "Signed in"
+                : "Connect to save prefs",
+            tone:
+              data?.auth.ok && data.auth.data.sessionReady ? "live" : "muted",
+          },
+        ]}
+      />
 
       <div className="settings-layout">
         <nav className="settings-rail" aria-label="Settings sections">
-          <a href="#empire-readiness">Keys & readiness</a>
-          <a href="#settings-network">Network</a>
-          <a href="#settings-tenant">Account</a>
-          <a href="#settings-session">Sign in</a>
           <a href="#settings-watch">Wallet</a>
+          <a href="#settings-session">Sign in</a>
+          <a href="#settings-tenant">Account</a>
           <a href="#settings-agent">Desk agent</a>
+          <a href="#settings-network">Network</a>
+          <a href="#empire-readiness">Keys (advanced)</a>
           <a href="#settings-key-guide">Key links</a>
         </nav>
         <div className="settings-main">
       <Panel
         title="Production readiness"
-        meta={<StatusBadge tone="blue">Operator</StatusBadge>}
+        meta={<StatusBadge tone="blue">Advanced</StatusBadge>}
         collapsible
-        defaultOpen
+        defaultOpen={false}
       >
         <div id="empire-readiness" className="scroll-mt-24" />
         <p className="mb-3 text-sm opacity-80">
@@ -875,21 +864,20 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
 
       <div id="settings-watch" className="scroll-mt-24">
       <Panel
-        title="Watch wallet (mainnet-read qty)"
+        title="Connect wallet"
         meta={
-          <StatusBadge tone={data?.sessionSecretPresent ? "green" : "amber"}>
-            {data?.sessionSecretPresent ? "Secret ready" : "Secret missing"}
+          <StatusBadge tone={data?.watchWallet ? "green" : "neutral"}>
+            {data?.watchWallet ? "Connected" : "Optional"}
           </StatusBadge>
         }
         collapsible
-        defaultOpen={false}
+        defaultOpen
       >
         <p className="mb-3 text-sm opacity-80">
-          Bind a Solana pubkey for mainnet token-balance reads on Positions. Requires{" "}
-          <code>FOLIO_SESSION_SECRET</code> only — this is <b>not</b> multi-tenant Privy auth.
+          Save a wallet so Positions and Credit show your live balances.
           {data?.sessionSecretPresent
             ? null
-            : " Set FOLIO_SESSION_SECRET (≥16) in Vercel env to enable bind on the public demo."}{" "}
+            : " Wallet binding needs a server secret — Connect stays disabled until it is set."}{" "}
           Currently:{" "}
           {data?.watchWallet ? (
             <code>{data.watchWallet.slice(0, 4)}…{data.watchWallet.slice(-4)}</code>
@@ -897,27 +885,37 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
             "none"
           )}
         </p>
-        <div className="form-grid">
+        <div className="form-grid form-grid-single">
           <label>
-            Wallet pubkey
+            Wallet address
             <input
               value={watchWalletInput}
               onChange={(e) => setWatchWalletInput(e.target.value)}
-              placeholder="Base58 pubkey"
+              placeholder="Paste wallet address"
               autoComplete="off"
+              spellCheck={false}
             />
+          </label>
+          <label className="hp-field" aria-hidden="true">
+            Fax
+            <input tabIndex={-1} autoComplete="off" defaultValue="" />
           </label>
           <button
             type="button"
-            className="wallet-pill"
+            className="wallet-pill wallet-pill-primary"
             disabled={
               watchBusy || !watchWalletInput.trim() || !data?.sessionSecretPresent
             }
             onClick={async () => {
+              const next = watchWalletInput.trim();
+              if (!isPlausibleSolanaAddress(next)) {
+                setWatchMsg("That doesn’t look like a Solana address.");
+                return;
+              }
               setWatchBusy(true);
               setWatchMsg("");
               try {
-                const res = await bindWatch({ data: { wallet: watchWalletInput.trim() } });
+                const res = await bindWatch({ data: { wallet: next } });
                 if (res.ok) {
                   setWatchMsg(res.data.note);
                   setWatchWalletInput("");
@@ -931,7 +929,7 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
               }
             }}
           >
-            {watchBusy ? "Binding…" : "Bind watch wallet"}
+            {watchBusy ? "Saving…" : "Save wallet"}
           </button>
           <button
             type="button"
@@ -942,7 +940,7 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
               setWatchMsg("");
               try {
                 const res = await clearWatch();
-                setWatchMsg(res.ok ? res.data.note : "Failed to clear watch wallet");
+                setWatchMsg(res.ok ? res.data.note : "Failed to clear wallet");
                 await invalidateSessionScopedBundles();
                 await refetch();
               } finally {
@@ -950,7 +948,7 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
               }
             }}
           >
-            Clear watch wallet
+            Disconnect
           </button>
         </div>
         {watchMsg ? <p className="mt-3 text-sm">{watchMsg}</p> : null}
@@ -959,8 +957,8 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
 
       <div id="settings-agent" className="scroll-mt-24">
       <Panel
-        title="Paper agent"
-        meta={<StatusBadge tone="blue">Live spine · no broadcast</StatusBadge>}
+        title="Desk agent"
+        meta={<StatusBadge tone="blue">Answers only · no trades</StatusBadge>}
         collapsible
         defaultOpen={false}
       >

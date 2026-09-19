@@ -15,6 +15,8 @@ import { Route as CreditRouteImport } from './routes/credit'
 import { Route as DeskRouteImport } from './routes/desk'
 import { Route as ExecutionRouteImport } from './routes/execution'
 import { Route as NetworkRouteImport } from './routes/network'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TruthRouteImport } from './routes/truth'
 import { Route as DeskIndexRouteImport } from './routes/desk.index'
 import { Route as DeskAcquireRouteImport } from './routes/desk.acquire'
@@ -54,6 +56,16 @@ const ExecutionRoute = ExecutionRouteImport.update({
 const NetworkRoute = NetworkRouteImport.update({
   id: '/network',
   path: '/network',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TruthRoute = TruthRouteImport.update({
@@ -114,6 +126,8 @@ export interface FileRoutesByFullPath {
   '/desk': typeof DeskRouteWithChildren
   '/execution': typeof ExecutionRoute
   '/network': typeof NetworkRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/truth': typeof TruthRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
@@ -131,6 +145,8 @@ export interface FileRoutesByTo {
   '/credit': typeof CreditRoute
   '/execution': typeof ExecutionRoute
   '/network': typeof NetworkRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/truth': typeof TruthRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
@@ -150,6 +166,8 @@ export interface FileRoutesById {
   '/desk': typeof DeskRouteWithChildren
   '/execution': typeof ExecutionRoute
   '/network': typeof NetworkRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/truth': typeof TruthRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
@@ -170,6 +188,8 @@ export interface FileRouteTypes {
     | '/desk'
     | '/execution'
     | '/network'
+    | '/privacy'
+    | '/terms'
     | '/truth'
     | '/desk/acquire'
     | '/desk/activity'
@@ -187,6 +207,8 @@ export interface FileRouteTypes {
     | '/credit'
     | '/execution'
     | '/network'
+    | '/privacy'
+    | '/terms'
     | '/truth'
     | '/desk/acquire'
     | '/desk/activity'
@@ -205,6 +227,8 @@ export interface FileRouteTypes {
     | '/desk'
     | '/execution'
     | '/network'
+    | '/privacy'
+    | '/terms'
     | '/truth'
     | '/desk/acquire'
     | '/desk/activity'
@@ -224,6 +248,8 @@ export interface RootRouteChildren {
   DeskRoute: typeof DeskRouteWithChildren
   ExecutionRoute: typeof ExecutionRoute
   NetworkRoute: typeof NetworkRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   TruthRoute: typeof TruthRoute
   LabShadersRoute: typeof LabShadersRoute
   LabUiRoute: typeof LabUiRoute
@@ -271,6 +297,20 @@ declare module '@tanstack/react-router' {
       path: '/network'
       fullPath: '/network'
       preLoaderRoute: typeof NetworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/truth': {
@@ -375,6 +415,8 @@ const rootRouteChildren: RootRouteChildren = {
   DeskRoute: DeskRouteWithChildren,
   ExecutionRoute: ExecutionRoute,
   NetworkRoute: NetworkRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   TruthRoute: TruthRoute,
   LabShadersRoute: LabShadersRoute,
   LabUiRoute: LabUiRoute,

@@ -3,28 +3,23 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { DeskShell, Panel } from "@/components/desk-shell";
+import { DeskStatusLine } from "@/components/desk-status-line";
 import { StatusBadge } from "@/components/folio-brand";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { Button } from "@/components/ui/button";
 import { getAcquireBundle } from "@/lib/desk.functions";
+import { siteMeta } from "@/lib/site-meta";
 
 const SYMBOLS = ["AAPLx", "NVDAx", "TSLAx"] as const;
 
 export const Route = createFileRoute("/desk/acquire")({
   head: () => ({
-    meta: [
-      { title: "Buy — FOLIO" },
-      { name: "description", content: "Buy tokenized stocks on Solana with live quotes." },
-      { property: "og:title", content: "Buy — FOLIO" },
-      {
-        property: "og:description",
-        content: "Buy tokenized stocks on Solana with live quotes.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
+    meta: siteMeta({
+      title: "Buy — FOLIO",
+      description: "Buy tokenized stocks on Solana with live quotes.",
+      path: "/desk/acquire",
+    }),
   }),
-  /** Prefetch default AAPLx $1 quote so wash fail-closed is visible by checks step. */
   loader: async () => getAcquireBundle({ data: { symbol: "AAPLx", spendUsdc: 1 } }),
   component: Page,
 });
@@ -34,8 +29,10 @@ function Page() {
   const [step, setStep] = useState(1);
   const [symbol, setSymbol] = useState<(typeof SYMBOLS)[number]>("AAPLx");
   const [amount, setAmount] = useState("1");
+  const [amountError, setAmountError] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState("");
   const spendUsdc = Number(amount);
-  const ready = Number.isFinite(spendUsdc) && spendUsdc > 0;
+  const ready = Number.isFinite(spendUsdc) && spendUsdc > 0 && spendUsdc <= 25;
 
   const fetchAcquire = useServerFn(getAcquireBundle);
   const enabled = ready && step >= 2;
@@ -56,9 +53,32 @@ function Page() {
     return null;
   }, [data, spendUsdc]);
 
+  function validateAmount(raw: string): boolean {
+    if (honeypot.trim()) return false;
+    const n = Number(raw);
+    if (!raw.trim() || !Number.isFinite(n) || n <= 0) {
+      setAmountError("Enter an amount greater than 0.");
+      return false;
+    }
+    if (n > 25) {
+      setAmountError("Max $25 while fills stay paused.");
+      return false;
+    }
+    setAmountError(null);
+    return true;
+  }
+
   return (
     <DeskShell eyebrow="Buy" title={`Buy ${symbol}`}>
-      <div className="stepper">
+      <DeskStatusLine
+        items={[
+          { label: "Live chart", tone: "live" },
+          { label: "Live quote", tone: "live" },
+          { label: "Fills paused", tone: "warn" },
+        ]}
+      />
+
+      <div className="stepper" aria-label="Buy steps">
         {["Order", "Checks", "Review"].map((x, i) => (
           <span className={step >= i + 1 ? "step-active" : ""} key={x}>
             {i + 1}. {x}
@@ -69,20 +89,31 @@ function Page() {
       <div className="acquire-layout">
         <Panel
           title={`${symbol.replace(/x$/i, "")} market`}
+          className="desk-card-lift"
           meta={<StatusBadge tone="blue">Live</StatusBadge>}
         >
-          <TradingViewChart symbol={symbol} height={440} interval="60" theme="light" />
+          <TradingViewChart
+            symbol={symbol}
+            height={440}
+            interval="60"
+            theme="light"
+          />
         </Panel>
 
         <div className="acquire-ticket">
           <Panel
+            className="desk-card-lift acquire-ticket-panel"
             title={
-              step === 1 ? "Your order" : step === 2 ? "Safety checks" : "Confirm quote"
+              step === 1
+                ? "Your order"
+                : step === 2
+                  ? "Safety checks"
+                  : "Confirm quote"
             }
             meta={<StatusBadge tone="blue">Live</StatusBadge>}
           >
             {step === 1 ? (
-              <div className="form-grid">
+              <div className="form-grid form-grid-single">
                 <label>
                   Asset
                   <select
@@ -102,11 +133,29 @@ function Page() {
                   Amount (USDC)
                   <input
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    onChange={(e) => {
+                      setAmount(e.target.value);
+                      if (amountError) setAmountError(null);
+                    }}
                     inputMode="decimal"
                     max={25}
+                    aria-invalid={Boolean(amountError)}
                   />
                 </label>
+                <label className="hp-field" aria-hidden="true">
+                  Website
+                  <input
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </label>
+                {amountError ? (
+                  <p className="form-error" role="alert">
+                    {amountError}
+                  </p>
+                ) : null}
                 <div className="quote-preview">
                   <span>You receive (after checks)</span>
                   <b>
@@ -114,7 +163,7 @@ function Page() {
                       ? `${indicative} ${symbol}`
                       : "Continue to see live quote"}
                   </b>
-                  <small>Live quote</small>
+                  <small>Live quote · fills paused</small>
                 </div>
               </div>
             ) : null}
@@ -123,10 +172,7 @@ function Page() {
               <div className="checks consumer-checks">
                 {isFetching ? <p>Running checks…</p> : null}
                 {isError ? (
-                  <p>
-                    <span>Something went wrong</span>
-                    <StatusBadge tone="neutral">Retry</StatusBadge>
-                  </p>
+                  <p className="form-error">{String(error)}</p>
                 ) : null}
                 <div className="desk-gate-grid acquire-gate-grid mb-4">
                   <div className="desk-gate-row">
@@ -153,7 +199,9 @@ function Page() {
                     </div>
                     <StatusBadge
                       tone={
-                        data?.scaledUiCompare.status === "match" ? "green" : "neutral"
+                        data?.scaledUiCompare.status === "match"
+                          ? "green"
+                          : "neutral"
                       }
                     >
                       {data?.scaledUiCompare.status === "match" ? "OK" : "…"}
@@ -163,7 +211,9 @@ function Page() {
                     <div>
                       <b>Safe route</b>
                       <small>
-                        {data?.gates.washOk ? "Route looks clean" : "Checking route…"}
+                        {data?.gates.washOk
+                          ? "Route looks clean"
+                          : "Checking route…"}
                       </small>
                     </div>
                     <StatusBadge tone={data?.gates.washOk ? "green" : "neutral"}>
@@ -188,7 +238,11 @@ function Page() {
                   <p className="consumer-note">
                     We need a clear share count, safe route, and live quote before
                     you continue.{" "}
-                    <button type="button" className="underline" onClick={() => refetch()}>
+                    <button
+                      type="button"
+                      className="underline"
+                      onClick={() => refetch()}
+                    >
                       Refresh
                     </button>
                   </p>
@@ -240,11 +294,12 @@ function Page() {
                 type="button"
                 data-testid="acquire-continue"
                 disabled={
-                  !ready ||
+                  (step === 1 && !ready) ||
                   (step === 2 && (isFetching || !data?.gates.canReview)) ||
                   (step === 3 && !data?.gates.canReview)
                 }
                 onClick={() => {
+                  if (step === 1 && !validateAmount(amount)) return;
                   if (step === 2 && !data?.gates.canReview) return;
                   setStep(Math.min(3, step + 1));
                 }}
@@ -256,6 +311,14 @@ function Page() {
                     : "Continue"}
               </Button>
             </div>
+            {step === 3 ? (
+              <p className="desk-panel-note mt-3">
+                Need credit instead?{" "}
+                <Link to="/desk/credit" className="underline">
+                  Open credit
+                </Link>
+              </p>
+            ) : null}
           </Panel>
         </div>
       </div>

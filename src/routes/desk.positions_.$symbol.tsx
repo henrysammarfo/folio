@@ -3,11 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { DeskShell, Panel } from "@/components/desk-shell";
+import { DeskStatusLine } from "@/components/desk-status-line";
 import { StatusBadge } from "@/components/folio-brand";
-import { ModeBadge } from "@/components/mode-badge";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { getPositionsBundle } from "@/lib/desk.functions";
 import { scaledUiHealthLabel } from "@/lib/position-health";
+import { siteMeta } from "@/lib/site-meta";
 
 const detailSearchSchema = z.object({
   inspect: z.string().max(64).optional().catch(undefined),
@@ -15,13 +16,11 @@ const detailSearchSchema = z.object({
 
 export const Route = createFileRoute("/desk/positions_/$symbol")({
   head: ({ params }) => ({
-    meta: [
-      { title: `${params.symbol} — FOLIO` },
-      {
-        name: "description",
-        content: `Live chart and share count for ${params.symbol}.`,
-      },
-    ],
+    meta: siteMeta({
+      title: `${params.symbol} — FOLIO`,
+      description: `Live chart and share count for ${params.symbol}.`,
+      path: `/desk/positions/${params.symbol}`,
+    }),
   }),
   validateSearch: (search) => detailSearchSchema.parse(search),
   loaderDeps: ({ search }) => ({ inspect: search.inspect }),
@@ -47,7 +46,9 @@ function Page() {
     initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
-  const row = data?.rows.find((r) => r.symbol.toLowerCase() === symbol.toLowerCase());
+  const row = data?.rows.find(
+    (r) => r.symbol.toLowerCase() === symbol.toLowerCase(),
+  );
 
   return (
     <DeskShell
@@ -63,19 +64,33 @@ function Page() {
         </Link>
       }
     >
-      <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Live chart</ModeBadge>
-        <ModeBadge mode={row?.qtySource === "wallet-read" ? "mainnet-read" : "paper"}>
-          {row?.qtySource === "wallet-read" ? "Wallet qty" : "Estimated qty"}
-        </ModeBadge>
-      </div>
+      <DeskStatusLine
+        items={[
+          { label: "Live chart", tone: "live" },
+          {
+            label:
+              row?.qtySource === "wallet-read" ? "Wallet qty" : "Estimated qty",
+            tone: row?.qtySource === "wallet-read" ? "live" : "muted",
+          },
+        ]}
+      />
 
       <div className="acquire-layout mb-4">
-        <Panel title="Market" meta={<StatusBadge tone="blue">Live</StatusBadge>}>
-          <TradingViewChart symbol={symbol} height={380} interval="D" theme="light" />
+        <Panel
+          title="Market"
+          className="desk-card-lift"
+          meta={<StatusBadge tone="blue">Live</StatusBadge>}
+        >
+          <TradingViewChart
+            symbol={symbol}
+            height={380}
+            interval="D"
+            theme="light"
+          />
         </Panel>
         <Panel
           title={row?.name ?? symbol}
+          className="desk-card-lift"
           meta={
             <StatusBadge
               tone={
@@ -86,7 +101,11 @@ function Page() {
                     : "neutral"
               }
             >
-              {isFetching ? "…" : row?.qtySource === "wallet-read" ? "Wallet" : "Estimate"}
+              {isFetching
+                ? "…"
+                : row?.qtySource === "wallet-read"
+                  ? "Wallet"
+                  : "Estimate"}
             </StatusBadge>
           }
         >
