@@ -632,5 +632,6 @@
 
 - User rejected prior desk as AI-slop cards/badges; demanded market-ready product pages + Settings hide ops.
 - New `app-desk` shell (rail Home/Buy/Holdings/Borrow/Activity/Account) + hairline `prod-*` pages (no white card grids).
-- Consumer Account = wallet / Privy / alerts only. Empire keys + paper agent → `/desk/settings?ops=1` (`DeskOpsSettings`).
-- e2e ops tests retargeted to `?ops=1`. Honesty labels kept (Scaled UI, Nest.credit, NestUSD, acquire Policy checks).
+- Consumer Account = wallet / Privy (clean Sign in) / alerts only. Empire keys + paper agent → `/desk/settings?wall=ops` (`DeskOpsSettings`).
+- Note: numeric query values like `?ops=1` are coerced to number by TanStack and stripped — use `?wall=ops`.
+- e2e ops tests retargeted to `?wall=ops`. Honesty labels kept (Scaled UI, Nest.credit, NestUSD, acquire Policy checks).

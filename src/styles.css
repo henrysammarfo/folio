@@ -1056,3 +1056,5 @@ a.prod-row:hover{opacity:.72}
   .prod-feed li{grid-template-columns:1fr}
   .prod-value{font-size:clamp(2.6rem,12vw,3.4rem)}
 }
+
+.prod-signin{display:flex;flex-direction:column;align-items:flex-start;gap:.65rem}

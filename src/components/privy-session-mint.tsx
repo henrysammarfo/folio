@@ -9,24 +9,27 @@ type Props = {
   /** Exact origin Henry must allowlist (no *.vercel.app wildcards). */
   allowedOrigin: string;
   onMinted: () => Promise<void>;
+  /** Consumer Account hides ops jargon; ops wall keeps setup copy. */
+  variant?: "consumer" | "ops";
 };
 
 /**
  * Client-only Privy login → getAccessToken → server mint httpOnly folio_session.
- * Never mounts App Secret; paste-token path remains as fallback.
+ * Never mounts App Secret; paste-token path remains as fallback on ops wall.
  */
 export function PrivySessionMint({
   appId,
   mintReady,
   allowedOrigin,
   onMinted,
+  variant = "ops",
 }: Props) {
   if (!appId.trim()) return null;
   return (
     <PrivyProvider
       appId={appId}
       config={{
-        appearance: { theme: "dark", accentColor: "#c4b59a" },
+        appearance: { theme: "light", accentColor: "#0EA5C9" },
         loginMethods: ["email", "wallet", "google"],
         embeddedWallets: { createOnLogin: "users-without-wallets" },
       }}
@@ -35,6 +38,7 @@ export function PrivySessionMint({
         mintReady={mintReady}
         allowedOrigin={allowedOrigin}
         onMinted={onMinted}
+        variant={variant}
       />
     </PrivyProvider>
   );
@@ -44,10 +48,12 @@ function PrivyMintInner({
   mintReady,
   allowedOrigin,
   onMinted,
+  variant,
 }: {
   mintReady: boolean;
   allowedOrigin: string;
   onMinted: () => Promise<void>;
+  variant: "consumer" | "ops";
 }) {
   const { ready, authenticated, login, logout, getAccessToken, user } = usePrivy();
   const createSession = useServerFn(createSessionFromPrivyToken);
@@ -61,24 +67,33 @@ function PrivyMintInner({
     try {
       const token = await getAccessToken();
       if (!token) {
-        setMsg("privy_token_missing — getAccessToken returned empty");
+        setMsg(
+          variant === "consumer"
+            ? "Sign-in didn’t return a token. Try again."
+            : "privy_token_missing — getAccessToken returned empty",
+        );
         return;
       }
       const res = await createSession({ data: { accessToken: token } });
       if (res.ok) {
         setMsg(
-          `Session bound for ${res.data.session.userId.slice(0, 16)}… — httpOnly cookie set. If tenants empty → Join folio-demo.`,
+          variant === "consumer"
+            ? "Signed in."
+            : `Session bound for ${res.data.session.userId.slice(0, 16)}… — httpOnly cookie set. If tenants empty → Join folio-demo.`,
         );
         await onMinted();
       } else {
-        setMsg(`${res.reason}${res.detail ? ` — ${res.detail}` : ""}`);
+        setMsg(
+          variant === "consumer"
+            ? "Couldn’t sign in. Try again."
+            : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+        );
       }
     } finally {
       setBusy(false);
     }
   }
 
-  // One-click path: after Privy login, auto-mint httpOnly folio_session once.
   useEffect(() => {
     if (!ready || !authenticated || !mintReady || busy) return;
     const uid = user?.id ?? "authed";
@@ -87,6 +102,42 @@ function PrivyMintInner({
     void mintFromPrivy();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional one-shot on auth
   }, [ready, authenticated, mintReady, user?.id]);
+
+  if (variant === "consumer") {
+    return (
+      <div className="prod-signin">
+        {!authenticated ? (
+          <button
+            type="button"
+            className="prod-cta"
+            disabled={!ready || !mintReady || busy}
+            onClick={() => login()}
+          >
+            {!ready
+              ? "Loading…"
+              : !mintReady
+                ? "Sign-in unavailable"
+                : busy
+                  ? "Signing in…"
+                  : "Sign in"}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="prod-text-btn"
+            disabled={busy}
+            onClick={() => {
+              autoMintedFor.current = null;
+              void logout();
+            }}
+          >
+            Disconnect sign-in
+          </button>
+        )}
+        {msg ? <p className="prod-sub">{msg}</p> : null}
+      </div>
+    );
+  }
 
   return (
     <div className="mb-4 rounded-lg border border-ledger/30 bg-ink/40 p-3 text-sm">

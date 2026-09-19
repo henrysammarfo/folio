@@ -30,7 +30,11 @@ const DeskOpsSettings = lazy(() =>
 );
 
 const searchSchema = z.object({
-  ops: z.string().optional().catch(undefined),
+  /**
+   * Operator wall. Must not be a bare numeric query value — TanStack coerces
+   * `?x=1` to number, which fails z.string() and gets stripped via redirect.
+   */
+  wall: z.enum(["ops"]).optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/desk/settings")({
@@ -48,8 +52,8 @@ export const Route = createFileRoute("/desk/settings")({
 
 function Page() {
   const initial = Route.useLoaderData();
-  const { ops } = Route.useSearch();
-  if (ops === "1") {
+  const { wall } = Route.useSearch();
+  if (wall === "ops") {
     return (
       <DeskShell title="Operator">
         <Suspense fallback={<p className="prod-sub">Loading…</p>}>
@@ -194,6 +198,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                   typeof window !== "undefined" ? window.location.origin : ""
                 }
                 onMinted={refresh}
+                variant="consumer"
               />
             </Suspense>
           ) : (
