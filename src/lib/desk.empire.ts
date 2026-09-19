@@ -659,10 +659,10 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           at: now,
           title:
             compare.status === "match"
-              ? `On-chain share count OK · ${compare.onchainEffective?.toFixed(6)}×`
+              ? `On-chain Scaled UI OK · ${compare.onchainEffective?.toFixed(6)}×`
               : compare.status === "mismatch"
-                ? `On-chain share count mismatch`
-                : "On-chain share count pending",
+                ? `On-chain Scaled UI mismatch`
+                : "On-chain Scaled UI pending",
           detail: compare.note,
           tone:
             compare.status === "match"
@@ -744,8 +744,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           ? "Earn vaults available"
           : "Earn vaults unavailable",
         detail: nestCredit.ok
-          ? `${nestCredit.data.vaultCount} vaults observed`
-          : nestCredit.reason,
+          ? `Nest.credit vault awareness · ${nestCredit.data.vaultCount} vaults · not NestUSD`
+          : `Nest.credit vault awareness · ${nestCredit.reason}`,
         tone: nestCredit.ok ? "blue" : "amber",
         mode: nestCredit.ok ? nestCredit.mode : "unavailable",
       },
@@ -753,8 +753,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         at: now,
         title: "Borrow capacity",
         detail: nestusd.ok
-          ? "Borrow path risk-labeled"
-          : "Borrow capacity not verified yet",
+          ? "NestUSD risk-labeled · not verified ready"
+          : "NestUSD capacity not verified · unavailable",
         tone: "amber",
         mode: "unavailable",
       },

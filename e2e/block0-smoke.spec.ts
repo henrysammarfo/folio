@@ -187,7 +187,7 @@ test.describe("FOLIO Block 0 smoke", () => {
     await page.goto("/desk/positions");
     await expect(page.getByText(/lab preview \(opt-in/i).first()).toBeVisible();
     await expect(page.locator("[data-testid='desk-lab-netro']")).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: /positions/i }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /positions|holdings/i }).first()).toBeVisible();
     await page.goto("/desk");
     await expect(page.locator("[data-testid='desk-lab-netro']")).toBeVisible();
     await page.getByRole("button", { name: /exit preview/i }).click();
@@ -224,8 +224,9 @@ test.describe("FOLIO Block 0 smoke", () => {
   });
 
   test("settings exposes watch-wallet bind (not Privy auth)", async ({ page }) => {
-    await page.goto("/desk/settings");
-    await expect(page.getByText(/settings|session|FOLIO/i).first()).toBeVisible({
+    // Operator wall is opt-in (?wall=ops) — consumer Account stays wallet/alerts only
+    await page.goto("/desk/settings?wall=ops");
+    await expect(page.getByText(/settings|session|FOLIO|operator|production readiness/i).first()).toBeVisible({
       timeout: 30_000,
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
@@ -538,7 +539,7 @@ test.describe("FOLIO Block 0 smoke", () => {
   });
 
   test("paper agent keeps live spine and never fills", async ({ page }) => {
-    await page.goto("/desk/settings", { waitUntil: "networkidle" });
+    await page.goto("/desk/settings?wall=ops", { waitUntil: "networkidle" });
     await expect(page.getByText(/paper agent/i).first()).toBeVisible({
       timeout: 30_000,
     });

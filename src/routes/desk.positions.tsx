@@ -1,21 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
-import { DeskShell, Panel } from "@/components/desk-shell";
-import { DeskStatusLine } from "@/components/desk-status-line";
-import { StatusBadge } from "@/components/folio-brand";
-import {
-  WalletLookupPanel,
-  walletSourceBadge,
-} from "@/components/wallet-lookup-panel";
+import { AllocationChart, paletteFor } from "@/components/allocation-chart";
+import { DeskShell } from "@/components/desk-shell";
+import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { getPositionsBundle } from "@/lib/desk.functions";
-import {
-  positionStatusLabel,
-  scaledUiHealthLabel,
-} from "@/lib/position-health";
+import { scaledUiHealthLabel } from "@/lib/position-health";
 import { siteMeta } from "@/lib/site-meta";
 
 const positionsSearchSchema = z.object({
@@ -25,7 +17,7 @@ const positionsSearchSchema = z.object({
 export const Route = createFileRoute("/desk/positions")({
   head: () => ({
     meta: siteMeta({
-      title: "Positions — FOLIO",
+      title: "Holdings — FOLIO",
       description: "Your tokenized stock holdings with live share counts.",
       path: "/desk/positions",
     }),
@@ -33,179 +25,178 @@ export const Route = createFileRoute("/desk/positions")({
   validateSearch: (search) => positionsSearchSchema.parse(search),
   loaderDeps: ({ search }) => ({ inspect: search.inspect }),
   loader: async ({ deps }) =>
-    getPositionsBundle({
-      data: { inspectWallet: deps.inspect },
-    }),
+    getPositionsBundle({ data: { inspectWallet: deps.inspect } }),
   component: Page,
 });
+
+function money(n: number) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}
 
 function Page() {
   const initial = Route.useLoaderData();
   const { inspect } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const fetchPositions = useServerFn(getPositionsBundle);
+  const [openLookup, setOpenLookup] = useState(Boolean(inspect));
   const [inspectInput, setInspectInput] = useState(inspect ?? "");
-  const { data, isFetching, isError, error } = useQuery({
+  const [err, setErr] = useState<string | null>(null);
+  const { data } = useQuery({
     queryKey: ["positions-bundle", inspect ?? ""],
-    queryFn: () =>
-      fetchPositions({
-        data: { inspectWallet: inspect },
-      }),
+    queryFn: () => fetchPositions({ data: { inspectWallet: inspect } }),
     initialData: initial,
     initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
 
-  const hasWalletRead =
-    data?.rows.some((r) => r.qtySource === "wallet-read") ?? false;
-  const boundElsewhere =
-    data?.walletSource === "watch-wallet" ||
-    data?.walletSource === "membership" ||
-    data?.walletSource === "session";
-  const total =
-    data?.rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0) ?? 0;
+  const rows = data?.rows ?? [];
+  const total = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
+  const walletRead = rows.some((r) => r.qtySource === "wallet-read");
+  const parts = rows
+    .filter((r) => (r.paperValueUsd ?? 0) > 0)
+    .map((r, i) => ({
+      label: r.symbol,
+      value: r.paperValueUsd ?? 0,
+      color: paletteFor(i),
+    }));
 
   return (
-    <DeskShell eyebrow="Holdings" title="Positions">
-      <DeskStatusLine
-        items={[
-          { label: "Live share counts", tone: "live" },
-          {
-            label: hasWalletRead ? "Wallet balances" : "Estimated balances",
-            tone: hasWalletRead ? "live" : "muted",
-          },
-          {
-            label: walletSourceBadge(data?.walletSource, data?.auth.ok),
-            tone: boundElsewhere || inspect ? "live" : "warn",
-          },
-        ]}
-      />
+    <DeskShell title="Holdings">
+      <section className="fx-page">
+        <header className="fx-hero">
+          <h1 className="fx-hero-kicker">
+            {walletRead ? "Holdings" : "Holdings · estimated"}
+          </h1>
+          <p className="fx-hero-value">{total > 0 ? money(total) : "—"}</p>
+          <p className="fx-hero-sub">
+            {walletRead
+              ? "Live balances from your wallet"
+              : "Connect a wallet to verify holdings"}
+          </p>
+        </header>
 
-      <div className="desk-hero-metrics">
-        <div>
-          <span>Portfolio</span>
-          <b>
-            {total > 0
-              ? total.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 0,
-                })
-              : "—"}
-          </b>
+        <div className="fx-actions">
+          <Link to="/desk/acquire" className="fx-btn fx-btn-primary">
+            Buy stocks
+          </Link>
+          <Link to="/desk/credit" className="fx-btn fx-btn-ghost">
+            Borrow
+          </Link>
         </div>
-        <div>
-          <span>Assets</span>
-          <b>{data?.rows.length ?? 0}</b>
-        </div>
-        <div>
-          <span>Status</span>
-          <b>{isFetching ? "Refreshing" : "Live"}</b>
-        </div>
-      </div>
 
-      <WalletLookupPanel
-        inspectInput={inspectInput}
-        onInspectInput={setInspectInput}
-        inspectActive={Boolean(inspect)}
-        boundElsewhere={boundElsewhere}
-        onLookUp={() => {
-          const next = inspectInput.trim();
-          void navigate({
-            search: (prev) => ({ ...prev, inspect: next || undefined }),
-          });
-        }}
-        onClear={() => {
-          setInspectInput("");
-          void navigate({
-            search: (prev) => {
-              const { inspect: _drop, ...rest } = prev as { inspect?: string };
-              return rest;
-            },
-          });
-        }}
-      />
+        {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
 
-      <Panel
-        title="Watchlist"
-        className="desk-card-lift"
-        meta={
-          <StatusBadge tone={isFetching ? "blue" : "neutral"}>
-            {isFetching ? "Refreshing…" : "Live"}
-          </StatusBadge>
-        }
-      >
-        {isError ? (
-          <p className="form-error">{String(error)}</p>
-        ) : null}
-        <p className="desk-panel-note">{data?.note}</p>
-        <div className="position-cards">
-          {(data?.rows ?? []).map((p) => (
-            <Link
-              key={p.symbol}
-              to="/desk/positions/$symbol"
-              params={{ symbol: p.symbol }}
-              search={inspect ? { inspect } : {}}
-              className="position-card"
+        <h2 className="fx-section-title">Your stocks</h2>
+        <div className="fx-card">
+          <ul className="fx-list" aria-label="Holdings">
+            {rows.map((p, i) => {
+              const chain = scaledUiHealthLabel(p.scaledUiCompare.status);
+              return (
+                <li key={p.symbol}>
+                  <Link
+                    to="/desk/positions/$symbol"
+                    params={{ symbol: p.symbol }}
+                    search={inspect ? { inspect } : {}}
+                    className="fx-asset"
+                  >
+                    <span
+                      className="fx-asset-mark"
+                      style={{ background: paletteFor(i) }}
+                      aria-hidden
+                    >
+                      {p.symbol[0]}
+                    </span>
+                    <span className="fx-asset-main">
+                      <strong>{p.symbol}</strong>
+                      <small>
+                        {p.name} ·{" "}
+                        {p.qty.toFixed(4)}{" "}
+                        {p.qtySource === "wallet-read" ? "shares" : "est. shares"}
+                      </small>
+                    </span>
+                    <span className="fx-asset-right">
+                      <strong>
+                        {p.paperValueUsd != null ? money(p.paperValueUsd) : "—"}
+                      </strong>
+                      <small>
+                        {p.usdPrice != null
+                          ? `$${p.usdPrice.toFixed(2)}`
+                          : "—"}
+                        {" · "}
+                        <span data-testid={`positions-scaled-ui-${p.symbol}`}>
+                          {chain}
+                        </span>
+                      </small>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="fx-foot">
+          {!openLookup ? (
+            <button
+              type="button"
+              className="fx-text-btn"
+              onClick={() => setOpenLookup(true)}
             >
-              <div className="position-card-top">
-                <span className="asset-icon" aria-hidden>
-                  {p.symbol[0]}
-                </span>
-                <div>
-                  <b>{p.symbol}</b>
-                  <small>{p.name}</small>
-                </div>
-                <ArrowUpRight className="position-card-arrow" aria-hidden />
-              </div>
-              <div className="position-card-grid">
-                <div>
-                  <span>Qty</span>
-                  <strong>
-                    {p.qty.toFixed(4)}{" "}
-                    <em>{p.qtySource === "wallet-read" ? "wallet" : "est."}</em>
-                  </strong>
-                </div>
-                <div>
-                  <span>Share count</span>
-                  <strong>
-                    {p.multiplier != null ? `${p.multiplier.toFixed(4)}×` : "—"}
-                  </strong>
-                  <small data-testid={`positions-scaled-ui-${p.symbol}`}>
-                    {scaledUiHealthLabel(p.scaledUiCompare.status)}
-                  </small>
-                </div>
-                <div>
-                  <span>Value</span>
-                  <strong>
-                    {p.paperValueUsd != null
-                      ? p.paperValueUsd.toLocaleString("en-US", {
-                          style: "currency",
-                          currency: "USD",
-                        })
-                      : "—"}
-                  </strong>
-                </div>
-              </div>
-              <StatusBadge
-                tone={
-                  p.health === "Verified"
-                    ? "green"
-                    : p.health === "Review"
-                      ? "amber"
-                      : "neutral"
+              Look up any wallet
+            </button>
+          ) : (
+            <form
+              className="fx-inline-form"
+              data-testid="netro-inspect-wallet"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const next = inspectInput.trim();
+                if (!isPlausibleSolanaAddress(next)) {
+                  setErr("Enter a valid Solana address.");
+                  return;
                 }
-              >
-                {positionStatusLabel({
-                  health: p.health,
-                  qtySource: p.qtySource,
-                  scaledUiStatus: p.scaledUiCompare.status,
-                })}
-              </StatusBadge>
-            </Link>
-          ))}
+                setErr(null);
+                void navigate({
+                  search: (prev) => ({ ...prev, inspect: next }),
+                });
+              }}
+            >
+              <input
+                value={inspectInput}
+                onChange={(e) => setInspectInput(e.target.value)}
+                placeholder="Wallet address"
+                aria-label="Wallet address"
+                autoComplete="off"
+                spellCheck={false}
+              />
+              <button type="submit">Look up</button>
+              {inspect ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInspectInput("");
+                    void navigate({
+                      search: (prev) => {
+                        const { inspect: _d, ...rest } = prev as {
+                          inspect?: string;
+                        };
+                        return rest;
+                      },
+                    });
+                  }}
+                >
+                  Clear
+                </button>
+              ) : null}
+              {err ? <p className="fx-err">{err}</p> : null}
+            </form>
+          )}
         </div>
-      </Panel>
+      </section>
     </DeskShell>
   );
 }

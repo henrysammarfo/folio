@@ -10,10 +10,6 @@ function shortPubkey(pk: string): string {
   return `${pk.slice(0, 4)}…${pk.slice(-4)}`;
 }
 
-/**
- * Honest desk wallet chip — never invents a demo pubkey.
- * Priority: membership → session → watch-wallet → Settings bind CTA.
- */
 export function DeskWalletPill() {
   const fetchSession = useServerFn(getSessionBundle);
   const { data } = useQuery({
@@ -24,40 +20,23 @@ export function DeskWalletPill() {
 
   const membership =
     data?.session.ok ? activeMembership(data.session.data) : null;
-  const { wallet, source } = resolveWalletBinding({
+  const { wallet } = resolveWalletBinding({
     membershipWallet: membership?.walletAddress ?? null,
-    sessionWallet:
-      data?.session.ok ? data.session.data.walletAddress : null,
+    sessionWallet: data?.session.ok ? data.session.data.walletAddress : null,
     watchWallet: data?.watchWallet ?? null,
   });
 
-  if (wallet && source) {
-    const prefix =
-      source === "membership"
-        ? "Wallet"
-        : source === "session"
-          ? "Wallet"
-          : "Wallet";
-    const title =
-      source === "membership"
-        ? "Connected wallet"
-        : source === "session"
-          ? "Connected wallet"
-          : "Connected wallet";
+  if (wallet) {
     return (
-      <Link to="/desk/settings" className="wallet-pill" title={title}>
-        {prefix} {shortPubkey(wallet)}
+      <Link to="/desk/settings" className="fx-btn fx-btn-ghost fx-btn-sm" title="Account">
+        {shortPubkey(wallet)}
       </Link>
     );
   }
 
   return (
-    <Link
-      to="/desk/settings"
-      className="wallet-pill"
-      title="Connect your wallet in Settings"
-    >
-      Connect wallet
+    <Link to="/desk/settings" className="fx-btn fx-btn-ghost fx-btn-sm" title="Connect wallet">
+      Connect
     </Link>
   );
 }

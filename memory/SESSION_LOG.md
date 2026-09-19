@@ -626,3 +626,20 @@
 - User: desk pages still unfinished; 20 web tasks.
 - Desk: Positions cards, Credit hero, Activity timeline, Buy validation, Settings Connect wallet first / keys advanced collapsed.
 - Launch: Privacy + Terms, cookie banner, consent analytics, OG/favicon/sitemap/robots, HSTS, custom 404, form validation + honeypot, contrast, legal footer links, single home CTA, frontend secrets scan.
+
+
+## 2026-09-19 — From-scratch product desk UI
+
+- User rejected prior desk as AI-slop cards/badges; demanded market-ready product pages + Settings hide ops.
+- New `app-desk` shell (rail Home/Buy/Holdings/Borrow/Activity/Account) + hairline `prod-*` pages (no white card grids).
+- Consumer Account = wallet / Privy (clean Sign in) / alerts only. Empire keys + paper agent → `/desk/settings?wall=ops` (`DeskOpsSettings`).
+- Note: numeric query values like `?ops=1` are coerced to number by TanStack and stripped — use `?wall=ops`.
+- e2e ops tests retargeted to `?wall=ops`. Honesty labels kept (Scaled UI, Nest.credit, NestUSD, acquire Policy checks).
+
+
+## 2026-09-19 — Web2 brokerage desk redesign
+
+- User: still 1/100; study exchanges + web3 + Web2 consumer.
+- Researched Robinhood / Cash App / Coinbase patterns.
+- Rebuilt desk as `fx-*` system: light shell, bottom tabs, allocation bar, asset cards, amount chips on Buy, LTV meter, profile Account.
+- Operator wall unchanged at `?wall=ops`.
