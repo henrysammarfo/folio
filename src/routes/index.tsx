@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Github, Linkedin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { FolioMark } from "@/components/folio-brand";
 import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
+import { LandingGlassFooter } from "@/components/landing-glass-footer";
+import { LandingProductTriptych } from "@/components/landing-product-triptych";
 import { getTruthBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
 
@@ -55,9 +57,17 @@ function Home() {
         <div className="home-safe">
           <header className="home-topbar">
             <div className="home-brand-hero">
-              <FolioMark className="size-8" />
+              <span className="home-brand-badge" aria-hidden>
+                <FolioMark className="size-5" />
+              </span>
               <span>FOLIO</span>
             </div>
+            <nav className="home-top-nav" aria-label="Marketing">
+              <Link to="/truth">Truth</Link>
+              <Link to="/execution">Execution</Link>
+              <Link to="/credit">Credit</Link>
+              <Link to="/about">About</Link>
+            </nav>
             <div className="home-topbar-actions">
               <Link to="/desk" className="home-top-cta">
                 Open desk
@@ -79,50 +89,44 @@ function Home() {
         </div>
       </section>
 
-      <section className="home-below" aria-label="What FOLIO does">
+      <section className="home-below home-below-light" aria-label="What FOLIO does">
         <div className="home-below-copy">
+          <p className="home-eyebrow">Stock desk on Solana</p>
           <h2>Own the economic truth.</h2>
           <p>
             {liveLine} FOLIO shows real share counts, refuses dirty tape, and
             quotes a live Solana route before you buy.
           </p>
           <div className="home-cta-row">
-            <Link to="/desk" className="home-cta">
+            <Link to="/desk" className="home-cta home-cta-ink">
               Open the desk <ArrowRight />
+            </Link>
+            <Link to="/desk/acquire" className="home-cta-ghost">
+              Buy AAPLx
             </Link>
           </div>
         </div>
+        <aside className="home-live-chip home-live-chip-light" aria-label="Live signal">
+          <span>Live</span>
+          <strong>
+            {mult?.ok
+              ? `${mult.data.currentMultiplier.toFixed(6)}×`
+              : "Pending"}
+          </strong>
+          <small>AAPLx share count</small>
+        </aside>
       </section>
 
-      <section className="home-section home-section-ink" aria-label="How it works">
-        <h2>Three steps. Then you own it.</h2>
-        <p>
-          Built so a first-time user can grasp the flow without a glossary —
-          truth, safe route, then buy.
-        </p>
-        <div className="home-pillars">
-          <article className="home-pillar">
-            <strong>1 · See the truth</strong>
-            <p>Live multiplier + on-chain Scaled UI for the stock you want.</p>
-          </article>
-          <article className="home-pillar">
-            <strong>2 · Safe route</strong>
-            <p>Wash checks fail closed. Jupiter quotes stay live and labeled.</p>
-          </article>
-          <article className="home-pillar">
-            <strong>3 · Buy or borrow</strong>
-            <p>Acquire with a clear ticket. Credit without selling your shares.</p>
-          </article>
-        </div>
-      </section>
+      <LandingProductTriptych />
 
-      <section className="home-section home-section-signal" aria-label="Desk">
+      <section className="home-section home-section-soft-light" aria-label="Desk">
         <div className="home-desk-tease">
           <div>
-            <h2>Your stock desk on Solana.</h2>
+            <p className="home-eyebrow">Product</p>
+            <h2>Your desk. Not a badge wall.</h2>
             <p>
-              Positions, live charts, quotes, and credit in one place — sized for
-              phones and wide screens. Open the desk and follow the Buy flow.
+              Holdings, charts, quotes, and credit — logos, swap ticket, honest
+              labels. Built for phones and wide screens.
             </p>
             <Link to="/desk" className="home-desk-preview-cta">
               Enter the desk <ArrowRight size={16} />
@@ -136,71 +140,18 @@ function Home() {
               </div>
               <div className="home-desk-preview-card dark">
                 <span>Market</span>
-                <b>AAPLx · safe route</b>
+                <b>AAPLx · TradingView</b>
               </div>
             </div>
             <div className="home-desk-preview-card">
-              <span>Buy ticket</span>
+              <span>Swap</span>
               <b>USDC → AAPLx · live quote</b>
             </div>
           </div>
         </div>
       </section>
 
-      <footer className="home-footer">
-        <div className="home-brand">
-          <div className="brand-lockup text-primary-foreground">
-            <FolioMark className="size-7" />
-            <span>FOLIO</span>
-          </div>
-          <p>Truth before trade. Credit without compromise.</p>
-        </div>
-        <nav className="home-nav">
-          <div>
-            <strong>PRODUCT</strong>
-            <Link to="/desk">Desk</Link>
-            <Link to="/desk/acquire">Buy</Link>
-            <Link to="/desk/credit">Credit</Link>
-          </div>
-          <div>
-            <strong>LEARN</strong>
-            <Link to="/truth">Share counts</Link>
-            <Link to="/network">Network</Link>
-            <Link to="/about">About</Link>
-          </div>
-          <div>
-            <strong>CONNECT</strong>
-            <a href="https://github.com/henrysammarfo">GitHub</a>
-            <a href="https://x.com/henrysammarfo">@henrysammarfo</a>
-            <Link to="/desk/settings">Settings</Link>
-          </div>
-        </nav>
-        <div className="home-bottom">
-          <p>
-            © 2026 FOLIO ·{" "}
-            <Link to="/privacy">Privacy</Link> ·{" "}
-            <Link to="/terms">Terms</Link>
-          </p>
-          <div>
-            <a
-              href="https://www.linkedin.com/in/henrysammarfo"
-              aria-label="LinkedIn"
-              rel="noreferrer"
-              target="_blank"
-            >
-              <Linkedin />
-            </a>
-            <a
-              href="https://github.com/henrysammarfo"
-              aria-label="GitHub"
-              rel="noreferrer"
-              target="_blank"
-            >
-              <Github />
-            </a>
-          </div>
-        </div>
-      </footer>
+      <LandingGlassFooter />
     </div>
   );
 }

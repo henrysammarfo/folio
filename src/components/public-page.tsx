@@ -1,6 +1,5 @@
-import { Link } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
-import { Wordmark } from "./folio-brand";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { FolioMark } from "./folio-brand";
 
 const nav = [
   ["Truth", "/truth"],
@@ -23,44 +22,63 @@ export function PublicShell({
   children: React.ReactNode;
   compactIntro?: boolean;
 }) {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="site-header">
-        <Wordmark />
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Main navigation">
-          {nav.map(([label, to]) => (
-            <Link
-              key={to}
-              to={to}
-              className="nav-link"
-              activeProps={{ className: "nav-link nav-link-active" }}
-            >
-              {label}
-            </Link>
-          ))}
+    <div className="mkt">
+      <header className="mkt-top">
+        <Link to="/" className="mkt-brand" aria-label="FOLIO home">
+          <span className="mkt-brand-badge" aria-hidden>
+            <FolioMark className="mkt-brand-mark" title="FOLIO" />
+          </span>
+          <b>FOLIO</b>
+        </Link>
+        <nav className="mkt-nav" aria-label="Main navigation">
+          {nav.map(([label, to]) => {
+            const active = path === to || path.startsWith(`${to}/`);
+            return (
+              <Link
+                key={to}
+                to={to}
+                className={`mkt-pill${active ? " is-active" : ""}`}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </nav>
-        <Link to="/desk" className="header-action">
-          Open desk <ArrowUpRight />
+        <Link to="/desk" className="mkt-cta">
+          Open desk
         </Link>
       </header>
+
       <main>
         <section
-          className={compactIntro ? "page-intro page-intro-compact" : "page-intro"}
+          className={
+            compactIntro ? "mkt-intro mkt-intro-compact" : "mkt-intro"
+          }
         >
-          <p className="eyebrow-dark">{eyebrow}</p>
+          <p className="mkt-eyebrow">{eyebrow}</p>
           <h1>{title}</h1>
-          <p>{intro}</p>
+          <p className="mkt-lede">{intro}</p>
         </section>
-        <div className="page-content">{children}</div>
+        <div className="mkt-content">{children}</div>
       </main>
-      <footer className="site-footer">
-        <Wordmark />
+
+      <footer className="mkt-foot">
+        <Link to="/" className="mkt-brand" aria-label="FOLIO home">
+          <span className="mkt-brand-badge" aria-hidden>
+            <FolioMark className="mkt-brand-mark" title="FOLIO" />
+          </span>
+          <b>FOLIO</b>
+        </Link>
         <p>Honest share counts for Solana xStocks.</p>
-        <nav className="site-footer-legal" aria-label="Legal">
+        <nav className="mkt-foot-links" aria-label="Legal">
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>
+          <Link to="/desk">Desk</Link>
         </nav>
-        <p>Built by Henry Sam Marfo · Accra</p>
+        <p className="mkt-foot-by">Built by Henry Sam Marfo · Accra</p>
       </footer>
     </div>
   );

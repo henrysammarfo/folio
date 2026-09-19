@@ -3,6 +3,10 @@
 > Updated: 2026-09-19 · Stocklana deadline **2026-09-18 20:00 UTC**
 > Doctrine: honest security only — **never claim unhackable / NK-proof**.
 
+## Marketing / landing (product)
+
+- Branch `cursor/folio-landing-marketing-f1ec`: landing slide-through (Truth/Route/Buy/Borrow), Netro-style marketing chrome (`mkt-*`), sharper CTAs, live AAPLx chip on home. Liquid stencil hero preserved.
+
 ## Desk UI (product)
 
 - Branch `cursor/folio-desk-polish-f1ec`: NetroBNB top pills + sharp CTAs; **collapsible** `fx-side` (localStorage); xStock logos; Buy = catalog picker + USDC→xStock swap ticket; Home/Netro TradingView (same as Buy); Account cards; responsive/zoom CSS.
