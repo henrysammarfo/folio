@@ -1,3 +1,13 @@
+
+## 2026-09-19 — Desk polish claims
+
+| Claim | Status |
+|---|---|
+| Sidebar can minimize on fx-desk | Verified in code (`data-sidebar-collapsed` + localStorage) |
+| Buy lets you pick tokenized stocks | Verified — XSTOCK_CATALOG picker + Jupiter quote |
+| Home chart matches Buy (TradingView) | Verified — Netro strip + fx Home use TradingViewChart |
+| Fills still paused | Unchanged — quote-only / broadcast paused |
+
 # FOLIO — FACT CHECK
 
 | Claim | Verdict | Evidence | As of |

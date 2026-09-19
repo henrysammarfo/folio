@@ -1,20 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { ArrowDownUp } from "lucide-react";
 import { useMemo, useState } from "react";
+import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { getAcquireBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
+import { XSTOCK_CATALOG, findCatalogItem } from "@/lib/xstock-catalog";
 
-const SYMBOLS = ["AAPLx", "NVDAx", "TSLAx"] as const;
 const CHIPS = ["1", "5", "10", "25"] as const;
 
 export const Route = createFileRoute("/desk/acquire")({
   head: () => ({
     meta: siteMeta({
       title: "Buy — FOLIO",
-      description: "Buy tokenized stocks on Solana with live quotes.",
+      description: "Swap USDC for tokenized stocks on Solana with live quotes.",
       path: "/desk/acquire",
     }),
   }),
@@ -25,13 +27,26 @@ export const Route = createFileRoute("/desk/acquire")({
 
 function Page() {
   const initial = Route.useLoaderData();
-  const [symbol, setSymbol] = useState<(typeof SYMBOLS)[number]>("AAPLx");
+  const [symbol, setSymbol] = useState("AAPLx");
   const [amount, setAmount] = useState("1");
+  const [query, setQuery] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [reviewed, setReviewed] = useState(false);
   const spendUsdc = Number(amount);
   const ready = Number.isFinite(spendUsdc) && spendUsdc > 0 && spendUsdc <= 25;
+  const selected = findCatalogItem(symbol) ?? XSTOCK_CATALOG[0];
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return XSTOCK_CATALOG;
+    return XSTOCK_CATALOG.filter(
+      (item) =>
+        item.symbol.toLowerCase().includes(q) ||
+        item.name.toLowerCase().includes(q) ||
+        item.underlying.toLowerCase().includes(q),
+    );
+  }, [query]);
 
   const fetchAcquire = useServerFn(getAcquireBundle);
   const { data, isFetching, refetch } = useQuery({
@@ -70,54 +85,110 @@ function Page() {
   return (
     <DeskShell title="Buy">
       <section className="fx-buy fx-page">
-        <div className="fx-card fx-buy-chart">
-          <TradingViewChart
-            symbol={symbol}
-            height={420}
-            interval="60"
-            theme="light"
-          />
+        <div className="fx-buy-stack">
+          <div className="fx-card fx-buy-chart">
+            <TradingViewChart
+              symbol={symbol}
+              height={420}
+              interval="60"
+              theme="light"
+            />
+          </div>
+
+          <div className="fx-card fx-picker">
+            <div className="fx-picker-head">
+              <h2>Choose a stock</h2>
+              <input
+                className="fx-picker-search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search AAPL, NVIDIA…"
+                aria-label="Search tokenized stocks"
+              />
+            </div>
+            <ul className="fx-picker-grid" role="listbox" aria-label="Tokenized stocks">
+              {filtered.map((item) => {
+                const on = item.symbol === symbol;
+                return (
+                  <li key={item.symbol}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={on}
+                      className={`fx-picker-item${on ? " is-on" : ""}`}
+                      onClick={() => {
+                        setSymbol(item.symbol);
+                        setReviewed(false);
+                      }}
+                    >
+                      <AssetLogo symbol={item.symbol} size={36} />
+                      <span className="fx-picker-copy">
+                        <strong>{item.underlying}</strong>
+                        <small>{item.symbol}</small>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            {filtered.length === 0 ? (
+              <p className="fx-ticket-sub" style={{ padding: "0 1rem 1rem" }}>
+                No matches — try another ticker.
+              </p>
+            ) : null}
+          </div>
         </div>
 
         <aside className="fx-card fx-ticket">
           <div>
-            <h1>Buy {symbol}</h1>
-            <p className="fx-ticket-sub">Live quote · fills pause until enabled</p>
+            <p className="fx-hero-kicker">Swap</p>
+            <h1>USDC → {selected.symbol}</h1>
+            <p className="fx-ticket-sub">
+              Live Jupiter quote · fills pause until enabled
+            </p>
           </div>
 
-          <div>
-            <p className="fx-field">Asset</p>
-            <div className="fx-chip-row">
-              {SYMBOLS.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={`fx-chip${symbol === s ? " is-on" : ""}`}
-                  onClick={() => {
-                    setSymbol(s);
+          <div className="fx-swap">
+            <div className="fx-swap-leg">
+              <span>You pay</span>
+              <div className="fx-swap-row">
+                <strong className="fx-swap-token">
+                  <span className="fx-logo fx-logo-fallback fx-logo-usdc" aria-hidden>
+                    $
+                  </span>
+                  USDC
+                </strong>
+                <input
+                  className="fx-swap-amt"
+                  value={amount}
+                  inputMode="decimal"
+                  onChange={(e) => {
+                    setAmount(e.target.value);
+                    setErr(null);
                     setReviewed(false);
                   }}
-                >
-                  {s}
-                </button>
-              ))}
+                  aria-label="Amount in USDC"
+                />
+              </div>
+            </div>
+
+            <div className="fx-swap-mid" aria-hidden>
+              <ArrowDownUp size={16} strokeWidth={2.2} />
+            </div>
+
+            <div className="fx-swap-leg">
+              <span>You receive</span>
+              <div className="fx-swap-row">
+                <strong className="fx-swap-token">
+                  <AssetLogo symbol={selected.symbol} size={28} />
+                  {selected.symbol}
+                </strong>
+                <b className="fx-swap-out">
+                  {isFetching ? "…" : out ? out : "—"}
+                </b>
+              </div>
             </div>
           </div>
-
-          <label className="fx-field">
-            Amount (USDC)
-            <div className="fx-amount-big">${amount || "0"}</div>
-            <input
-              value={amount}
-              inputMode="decimal"
-              onChange={(e) => {
-                setAmount(e.target.value);
-                setErr(null);
-                setReviewed(false);
-              }}
-              aria-label="Amount in USDC"
-            />
-          </label>
 
           <div className="fx-chip-row">
             {CHIPS.map((c) => (
@@ -145,13 +216,6 @@ function Page() {
               onChange={(e) => setHoneypot(e.target.value)}
             />
           </label>
-
-          <div className="fx-quote-row">
-            <span>You receive</span>
-            <strong>
-              {isFetching ? "…" : out ? `${out} ${symbol}` : "—"}
-            </strong>
-          </div>
 
           {err ? <p className="fx-err">{err}</p> : null}
 
@@ -221,7 +285,7 @@ function Page() {
                 disabled={!canBuy}
               >
                 {canBuy
-                  ? "Buy — fills paused"
+                  ? "Swap — fills paused"
                   : data?.gates.blockedReasons.some((r) =>
                         /BITQUERY|fail-closed|wash/i.test(r),
                       )

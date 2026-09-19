@@ -6,6 +6,8 @@ import {
   BriefcaseBusiness,
   CircleDollarSign,
   House,
+  PanelLeftClose,
+  PanelLeft,
   Settings,
   ArrowUpRight,
 } from "lucide-react";
@@ -39,6 +41,8 @@ import { buildNetroLiveGateLabels } from "@/lib/netro-live-gates";
 import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 import { buildNetroOwnershipSummary } from "@/lib/netro-ownership";
 
+const SIDEBAR_KEY = "folio.fx.sidebar.collapsed";
+
 /** Web2 consumer IA — Cash App / Robinhood style primary destinations */
 const links = [
   ["Home", "/desk", House],
@@ -56,6 +60,12 @@ function previewShaderVariant(
   if (labShader) return labShader;
   if (labUi === "cinematic-landing-21st") return "ink-ledger";
   return null;
+}
+
+function linkActive(path: string, to: string) {
+  return to === "/desk"
+    ? path === to || path === "/desk/"
+    : path.startsWith(to);
 }
 
 export function DeskShell({
@@ -80,6 +90,7 @@ export function DeskShell({
   const [labUi, setLabUi] = useState<LabUiId | null>(null);
   const [labShader, setLabShader] = useState<LabShaderId | null>(null);
   const [previewOn, setPreviewOn] = useState(false);
+  const [sideCollapsed, setSideCollapsed] = useState(false);
   const fetchTruth = useServerFn(getTruthBundle);
   const fetchApprovals = useServerFn(getLabApprovals);
   const fetchNetwork = useServerFn(getNetworkBundle);
@@ -107,6 +118,26 @@ export function DeskShell({
     setLabUi(readLabUiPick());
     setLabShader(readLabShaderPick());
   }, [path]);
+
+  useEffect(() => {
+    try {
+      setSideCollapsed(localStorage.getItem(SIDEBAR_KEY) === "1");
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  function toggleSidebar() {
+    setSideCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(SIDEBAR_KEY, next ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
 
   function exitPreview() {
     stopLabPreview();
@@ -222,6 +253,7 @@ export function DeskShell({
       data-lab-plasma={liveShader ? "1" : undefined}
       data-lab-approved={productionChrome ? "1" : undefined}
       data-netro-surface={showNetroCanvas ? "1" : undefined}
+      data-sidebar-collapsed={sideCollapsed ? "1" : "0"}
     >
       {previewing ? (
         <div className="lab-preview-banner" role="status">
@@ -246,11 +278,29 @@ export function DeskShell({
         </div>
       ) : null}
 
-      <header className="fx-top">
+      <header className="fx-top fx-top-netro">
         <Link to="/" className="fx-brand" aria-label="FOLIO home">
-          <FolioMark className="fx-brand-mark" title="FOLIO" />
-          <span>FOLIO</span>
+          <span className="fx-brand-badge" aria-hidden>
+            <FolioMark className="fx-brand-mark" title="FOLIO" />
+          </span>
+          <b>FOLIO</b>
         </Link>
+
+        <nav className="fx-top-nav" aria-label="Desk">
+          {links.map(([label, to]) => {
+            const active = linkActive(path, to);
+            return (
+              <Link
+                key={to}
+                to={to}
+                className={`fx-top-pill${active ? " is-active" : ""}`}
+              >
+                {label}
+              </Link>
+            );
+          })}
+        </nav>
+
         <div className="fx-top-actions">
           {actions}
           <Link to="/desk/acquire" className="fx-btn fx-btn-primary fx-btn-sm">
@@ -261,25 +311,53 @@ export function DeskShell({
       </header>
 
       <div className="fx-body">
-        <aside className="fx-side" aria-label="Desk">
+        <aside className="fx-side" aria-label="Desk sidebar">
+          <button
+            type="button"
+            className="fx-side-collapse"
+            onClick={toggleSidebar}
+            aria-pressed={sideCollapsed}
+            aria-label={sideCollapsed ? "Expand sidebar" : "Minimize sidebar"}
+            title={sideCollapsed ? "Expand" : "Minimize"}
+          >
+            {sideCollapsed ? (
+              <PanelLeft size={16} strokeWidth={2} aria-hidden />
+            ) : (
+              <PanelLeftClose size={16} strokeWidth={2} aria-hidden />
+            )}
+            <span className="fx-side-collapse-label">
+              {sideCollapsed ? "Expand" : "Minimize"}
+            </span>
+          </button>
           <nav className="fx-side-nav">
             {links.map(([label, to, Icon]) => {
-              const active =
-                to === "/desk"
-                  ? path === to || path === "/desk/"
-                  : path.startsWith(to);
+              const active = linkActive(path, to);
               return (
                 <Link
                   key={to}
                   to={to}
                   className={`fx-side-link${active ? " is-active" : ""}`}
+                  title={label}
                 >
                   <Icon size={18} strokeWidth={1.85} aria-hidden />
-                  <span>{label}</span>
+                  <span className="fx-side-label">{label}</span>
                 </Link>
               );
             })}
           </nav>
+          <Link
+            to="/desk/settings"
+            className="fx-side-profile"
+            title="Account"
+          >
+            <span className="fx-side-avatar" aria-hidden>
+              F
+            </span>
+            <span className="fx-side-profile-copy">
+              <strong>Account</strong>
+              <small>Profile &amp; settings</small>
+            </span>
+          </Link>
         </aside>
 
         <div className="fx-stage">
@@ -322,10 +400,7 @@ export function DeskShell({
 
       <nav className="fx-tabs" aria-label="Desk">
         {links.map(([label, to, Icon]) => {
-          const active =
-            to === "/desk"
-              ? path === to || path === "/desk/"
-              : path.startsWith(to);
+          const active = linkActive(path, to);
           return (
             <Link
               key={to}

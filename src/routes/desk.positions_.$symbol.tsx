@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { getPositionsBundle } from "@/lib/desk.functions";
@@ -74,10 +75,18 @@ function Page() {
           />
         </div>
         <aside className="fx-card fx-ticket">
-          <p className="fx-hero-kicker">{row?.name ?? symbol}</p>
-          <h1 className="fx-hero-value" style={{ fontSize: "2.4rem" }}>
+          <div className="fx-detail-head">
+            <AssetLogo symbol={symbol} logo={row?.logo} size={48} />
+            <div>
+              <p className="fx-hero-kicker">{row?.name ?? symbol}</p>
+              <h1 className="fx-title" style={{ margin: 0 }}>
+                {symbol}
+              </h1>
+            </div>
+          </div>
+          <p className="fx-hero-value" style={{ fontSize: "2.4rem" }}>
             {row?.paperValueUsd != null ? money(row.paperValueUsd) : "—"}
-          </h1>
+          </p>
           <ul className="fx-kv">
             <li>
               <span>Shares</span>

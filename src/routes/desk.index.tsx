@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AllocationChart, paletteFor } from "@/components/allocation-chart";
+import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
+import { TradingViewChart } from "@/components/tradingview-chart";
 import {
   getCreditBundle,
   getPositionsBundle,
@@ -65,6 +67,7 @@ function Page() {
   const rows = positions.data?.rows ?? [];
   const total = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
   const borrow = credit.data?.paper.illustrativeBorrowUsd;
+  const featured = rows[0]?.symbol ?? "AAPLx";
   const parts = rows
     .filter((r) => (r.paperValueUsd ?? 0) > 0)
     .map((r, i) => ({
@@ -75,7 +78,7 @@ function Page() {
 
   return (
     <DeskShell title="Home">
-      <section className="fx-page">
+      <section className="fx-page fx-home">
         <header className="fx-hero">
           <p className="fx-hero-kicker">Your portfolio</p>
           <h1 className="fx-hero-value">{total > 0 ? money(total) : "—"}</h1>
@@ -98,42 +101,67 @@ function Page() {
           </Link>
         </div>
 
-        {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
+        <div className="fx-home-grid">
+          <div className="fx-card fx-home-chart">
+            <div className="fx-home-chart-head">
+              <div>
+                <p className="fx-hero-kicker">{featured}</p>
+                <h2 className="fx-home-chart-title">Live chart</h2>
+              </div>
+              <Link
+                to="/desk/positions/$symbol"
+                params={{ symbol: featured }}
+                search={inspect ? { inspect } : {}}
+                className="fx-text-btn"
+              >
+                Open
+              </Link>
+            </div>
+            <TradingViewChart
+              symbol={featured}
+              height={360}
+              interval="60"
+              theme="light"
+            />
+          </div>
 
-        <h2 className="fx-section-title">Holdings</h2>
-        <div className="fx-card">
-          <ul className="fx-list">
-            {rows.slice(0, 4).map((p, i) => (
-              <li key={p.symbol}>
-                <Link
-                  to="/desk/positions/$symbol"
-                  params={{ symbol: p.symbol }}
-                  search={inspect ? { inspect } : {}}
-                  className="fx-asset"
-                >
-                  <span
-                    className="fx-asset-mark"
-                    style={{ background: paletteFor(i) }}
-                    aria-hidden
-                  >
-                    {p.symbol[0]}
-                  </span>
-                  <span className="fx-asset-main">
-                    <strong>{p.symbol}</strong>
-                    <small>{p.name}</small>
-                  </span>
-                  <span className="fx-asset-right">
-                    <strong>
-                      {p.paperValueUsd != null ? money(p.paperValueUsd) : "—"}
-                    </strong>
-                    <small>
-                      {p.usdPrice != null ? `$${p.usdPrice.toFixed(2)}` : "Live"}
-                    </small>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="fx-home-side">
+            {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
+
+            <h2 className="fx-section-title">Holdings</h2>
+            <div className="fx-card">
+              <ul className="fx-list">
+                {rows.slice(0, 5).map((p) => (
+                  <li key={p.symbol}>
+                    <Link
+                      to="/desk/positions/$symbol"
+                      params={{ symbol: p.symbol }}
+                      search={inspect ? { inspect } : {}}
+                      className="fx-asset"
+                    >
+                      <AssetLogo symbol={p.symbol} logo={p.logo} size={40} />
+                      <span className="fx-asset-main">
+                        <strong>{p.symbol}</strong>
+                        <small>{p.name}</small>
+                      </span>
+                      <span className="fx-asset-right">
+                        <strong>
+                          {p.paperValueUsd != null
+                            ? money(p.paperValueUsd)
+                            : "—"}
+                        </strong>
+                        <small>
+                          {p.usdPrice != null
+                            ? `$${p.usdPrice.toFixed(2)}`
+                            : "Live"}
+                        </small>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
     </DeskShell>

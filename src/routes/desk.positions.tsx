@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { AllocationChart, paletteFor } from "@/components/allocation-chart";
+import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { getPositionsBundle } from "@/lib/desk.functions";
@@ -93,7 +94,7 @@ function Page() {
         <h2 className="fx-section-title">Your stocks</h2>
         <div className="fx-card">
           <ul className="fx-list" aria-label="Holdings">
-            {rows.map((p, i) => {
+            {rows.map((p) => {
               const chain = scaledUiHealthLabel(p.scaledUiCompare.status);
               return (
                 <li key={p.symbol}>
@@ -103,13 +104,7 @@ function Page() {
                     search={inspect ? { inspect } : {}}
                     className="fx-asset"
                   >
-                    <span
-                      className="fx-asset-mark"
-                      style={{ background: paletteFor(i) }}
-                      aria-hidden
-                    >
-                      {p.symbol[0]}
-                    </span>
+                    <AssetLogo symbol={p.symbol} logo={p.logo} size={40} />
                     <span className="fx-asset-main">
                       <strong>{p.symbol}</strong>
                       <small>

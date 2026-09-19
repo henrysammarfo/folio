@@ -5,9 +5,7 @@
 
 ## Desk UI (product)
 
-- Branch `cursor/folio-desk-product-ui-f1ec`: from-scratch consumer chrome (`fx-desk` Web2 brokerage chrome).
-- Default Settings = Account only. Operator wall: `/desk/settings?wall=ops`.
-- Holdings / Borrow / Buy / Activity: hero numbers + hairline lists (not badge-card dashboard).
+- Branch `cursor/folio-desk-polish-f1ec`: NetroBNB top pills + sharp CTAs; **collapsible** `fx-side` (localStorage); xStock logos; Buy = catalog picker + USDC→xStock swap ticket; Home/Netro TradingView (same as Buy); Account cards; responsive/zoom CSS.
 
 ## Product lock
 

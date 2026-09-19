@@ -1,3 +1,12 @@
+
+## 2026-09-19 — Desk polish (logos / swap / nav / chart / account)
+
+- NetroBNB-style top nav pills + dark Connect; sidebar Minimize/Expand persisted.
+- Asset logos (Backed CDN) on Home/Holdings/Buy/detail; XSTOCK_CATALOG picker + swap ticket.
+- Home + Netro market strip: TradingView (parity with Buy); Account profile cards.
+- Sharper 8px CTAs; responsive/zoom breakpoints for rail + cards.
+- Build + 147 unit tests green.
+
 # FOLIO — SESSION LOG
 
 ## 2026-09-15 — Plan lock + execution start

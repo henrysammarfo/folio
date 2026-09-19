@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Bell, Shield, Wallet } from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { z } from "zod";
 import { DeskShell } from "@/components/desk-shell";
@@ -110,33 +111,31 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
 
   return (
     <DeskShell title="Account">
-      <section className="fx-page" style={{ maxWidth: 520 }}>
-        <header className="fx-hero" style={{ marginBottom: "1.15rem" }}>
-          <div
-            className="fx-asset-mark"
-            style={{
-              width: "3.25rem",
-              height: "3.25rem",
-              fontSize: "1.25rem",
-              background: "#0EA5C9",
-              marginBottom: ".85rem",
-            }}
-            aria-hidden
-          >
+      <section className="fx-page fx-account">
+        <header className="fx-account-hero">
+          <div className="fx-account-avatar" aria-hidden>
             {shortWallet ? shortWallet[0]!.toUpperCase() : "F"}
           </div>
-          <h1 className="fx-title">Account</h1>
-          <p className="fx-sub">
-            {signedIn
-              ? "Signed in · wallet prefs save to your desk."
-              : "Connect a wallet to see verified holdings."}
-          </p>
+          <div>
+            <p className="fx-hero-kicker">Profile</p>
+            <h1 className="fx-title">Account</h1>
+            <p className="fx-sub">
+              {signedIn
+                ? "Signed in · wallet prefs save to your desk."
+                : "Connect a wallet to see verified holdings."}
+            </p>
+          </div>
         </header>
 
-        <div className="fx-card">
-          <div className="fx-account-block">
-            <h2>Wallet</h2>
-            <p>{shortWallet ?? "No wallet connected"}</p>
+        <div className="fx-account-grid">
+          <article className="fx-card fx-account-card">
+            <header className="fx-account-card-head">
+              <Wallet size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Wallet</h2>
+                <p>{shortWallet ?? "No wallet connected"}</p>
+              </div>
+            </header>
             <form
               className="fx-inline-form"
               onSubmit={async (e) => {
@@ -170,6 +169,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               />
               <button
                 type="submit"
+                className="fx-btn fx-btn-dark fx-btn-sm"
                 disabled={busy || !data?.sessionSecretPresent}
               >
                 {busy ? "…" : "Save"}
@@ -179,7 +179,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               <button
                 type="button"
                 className="fx-text-btn"
-                style={{ marginTop: ".75rem" }}
+                style={{ marginTop: ".85rem" }}
                 disabled={busy}
                 onClick={async () => {
                   setBusy(true);
@@ -195,10 +195,20 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                 Disconnect wallet
               </button>
             ) : null}
-          </div>
+          </article>
 
-          <div className="fx-account-block">
-            <h2>Sign in</h2>
+          <article className="fx-card fx-account-card">
+            <header className="fx-account-card-head">
+              <Shield size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Sign in</h2>
+                <p>
+                  {signedIn
+                    ? "Session active on this device"
+                    : "Optional · unlocks saved prefs"}
+                </p>
+              </div>
+            </header>
             {privyClient && appId ? (
               <Suspense fallback={null}>
                 <PrivySessionMint
@@ -218,7 +228,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               <button
                 type="button"
                 className="fx-text-btn"
-                style={{ marginTop: ".75rem" }}
+                style={{ marginTop: ".85rem" }}
                 onClick={async () => {
                   await clearSession();
                   await refresh();
@@ -228,13 +238,16 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                 Sign out
               </button>
             ) : null}
-          </div>
+          </article>
 
-          <div className="fx-account-block row">
-            <div>
-              <h2>Corporate-action alerts</h2>
-              <p>Notify when a pending multiplier appears.</p>
-            </div>
+          <article className="fx-card fx-account-card fx-account-card-row">
+            <header className="fx-account-card-head">
+              <Bell size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Corporate-action alerts</h2>
+                <p>Notify when a pending multiplier appears.</p>
+              </div>
+            </header>
             <Switch
               checked={Boolean(alertsOn)}
               disabled={!prefsEditable}
@@ -244,10 +257,14 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                 await refresh();
               }}
             />
-          </div>
+          </article>
         </div>
 
-        {msg ? <p className="fx-sub" style={{ marginTop: ".85rem" }}>{msg}</p> : null}
+        {msg ? (
+          <p className="fx-sub" style={{ marginTop: ".85rem" }}>
+            {msg}
+          </p>
+        ) : null}
 
         <p className="fx-legal">
           <Link to="/privacy">Privacy</Link>

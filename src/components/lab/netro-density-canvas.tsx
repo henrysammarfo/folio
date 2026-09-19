@@ -9,6 +9,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
+import { TradingViewChart } from "@/components/tradingview-chart";
 import { runDeskAgent } from "@/lib/desk.functions";
 import {
   NETRO_LIVE_GATE_DEFAULTS,
@@ -444,29 +445,19 @@ export function NetroDensityCanvas({
               <em>{multiplierLabel.replace(/\s*live$/i, "")}</em>
             </div>
             <div
-              className="netro-density-chart netro-density-chart-dark"
-              role="presentation"
+              className="netro-density-chart netro-density-chart-dark netro-density-chart-tv"
               data-testid="netro-truth-strip"
             >
               <div className="netro-density-chart-meta">
-                <b>Share count</b>
-                <span>Live vs on-chain</span>
+                <b>Live chart</b>
+                <span>TradingView · same as Buy</span>
               </div>
-              <svg viewBox="0 0 640 180" preserveAspectRatio="none" aria-hidden>
-                <polyline
-                  fill="none"
-                  stroke="#0EA5C9"
-                  strokeWidth="2.2"
-                  points="0,140 40,132 80,128 120,118 160,122 200,108 240,98 280,104 320,86 360,92 400,74 440,80 480,62 520,70 560,52 600,58 640,44"
-                />
-                <polyline
-                  fill="none"
-                  stroke="rgba(255,255,255,.35)"
-                  strokeWidth="1.5"
-                  strokeDasharray="4 4"
-                  points="0,150 80,148 160,146 240,144 320,142 400,140 480,138 560,136 640,134"
-                />
-              </svg>
+              <TradingViewChart
+                symbol="AAPLx"
+                height={280}
+                interval="60"
+                theme="dark"
+              />
               <div className="netro-density-chart-foot">
                 <span data-testid="netro-scaled-ui-strip">
                   {/match/i.test(scaledUiStripLabel)
