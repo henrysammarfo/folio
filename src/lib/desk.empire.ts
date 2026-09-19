@@ -56,6 +56,12 @@ import {
   activeMembership,
   prefsWriteBlockedReason,
 } from "./auth/role-gates";
+import {
+  agentBlockedReason,
+  bootstrapBlockedReason,
+  deskAccessFromSession,
+  type DeskAccess,
+} from "./auth/desk-access";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
@@ -826,7 +832,19 @@ const AgentInput = z.object({
 
 export const runDeskAgent = createServerFn({ method: "POST" })
   .validator(AgentInput)
-  .handler(async ({ data }) => runPaperAgent(data.prompt));
+  .handler(async ({ data }) => {
+    const session = readVerifiedSession();
+    const blocked = agentBlockedReason(session);
+    if (blocked) {
+      return errResult("folio.agent.paper", "agent_requires_session", blocked);
+    }
+    return runPaperAgent(data.prompt);
+  });
+
+/** Soft-gate desk access for chrome banners — never invents a membership. */
+export const getDeskAccess = createServerFn({ method: "GET" }).handler(
+  async (): Promise<DeskAccess> => deskAccessFromSession(readVerifiedSession()),
+);
 
 const PrefsInput = z.object({
   corporateActionAlerts: z.boolean(),
@@ -1054,6 +1072,14 @@ export const attachDemoTenantMembership = createServerFn({ method: "POST" }).han
  */
 export const bootstrapDemoDeskSession = createServerFn({ method: "POST" }).handler(
   async () => {
+    const blocked = bootstrapBlockedReason();
+    if (blocked) {
+      return errResult(
+        "folio.session.bootstrap-demo",
+        "bootstrap_demo_disabled",
+        blocked,
+      );
+    }
     const built = await buildBootstrapDemoSession();
     if (!built.ok) {
       return errResult(

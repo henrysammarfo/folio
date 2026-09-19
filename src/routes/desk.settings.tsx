@@ -11,6 +11,7 @@ import {
   clearFolioSession,
   clearWatchWallet,
   getSessionBundle,
+  setActiveTenant,
   updateDeskPreferences,
   type SessionBundle,
 } from "@/lib/desk.functions";
@@ -69,6 +70,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
   const clearWatch = useServerFn(clearWatchWallet);
   const clearSession = useServerFn(clearFolioSession);
   const savePrefs = useServerFn(updateDeskPreferences);
+  const switchTenant = useServerFn(setActiveTenant);
   const { data, refetch } = useQuery({
     queryKey: ["session-bundle"],
     queryFn: () => fetchSession(),
@@ -80,6 +82,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
   const [wallet, setWallet] = useState("");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [tenantBusy, setTenantBusy] = useState(false);
   const [privyClient, setPrivyClient] = useState(false);
   useEffect(() => setPrivyClient(true), []);
 
@@ -258,6 +261,70 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               }}
             />
           </article>
+
+          {signedIn && tenants.length > 0 ? (
+            <article className="fx-card fx-account-card">
+              <header className="fx-account-card-head">
+                <Shield size={18} strokeWidth={2} aria-hidden />
+                <div>
+                  <h2>Workspace</h2>
+                  <p>
+                    {prefsTenant
+                      ? `${prefsTenant.role} · ${
+                          prefsTenant.slug ??
+                          prefsTenant.displayName ??
+                          prefsTenant.tenantId.slice(0, 8)
+                        }`
+                      : "No active tenant"}
+                    {tenants.length > 1 ? ` · ${tenants.length} memberships` : ""}
+                  </p>
+                </div>
+              </header>
+              {tenants.length > 1 ? (
+                <ul className="fx-tenant-list" aria-label="Switch workspace">
+                  {tenants.map((t) => {
+                    const on = t.tenantId === activeTenantId;
+                    const label =
+                      t.slug ?? t.displayName ?? `${t.tenantId.slice(0, 8)}…`;
+                    return (
+                      <li key={t.tenantId}>
+                        <button
+                          type="button"
+                          className={`fx-tenant-item${on ? " is-on" : ""}`}
+                          disabled={tenantBusy || on}
+                          onClick={async () => {
+                            setTenantBusy(true);
+                            setMsg("");
+                            try {
+                              const res = await switchTenant({
+                                data: { tenantId: t.tenantId },
+                              });
+                              setMsg(
+                                res.ok
+                                  ? res.data.note
+                                  : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                              );
+                              await refresh();
+                            } finally {
+                              setTenantBusy(false);
+                            }
+                          }}
+                        >
+                          <strong>{label}</strong>
+                          <small>{t.role}</small>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="fx-sub">
+                  Prefs and alerts save to this workspace. Multi-tenant switch
+                  appears when you join another desk.
+                </p>
+              )}
+            </article>
+          ) : null}
         </div>
 
         {msg ? (

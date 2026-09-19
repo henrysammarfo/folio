@@ -50,6 +50,7 @@ function Page() {
 
   return (
     <PublicShell
+      tone="network"
       eyebrow="Network matrix"
       title="No blurred lines between demo and live."
       intro="Stocklana + Colosseum World’s Fair path: mainnet READ for truth, Jupiter quote-only, borrow CPI unavailable until funded (no fork harness on this budget). Custom mainnet program deploy is out of the ≤~$1 budget. Broadcast stays paused until funded and explicitly confirmed."
@@ -78,6 +79,14 @@ function Page() {
           </div>
         ))}
       </div>
+      <section className="mkt-aside-band" aria-label="How to read this matrix">
+        <h2>Read the mode, not the marketing</h2>
+        <p>
+          Mainnet-read means a live probe returned. Quote-only means Jupiter
+          routes without broadcast. Unavailable is intentional — not a broken
+          badge waiting for a screenshot.
+        </p>
+      </section>
     </PublicShell>
   );
 }

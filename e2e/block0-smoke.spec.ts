@@ -538,22 +538,29 @@ test.describe("FOLIO Block 0 smoke", () => {
     await expect(page.locator("#stage-netro .netro-density-rail")).toBeVisible();
   });
 
-  test("paper agent keeps live spine and never fills", async ({ page }) => {
+  test("paper agent requires session and never fills", async ({ page }) => {
     await page.goto("/desk/settings?wall=ops", { waitUntil: "networkidle" });
-    await expect(page.getByText(/paper agent/i).first()).toBeVisible({
+    await expect(page.getByText(/paper agent|desk agent/i).first()).toBeVisible({
       timeout: 30_000,
     });
     const runBtn = page.getByRole("button", { name: /run paper agent/i });
     await runBtn.scrollIntoViewIfNeeded();
     await runBtn.click();
-    await expect(page.locator("pre").filter({ hasText: /nl=/i })).toBeVisible({
+    await expect(
+      page.locator("pre").filter({
+        hasText: /agent_requires_session|nl=|broadcast=false/i,
+      }),
+    ).toBeVisible({
       timeout: 60_000,
     });
-    const out = (await page.locator("pre").filter({ hasText: /nl=/i }).innerText()).toLowerCase();
-    // nl=off when AGENTROUTER missing; ok/failed/skipped when NL path runs
-    expect(out).toMatch(/nl=(ok|failed|skipped|off)/);
-    expect(out).toMatch(/broadcast=false/);
-    expect(out).toMatch(/truth|quote|gates|×|multiplier|pending/);
+    const out = (
+      await page
+        .locator("pre")
+        .filter({ hasText: /agent_requires_session|nl=|broadcast=false/i })
+        .innerText()
+    ).toLowerCase();
+    expect(out).toMatch(/agent_requires_session|signed session|nl=(ok|failed|skipped|off)/);
+    expect(out).toMatch(/broadcast=false|agent_requires_session/);
     expect(out).not.toMatch(/filled on mainnet|broadcast complete|unhackable/);
   });
 });

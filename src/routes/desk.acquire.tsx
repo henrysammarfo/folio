@@ -8,9 +8,21 @@ import { DeskShell } from "@/components/desk-shell";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { getAcquireBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
-import { XSTOCK_CATALOG, findCatalogItem } from "@/lib/xstock-catalog";
+import {
+  XSTOCK_CATALOG,
+  XSTOCK_COMPARE_PAIRS,
+  catalogByLane,
+  findCatalogItem,
+  type XStockLane,
+} from "@/lib/xstock-catalog";
 
 const CHIPS = ["1", "5", "10", "25"] as const;
+const LANES: { id: XStockLane | "all"; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "mega", label: "Mega" },
+  { id: "ipo", label: "IPO" },
+  { id: "meme", label: "Meme" },
+];
 
 export const Route = createFileRoute("/desk/acquire")({
   head: () => ({
@@ -30,23 +42,29 @@ function Page() {
   const [symbol, setSymbol] = useState("AAPLx");
   const [amount, setAmount] = useState("1");
   const [query, setQuery] = useState("");
+  const [lane, setLane] = useState<XStockLane | "all">("all");
+  const [compareRight, setCompareRight] = useState<string | null>(null);
   const [honeypot, setHoneypot] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [reviewed, setReviewed] = useState(false);
   const spendUsdc = Number(amount);
   const ready = Number.isFinite(spendUsdc) && spendUsdc > 0 && spendUsdc <= 25;
-  const selected = findCatalogItem(symbol) ?? XSTOCK_CATALOG[0];
+  const selected = findCatalogItem(symbol) ?? XSTOCK_CATALOG[0]!;
+  if (!selected) {
+    throw new Error("XSTOCK_CATALOG is empty");
+  }
 
   const filtered = useMemo(() => {
+    const base = catalogByLane(lane);
     const q = query.trim().toLowerCase();
-    if (!q) return XSTOCK_CATALOG;
-    return XSTOCK_CATALOG.filter(
+    if (!q) return base;
+    return base.filter(
       (item) =>
         item.symbol.toLowerCase().includes(q) ||
         item.name.toLowerCase().includes(q) ||
         item.underlying.toLowerCase().includes(q),
     );
-  }, [query]);
+  }, [query, lane]);
 
   const fetchAcquire = useServerFn(getAcquireBundle);
   const { data, isFetching, refetch } = useQuery({
@@ -58,13 +76,34 @@ function Page() {
     staleTime: 15_000,
   });
 
+  const compareSpend = ready ? spendUsdc : 1;
+  const { data: compareData, isFetching: compareFetching } = useQuery({
+    queryKey: ["acquire-compare", compareRight, compareSpend],
+    queryFn: () =>
+      fetchAcquire({
+        data: { symbol: compareRight!, spendUsdc: compareSpend },
+      }),
+    enabled: Boolean(compareRight) && ready,
+    staleTime: 15_000,
+  });
+
   const out = useMemo(() => {
     if (data?.jupiter.ok) return data.jupiter.data.outUiAmount.toFixed(6);
     return null;
   }, [data]);
 
+  const compareOut = useMemo(() => {
+    if (compareData?.jupiter.ok)
+      return compareData.jupiter.data.outUiAmount.toFixed(6);
+    return null;
+  }, [compareData]);
+
   const canBuy =
-    Boolean(data?.gates.canReview) && !isFetching && ready && !honeypot.trim();
+    Boolean(data?.gates.canReview) &&
+    !isFetching &&
+    ready &&
+    !honeypot.trim() &&
+    Boolean(selected?.buyable);
 
   const scaledStatus =
     data?.scaledUiCompare.status === "match"
@@ -76,6 +115,9 @@ function Page() {
   const checkLines = [
     ...(data?.gates.blockedReasons ?? []),
     ...(data?.gates.honestyNotes ?? []),
+    !selected?.buyable
+      ? selected?.blurb ?? "Watchlist only — mint not confirmed on desk"
+      : null,
     data?.prefsFromSession
       ? null
       : "Strict prefs · no session — public demo fail-closed labels apply",
@@ -102,9 +144,23 @@ function Page() {
                 className="fx-picker-search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search AAPL, NVIDIA…"
+                placeholder="Search AAPL, NVIDIA, GME…"
                 aria-label="Search tokenized stocks"
               />
+            </div>
+            <div className="fx-lane-row" role="tablist" aria-label="Catalog lane">
+              {LANES.map((l) => (
+                <button
+                  key={l.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={lane === l.id}
+                  className={`fx-lane${lane === l.id ? " is-on" : ""}`}
+                  onClick={() => setLane(l.id)}
+                >
+                  {l.label}
+                </button>
+              ))}
             </div>
             <ul className="fx-picker-grid" role="listbox" aria-label="Tokenized stocks">
               {filtered.map((item) => {
@@ -115,16 +171,23 @@ function Page() {
                       type="button"
                       role="option"
                       aria-selected={on}
-                      className={`fx-picker-item${on ? " is-on" : ""}`}
+                      className={`fx-picker-item${on ? " is-on" : ""}${
+                        !item.buyable ? " is-watch" : ""
+                      }`}
                       onClick={() => {
                         setSymbol(item.symbol);
                         setReviewed(false);
+                        setErr(null);
                       }}
                     >
                       <AssetLogo symbol={item.symbol} size={36} />
                       <span className="fx-picker-copy">
                         <strong>{item.underlying}</strong>
-                        <small>{item.symbol}</small>
+                        <small>
+                          {item.symbol}
+                          {!item.buyable ? " · watch" : ""}
+                          {item.lane !== "mega" ? ` · ${item.lane}` : ""}
+                        </small>
                       </span>
                     </button>
                   </li>
@@ -133,9 +196,43 @@ function Page() {
             </ul>
             {filtered.length === 0 ? (
               <p className="fx-ticket-sub" style={{ padding: "0 1rem 1rem" }}>
-                No matches — try another ticker.
+                No matches — try another ticker or lane.
               </p>
             ) : null}
+
+            <div className="fx-pair-strip">
+              <p className="fx-pair-label">Compare pairs</p>
+              <div className="fx-pair-chips">
+                {XSTOCK_COMPARE_PAIRS.map((p) => {
+                  const on =
+                    (symbol === p.left && compareRight === p.right) ||
+                    (symbol === p.right && compareRight === p.left);
+                  return (
+                    <button
+                      key={`${p.left}-${p.right}`}
+                      type="button"
+                      className={`fx-chip${on ? " is-on" : ""}`}
+                      onClick={() => {
+                        setSymbol(p.left);
+                        setCompareRight(p.right);
+                        setReviewed(false);
+                      }}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+                {compareRight ? (
+                  <button
+                    type="button"
+                    className="fx-text-btn"
+                    onClick={() => setCompareRight(null)}
+                  >
+                    Clear pair
+                  </button>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -144,7 +241,9 @@ function Page() {
             <p className="fx-hero-kicker">Swap</p>
             <h1>USDC → {selected.symbol}</h1>
             <p className="fx-ticket-sub">
-              Live Jupiter quote · fills pause until enabled
+              {selected.blurb
+                ? selected.blurb
+                : "Live Jupiter quote · fills pause until enabled"}
             </p>
           </div>
 
@@ -190,6 +289,24 @@ function Page() {
             </div>
           </div>
 
+          {compareRight ? (
+            <div className="fx-compare-leg" aria-live="polite">
+              <span>
+                Pair · {compareRight}
+                {findCatalogItem(compareRight)?.buyable === false
+                  ? " (watch)"
+                  : ""}
+              </span>
+              <b>
+                {compareFetching
+                  ? "…"
+                  : compareOut
+                    ? `${compareOut} ${compareRight}`
+                    : "—"}
+              </b>
+            </div>
+          ) : null}
+
           <div className="fx-chip-row">
             {CHIPS.map((c) => (
               <button
@@ -219,12 +336,19 @@ function Page() {
 
           {err ? <p className="fx-err">{err}</p> : null}
 
+          {!selected?.buyable ? (
+            <p className="fx-checks">
+              Watchlist only — quotes may fail until the Backed mint is confirmed
+              on desk.
+            </p>
+          ) : null}
+
           {!reviewed ? (
             <button
               type="button"
               className="fx-btn fx-btn-primary fx-btn-block"
               data-testid="acquire-continue"
-              disabled={!ready}
+              disabled={!ready || !selected?.buyable}
               onClick={() => {
                 const n = Number(amount);
                 if (!Number.isFinite(n) || n <= 0) {
@@ -233,6 +357,10 @@ function Page() {
                 }
                 if (n > 25) {
                   setErr("Max $25 while fills stay paused.");
+                  return;
+                }
+                if (!selected?.buyable) {
+                  setErr("This name is watchlist-only until mint is confirmed.");
                   return;
                 }
                 setErr(null);

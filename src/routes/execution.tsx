@@ -51,6 +51,7 @@ function Page() {
 
   return (
     <PublicShell
+      tone="execution"
       eyebrow="Execution policy"
       title="Every gate is labeled. A missing signal stops the path."
       intro="FOLIO compares reference pricing, venue liquidity, and linked-flow pressure before offering a quote. Green is not a guarantee — it means the live check returned and cleared its band. Broadcast stays off on the ≤~$1 Stocklana budget."
@@ -115,6 +116,14 @@ function Page() {
           Full network matrix →
         </Link>
       </p>
+      <section className="mkt-aside-band" aria-label="What execution means here">
+        <h2>Guarded, not gamified</h2>
+        <p>
+          IPO and meme lanes sit behind the same wash and Scaled UI checks as
+          mega names. A pair compare on Buy never softens a blocked route into a
+          green “go.”
+        </p>
+      </section>
     </PublicShell>
   );
 }

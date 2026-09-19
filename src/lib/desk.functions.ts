@@ -502,6 +502,7 @@ export {
   getActivityBundle,
   getSessionBundle,
   getEmpireReadiness,
+  getDeskAccess,
   runDeskAgent,
   updateDeskPreferences,
   setActiveTenant,
@@ -521,3 +522,4 @@ export type {
   PositionRow,
   ActivityEvent,
 } from "./desk.empire";
+export type { DeskAccess } from "./auth/desk-access";

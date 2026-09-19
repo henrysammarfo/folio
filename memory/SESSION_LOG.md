@@ -1,4 +1,13 @@
 
+## 2026-09-19 — Routes / tenancy / depth (IPO · meme · pairs · agent · templates)
+
+- Soft desk READ stays public; hard-gate paper agent (session) + bootstrap (`FOLIO_ALLOW_BOOTSTRAP_DEMO=1`).
+- `getDeskAccess` + desk chrome banner; Account tenant switcher via `setActiveTenant`.
+- Catalog lanes mega/ipo/meme + `XSTOCK_COMPARE_PAIRS` on Buy; watchlist `buyable=false` honesty.
+- Paper agent intents: compare / credit / network / positions (+ truth/quote).
+- Marketing: PublicShell tones + LandingGlassFooter; landing Benefits + Glow templates wired.
+- Vitest 154 green.
+
 ## 2026-09-19 — Landing templates (benefits / glow / glass / falcon)
 
 - Wired BenefitsSection (3-card + video), glowing FeatureCards (motion), liquid-glass video footer on `/`.

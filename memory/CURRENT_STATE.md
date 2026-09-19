@@ -5,11 +5,15 @@
 
 ## Marketing / landing (product)
 
-- Branch `cursor/folio-landing-marketing-f1ec`: landing slide-through (Truth/Route/Buy/Borrow), Netro-style marketing chrome (`mkt-*`), sharper CTAs, live AAPLx chip on home. Liquid stencil hero preserved.
+- Landing: liquid stencil hero + Falcon-style triptych + **BenefitsSection** + **GlowingFeaturesSection** + **LandingGlassFooter** (liquid-glass template).
+- Marketing PublicShell: per-page `tone` (truth / execution / credit / network / about / legal) + glass footer on all public pages (not one sloppy shell).
 
 ## Desk UI (product)
 
-- Branch `cursor/folio-desk-polish-f1ec`: NetroBNB top pills + sharp CTAs; **collapsible** `fx-side` (localStorage); xStock logos; Buy = catalog picker + USDC→xStock swap ticket; Home/Netro TradingView (same as Buy); Account cards; responsive/zoom CSS.
+- Buy: Mega / IPO / Meme lanes + watchlist honesty (`buyable`) + **compare pairs** strip (dual Jupiter quotes).
+- Soft access banner on desk chrome; Account workspace/tenant switcher when multi-member.
+- Paper agent: hard-gated to signed session; intents truth/quote/**compare**/credit/network/positions.
+- Bootstrap demo: hard-gated behind `FOLIO_ALLOW_BOOTSTRAP_DEMO=1`.
 
 ## Product lock
 

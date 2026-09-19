@@ -24,6 +24,7 @@ export const Route = createFileRoute("/about")({
 function Page() {
   return (
     <PublicShell
+      tone="about"
       eyebrow="Built in Accra"
       title="A desk that earns trust by refusing shortcuts."
       intro="FOLIO is for people who need economic-share truth before they buy, borrow, or automate — built by a founder who refuses to let starting line cap ambition."

@@ -1,4 +1,15 @@
 
+## 2026-09-19 — Routes / tenancy / depth claims
+
+| Claim | Status |
+|---|---|
+| Paper agent requires signed session | Verified — `agentBlockedReason` + `runDeskAgent` gate |
+| Bootstrap demo opt-in flag | Verified — `FOLIO_ALLOW_BOOTSTRAP_DEMO=1` |
+| Buy has IPO / meme lanes + pairs | Verified — `XSTOCK_CATALOG` lanes + `XSTOCK_COMPARE_PAIRS` UI |
+| Marketing pages use distinct tones + glass footer | Verified — `PublicShell` tone + `LandingGlassFooter` |
+| Agent compare/credit/network/positions intents | Verified — `parsePaperIntent` + spine fetch |
+| Never unhackable | Policy unchanged |
+
 ## 2026-09-19 — Desk polish claims
 
 | Claim | Status |

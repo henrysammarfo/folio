@@ -22,6 +22,8 @@ export const Route = createFileRoute("/terms")({
 function Page() {
   return (
     <PublicShell
+      tone="legal"
+      compactIntro
       eyebrow="Legal"
       title="Terms of Use"
       intro="Last updated September 19, 2026. By using FOLIO you agree to these terms."

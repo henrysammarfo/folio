@@ -676,6 +676,7 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
           <p className="mt-2 text-sm opacity-70">
             Labeled server path: Privy custom_auth <code>folio-demo-bootstrap</code> → attach
             owner → mint+verify cookie. Works without Allowed origins / browser login.
+            Requires <code>FOLIO_ALLOW_BOOTSTRAP_DEMO=1</code> — disabled by default.
           </p>
         </div>
         {privyClient && data?.readiness.privyAppId ? (
@@ -929,11 +930,13 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
         defaultOpen={false}
       >
         <p className="mb-3 text-sm opacity-80">
-          Runs live xStocks multiplier / Jupiter quote-only reads and the same acquire wash
-          gates on quote intents. Never broadcasts. AgentRouter expands NL only when keyed —
-          if AgentRouter returns WAF/HTML or errors, the live spine reply still returns
-          (NL skipped, labeled). Truth spine labels pending corporate-action multiplier (or
-          none); quotes label Jupiter live/cached/stale.
+          Requires a signed session (Account). Runs live xStocks multiplier /
+          Jupiter quote-only reads, pair compares, credit / network / positions
+          intents, and the same acquire wash gates on quote intents. Never
+          broadcasts. AgentRouter expands NL only when keyed — if AgentRouter
+          returns WAF/HTML or errors, the live spine reply still returns (NL
+          skipped, labeled). Try: truth AAPLx · quote 1 USDC NVDAx · compare
+          AAPLx vs MSFTx · credit · network · positions.
         </p>
         <div className="form-grid">
           <label>
