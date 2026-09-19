@@ -73,7 +73,12 @@ const SymbolInput = z.object({
 
 const QuoteInput = z.object({
   symbol: z.string().min(2).max(16).default("AAPLx"),
-  spendUsdc: z.number().positive().max(25), // quote inspection cap; broadcast still off (≤~$1 budget)
+  /** USDC spend when paySymbol is omitted / USDC. */
+  spendUsdc: z.number().positive().max(25).optional(),
+  /** Pay-side xStock for true stock↔stock Jupiter quotes. */
+  paySymbol: z.string().min(2).max(16).optional(),
+  /** Pay qty (USDC dollars or xStock units). Cap keeps inspection cheap. */
+  amount: z.number().positive().max(25).optional(),
 });
 
 export type TruthBundle = {
@@ -117,7 +122,12 @@ export type TruthBundle = {
 
 export type AcquireBundle = {
   symbol: string;
+  /** "USDC" or pay-side xStock symbol. */
+  paySymbol: string;
   spendUsdc: number;
+  payAmount: number;
+  mode: "usdc" | "stock-pair";
+  payAsset: AdapterResult<XStockAsset> | null;
   asset: AdapterResult<XStockAsset>;
   multiplier: AdapterResult<XStockMultiplier>;
   pyth: AdapterResult<PythPrice>;
@@ -275,21 +285,44 @@ export const getTruthBundle = createServerFn({ method: "GET" })
 export const getAcquireBundle = createServerFn({ method: "GET" })
   .validator(QuoteInput)
   .handler(async ({ data }): Promise<AcquireBundle> => {
-    const { symbol, spendUsdc } = data;
-    const [asset, multiplier] = await Promise.all([
+    const symbol = data.symbol;
+    const payRaw = data.paySymbol?.trim();
+    const isPair = Boolean(payRaw && payRaw.toUpperCase() !== "USDC");
+    const paySymbol = isPair ? payRaw! : "USDC";
+    const payAmount = data.amount ?? data.spendUsdc ?? (isPair ? 0.01 : 1);
+    const spendUsdc = payAmount;
+
+    const [asset, multiplier, payAssetRes] = await Promise.all([
       fetchXStockAsset(symbol),
       fetchXStockMultiplier(symbol),
+      isPair ? fetchXStockAsset(paySymbol) : Promise.resolve(null),
     ]);
+    const payAsset =
+      payAssetRes && typeof payAssetRes === "object" && "ok" in payAssetRes
+        ? payAssetRes
+        : null;
     const underlying = asset.ok
       ? asset.data.underlyingSymbol
       : symbol.replace(/x$/i, "").toUpperCase();
     const mint = asset.ok ? asset.data.solanaMint : null;
-    const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
+    const decimals =
+      asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
+    const payMint =
+      isPair && payAsset?.ok ? payAsset.data.solanaMint : null;
+    const payDecimals =
+      isPair && payAsset?.ok && payAsset.data.decimals != null
+        ? payAsset.data.decimals
+        : 8;
+    const notionalUsd = isPair
+      ? Math.min(25, Math.max(0.5, payAmount * 50))
+      : spendUsdc;
 
     const [equityRef, jupiterPrice, wash, pools, scaledUi] = await Promise.all([
       fetchEquityReferencePrice(underlying),
-      mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
-      evaluateWashGate({ symbol, mint, notionalUsd: spendUsdc }),
+      mint
+        ? fetchJupiterTokenPrice(mint)
+        : Promise.resolve(unavailablePrice("xstock_mint_missing")),
+      evaluateWashGate({ symbol, mint, notionalUsd }),
       mint
         ? fetchRaydiumPoolsForMint(mint)
         : Promise.resolve(errResult("api-v3.raydium.io", "xstock_mint_missing")),
@@ -305,23 +338,47 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
     ]);
     const pyth = pythOffShipPath();
 
-    const jupiter: AdapterResult<JupiterQuote> = !mint
-      ? {
-          ok: false,
-          mode: "unavailable",
-          asOf: new Date().toISOString(),
-          source: "api.jup.ag/swap/v1/quote",
-          reason: "xstock_mint_missing",
-          detail: "Cannot quote without Solana mint from xStocks deployments",
-        }
-      : await fetchJupiterQuote({
-          outputMint: mint,
-          amountRaw: Math.round(spendUsdc * 1_000_000),
-          slippageBps: 50,
-          outputDecimals: decimals,
-        });
+    let jupiter: AdapterResult<JupiterQuote>;
+    if (!mint) {
+      jupiter = {
+        ok: false,
+        mode: "unavailable",
+        asOf: new Date().toISOString(),
+        source: "api.jup.ag/swap/v1/quote",
+        reason: "xstock_mint_missing",
+        detail: "Cannot quote without Solana mint from xStocks deployments",
+      };
+    } else if (isPair && !payMint) {
+      jupiter = {
+        ok: false,
+        mode: "unavailable",
+        asOf: new Date().toISOString(),
+        source: "api.jup.ag/swap/v1/quote",
+        reason: "pay_mint_missing",
+        detail: `Cannot stock-pair quote without pay mint for ${paySymbol}`,
+      };
+    } else if (isPair && payMint === mint) {
+      jupiter = {
+        ok: false,
+        mode: "unavailable",
+        asOf: new Date().toISOString(),
+        source: "api.jup.ag/swap/v1/quote",
+        reason: "same_mint_pair",
+        detail: "Pay and receive must be different stocks",
+      };
+    } else {
+      jupiter = await fetchJupiterQuote({
+        inputMint: isPair && payMint ? payMint : undefined,
+        outputMint: mint,
+        amountRaw: Math.round(payAmount * 10 ** (isPair ? payDecimals : 6)),
+        slippageBps: 50,
+        outputDecimals: decimals,
+        inputDecimals: isPair ? payDecimals : 6,
+      });
+    }
 
-    const truthOk = multiplier.ok && asset.ok;
+    const truthOk =
+      multiplier.ok && asset.ok && (!isPair || Boolean(payAsset?.ok));
     const washOk = washAllowsSize(wash);
     const scaledUiCompare = compareApiOnchainMultiplier(
       multiplier.ok ? multiplier.data.currentMultiplier : null,
@@ -369,9 +426,20 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       scaledUi: scaledUiGate,
     });
 
+    const honestyNotes = [
+      ...gateMsgs.honestyNotes,
+      isPair
+        ? `Stock↔stock · ${paySymbol} → ${symbol} · Jupiter quote-only (not two USDC buys)`
+        : null,
+    ].filter(Boolean) as string[];
+
     return {
       symbol,
+      paySymbol,
       spendUsdc,
+      payAmount,
+      mode: isPair ? "stock-pair" : "usdc",
+      payAsset,
       asset,
       multiplier,
       pyth,
@@ -392,7 +460,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         scaledUiOk,
         canReview: gateMsgs.canReview,
         blockedReasons: gateMsgs.blockedReasons,
-        honestyNotes: gateMsgs.honestyNotes,
+        honestyNotes,
       },
     };
   });
@@ -513,6 +581,7 @@ export {
   bindWatchWallet,
   clearWatchWallet,
 } from "./desk.empire";
+export { getPreipoBundle, getTesseraBundle } from "./desk.markets";
 export type {
   PositionsBundle,
   CreditBundle,
@@ -523,3 +592,4 @@ export type {
   ActivityEvent,
 } from "./desk.empire";
 export type { DeskAccess } from "./auth/desk-access";
+export type { PreipoBundle, TesseraBundle } from "./desk.markets";

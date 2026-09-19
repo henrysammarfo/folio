@@ -106,18 +106,18 @@ export function parsePaperIntent(raw: string): AgentIntent {
 
   const compare =
     text.match(
-      /compare\s+([A-Za-z]{1,6}x?)\s+(?:vs|versus|and|\/)\s+([A-Za-z]{1,6}x?)(?:\s+(\d+(?:\.\d+)?))?/i,
+      /(?:compare|swap|pair)\s+([A-Za-z]{1,6}x?)\s+(?:vs|versus|and|\/|for|to|→|->)\s+([A-Za-z]{1,6}x?)(?:\s+(\d+(?:\.\d+)?))?/i,
     ) ??
     text.match(
-      /pair\s+([A-Za-z]{1,6}x?)\s+(?:vs|versus|and|\/)\s+([A-Za-z]{1,6}x?)(?:\s+(\d+(?:\.\d+)?))?/i,
+      /([A-Za-z]{1,6}x)\s*(?:→|->|to)\s*([A-Za-z]{1,6}x)(?:\s+(\d+(?:\.\d+)?))?/i,
     );
   if (compare?.[1] && compare[2]) {
-    const spend = compare[3] ? Math.min(Number(compare[3]), MAX_SPEND) : 1;
+    const spend = compare[3] ? Math.min(Number(compare[3]), MAX_SPEND) : 0.01;
     return {
       kind: "compare",
       left: normalizeXSymbol(compare[1]),
       right: normalizeXSymbol(compare[2]),
-      spendUsdc: Number.isFinite(spend) && spend > 0 ? spend : 1,
+      spendUsdc: Number.isFinite(spend) && spend > 0 ? spend : 0.01,
     };
   }
 
@@ -167,6 +167,65 @@ export function parsePaperIntent(raw: string): AgentIntent {
   }
 
   return { kind: "unknown", raw: text };
+}
+
+async function quoteStockPair(
+  paySymbol: string,
+  receiveSymbol: string,
+  payAmount: number,
+): Promise<{ out: number | null; note: string }> {
+  if (!isBuyableXStock(paySymbol) && findCatalogItem(paySymbol)) {
+    return {
+      out: null,
+      note: `${paySymbol} watchlist-only (cannot pay)`,
+    };
+  }
+  if (!isBuyableXStock(receiveSymbol) && findCatalogItem(receiveSymbol)) {
+    return {
+      out: null,
+      note: `${receiveSymbol} watchlist-only (cannot receive)`,
+    };
+  }
+  const [payAsset, recvAsset] = await Promise.all([
+    fetchXStockAsset(paySymbol),
+    fetchXStockAsset(receiveSymbol),
+  ]);
+  if (!payAsset.ok || !payAsset.data.solanaMint) {
+    return {
+      out: null,
+      note: `pay mint missing for ${paySymbol}`,
+    };
+  }
+  if (!recvAsset.ok || !recvAsset.data.solanaMint) {
+    return {
+      out: null,
+      note: `receive mint missing for ${receiveSymbol}`,
+    };
+  }
+  const payDecimals = payAsset.data.decimals ?? 8;
+  const recvDecimals = recvAsset.data.decimals ?? 8;
+  const quote = await fetchJupiterQuote({
+    inputMint: payAsset.data.solanaMint,
+    outputMint: recvAsset.data.solanaMint,
+    amountRaw: Math.round(payAmount * 10 ** payDecimals),
+    outputDecimals: recvDecimals,
+    inputDecimals: payDecimals,
+  });
+  if (!quote.ok) {
+    return {
+      out: null,
+      note: `${quote.reason}${quote.detail ? ` — ${quote.detail}` : ""}`,
+    };
+  }
+  const cacheLabel = quote.source.includes("stale")
+    ? "stale-cache"
+    : quote.source.includes("cached")
+      ? "cached"
+      : "live";
+  return {
+    out: quote.data.outUiAmount,
+    note: `${payAmount} ${paySymbol} → ≈${quote.data.outUiAmount.toFixed(6)} ${receiveSymbol} · ${cacheLabel} · never a fill`,
+  };
 }
 
 async function quoteLeg(
@@ -289,23 +348,23 @@ export async function fetchPaperAgentSpine(
   }
 
   if (intent.kind === "compare") {
-    const [left, right] = await Promise.all([
-      quoteLeg(intent.left, intent.spendUsdc),
-      quoteLeg(intent.right, intent.spendUsdc),
-    ]);
-    const note = `${intent.spendUsdc} USDC · ${intent.left}: ${left.note} · ${intent.right}: ${right.note} · never a fill`;
+    const leg = await quoteStockPair(
+      intent.left,
+      intent.right,
+      intent.spendUsdc,
+    );
     return {
       spine: {
         compare: {
           left: intent.left,
           right: intent.right,
           spendUsdc: intent.spendUsdc,
-          leftOut: left.out,
-          rightOut: right.out,
-          note,
+          leftOut: null,
+          rightOut: leg.out,
+          note: leg.note,
         },
       },
-      facts: `Compare: ${note}. ${broadcastNote}.`,
+      facts: `Stock↔stock ${intent.left} → ${intent.right}: ${leg.note}. ${broadcastNote}.`,
     };
   }
 
@@ -531,7 +590,7 @@ export async function runPaperAgent(
       nlExpansion: "off",
       nlExpansionNote: null,
       reply:
-        "Paper agent only. Try: `truth AAPLx` · `quote 25 USDC AAPLx` · `compare AAPLx vs MSFTx` · `credit` · `network` · `positions`. Broadcast is disabled.",
+        "Paper agent only. Try: `truth AAPLx` · `quote 25 USDC AAPLx` · `swap AAPLx to MSFTx` · `credit` · `network` · `positions`. Broadcast is disabled.",
     });
   }
 

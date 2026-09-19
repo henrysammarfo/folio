@@ -16,15 +16,17 @@ const VIDEO_SRC =
 const discover = [
   { label: "Desk", to: "/desk" as const },
   { label: "Buy", to: "/desk/acquire" as const },
+  { label: "Markets", to: "/markets" as const },
+  { label: "Pre-IPO", to: "/preipo" as const },
+  { label: "Pairs", to: "/pairs" as const },
   { label: "Borrow", to: "/desk/credit" as const },
-  { label: "Share counts", to: "/truth" as const },
-  { label: "Network", to: "/network" as const },
 ];
 
 const mission = [
   { label: "About", to: "/about" as const },
   { label: "Execution", to: "/execution" as const },
   { label: "Credit", to: "/credit" as const },
+  { label: "Network", to: "/network" as const },
   { label: "Open desk", to: "/desk" as const },
 ];
 

@@ -1,4 +1,4 @@
-/** Curated Solana xStock catalog — mega / IPO / meme lanes + compare pairs. */
+/** Curated Solana stock catalog — mega / IPO / meme lanes + true stock↔stock pairs. */
 
 export type XStockLane = "mega" | "ipo" | "meme";
 
@@ -11,6 +11,47 @@ export type XStockCatalogItem = {
   buyable: boolean;
   blurb?: string;
 };
+
+export type LaneMeta = {
+  id: XStockLane | "all" | "pairs";
+  label: string;
+  title: string;
+  body: string;
+};
+
+/** Lane copy — keeps Buy organized and honest about what each bucket is. */
+export const LANE_META: readonly LaneMeta[] = [
+  {
+    id: "all",
+    label: "All",
+    title: "Full desk catalog",
+    body: "Mega names, recent IPO-era listings, and high-beta meme stocks — each with a buyable or watchlist label.",
+  },
+  {
+    id: "mega",
+    label: "Mega",
+    title: "Mega-cap xStocks",
+    body: "Large liquid names (AAPL, NVDA, MSFT…). Best for USDC buys and stock↔stock pairs when you want deep Jupiter routes.",
+  },
+  {
+    id: "ipo",
+    label: "IPO",
+    title: "IPO & recent listings",
+    body: "Newer public names (Arm, Reddit…). Not private pre-IPO — those live on Pre-IPO (PreStocks) and Tessera desks. Verify mint before size.",
+  },
+  {
+    id: "meme",
+    label: "Meme",
+    title: "Meme & high-beta",
+    body: "Retail-driven names (GME…). Same wash + Scaled UI gates as mega — never a soft-sold fill. Watchlist rows stay non-buyable until mint is confirmed.",
+  },
+  {
+    id: "pairs",
+    label: "Pairs",
+    title: "Stock ↔ stock swaps",
+    body: "Pay one xStock, receive another (e.g. AAPLx → MSFTx). Quote-only on Jupiter — not two separate USDC buys glued together.",
+  },
+] as const;
 
 /** Popular + labeled IPO / meme lanes — logos at xstocks-metadata.backed.fi when present. */
 export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
@@ -26,14 +67,13 @@ export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
   { symbol: "CRWDx", name: "CrowdStrike xStock", underlying: "CRWD", lane: "mega", buyable: true },
   { symbol: "PLTRx", name: "Palantir xStock", underlying: "PLTR", lane: "mega", buyable: true },
   { symbol: "AVGOx", name: "Broadcom xStock", underlying: "AVGO", lane: "mega", buyable: true },
-  // IPO / recent-list lane — buyable when Backed mint exists; still honesty-labeled
   {
     symbol: "ARMXx",
     name: "Arm xStock",
     underlying: "ARM",
     lane: "ipo",
     buyable: true,
-    blurb: "Recent large IPO · verify mint before size",
+    blurb: "Recent large IPO · public listing · not PreStocks private",
   },
   {
     symbol: "RDDTx",
@@ -41,7 +81,7 @@ export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
     underlying: "RDDT",
     lane: "ipo",
     buyable: true,
-    blurb: "IPO-era name · quote-only until fill gate opens",
+    blurb: "IPO-era public name · quote-only until fill gate opens",
   },
   {
     symbol: "CMBGx",
@@ -51,7 +91,6 @@ export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
     buyable: false,
     blurb: "Watchlist · mint not confirmed on desk",
   },
-  // Meme / high-beta lane — honest labels, not hype fills
   {
     symbol: "GMEXx",
     name: "GameStop xStock",
@@ -78,19 +117,95 @@ export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
   },
 ] as const;
 
-/** Suggested compare pairs for the Buy desk (USDC→A vs USDC→B quotes). */
-export const XSTOCK_COMPARE_PAIRS: readonly {
-  left: string;
-  right: string;
+/**
+ * True stock↔stock swap presets — Jupiter inputMint = left, outputMint = right.
+ * Distinct from side-by-side USDC compares.
+ */
+export const XSTOCK_SWAP_PAIRS: readonly {
+  pay: string;
+  receive: string;
   label: string;
+  group: "mega" | "ipo" | "meme" | "cross";
+  blurb: string;
 }[] = [
-  { left: "AAPLx", right: "MSFTx", label: "Mega tech" },
-  { left: "NVDAx", right: "AVGOx", label: "AI semis" },
-  { left: "TSLAx", right: "HOODx", label: "Retail beta" },
-  { left: "COINx", right: "HOODx", label: "Brokerage" },
-  { left: "ARMXx", right: "NVDAx", label: "IPO vs mega" },
-  { left: "GMEXx", right: "AAPLx", label: "Meme vs mega" },
+  {
+    pay: "AAPLx",
+    receive: "MSFTx",
+    label: "AAPL → MSFT",
+    group: "mega",
+    blurb: "Mega tech rotation without selling to cash first",
+  },
+  {
+    pay: "NVDAx",
+    receive: "AVGOx",
+    label: "NVDA → AVGO",
+    group: "mega",
+    blurb: "AI semis pair — pay NVIDIA, receive Broadcom",
+  },
+  {
+    pay: "TSLAx",
+    receive: "HOODx",
+    label: "TSLA → HOOD",
+    group: "mega",
+    blurb: "Retail beta: Tesla into Robinhood exposure",
+  },
+  {
+    pay: "COINx",
+    receive: "HOODx",
+    label: "COIN → HOOD",
+    group: "mega",
+    blurb: "Brokerage lane: Coinbase into Robinhood",
+  },
+  {
+    pay: "ARMXx",
+    receive: "NVDAx",
+    label: "ARM → NVDA",
+    group: "ipo",
+    blurb: "IPO-era Arm into mega NVIDIA — still public xStocks",
+  },
+  {
+    pay: "RDDTx",
+    receive: "METAx",
+    label: "RDDT → META",
+    group: "ipo",
+    blurb: "Social IPO into Meta mega-cap",
+  },
+  {
+    pay: "GMEXx",
+    receive: "AAPLx",
+    label: "GME → AAPL",
+    group: "meme",
+    blurb: "Meme high-beta into mega Apple — gates still apply",
+  },
+  {
+    pay: "GMEXx",
+    receive: "TSLAx",
+    label: "GME → TSLA",
+    group: "meme",
+    blurb: "Meme into Tesla retail beta",
+  },
+  {
+    pay: "AAPLx",
+    receive: "GMEXx",
+    label: "AAPL → GME",
+    group: "cross",
+    blurb: "Mega into meme — labeled high-beta receive side",
+  },
+  {
+    pay: "NVDAx",
+    receive: "ARMXx",
+    label: "NVDA → ARM",
+    group: "cross",
+    blurb: "Mega into IPO-era Arm",
+  },
 ] as const;
+
+/** @deprecated Use XSTOCK_SWAP_PAIRS — kept for agent pair-hint shorthand. */
+export const XSTOCK_COMPARE_PAIRS = XSTOCK_SWAP_PAIRS.map((p) => ({
+  left: p.pay,
+  right: p.receive,
+  label: p.label,
+}));
 
 export function xStockLogoUrl(symbol: string): string {
   return `https://xstocks-metadata.backed.fi/logos/tokens/${encodeURIComponent(symbol)}.png`;
@@ -109,4 +224,15 @@ export function isBuyableXStock(symbol: string): boolean {
 export function catalogByLane(lane: XStockLane | "all"): readonly XStockCatalogItem[] {
   if (lane === "all") return XSTOCK_CATALOG;
   return XSTOCK_CATALOG.filter((s) => s.lane === lane);
+}
+
+export function laneMeta(id: LaneMeta["id"]): LaneMeta {
+  return LANE_META.find((l) => l.id === id) ?? LANE_META[0]!;
+}
+
+export function swapPairsByGroup(
+  group: "all" | "mega" | "ipo" | "meme" | "cross",
+): typeof XSTOCK_SWAP_PAIRS {
+  if (group === "all") return XSTOCK_SWAP_PAIRS;
+  return XSTOCK_SWAP_PAIRS.filter((p) => p.group === group);
 }

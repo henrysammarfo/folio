@@ -66,7 +66,8 @@ function Home() {
             </div>
             <nav className="home-top-nav" aria-label="Marketing">
               <Link to="/truth">Truth</Link>
-              <Link to="/execution">Execution</Link>
+              <Link to="/markets">Markets</Link>
+              <Link to="/preipo">Pre-IPO</Link>
               <Link to="/credit">Credit</Link>
               <Link to="/about">About</Link>
             </nav>

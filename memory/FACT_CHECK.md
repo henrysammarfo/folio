@@ -1,4 +1,15 @@
 
+## 2026-09-19 — Stock pairs + Pre-IPO claims
+
+| Claim | Status |
+|---|---|
+| Stock↔stock is true Jupiter input→output mint | Verified — `getAcquireBundle` paySymbol + live AAPLx→MSFTx quote |
+| IPO lane = public recent listings (not private) | Verified — copy + PreStocks/Tessera separate desks |
+| PreStocks catalog live | Verified — prestocks.com/api/prestocks |
+| Tessera T-tokens live | Verified — rest-api.tessera.pe token-details |
+| Stocklana deadline 25 Sep 2026 4pm ET | CONFIRMED — hackathon site / Gate news extension |
+| PreStocks bounty forbids non-PreStocks pre-IPO mix | Honored — PreStocks desk only |
+
 ## 2026-09-19 — Routes / tenancy / depth claims
 
 | Claim | Status |

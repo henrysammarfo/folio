@@ -69,7 +69,13 @@ describe("parsePaperIntent", () => {
       kind: "compare",
       left: "AAPLx",
       right: "MSFTx",
-      spendUsdc: 1,
+      spendUsdc: 0.01,
+    });
+    expect(parsePaperIntent("swap NVDAx to AVGOx 0.05")).toEqual({
+      kind: "compare",
+      left: "NVDAx",
+      right: "AVGOx",
+      spendUsdc: 0.05,
     });
     expect(parsePaperIntent("pair NVDAx / AVGOx 5")).toEqual({
       kind: "compare",

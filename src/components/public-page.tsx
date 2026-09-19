@@ -4,9 +4,10 @@ import { LandingGlassFooter } from "./landing-glass-footer";
 
 const nav = [
   ["Truth", "/truth"],
+  ["Markets", "/markets"],
   ["Execution", "/execution"],
   ["Credit", "/credit"],
-  ["Network", "/network"],
+  ["Pre-IPO", "/preipo"],
   ["About", "/about"],
 ] as const;
 

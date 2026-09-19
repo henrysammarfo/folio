@@ -1,19 +1,23 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-19 · Stocklana deadline **2026-09-18 20:00 UTC**
+> Updated: 2026-09-19 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
 > Doctrine: honest security only — **never claim unhackable / NK-proof**.
 
 ## Marketing / landing (product)
 
-- Landing: liquid stencil hero + Falcon-style triptych + **BenefitsSection** + **GlowingFeaturesSection** + **LandingGlassFooter** (liquid-glass template).
-- Marketing PublicShell: per-page `tone` (truth / execution / credit / network / about / legal) + glass footer on all public pages (not one sloppy shell).
+- Landing: liquid stencil hero + Falcon-style triptych + **BenefitsSection** + **GlowingFeaturesSection** + **LandingGlassFooter**.
+- Marketing PublicShell tones + glass footer; new routes **/markets**, **/preipo**, **/pairs**.
 
 ## Desk UI (product)
 
-- Buy: Mega / IPO / Meme lanes + watchlist honesty (`buyable`) + **compare pairs** strip (dual Jupiter quotes).
-- Soft access banner on desk chrome; Account workspace/tenant switcher when multi-member.
-- Paper agent: hard-gated to signed session; intents truth/quote/**compare**/credit/network/positions.
-- Bootstrap demo: hard-gated behind `FOLIO_ALLOW_BOOTSTRAP_DEMO=1`.
+- Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
+- **/desk/markets** map · **/desk/preipo** PreStocks-only · **/desk/tessera** T-tokens (bounty tracks separated).
+- Soft access banner; Account tenant switcher; agent session-gated.
+
+## Stocklana (live)
+
+- Deadline extended to **25 Sep 2026 16:00 ET**; prize pool ~$126k; tracks include PreStocks, Tessera, Clawpump, Meteora DBC, Pyth.
+- FOLIO wedge: honest share counts + safe routes + credit + stock pairs + PreStocks/Tessera desks.
 
 ## Product lock
 
