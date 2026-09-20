@@ -62,28 +62,19 @@ function Page() {
         />
       </div>
 
-      <section className="mkt-aside-band">
+      <section className="mkt-block">
         <h2>What “IPO lane” is not</h2>
         <p>
           Buy → <b>IPO</b> is for <em>public</em> recent listings (Arm, Reddit
           xStocks). Private companies are PreStocks / Tessera — never silently
           mixed into the public IPO chip.
         </p>
+        <p className="mkt-links">
+          <Link to="/desk/preipo">Open PreStocks desk →</Link>
+          <Link to="/desk/tessera">Tessera desk →</Link>
+          <Link to="/markets">Full market map →</Link>
+        </p>
       </section>
-
-      <p className="mt-6 text-sm">
-        <Link to="/desk/preipo" className="underline">
-          Open PreStocks desk →
-        </Link>
-        {" · "}
-        <Link to="/desk/tessera" className="underline">
-          Tessera desk →
-        </Link>
-        {" · "}
-        <Link to="/markets" className="underline">
-          Full market map →
-        </Link>
-      </p>
     </PublicShell>
   );
 }

@@ -24,31 +24,31 @@ function Page() {
       title="Pay Apple. Receive Microsoft. One route."
       intro="Pair mode on Buy sets Jupiter’s input mint to the stock you pay and the output mint to the stock you receive. That is not two USDC buys glued together — it is a single quote-only path."
     >
-      <div className="three-features">
-        <article>
+      <ol className="mkt-stack">
+        <li>
           <h2>Mega rotations</h2>
           <p>
             AAPL → MSFT, NVDA → AVGO, COIN → HOOD — liquid names for clean pair
             discovery.
           </p>
-        </article>
-        <article>
+        </li>
+        <li>
           <h2>IPO ↔ mega</h2>
           <p>
             ARM → NVDA, RDDT → META — recent public listings into mega-cap
             exposure. Still xStocks, not PreStocks private.
           </p>
-        </article>
-        <article>
+        </li>
+        <li>
           <h2>Meme ↔ mega</h2>
           <p>
             GME → AAPL / TSLA — high-beta into calmer mega. Same wash + Scaled UI
             gates; never a soft-sold fill.
           </p>
-        </article>
-      </div>
+        </li>
+      </ol>
 
-      <section className="mkt-aside-band">
+      <section className="mkt-block">
         <h2>Preset board</h2>
         <ul className="mkt-pair-list">
           {XSTOCK_SWAP_PAIRS.map((p) => (
@@ -58,10 +58,8 @@ function Page() {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-sm">
-          <Link to="/desk/acquire" className="underline">
-            Trade pairs on Buy →
-          </Link>
+        <p className="mkt-links">
+          <Link to="/desk/acquire">Trade pairs on Buy →</Link>
         </p>
       </section>
     </PublicShell>

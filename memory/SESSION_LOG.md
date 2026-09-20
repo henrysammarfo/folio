@@ -1,5 +1,11 @@
 
-## 2026-09-19 — Stock↔stock pairs + PreStocks/Tessera + missing routes
+## 2026-09-20 — Marketing + desk slop redo
+
+- Killed PublicShell pill nav, dark intros, three-features/metric card walls, Benefits + Glow landing sections.
+- Brand-first home hero (FOLIO signal + headline + CTA in first viewport); editorial strip; light mkt atmosphere.
+- Desk: square lane filters; markets pair links as list not cards; truth badge cluster trimmed.
+- Branch: `cursor/folio-marketing-desk-redo-f1ec`.
+
 
 - Buy Pairs tab: true Jupiter stock↔stock (pay mint → receive mint), lane explainers for Mega/IPO/Meme.
 - New desk: `/desk/markets`, `/desk/preipo` (PreStocks-only), `/desk/tessera`.

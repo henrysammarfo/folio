@@ -7,12 +7,14 @@ export const Route = createFileRoute("/about")({
       { title: "About — FOLIO" },
       {
         name: "description",
-        content: "Doctrine and builder behind FOLIO — Accra, fail-closed, built for years.",
+        content:
+          "Doctrine and builder behind FOLIO — Accra, fail-closed, built for years.",
       },
       { property: "og:title", content: "About — FOLIO" },
       {
         property: "og:description",
-        content: "Doctrine and builder behind FOLIO — Accra, fail-closed, built for years.",
+        content:
+          "Doctrine and builder behind FOLIO — Accra, fail-closed, built for years.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -48,7 +50,7 @@ function Page() {
         </div>
       </div>
 
-      <section className="about-vision mt-10">
+      <section className="about-vision">
         <h2>Why this desk</h2>
         <p>
           Tokenized US stocks on Solana break when corporate actions, wash flow,
@@ -75,25 +77,13 @@ function Page() {
             trust.
           </li>
         </ol>
-        <p className="mt-4 text-sm opacity-80">
-          <Link to="/whitepaper" className="underline">
-            Whitepaper
-          </Link>
-          {" · "}
-          <Link to="/beta" className="underline">
-            Closed beta
-          </Link>
-          {" · "}
-          <Link to="/network" className="underline">
-            Network honesty
-          </Link>
-          {" · "}
-          <Link to="/desk" className="underline">
-            Open desk
-          </Link>
+        <p className="mkt-links">
+          <Link to="/whitepaper">Whitepaper</Link>
+          <Link to="/beta">Closed beta</Link>
+          <Link to="/network">Network honesty</Link>
+          <Link to="/desk">Open desk</Link>
         </p>
       </section>
     </PublicShell>
   );
 }
-
