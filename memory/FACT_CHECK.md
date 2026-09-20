@@ -7,6 +7,8 @@
 | Open App = email/social embedded or connect Phantom/Solflare | Implemented — header + Account Sign in |
 | Account link wallet + export key with ack warnings | Implemented — `AccountCustodyPanel` |
 | Nested PrivyProvider removed from session mint | Verified — uses shell context |
+| Privy Solana peers (`@solana/kit`, program packages) required for `/solana` import | Verified — desk blank without them |
+| Localhost Open App modal needs Privy Allowed Origins | Residual — CSP frame-ancestors prod-only until allowlisted |
 
 ## 2026-09-20 — Phase A Jupiter V2 + ecosystem
 
