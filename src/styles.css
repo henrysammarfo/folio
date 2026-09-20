@@ -1669,7 +1669,20 @@ button.fx-swap-mid:disabled{opacity:.4;cursor:default}
 .mkt-intro-compact h1{font-size:clamp(1.6rem,3.2vw,2.2rem);max-width:28ch}
 .mkt-lede{margin:.9rem 0 0;max-width:38rem;font-size:1.02rem;line-height:1.55;color:var(--mkt-muted)}
 .mkt-intro-aside{min-width:0}
-.mkt-status-col{display:flex;flex-direction:column;align-items:flex-start;gap:.45rem}
+.mkt-status-col{display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;padding:0;border:0;background:transparent}
+.mkt-status-line{
+  display:grid;grid-template-columns:auto 1fr;gap:.55rem;align-items:baseline;
+  font-size:.78rem;letter-spacing:.02em;color:var(--mkt-muted);
+}
+.mkt-status-line b{font-weight:650;color:var(--mkt-ink);font-size:.8rem;letter-spacing:0}
+.mkt-status-line[data-ok="true"] b{color:#066A84}
+.mkt-status-line[data-ok="false"] b{color:#8A5A00}
+.mkt-eyebrow-row{
+  display:inline-flex;align-items:baseline;gap:.55rem;
+  font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mkt-brand);font-weight:650;
+  margin:0 0 .65rem;
+}
+.mkt-eyebrow-row em{font-style:normal;color:var(--mkt-muted);font-weight:550;letter-spacing:.04em}
 .mkt-body{padding:clamp(1.75rem,4vw,2.75rem) 0 3.5rem}
 .mkt-sec{padding:1.75rem 0;border-top:1px solid var(--mkt-line)}
 .mkt-sec:first-child{border-top:0;padding-top:0}
@@ -1723,10 +1736,15 @@ button.fx-swap-mid:disabled{opacity:.4;cursor:default}
 .mkt .metric span{font-size:.76rem;color:var(--mkt-muted);line-height:1.4}
 .mkt .protocol-list{display:grid;gap:0;margin-top:.25rem;border-top:1px solid var(--mkt-line)}
 .mkt .protocol-list > div{
-  display:grid;grid-template-columns:7rem auto 1fr;gap:.75rem 1rem;align-items:center;
+  display:grid;grid-template-columns:7rem 8.5rem 1fr;gap:.75rem 1rem;align-items:center;
   padding:1rem 0;border-bottom:1px solid var(--mkt-line);
 }
 .mkt .protocol-list span{font-weight:700;font-size:.85rem}
+.mkt .protocol-list em{
+  font-style:normal;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;
+  color:#8A5A00;font-weight:650;
+}
+.mkt .protocol-list em[data-ok="true"]{color:#066A84}
 .mkt .protocol-list b{font-weight:550;font-size:.85rem;color:var(--mkt-muted)}
 .mkt .legal-doc h2{font-size:1.05rem;margin:1.5rem 0 .45rem}
 .mkt .legal-doc p{color:var(--mkt-muted);line-height:1.55}

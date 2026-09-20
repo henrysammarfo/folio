@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PublicShell, MktSection } from "@/components/public-page";
-import { StatusBadge } from "@/components/folio-brand";
 import { getNetworkBundle } from "@/lib/desk.functions";
 
 export const Route = createFileRoute("/execution")({
@@ -54,22 +53,27 @@ function Page() {
       title="Every gate is labeled. Missing signals stop the path."
       intro="FOLIO compares reference pricing, venue liquidity, and linked-flow pressure before offering a quote. Green means the live check returned and cleared its band — not a guarantee. Broadcast stays off on the ≤~$1 Stocklana budget."
       aside={
-        <div className="mkt-status-col">
-          <StatusBadge tone={wash?.mode === "mainnet-read" ? "green" : "amber"}>
-            Wash · {wash?.mode ?? "unavailable"}
-          </StatusBadge>
-          <StatusBadge
-            tone={
-              quote?.mode === "quote-only" || quote?.mode === "mainnet-read"
-                ? "blue"
-                : "amber"
-            }
+        <div className="mkt-status-col" aria-label="Execution status">
+          <div
+            className="mkt-status-line"
+            data-ok={String(wash?.mode === "mainnet-read")}
           >
-            Quote · {quote?.mode ?? "unavailable"}
-          </StatusBadge>
-          <StatusBadge tone={broadcastPaused ? "neutral" : "amber"}>
-            {broadcastPaused ? "Broadcast paused" : "Broadcast armed"}
-          </StatusBadge>
+            <b>Wash</b>
+            <span>{wash?.mode ?? "unavailable"}</span>
+          </div>
+          <div
+            className="mkt-status-line"
+            data-ok={String(
+              quote?.mode === "quote-only" || quote?.mode === "mainnet-read",
+            )}
+          >
+            <b>Quote</b>
+            <span>{quote?.mode ?? "unavailable"}</span>
+          </div>
+          <div className="mkt-status-line" data-ok={String(broadcastPaused)}>
+            <b>Broadcast</b>
+            <span>{broadcastPaused ? "Paused" : "Armed"}</span>
+          </div>
         </div>
       }
     >

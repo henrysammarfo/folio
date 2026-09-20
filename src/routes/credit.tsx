@@ -3,7 +3,6 @@ import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PublicShell, Metric } from "@/components/public-page";
-import { StatusBadge } from "@/components/folio-brand";
 import { getCreditBundle } from "@/lib/desk.functions";
 
 export const Route = createFileRoute("/credit")({
@@ -115,13 +114,13 @@ function Page() {
       <div className="protocol-list">
         <div>
           <span>Kamino</span>
-          <StatusBadge tone={data?.kamino.ok ? "green" : "amber"}>
+          <em data-ok={String(Boolean(data?.kamino.ok))}>
             {data?.kamino.ok
               ? "Mainnet read"
               : data && !data.kamino.ok
                 ? data.kamino.reason
                 : "…"}
-          </StatusBadge>
+          </em>
           <b>
             {data?.kamino.ok
               ? `${data.kamino.data.reserves.length} xStocks reserves · AAPLx LTV ${
@@ -132,24 +131,24 @@ function Page() {
         </div>
         <div>
           <span>Jupiter Lend</span>
-          <StatusBadge tone={data?.jupiterLend.ok ? "blue" : "amber"}>
+          <em data-ok={String(Boolean(data?.jupiterLend.ok))}>
             {data?.jupiterLend.ok
               ? "Earn vaults"
               : data && !data.jupiterLend.ok
                 ? data.jupiterLend.reason
                 : "…"}
-          </StatusBadge>
+          </em>
           <b>Earn vaults observed — not an xStock borrow path</b>
         </div>
         <div>
           <span>Nest.credit</span>
-          <StatusBadge tone={data?.nestCredit.ok ? "green" : "amber"}>
+          <em data-ok={String(Boolean(data?.nestCredit.ok))}>
             {data?.nestCredit.ok
               ? `${data.nestCredit.data.vaultCount} vaults`
               : data && !data.nestCredit.ok
                 ? data.nestCredit.reason
                 : "…"}
-          </StatusBadge>
+          </em>
           <b>
             {data?.nestCredit.ok
               ? `Indexed TVL ~$${Math.round(data.nestCredit.data.totalTvlUsd).toLocaleString()} · ${data.nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
@@ -158,7 +157,7 @@ function Page() {
         </div>
         <div>
           <span>NestUSD</span>
-          <StatusBadge tone="amber">{nestDetail}</StatusBadge>
+          <em data-ok="false">{nestDetail}</em>
           <b>Capacity hidden until verified NestUSD borrow metrics</b>
         </div>
       </div>

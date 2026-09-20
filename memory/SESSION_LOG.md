@@ -1,4 +1,10 @@
 
+## 2026-09-20 — Marketing layout polish (no pills)
+
+- Truth / Execution / Credit: replace ModeBadge/StatusBadge clusters with `mkt-status-line` + protocol `em` status.
+- Keeps ledger/metrics; drops pill walls on public marketing pages.
+- PR #21 on `cursor/folio-mkt-layout-redo-f1ec`.
+
 ## 2026-09-20 — Marketing layout system redo
 
 - Landing: keep stencil-only viewport; rebuild below-fold as pitch → numbered path → desk entry; drop glass video footer.
