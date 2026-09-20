@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowDownUp } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowDownUp, ChevronDown, Settings2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { TradingViewChart } from "@/components/tradingview-chart";
@@ -19,8 +19,14 @@ import {
 
 const USDC_CHIPS = ["1", "5", "10", "25"] as const;
 const PAIR_CHIPS = ["0.01", "0.05", "0.1", "0.25"] as const;
+const SLIPPAGE_CHIPS = [
+  { id: "50", label: "0.5%", bps: 50 },
+  { id: "100", label: "1%", bps: 100 },
+  { id: "200", label: "2%", bps: 200 },
+] as const;
 
 type Tab = XStockLane | "all" | "pairs";
+type GasPref = "best" | "usdc" | "sol";
 
 export const Route = createFileRoute("/desk/acquire")({
   head: () => ({
@@ -46,6 +52,19 @@ function Page() {
   const [honeypot, setHoneypot] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [reviewed, setReviewed] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [slippageBps, setSlippageBps] = useState(50);
+  const [gasPref, setGasPref] = useState<GasPref>("best");
+
+  useEffect(() => {
+    if (!settingsOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSettingsOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [settingsOpen]);
 
   const isPair = pay !== "USDC";
   const payAmount = Number(amount);
@@ -100,6 +119,11 @@ function Page() {
   });
 
   const out = data?.jupiter.ok ? data.jupiter.data.outUiAmount.toFixed(6) : null;
+  const impactPct =
+    data?.jupiter.ok && data.jupiter.data.priceImpactPct != null
+      ? Number(data.jupiter.data.priceImpactPct)
+      : null;
+  const routeHops = data?.jupiter.ok ? data.jupiter.data.routePlanLength : null;
   const canBuy =
     Boolean(data?.gates.canReview) &&
     !isFetching &&
@@ -156,12 +180,19 @@ function Page() {
       <section className="fx-buy fx-page">
         <div className="fx-buy-stack">
           <div className="fx-card fx-buy-chart">
-            <TradingViewChart
-              symbol={receive}
-              height={380}
-              interval="60"
-              theme="light"
-            />
+            <div className="fx-buy-chart-stage">
+              <TradingViewChart
+                symbol={receive}
+                height={380}
+                interval="60"
+                theme="light"
+                hideAttr
+              />
+              <div className="fx-buy-chart-mark" aria-hidden>
+                <img src="/folio-mark.svg" alt="" />
+                <span>FOLIO</span>
+              </div>
+            </div>
           </div>
 
           <div className="fx-card fx-picker">
@@ -303,19 +334,32 @@ function Page() {
         </div>
 
         <aside className="fx-card fx-ticket">
-          <div>
-            <p className="fx-hero-kicker">
-              {isPair ? "Stock ↔ stock" : "Swap"}
-            </p>
-            <h1>
-              {isPair ? `${pay} → ${selected.symbol}` : `USDC → ${selected.symbol}`}
-            </h1>
-            <p className="fx-ticket-sub">
-              {isPair
-                ? "True Jupiter pair route · fills paused"
-                : selected.blurb ??
-                  "Live Jupiter quote · fills pause until enabled"}
-            </p>
+          <div className="fx-ticket-top">
+            <div>
+              <p className="fx-hero-kicker">
+                {isPair ? "Stock ↔ stock" : "Swap"}
+              </p>
+              <h1>
+                {isPair
+                  ? `${pay} → ${selected.symbol}`
+                  : `USDC → ${selected.symbol}`}
+              </h1>
+              <p className="fx-ticket-sub">
+                {isPair
+                  ? "True Jupiter pair route · fills paused"
+                  : selected.blurb ??
+                    "Live Jupiter quote · fills pause until enabled"}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="fx-sheet-gear"
+              aria-label="Swap settings"
+              data-testid="acquire-settings"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <Settings2 size={18} strokeWidth={2.1} />
+            </button>
           </div>
 
           <div className="fx-mode-row" role="group" aria-label="Pay with">
@@ -433,6 +477,57 @@ function Page() {
             ))}
           </div>
 
+          <div className="fx-swap-sheet" data-testid="acquire-swap-sheet">
+            <button
+              type="button"
+              className={`fx-swap-sheet-toggle${detailsOpen ? " is-open" : ""}`}
+              aria-expanded={detailsOpen}
+              onClick={() => setDetailsOpen((v) => !v)}
+            >
+              <span>Details</span>
+              <em>
+                {slippageBps / 100}% · paused
+              </em>
+              <ChevronDown size={16} strokeWidth={2.2} />
+            </button>
+            {detailsOpen ? (
+              <dl className="fx-swap-sheet-body">
+                <div>
+                  <dt>Route</dt>
+                  <dd>
+                    {data?.jupiter.ok
+                      ? `${routeHops ?? "—"} · Jupiter`
+                      : isFetching
+                        ? "…"
+                        : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Impact</dt>
+                  <dd>
+                    {impactPct != null && Number.isFinite(impactPct)
+                      ? `${impactPct.toFixed(2)}%`
+                      : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Gas</dt>
+                  <dd>
+                    {gasPref === "usdc"
+                      ? "USDC only"
+                      : gasPref === "sol"
+                        ? "SOL"
+                        : "USDC + SOL"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Fill</dt>
+                  <dd>Paused</dd>
+                </div>
+              </dl>
+            ) : null}
+          </div>
+
           <label className="hp-field" aria-hidden="true">
             Website
             <input
@@ -546,6 +641,84 @@ function Page() {
           </p>
         </aside>
       </section>
+
+      {settingsOpen ? (
+        <div
+          className="fx-sheet-overlay"
+          role="presentation"
+          onClick={() => setSettingsOpen(false)}
+        >
+          <div
+            className="fx-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="fx-sheet-title"
+            data-testid="acquire-settings-sheet"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <header className="fx-sheet-head">
+              <h2 id="fx-sheet-title">Swap settings</h2>
+              <button
+                type="button"
+                className="fx-sheet-close"
+                aria-label="Close settings"
+                onClick={() => setSettingsOpen(false)}
+              >
+                <X size={18} strokeWidth={2.2} />
+              </button>
+            </header>
+
+            <section className="fx-sheet-section">
+              <h3>Slippage</h3>
+              <div className="fx-chip-row">
+                {SLIPPAGE_CHIPS.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className={`fx-chip${slippageBps === c.bps ? " is-on" : ""}`}
+                    onClick={() => setSlippageBps(c.bps)}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="fx-sheet-section">
+              <h3>Gas</h3>
+              <div className="fx-gas-prefs" role="radiogroup" aria-label="Gas">
+                {(
+                  [
+                    ["best", "Best", "USDC + SOL"],
+                    ["usdc", "USDC only", "Gasless ≥~$10"],
+                    ["sol", "SOL", "Pay gas in SOL"],
+                  ] as const
+                ).map(([id, title, blurb]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="radio"
+                    aria-checked={gasPref === id}
+                    className={`fx-gas-pref${gasPref === id ? " is-on" : ""}`}
+                    onClick={() => setGasPref(id)}
+                  >
+                    <strong>{title}</strong>
+                    <span>{blurb}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <button
+              type="button"
+              className="fx-btn fx-btn-primary fx-btn-block"
+              onClick={() => setSettingsOpen(false)}
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      ) : null}
     </DeskShell>
   );
 }

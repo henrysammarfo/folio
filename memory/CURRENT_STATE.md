@@ -14,13 +14,17 @@
 ## Desk UI (product)
 
 - Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
-- **/desk/markets** live Jupiter board (venue + liq + session + vs-ref) — square lane filters, list-style pairs.
+- Buy **Netro-depth**: short Details (route/impact/gas/fill) + settings (slippage + gas chips). Fills still paused.
+- **/desk/markets** live Jupiter board + **flow strip** (quick Buy chips) — square lane filters, list-style pairs.
+- Netro overview: **FOLIO watermark** over TradingView (NetroBNB CryptoMarketCard pattern) · tight Buy sheet · AI modal.
+- Live-trade research: `docs/LIVE_TRADE_NO_PROGRAM.md` — no FOLIO program; Jupiter Swap V2 gasless / JupiterZ / later Kora; each tester brings own ~$10.
 - **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
 - Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).
 - Soft access banner; Account tenant switcher; agent session-gated.
 - **/whitepaper** · **/beta** waitlist · docs: `FOLIO_WHITEPAPER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
 - Human wash copy (no raw `bitquery_*` in PreStocks/Tessera consumer UI).
+- Branch (active): `cursor/folio-netro-desk-depth-f1ec`.
 
 ## Launch path (Stocklana → Colosseum → beta)
 

@@ -35,12 +35,15 @@ export function TradingViewChart({
   height = 420,
   interval = "60",
   theme = "light",
+  hideAttr = false,
 }: {
   /** FOLIO xStock (AAPLx) or raw TV symbol (NASDAQ:AAPL). */
   symbol: string;
   height?: number;
   interval?: string;
   theme?: "light" | "dark";
+  /** Hide FOLIO attr row (TradingView widget keeps its own credit). */
+  hideAttr?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -57,7 +60,7 @@ export function TradingViewChart({
 
     const widgetHost = document.createElement("div");
     widgetHost.className = "tradingview-widget-container__widget";
-    widgetHost.style.height = "calc(100% - 28px)";
+    widgetHost.style.height = hideAttr ? "100%" : "calc(100% - 28px)";
     widgetHost.style.width = "100%";
     container.appendChild(widgetHost);
 
@@ -90,7 +93,7 @@ export function TradingViewChart({
     return () => {
       container.innerHTML = "";
     };
-  }, [mounted, tvSymbol, interval, theme]);
+  }, [mounted, tvSymbol, interval, theme, hideAttr]);
 
   return (
     <div
@@ -111,16 +114,18 @@ export function TradingViewChart({
         ref={containerRef}
         style={{ height: "100%", width: "100%" }}
       />
-      <p className="folio-tv-chart-attr">
-        <a
-          href={`https://www.tradingview.com/symbols/${tvSymbol.replace(":", "-")}/`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {tvSymbol} chart
-        </a>{" "}
-        by TradingView
-      </p>
+      {hideAttr ? null : (
+        <p className="folio-tv-chart-attr">
+          <a
+            href={`https://www.tradingview.com/symbols/${tvSymbol.replace(":", "-")}/`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {tvSymbol} chart
+          </a>{" "}
+          by TradingView
+        </p>
+      )}
     </div>
   );
 }

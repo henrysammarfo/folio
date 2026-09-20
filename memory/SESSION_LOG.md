@@ -1,4 +1,21 @@
 
+# FOLIO — SESSION LOG
+
+## 2026-09-20 — FOLIO chart watermark + copy strip (NetroBNB)
+
+- Cloned NetroBNB `CryptoMarketCard`: brand mark dead-center **over** TradingView stage (`z-index:10`), not behind the iframe / not centered on stats+icons.
+- Overview + Buy desk both show FOLIO watermark; density chart hides extra attr row.
+- Cut wordy swap/gas paragraphs; Details = Route / Impact / Gas / Fill only; left rail cards shortened.
+- Branch: `cursor/folio-netro-desk-depth-f1ec` · PR #26.
+
+## 2026-09-20 — Netro-depth desk + live-trade gas research
+
+- Research (docs-verified): Jupiter Swap V2 `/order` gasless (auto ≥~$10 + &lt;0.01 SOL · JupiterZ MM · integrator `payer` skip for beta); Kora later; no FOLIO program; each tester brings own ~$10. Wrote `docs/LIVE_TRADE_NO_PROGRAM.md`.
+- **Conclusion:** USDC + tiny SOL = best; USDC-only OK via Jupiter gasless ≥~$10; SOL-native OK; no FOLIO program / no sponsor others.
+- Buy page: swap details sheet + settings. Markets page: flow strip.
+- **Overview deepened:** chart symbol tabs + icon strip · Buy swap sheet (chips + details + gas note) · AI rail mark + expand modal (share/quote/borrow/buy).
+- Branch: `cursor/folio-netro-desk-depth-f1ec` · PR #26.
+
 ## 2026-09-20 — Nexeus cinematic landing + marketing
 
 - Pixel-exact Nexeus standalone at `public/nexeus/index.html` (video/poster/scrim/entrance per spec).
