@@ -1,6 +1,14 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Phase D route protection · rate limits · speed
+
+- Hard-gate `executeJupiterSwap` on verified `folio_session` (+ existing prefs/agent gates).
+- In-memory sliding-window rate limits: quote · execute · agent · waitlist (user id or IP).
+- Beta join calls rate-limited `joinBetaWaitlist` before localStorage write.
+- Shared `["session-bundle"]` query key for Open App + Account (fewer duplicate fetches).
+- Branch: `cursor/folio-phase-d-route-limits-f1ec` (stacked on Phase C).
+
 ## 2026-09-20 — Phase C consumer settings + copy cleanup
 
 - Ops wall gated: `/desk/settings?wall=ops` only when `FOLIO_OPS=1` (else consumer Account).
