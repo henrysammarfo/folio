@@ -1,10 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { FolioMark } from "./folio-brand";
 
+/** Primary marketing IA — keep short so layout stays scannable. */
 const nav = [
-  ["Truth", "/truth"],
   ["Markets", "/markets"],
-  ["Execution", "/execution"],
+  ["Truth", "/truth"],
   ["Credit", "/credit"],
   ["Pre-IPO", "/preipo"],
   ["About", "/about"],
@@ -25,14 +25,16 @@ export function PublicShell({
   children,
   compactIntro = false,
   tone = "truth",
+  aside,
 }: {
   eyebrow: string;
   title: string;
   intro: string;
   children: React.ReactNode;
   compactIntro?: boolean;
-  /** Per-page atmosphere — marketing pages must not share one bland shell. */
   tone?: PublicTone;
+  /** Optional live signal column beside the intro (metrics, status). */
+  aside?: React.ReactNode;
 }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
 
@@ -62,34 +64,58 @@ export function PublicShell({
         </Link>
       </header>
 
-      <main>
-        <section
+      <main className="mkt-main">
+        <header
           className={
-            compactIntro ? "mkt-intro mkt-intro-compact" : "mkt-intro"
+            compactIntro
+              ? "mkt-intro mkt-intro-compact"
+              : aside
+                ? "mkt-intro mkt-intro-split"
+                : "mkt-intro"
           }
         >
-          <p className="mkt-brand-signal" aria-hidden={!compactIntro}>
-            FOLIO
-          </p>
-          <p className="mkt-eyebrow">{eyebrow}</p>
-          <h1>{title}</h1>
-          <p className="mkt-lede">{intro}</p>
-        </section>
-        <div className="mkt-content">{children}</div>
+          <div className="mkt-intro-copy">
+            <p className="mkt-eyebrow">{eyebrow}</p>
+            <h1>{title}</h1>
+            <p className="mkt-lede">{intro}</p>
+          </div>
+          {aside ? <div className="mkt-intro-aside">{aside}</div> : null}
+        </header>
+        <div className="mkt-body">{children}</div>
       </main>
 
       <footer className="mkt-foot">
-        <Link to="/" className="mkt-brand" aria-label="FOLIO home">
-          <FolioMark className="mkt-brand-mark" title="FOLIO" />
-          <b>FOLIO</b>
-        </Link>
-        <p>Honest share counts for Solana xStocks.</p>
-        <nav className="mkt-foot-links" aria-label="Footer">
-          <Link to="/whitepaper">Whitepaper</Link>
-          <Link to="/beta">Beta</Link>
-          <Link to="/privacy">Privacy</Link>
-          <Link to="/terms">Terms</Link>
-          <Link to="/desk">Desk</Link>
+        <div className="mkt-foot-brand">
+          <Link to="/" className="mkt-brand" aria-label="FOLIO home">
+            <FolioMark className="mkt-brand-mark" title="FOLIO" />
+            <b>FOLIO</b>
+          </Link>
+          <p>Honest share counts for Solana xStocks.</p>
+        </div>
+        <nav className="mkt-foot-cols" aria-label="Footer">
+          <div>
+            <strong>Product</strong>
+            <Link to="/desk">Desk</Link>
+            <Link to="/desk/acquire">Buy</Link>
+            <Link to="/desk/markets">Live board</Link>
+            <Link to="/desk/credit">Borrow</Link>
+          </div>
+          <div>
+            <strong>Learn</strong>
+            <Link to="/truth">Truth</Link>
+            <Link to="/execution">Execution</Link>
+            <Link to="/pairs">Pairs</Link>
+            <Link to="/preipo">Pre-IPO</Link>
+            <Link to="/whitepaper">Whitepaper</Link>
+          </div>
+          <div>
+            <strong>Company</strong>
+            <Link to="/about">About</Link>
+            <Link to="/beta">Beta</Link>
+            <Link to="/network">Network</Link>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+          </div>
         </nav>
         <p className="mkt-foot-by">Built by Henry Sam Marfo · Accra</p>
       </footer>
@@ -112,5 +138,26 @@ export function Metric({
       <strong>{value}</strong>
       <span>{detail}</span>
     </article>
+  );
+}
+
+/** Numbered editorial section — one job per block. */
+export function MktSection({
+  n,
+  title,
+  children,
+}: {
+  n?: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mkt-sec">
+      <header className="mkt-sec-head">
+        {n ? <span className="mkt-sec-n">{n}</span> : null}
+        <h2>{title}</h2>
+      </header>
+      <div className="mkt-sec-body">{children}</div>
+    </section>
   );
 }

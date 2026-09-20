@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PublicShell } from "@/components/public-page";
+import { PublicShell, MktSection } from "@/components/public-page";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -31,41 +31,41 @@ function Page() {
       title="A desk that earns trust by refusing shortcuts."
       intro="FOLIO is for people who need economic-share truth before they buy, borrow, or automate — built by a founder who refuses to let starting line cap ambition."
     >
-      <div className="manifesto">
-        <blockquote>
+      <MktSection title="Doctrine">
+        <blockquote className="mkt-quote">
           “Prove the shares. Refuse the wash. Open credit on honest balances.”
         </blockquote>
-        <div>
-          <p>
-            FOLIO never fabricates equity mints, fills, or traction. Live mainnet
-            reads stay separate from unfunded borrow broadcast. Every refusal is
-            legible — wash without a key stays fail-closed; NestUSD stays hidden
-            until verified; broadcast stays off until funded.
-          </p>
-          <p>
-            <b>Henry Sam Marfo</b>
-            <br />
-            Builder · Accra, Ghana · @henrysammarfo
-          </p>
-        </div>
-      </div>
+        <p>
+          FOLIO never fabricates equity mints, fills, or traction. Live mainnet
+          reads stay separate from unfunded borrow broadcast. Every refusal is
+          legible.
+        </p>
+        <p>
+          <b>Henry Sam Marfo</b>
+          <br />
+          Builder · Accra, Ghana · @henrysammarfo
+        </p>
+      </MktSection>
 
-      <section className="about-vision">
-        <h2>Why this desk</h2>
+      <MktSection n="01" title="Why this desk">
         <p>
           Tokenized US stocks on Solana break when corporate actions, wash flow,
           and credit are papered over. FOLIO is the honest stock desk: share
           counts you can trust, pools we refuse when dirty, credit without
           forced selling.
         </p>
-        <h2>Why Accra</h2>
+      </MktSection>
+
+      <MktSection n="02" title="Why Accra">
         <p>
           Pedigree will not carry this — the product must. Interview posture is
           not “please validate us.” It is: this is the problem we die on; here
           is the live spine; here is how it compounds.
         </p>
-        <h2>How we last</h2>
-        <ol>
+      </MktSection>
+
+      <MktSection n="03" title="How we last">
+        <ol className="mkt-steps">
           <li>
             <b>Now</b> — live read spine, wash gate, quote-only, credit honesty.
           </li>
@@ -83,7 +83,7 @@ function Page() {
           <Link to="/network">Network honesty</Link>
           <Link to="/desk">Open desk</Link>
         </p>
-      </section>
+      </MktSection>
     </PublicShell>
   );
 }

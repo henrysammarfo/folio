@@ -52,37 +52,36 @@ function Page() {
       eyebrow="Corporate-action ledger"
       title="One balance. Every truth behind it."
       intro="Token balances alone can lie after dividends and splits. FOLIO reads the live xStocks Scaled UI multiplier on Solana mainnet and shows raw vs economic ownership — no fixture 4.0× theater."
-    >
-      <div className="mkt-status-row">
-        <ModeBadge mode={mult?.ok ? mult.mode : "unavailable"}>
-          {mult?.ok ? "xStocks live" : "Multiplier unavailable"}
-        </ModeBadge>
-        <ModeBadge
-          mode={
-            data?.scaledUi?.ok
-              ? data.scaledUi.mode
-              : data?.scaledUiCompare?.status === "mismatch"
-                ? "unavailable"
+      aside={
+        <div className="mkt-status-col">
+          <ModeBadge mode={mult?.ok ? mult.mode : "unavailable"}>
+            {mult?.ok ? "xStocks live" : "Multiplier unavailable"}
+          </ModeBadge>
+          <ModeBadge
+            mode={
+              data?.scaledUi?.ok
+                ? data.scaledUi.mode
                 : "unavailable"
-          }
-        >
-          {data?.scaledUi?.ok
-            ? data.scaledUiCompare?.status === "mismatch"
-              ? "Scaled UI mismatch"
-              : data.scaledUiCompare?.status === "match"
-                ? "Scaled UI match"
-                : "Scaled UI live"
-            : "Scaled UI off"}
-        </ModeBadge>
-        <ModeBadge mode={data?.jupiterPrice.ok ? data.jupiterPrice.mode : "unavailable"}>
-          {!data?.jupiterPrice.ok
-            ? "Jupiter off"
-            : data.jupiterPrice.source.includes("stale")
-              ? "Jupiter stale"
-              : "Jupiter live"}
-        </ModeBadge>
-      </div>
-
+            }
+          >
+            {data?.scaledUi?.ok
+              ? data.scaledUiCompare?.status === "mismatch"
+                ? "Scaled UI mismatch"
+                : data.scaledUiCompare?.status === "match"
+                  ? "Scaled UI match"
+                  : "Scaled UI live"
+              : "Scaled UI off"}
+          </ModeBadge>
+          <ModeBadge mode={data?.jupiterPrice.ok ? data.jupiterPrice.mode : "unavailable"}>
+            {!data?.jupiterPrice.ok
+              ? "Jupiter off"
+              : data.jupiterPrice.source.includes("stale")
+                ? "Jupiter stale"
+                : "Jupiter live"}
+          </ModeBadge>
+        </div>
+      }
+    >
       <div className="metrics-grid">
         <Metric
           label="Paper raw balance"

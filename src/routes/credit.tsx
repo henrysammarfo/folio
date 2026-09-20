@@ -82,34 +82,36 @@ function Page() {
       eyebrow="Credit without selling"
       title="Keep the shares. Test the liquidity."
       intro="Credit capacity uses live Kamino reads against paper or wallet-read quantities — never hardcoded dollar theater. NestUSD stays hidden until a verified public metrics endpoint exists. Borrow broadcast stays off on the ≤~$1 Stocklana budget."
+      aside={
+        <div className="metrics-grid metrics-grid-aside">
+          <Metric
+            label={
+              data?.paper.label === "wallet-read"
+                ? "Wallet-read collateral"
+                : "Paper collateral"
+            }
+            value={collateral}
+            detail={data?.paper.note ?? "Live marks · labeled qty"}
+          />
+          <Metric
+            label="Illustrative capacity"
+            value={borrow}
+            detail={
+              aaplLtv != null
+                ? `AAPLx maxLtv ${(aaplLtv * 100).toFixed(0)}% · no broadcast`
+                : data?.paper.maxLtvUsed != null
+                  ? `AAPLx maxLtv ${(data.paper.maxLtvUsed * 100).toFixed(0)}% · no broadcast`
+                  : "Kamino maxLtv · no broadcast"
+            }
+          />
+          <Metric
+            label="Borrow execution"
+            value="Off / unavailable"
+            detail={data?.borrowExecution ?? "Unfunded ≤~$1 budget"}
+          />
+        </div>
+      }
     >
-      <div className="metrics-grid">
-        <Metric
-          label={
-            data?.paper.label === "wallet-read"
-              ? "Wallet-read collateral"
-              : "Paper collateral"
-          }
-          value={collateral}
-          detail={data?.paper.note ?? "Live marks · labeled qty"}
-        />
-        <Metric
-          label="Illustrative capacity"
-          value={borrow}
-          detail={
-            aaplLtv != null
-              ? `AAPLx maxLtv ${(aaplLtv * 100).toFixed(0)}% · no broadcast`
-              : data?.paper.maxLtvUsed != null
-                ? `AAPLx maxLtv ${(data.paper.maxLtvUsed * 100).toFixed(0)}% · no broadcast`
-                : "Kamino maxLtv · no broadcast"
-          }
-        />
-        <Metric
-          label="Borrow execution"
-          value="Off / unavailable"
-          detail={data?.borrowExecution ?? "Unfunded ≤~$1 budget"}
-        />
-      </div>
       <div className="protocol-list">
         <div>
           <span>Kamino</span>
@@ -165,11 +167,10 @@ function Page() {
           ? "Capacity uses ephemeral inspect wallet-read qty (not auth / not multi-tenant)."
           : "Optional: append ?inspect=<pubkey> for ephemeral mainnet-read capacity without a session secret."}
       </p>
-      <p className="mt-6 text-sm">
+      <p className="mkt-links">
         <Link
           to="/desk/credit"
           search={inspect ? { inspect } : {}}
-          className="underline"
         >
           Open live credit desk →
         </Link>
