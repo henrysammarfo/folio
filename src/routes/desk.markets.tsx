@@ -78,6 +78,37 @@ function Page() {
           </div>
         </header>
 
+        <div
+          className="fx-markets-flow"
+          data-testid="markets-flow-strip"
+          aria-label="Quick trade flow"
+        >
+          {rows.slice(0, 10).map((row) => (
+            <Link
+              key={row.symbol}
+              to="/desk/acquire"
+              className="fx-markets-flow-chip"
+              aria-label={`Buy ${row.symbol}`}
+            >
+              <AssetLogo
+                symbol={row.symbol}
+                logo={row.logo}
+                underlying={row.underlying}
+                size={32}
+              />
+              <span>
+                <strong>{row.underlying}</strong>
+                <small>
+                  {row.usdPrice != null ? money(row.usdPrice) : "—"}
+                </small>
+              </span>
+            </Link>
+          ))}
+          {rows.length === 0 ? (
+            <p className="fx-ticket-sub">Loading market flow…</p>
+          ) : null}
+        </div>
+
         <div className="fx-lane-row fx-markets-tabs" role="tablist">
           {(["all", "mega", "ipo", "meme"] as const).map((id) => {
             const meta = LANE_META.find((l) => l.id === id);

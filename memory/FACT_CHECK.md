@@ -1,4 +1,15 @@
 
+## 2026-09-20 — Live trade / gasless (no FOLIO program)
+
+| Claim | Status |
+|---|---|
+| Do not deploy FOLIO custom program for $10 beta | Decision lock — rent ≫ budget |
+| Jupiter Swap V2 `/order` has automatic gasless when SOL &lt; 0.01 and trade ≈ ≥$10 | Verified — developers.jup.ag/docs/swap/advanced/gasless |
+| JupiterZ RFQ can be gasless without min size if MM quotes; ATA rent via Jupiter gas wallet when no referral | Verified — same docs + Ultra gasless |
+| Integrator `payer` needs referral + dual sign; Metis-only; FOLIO would fund gas | Verified — skip for peer $10 beta |
+| Kora paymaster = OSS USDC fee-token path (ops + funded signer) | Verified — solana-foundation/kora |
+| Best tester wallet: USDC + tiny SOL; USDC-only OK for ≥~$10; SOL-native OK | Product recommendation — documented |
+
 ## 2026-09-20 — Nexeus cinematic
 
 | Claim | Status |

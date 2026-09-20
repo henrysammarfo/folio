@@ -1,4 +1,13 @@
 
+# FOLIO — SESSION LOG
+
+## 2026-09-20 — Netro-depth desk + live-trade gas research
+
+- Research (docs-verified): Jupiter Swap V2 `/order` gasless (auto ≥~$10 + &lt;0.01 SOL · JupiterZ MM · integrator `payer` skip for beta); Kora later; no FOLIO program; each tester brings own ~$10. Wrote `docs/LIVE_TRADE_NO_PROGRAM.md`.
+- **Recommendation:** USDC + tiny SOL best quotes; USDC-only via Jupiter gasless for onboarding; SOL-native also fine; do not FOLIO-sponsor gas.
+- Buy: swap details sheet + settings (slippage · gas pref). Markets: flow strip. Netro: symbol flow icons + AI modal.
+- Branch: `cursor/folio-netro-desk-depth-f1ec`.
+
 ## 2026-09-20 — Nexeus cinematic landing + marketing
 
 - Pixel-exact Nexeus standalone at `public/nexeus/index.html` (video/poster/scrim/entrance per spec).
