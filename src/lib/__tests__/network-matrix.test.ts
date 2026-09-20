@@ -80,6 +80,31 @@ describe("buildNetworkMatrix honesty", () => {
     );
   });
 
+  it("labels user-signed fills armed when broadcastPaused=false without FOLIO treasury", () => {
+    const rows = buildNetworkMatrix({
+      multiplier: live,
+      pyth: down,
+      jupiter: live,
+      jupiterPrice: live,
+      wash: down,
+      kamino: live,
+      jupiterLend: live,
+      nestusd: down,
+      nestCredit: live,
+      scaledUi: live,
+      pools: live,
+      bitqueryKeyPresent: false,
+      multiTenantKeysPresent: false,
+      sessionSecretPresent: true,
+      solanaRpcPublicFallback: true,
+      broadcastFunded: false,
+      broadcastPaused: false,
+    });
+    const row = rows.find((r) => r.capability === "Broadcast swap / borrow");
+    expect(row?.mode).toBe("mainnet-read");
+    expect(row?.detail).toMatch(/user-signed|no FOLIO payer/i);
+  });
+
   it("labels wash live from Bitquery or free Gecko source", () => {
     const rows = buildNetworkMatrix({
       multiplier: live,

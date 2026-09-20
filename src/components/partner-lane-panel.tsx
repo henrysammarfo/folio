@@ -6,6 +6,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getPreipoBundle, getTesseraBundle } from "@/lib/desk.functions";
+import { trackFolioEvent } from "@/lib/analytics";
 import { humanizeWashNote } from "@/lib/humanize-copy";
 
 export type PartnerLaneId = "stocks" | "preipo" | "tessera";
@@ -37,7 +38,10 @@ export function PartnerLaneTabs({
           role="tab"
           aria-selected={lane === l.id}
           className={`netro-partner-tab${lane === l.id ? " is-on" : ""}`}
-          onClick={() => onChange(l.id)}
+          onClick={() => {
+            trackFolioEvent("partner_lane", { lane: l.id });
+            onChange(l.id);
+          }}
         >
           {l.label}
         </button>
@@ -121,6 +125,16 @@ function PreipoLanePanel() {
         <div>
           <span>Wash</span>
           <b>{data ? (data.washOk ? "Clear" : "Paused") : "…"}</b>
+        </div>
+        <div>
+          <span>$1 quote</span>
+          <b>
+            {data?.jupiter.ok
+              ? `${data.jupiter.data.outUiAmount.toFixed(4)} tok`
+              : isFetching
+                ? "…"
+                : "—"}
+          </b>
         </div>
       </div>
 
@@ -217,6 +231,16 @@ function TesseraLanePanel() {
         <div>
           <span>Wash</span>
           <b>{data ? (data.washOk ? "Clear" : "Paused") : "…"}</b>
+        </div>
+        <div>
+          <span>$1 quote</span>
+          <b>
+            {data?.jupiter.ok
+              ? `${data.jupiter.data.outUiAmount.toFixed(4)} T`
+              : isFetching
+                ? "…"
+                : "—"}
+          </b>
         </div>
       </div>
 

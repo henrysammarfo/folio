@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { usePrivyShellReady } from "@/components/privy-app-provider";
+import { trackFolioEvent } from "@/lib/analytics";
 import { createSessionFromPrivyToken, getSessionBundle } from "@/lib/desk.functions";
 import { activeMembership } from "@/lib/auth/role-gates";
 import { resolveWalletBinding } from "@/lib/wallet-binding";
@@ -107,6 +108,10 @@ function OpenAppPrivyControls({
       className={className}
       disabled={!ready || !mintReady || busy}
       onClick={() => {
+        trackFolioEvent("open_app", {
+          from: "header",
+          authenticated: Boolean(authenticated),
+        });
         if (authenticated) void mintFromPrivy();
         else login();
       }}

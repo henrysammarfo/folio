@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { PublicShell } from "@/components/public-page";
+import { trackFolioEvent } from "@/lib/analytics";
 import { joinBetaWaitlist } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
 import { primaryXHandle, primaryXUrl, SOCIALS } from "@/lib/socials";
@@ -50,6 +51,7 @@ function Page() {
         setErr(res.detail ?? "Couldn’t join — try again shortly.");
         return;
       }
+      trackFolioEvent("beta_join", { ok: true });
       setDone(true);
     } finally {
       setBusy(false);
@@ -134,8 +136,11 @@ function Page() {
           <ul>
             <li>Live Markets board + Buy lanes (mega / IPO / meme / pairs)</li>
             <li>PreStocks + Tessera desks (kept separate on purpose)</li>
-            <li>Scaled UI share truth · wash refuse · quote-only</li>
-            <li>Fills &amp; borrows paused until funded — labeled honestly</li>
+            <li>Scaled UI share truth · wash refuse · Jupiter quotes</li>
+            <li>
+              Fills arm when BROADCAST_PAUSED=false · borrows still
+              unavailable-until-funded
+            </li>
           </ul>
           <p>
             <a href={SOCIALS.stocklana} target="_blank" rel="noreferrer">

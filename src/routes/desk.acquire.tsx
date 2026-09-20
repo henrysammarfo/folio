@@ -4,8 +4,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { ArrowDownUp, ChevronDown, Settings2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
+import { BuyExecuteButton } from "@/components/buy-execute-button";
 import { DeskShell } from "@/components/desk-shell";
 import { TradingViewChart } from "@/components/tradingview-chart";
+import { trackFolioEvent } from "@/lib/analytics";
 import { getAcquireBundle } from "@/lib/desk.functions";
 import {
   humanizeGateReason,
@@ -60,6 +62,7 @@ function Page() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [slippageBps, setSlippageBps] = useState(50);
   const [gasPref, setGasPref] = useState<GasPref>("best");
+  const [fillSig, setFillSig] = useState<string | null>(null);
 
   useEffect(() => {
     if (!settingsOpen) return;
@@ -590,6 +593,11 @@ function Page() {
                   return;
                 }
                 setErr(null);
+                trackFolioEvent("buy_review", {
+                  symbol: receive,
+                  pair: isPair,
+                  amount: payAmount,
+                });
                 void refetch().then(() => setReviewed(true));
               }}
             >
@@ -633,21 +641,38 @@ function Page() {
               {checkLines.length > 0 ? (
                 <p className="fx-checks">{checkLines.join("\n")}</p>
               ) : null}
-              <button
-                type="button"
-                className="fx-btn fx-btn-primary fx-btn-block"
-                disabled={!canBuy}
-              >
-                {canBuy
-                  ? isPair
-                    ? "Swap stocks — fills paused"
-                    : "Swap — fills paused"
-                  : "Blocked for safety"}
-              </button>
+              {fillSig ? (
+                <p className="fx-checks" data-testid="acquire-fill-sig">
+                  Landed · {fillSig.slice(0, 8)}…{fillSig.slice(-6)}
+                </p>
+              ) : null}
+              <BuyExecuteButton
+                canBuy={Boolean(canBuy)}
+                isPair={isPair}
+                broadcastPaused={
+                  !(
+                    data &&
+                    "broadcastPaused" in data &&
+                    data.broadcastPaused === false
+                  )
+                }
+                symbol={receive}
+                paySymbol={isPair ? pay : "USDC"}
+                amount={payAmount}
+                slippageBps={slippageBps}
+                onError={(msg) => setErr(msg || null)}
+                onSuccess={(sig) => {
+                  setFillSig(sig);
+                  setErr(null);
+                }}
+              />
               <button
                 type="button"
                 className="fx-text-btn"
-                onClick={() => setReviewed(false)}
+                onClick={() => {
+                  setReviewed(false);
+                  setFillSig(null);
+                }}
               >
                 Edit order
               </button>

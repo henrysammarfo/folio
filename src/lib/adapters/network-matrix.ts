@@ -46,7 +46,10 @@ export function buildNetworkMatrix(input: {
   sessionSecretPresent: boolean;
   /** Public RPC fallback in use (still mainnet-read, rate-limited). */
   solanaRpcPublicFallback: boolean;
+  /** FOLIO-sponsored treasury / CPI budget — still false at ≤~$1. */
   broadcastFunded: boolean;
+  /** Env arm: BROADCAST_PAUSED=false enables user-signed Jupiter /execute. */
+  broadcastPaused?: boolean;
 }): MatrixRow[] {
   return [
     {
@@ -185,10 +188,15 @@ export function buildNetworkMatrix(input: {
     },
     {
       capability: "Broadcast swap / borrow",
-      mode: input.broadcastFunded ? "mainnet-read" : "unavailable",
+      mode:
+        input.broadcastFunded || input.broadcastPaused === false
+          ? "mainnet-read"
+          : "unavailable",
       detail: input.broadcastFunded
         ? "Funded wallet path (still requires explicit user confirm)"
-        : "Not funded · ≤~$1 budget · quote-only · BROADCAST_PAUSED",
+        : input.broadcastPaused === false
+          ? "User-signed Jupiter fills armed · no FOLIO payer · borrow CPI still unfunded"
+          : "Not funded · ≤~$1 budget · quote-only · BROADCAST_PAUSED",
     },
     {
       capability: "Custom FOLIO program deploy",

@@ -1,6 +1,7 @@
 /**
  * In-memory sliding-window rate limits for desk mutations / hot paths.
  * Per-process only — honest for single Node / serverless instance; not a global CDN WAF.
+ * Upstash/Redis deferred until UPSTASH_* keys exist (do not invent a distributed store).
  */
 
 export type RateLimitBucket =
