@@ -1721,19 +1721,35 @@ button.fx-swap-mid:disabled{opacity:.4;cursor:default}
 }
 .mkt-links a:hover{color:var(--mkt-brand)}
 .mkt .metrics-grid{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:0;border-top:1px solid var(--mkt-line);border-bottom:1px solid var(--mkt-line);
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:0;border:0;border-top:1px solid var(--mkt-line);border-bottom:1px solid var(--mkt-line);
+  background:transparent;overflow:visible;
 }
 .mkt .metrics-grid-aside{border:0;display:grid;grid-template-columns:1fr;gap:0}
 .mkt .metrics-grid-aside .metric{
-  border-right:0;border-bottom:1px solid var(--mkt-line);padding:.85rem 0;
+  grid-column:auto;border-right:0;border-bottom:1px solid var(--mkt-line);padding:.85rem 0;
 }
 .mkt .metrics-grid-aside .metric:last-child{border-bottom:0}
-.mkt .metric{padding:1.15rem 1.15rem 1.15rem 0;border-right:1px solid var(--mkt-line);background:transparent}
-.mkt .metric:last-child{border-right:0;padding-right:0}
-.mkt .metric p{margin:0;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mkt-muted)}
-.mkt .metric strong{display:block;margin:.35rem 0 .15rem;font-family:var(--font-display);font-size:clamp(1.5rem,2.8vw,2rem);font-weight:400;letter-spacing:-.02em}
-.mkt .metric span{font-size:.76rem;color:var(--mkt-muted);line-height:1.4}
+.mkt .metric{
+  min-width:0;padding:1.35rem 1.35rem;border-right:1px solid var(--mkt-line);
+  border-bottom:1px solid var(--mkt-line);background:transparent;overflow:visible;
+}
+.mkt .metrics-grid > .metric:nth-child(even){border-right:0}
+.mkt .metrics-grid > .metric:nth-last-child(-n+2){border-bottom:0}
+.mkt .metrics-grid > .metric:last-child:nth-child(odd){
+  grid-column:1 / -1;border-right:0;border-bottom:0;
+}
+.mkt .metric p{
+  margin:0;font-size:.68rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--mkt-muted);
+}
+.mkt .metric strong{
+  display:block;margin:.5rem 0 .25rem;padding-inline:.06em 0;
+  font-family:var(--font-display);font-size:clamp(1.55rem,2.4vw,2.05rem);
+  font-weight:400;letter-spacing:-.015em;line-height:1.2;
+  overflow:visible;white-space:nowrap;
+}
+.mkt .metric span{display:block;font-size:.76rem;color:var(--mkt-muted);line-height:1.4;max-width:34ch}
 .mkt .protocol-list{display:grid;gap:0;margin-top:.25rem;border-top:1px solid var(--mkt-line)}
 .mkt .protocol-list > div{
   display:grid;grid-template-columns:7rem 8.5rem 1fr;gap:.75rem 1rem;align-items:center;
@@ -1782,8 +1798,15 @@ button.fx-swap-mid:disabled{opacity:.4;cursor:default}
 @media(min-width:860px){.mkt-nav{display:inline-flex}}
 @media(max-width:800px){
   .mkt .metrics-grid{grid-template-columns:1fr}
-  .mkt .metric{border-right:0;border-bottom:1px solid var(--mkt-line);padding:1rem 0}
+  .mkt .metrics-grid > .metric,
+  .mkt .metrics-grid > .metric:nth-child(n+4),
+  .mkt .metrics-grid > .metric:last-child:nth-child(odd){grid-column:auto}
+  .mkt .metric{
+    border-right:0 !important;border-bottom:1px solid var(--mkt-line);padding:1.1rem 0;
+  }
+  .mkt .metrics-grid > .metric:nth-last-child(-n+2){border-bottom:1px solid var(--mkt-line)}
   .mkt .metric:last-child{border-bottom:0}
+  .mkt .metric strong{white-space:normal;font-size:clamp(1.5rem,7vw,1.95rem)}
   .mkt .protocol-list > div{grid-template-columns:1fr;gap:.35rem}
 }
 
@@ -2208,8 +2231,17 @@ html.js-enter .nx-headline{transform:translate3d(0,118%,0)}
 .mkt-cine .mkt-status-line[data-ok="false"] b{color:#F5C97A}
 .mkt-cine .mkt-eyebrow-row{color:#9FE0F0}
 .mkt-cine .mkt-eyebrow-row em{color:rgba(255,255,255,.65)}
-.mkt-cine .metrics-grid{border-color:rgba(255,255,255,.2);background:rgba(4,20,32,.25);backdrop-filter:blur(12px)}
-.mkt-cine .metric{border-color:rgba(255,255,255,.16);color:#fff}
+.mkt-cine .metrics-grid{
+  border-color:rgba(255,255,255,.22);
+  background:transparent;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+.mkt-cine .metric{
+  border-color:rgba(255,255,255,.16);
+  color:#fff;
+  background:transparent;
+}
 .mkt-cine .metric p,.mkt-cine .metric span{color:rgba(255,255,255,.62)}
 .mkt-cine .metric strong{color:#fff}
 .mkt-cine .feature-band{color:#fff}

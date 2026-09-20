@@ -93,6 +93,11 @@ function Page() {
           detail="Illustrative paper qty — not wallet truth until Privy binding"
         />
         <Metric
+          label="Economic shares"
+          value={economic != null ? economic.toFixed(4) : isLoading ? "…" : "—"}
+          detail="raw × live multiplier"
+        />
+        <Metric
           label="Live action multiplier"
           value={
             mult?.ok ? `${mult.data.currentMultiplier.toFixed(6)}×` : isLoading ? "…" : "—"
@@ -121,11 +126,6 @@ function Page() {
                 ? data.scaledUi.reason
                 : "Awaiting mint + RPC"
           }
-        />
-        <Metric
-          label="Economic shares"
-          value={economic != null ? economic.toFixed(4) : isLoading ? "…" : "—"}
-          detail="raw × live multiplier"
         />
         <Metric
           label="Pending corporate action"
