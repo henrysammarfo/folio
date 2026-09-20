@@ -1,6 +1,12 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — FOLIO watermark shipped to main/prod
+
+- User still saw old wordy Buy sheet — that was **main/prod**, not PR #26 preview.
+- Merged Netro-depth + FOLIO TV watermark + lean copy onto `main` (`8408c35`).
+- Details sheet defaults closed on overview Buy.
+
 ## 2026-09-20 — FOLIO chart watermark + copy strip (NetroBNB)
 
 - Cloned NetroBNB `CryptoMarketCard`: brand mark dead-center **over** TradingView stage (`z-index:10`), not behind the iframe / not centered on stats+icons.
