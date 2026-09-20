@@ -186,19 +186,15 @@ function Page() {
         </div>
 
         <div className="fx-markets-extra">
-          <article className="fx-card">
+          <article className="fx-markets-aside">
             <h2>Stock ↔ stock</h2>
             <p>Rotate without cashing to USDC first — pairs on Buy.</p>
-            <Link to="/desk/acquire" className="fx-btn fx-btn-sm">
-              Open pairs
-            </Link>
+            <Link to="/desk/acquire">Open pairs →</Link>
           </article>
-          <article className="fx-card">
+          <article className="fx-markets-aside">
             <h2>Pre-IPO</h2>
             <p>PreStocks private names · Tessera T-tokens on their own desks.</p>
-            <Link to="/desk/preipo" className="fx-btn fx-btn-sm">
-              PreStocks
-            </Link>
+            <Link to="/desk/preipo">PreStocks →</Link>
           </article>
         </div>
       </section>
