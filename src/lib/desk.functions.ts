@@ -333,7 +333,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
           status: "unavailable",
           apiMultiplier: null,
           onchainEffective: null,
-          absDiff: null,
+          deltaBps: null,
           note: rl.detail,
         },
         strictFailClosed: false,
