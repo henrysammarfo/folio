@@ -1,4 +1,13 @@
 
+## 2026-09-20 — Nexeus cinematic
+
+| Claim | Status |
+|---|---|
+| Standalone Nexeus HTML uses exact CloudFront video + poster URLs | Verified — `public/nexeus/index.html` |
+| FOLIO landing uses same video/poster + entrance motion | Verified — `nexeus-cinematic.tsx` |
+| FOLIO footer (Whitepaper/Beta/About/Privacy/Desk) unchanged in content | Verified — `FolioSimpleFooter` |
+| Marketing pages share cinematic bg, same simple footer | Verified — `PublicShell` |
+
 ## 2026-09-20 — Marketing layout system
 
 | Claim | Status |
