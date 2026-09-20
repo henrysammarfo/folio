@@ -11,7 +11,10 @@
 | trackFolioEvent consent-gated via @vercel/analytics | Implemented |
 | /desk/admin ops-only (FOLIO_OPS) | Implemented |
 | Truth reconcile ≠ issuer PoR | Honest copy |
-| NestUSD / borrow still unavailable-until-funded | Unchanged — no fake capacity |
+| NestUSD / borrow still unavailable-until-funded | SUPERSEDED 2026-09-20 — NestUSD live metrics + Kamino/NestUSD app CTAs |
+| NestUSD api.nestusd.com/v1/risk live collateral LTV | Verified — live probe + adapter |
+| Kamino borrow deep-link kamino.com/borrow/{market} | Verified |
+| FOLIO does not assemble Nest/Kamino CPI in-desk | Honest residual |
 | Rate limits still in-memory (no Upstash) | Honest residual |
 | Privy Allowed Origins + beta_waitlist migration | Action required (Henry) |
 

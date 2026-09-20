@@ -22,6 +22,11 @@ export type GoalSmokeInput = {
   kaminoOk: boolean;
   scaledUiOk: boolean;
   nestUsdUnavailable: boolean;
+  /**
+   * NestUSD honesty: true when fail-closed OR live metrics labeled external-only
+   * (never invent FOLIO CPI Ready). Prefer nestUsdHonest in new call sites.
+   */
+  nestUsdHonest?: boolean;
   washLive: boolean;
   washFailClosed: boolean;
   pythLive: boolean;
@@ -46,12 +51,15 @@ export function classifyGoalRequirements(
     input.scaledUiOk,
   ].filter(Boolean).length;
 
+  const nestHonest =
+    input.nestUsdHonest ?? input.nestUsdUnavailable;
+
   let empireStatus: GoalStatus = "blocked";
   let empireDetail = "xStocks multiplier unavailable — Block 0 spine dark";
-  if (empireLiveBits >= 3 && input.nestUsdUnavailable) {
+  if (empireLiveBits >= 3 && nestHonest) {
     if (input.washLive && input.pythLive) {
       empireStatus = "done";
-      empireDetail = `Live truth/quote/credit/wash/equity-ref · NestUSD unavailable · ${input.multiplierLabel}`;
+      empireDetail = `Live truth/quote/credit/wash/equity-ref · NestUSD honest · ${input.multiplierLabel}`;
     } else {
       empireStatus = "partial";
       const waiting: string[] = [];
@@ -106,14 +114,14 @@ export function classifyGoalRequirements(
         : "BROADCAST_PAUSED not set — set true on Vercel";
 
   const honestyStatus: GoalStatus =
-    input.nestUsdUnavailable &&
+    nestHonest &&
     (input.washFailClosed || input.washLive) &&
     (input.pythFailClosed || input.pythLive)
       ? "done"
       : "partial";
-  const honestyDetail = input.nestUsdUnavailable
-    ? "NestUSD unavailable · wash/Pyth fail-closed or live · no invent-a-green"
-    : "NestUSD must stay unavailable until verified endpoint";
+  const honestyDetail = nestHonest
+    ? "NestUSD fail-closed or live-external · wash/Pyth fail-closed or live · no invent-a-green"
+    : "NestUSD must stay fail-closed or external-only — never invent FOLIO CPI Ready";
 
   const broadcastStatus: GoalStatus = input.broadcastPaused ? "done" : "blocked";
   const broadcastDetail = input.broadcastPaused

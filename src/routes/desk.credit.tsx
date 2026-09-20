@@ -5,6 +5,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { DeskShell } from "@/components/desk-shell";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
+import { trackFolioEvent } from "@/lib/analytics";
 import { getCreditBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
 
@@ -51,15 +52,22 @@ function Page() {
   });
 
   const reserves = data?.kamino.ok ? data.kamino.data.reserves.slice(0, 6) : [];
+  const nestRows =
+    data?.nestusd.ok
+      ? data.nestusd.data.collaterals
+          .filter((c) => /x$/i.test(c.symbol) || c.symbol === "AAPLx")
+          .slice(0, 8)
+      : [];
   const borrow = data?.paper.illustrativeBorrowUsd;
   const ltv = data?.paper.maxLtvUsed;
   const collateral = data?.paper.collateralUsd;
-  const nestusdNote = data?.nestusd?.ok
-    ? "NestUSD is risk-labeled and not ready to borrow against yet"
-    : "NestUSD capacity isn’t available yet";
+  const kaminoUrl = data?.kaminoBorrowUrl;
+  const nestUrl = data?.nestusdAppUrl;
+  const nestLive =
+    data?.nestusd.ok && data.nestusd.data.status === "live";
   const nestEarn = data?.nestCredit?.ok
-    ? `Nest earn shows ${data.nestCredit.data.vaultCount} vaults (read-only)`
-    : "Nest earn rates aren’t available yet";
+    ? `Nest.credit shows ${data.nestCredit.data.vaultCount} vaults (read-only · not NestUSD)`
+    : null;
 
   return (
     <DeskShell title="Borrow">
@@ -70,15 +78,15 @@ function Page() {
             {borrow != null ? money(borrow) : "—"}
           </h1>
           <p className="fx-hero-sub">
-            Keep your stocks. Borrow stays off until NestUSD capacity is verified
-            and CPI is funded — LTV below is mainnet-read only.
+            {data?.paper.note ??
+              "Keep your stocks. Borrow against xStocks on live Kamino / NestUSD rails."}
           </p>
         </header>
 
         {ltv != null ? (
           <div className="fx-card fx-card-pad" style={{ marginBottom: "1rem" }}>
             <p className="fx-section-title" style={{ marginBottom: ".35rem" }}>
-              Loan-to-value (illustrative)
+              Loan-to-value (Kamino live)
             </p>
             <div className="fx-meter">
               <div className="fx-meter-track">
@@ -98,9 +106,38 @@ function Page() {
         ) : null}
 
         <div className="fx-actions">
-          <button type="button" className="fx-btn fx-btn-primary" disabled>
-            Borrow — unavailable until funded
-          </button>
+          {kaminoUrl ? (
+            <a
+              href={kaminoUrl}
+              className="fx-btn fx-btn-primary"
+              target="_blank"
+              rel="noreferrer"
+              data-testid="credit-borrow-kamino"
+              onClick={() =>
+                trackFolioEvent("cta_click", { cta: "borrow_kamino" })
+              }
+            >
+              Borrow on Kamino
+            </a>
+          ) : (
+            <button type="button" className="fx-btn fx-btn-primary" disabled>
+              Kamino unavailable
+            </button>
+          )}
+          {nestLive && nestUrl ? (
+            <a
+              href={nestUrl}
+              className="fx-btn fx-btn-ghost"
+              target="_blank"
+              rel="noreferrer"
+              data-testid="credit-borrow-nestusd"
+              onClick={() =>
+                trackFolioEvent("cta_click", { cta: "borrow_nestusd" })
+              }
+            >
+              NestUSD app
+            </a>
+          ) : null}
           <Link to="/desk/positions" className="fx-btn fx-btn-ghost">
             View holdings
           </Link>
@@ -108,7 +145,7 @@ function Page() {
 
         {reserves.length > 0 ? (
           <>
-            <h2 className="fx-section-title">Market rates</h2>
+            <h2 className="fx-section-title">Kamino xStocks rates</h2>
             <div className="fx-card">
               <ul className="fx-list">
                 {reserves.map((r, i) => (
@@ -135,9 +172,42 @@ function Page() {
           </>
         ) : null}
 
+        {nestRows.length > 0 ? (
+          <>
+            <h2 className="fx-section-title">NestUSD collateral (live)</h2>
+            <div className="fx-card">
+              <ul className="fx-list" data-testid="credit-nestusd-rows">
+                {nestRows.map((r, i) => (
+                  <li key={r.symbol} className="fx-asset" style={{ cursor: "default" }}>
+                    <span
+                      className="fx-asset-mark"
+                      style={{ background: i % 2 ? "#0B1220" : "#7DD3E8" }}
+                      aria-hidden
+                    >
+                      {r.symbol[0]}
+                    </span>
+                    <span className="fx-asset-main">
+                      <strong>{r.symbol}</strong>
+                      <small>
+                        {(r.borrowLtv * 100).toFixed(0)}% borrow LTV
+                        {r.borrowsPaused ? " · paused" : ""}
+                      </small>
+                    </span>
+                    <span className="fx-asset-right">
+                      <strong>{(r.liquidationThreshold * 100).toFixed(0)}%</strong>
+                      <small>liq</small>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        ) : null}
+
         <p className="fx-sub" style={{ marginTop: "1.25rem" }}>
-          {nestEarn}. {nestusdNote}. Nest.credit vault TVL is not NestUSD borrow
-          capacity. No FOLIO claim that borrowing is live.
+          FOLIO reads live rails and opens Kamino / NestUSD for the borrow
+          transaction — we do not run a custom borrow CPI.{" "}
+          {nestEarn ? `${nestEarn}.` : null}
         </p>
 
         <div className="fx-foot">

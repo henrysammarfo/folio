@@ -11,12 +11,14 @@ export const Route = createFileRoute("/credit")({
       { title: "Credit Desk — FOLIO" },
       {
         name: "description",
-        content: "Live Kamino / Jupiter Lend / NestUSD credit reads — no borrow broadcast.",
+        content:
+          "Live Kamino / NestUSD credit reads — borrow via partner apps (no FOLIO CPI).",
       },
       { property: "og:title", content: "Credit Desk — FOLIO" },
       {
         property: "og:description",
-        content: "Live Kamino / Jupiter Lend / NestUSD credit reads — no borrow broadcast.",
+        content:
+          "Live Kamino / NestUSD credit reads — borrow via partner apps (no FOLIO CPI).",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -25,12 +27,10 @@ export const Route = createFileRoute("/credit")({
   validateSearch: (search) =>
     z
       .object({
-        /** Ephemeral mainnet-read inspect pubkey — not auth. */
         inspect: z.string().max(64).optional().catch(undefined),
       })
       .parse(search),
   loaderDeps: ({ search }) => ({ inspect: search.inspect }),
-  /** Prefetch live credit honesty for first paint (NestUSD never Ready). */
   loader: async ({ deps }) =>
     getCreditBundle({ data: { inspectWallet: deps.inspect } }),
   component: Page,
@@ -48,10 +48,9 @@ function Page() {
     staleTime: 20_000,
   });
 
-  const aaplLtv =
-    data?.kamino.ok
-      ? data.kamino.data.reserves.find((r) => r.symbol === "AAPLx")?.maxLtv
-      : null;
+  const aaplLtv = data?.kamino.ok
+    ? data.kamino.data.reserves.find((r) => r.symbol === "AAPLx")?.maxLtv
+    : null;
   const collateral =
     data?.paper.collateralUsd != null
       ? data.paper.collateralUsd.toLocaleString("en-US", {
@@ -68,20 +67,13 @@ function Page() {
           maximumFractionDigits: 0,
         })
       : "—";
-  const nestStatus = data && !data.nestusd.ok ? "Unverified" : data?.nestusd.ok ? "Probed" : "…";
-  const nestDetail =
-    data && !data.nestusd.ok
-      ? "NestUSD borrow capacity stays hidden until a verified public metrics endpoint exists. Nest.credit vault TVL is a different product."
-      : data?.nestusd.ok
-        ? "Probed · risk-labeled — still not NestUSD borrow capacity"
-        : "Capacity hidden until verified NestUSD borrow metrics";
 
   return (
     <PublicShell
       tone="credit"
       eyebrow="Credit without selling"
       title="Keep the shares. Test the liquidity."
-      intro="Credit capacity uses live Kamino reads against paper or wallet-read quantities — never hardcoded dollar theater. NestUSD stays hidden until a verified public metrics endpoint exists. Borrow broadcast stays off on the ≤~$1 Stocklana budget."
+      intro="Credit uses live Kamino + NestUSD metrics. Borrow opens on Kamino / NestUSD apps — FOLIO does not run a custom borrow CPI. Nest.credit vault TVL is a different product."
       aside={
         <div className="metrics-grid metrics-grid-aside">
           <Metric
@@ -98,16 +90,28 @@ function Page() {
             value={borrow}
             detail={
               aaplLtv != null
-                ? `AAPLx maxLtv ${(aaplLtv * 100).toFixed(0)}% · no broadcast`
+                ? `AAPLx maxLtv ${(aaplLtv * 100).toFixed(0)}% · Kamino live`
                 : data?.paper.maxLtvUsed != null
-                  ? `AAPLx maxLtv ${(data.paper.maxLtvUsed * 100).toFixed(0)}% · no broadcast`
-                  : "Kamino maxLtv · no broadcast"
+                  ? `AAPLx maxLtv ${(data.paper.maxLtvUsed * 100).toFixed(0)}% · Kamino live`
+                  : "Kamino maxLtv when reachable"
             }
           />
           <Metric
             label="Borrow execution"
-            value="Off / unavailable"
-            detail={data?.borrowExecution ?? "Unfunded ≤~$1 budget"}
+            value={
+              data?.borrowExecution === "kamino-external"
+                ? "Kamino live"
+                : data?.borrowExecution === "nestusd-external"
+                  ? "NestUSD app"
+                  : data?.borrowExecution === "unavailable"
+                    ? "Unavailable"
+                    : "…"
+            }
+            detail={
+              data?.kaminoBorrowUrl
+                ? "Deep-link to Kamino · FOLIO does not sign borrow CPI"
+                : "No live borrow rail"
+            }
           />
         </div>
       }
@@ -128,7 +132,7 @@ function Page() {
             {data?.kamino.ok
               ? `${data.kamino.data.reserves.length} xStocks reserves · AAPLx LTV ${
                   aaplLtv != null ? `${(aaplLtv * 100).toFixed(0)}%` : "—"
-                }`
+                } · borrow on Kamino`
               : data && !data.kamino.ok
                 ? data.kamino.reason
                 : "xStocks market reserves (live LTV/APY when reachable)"}
@@ -175,9 +179,27 @@ function Page() {
         <div>
           <header>
             <span>NestUSD</span>
-            <em data-ok="false">{nestStatus}</em>
+            <em
+              data-ok={String(
+                Boolean(data?.nestusd.ok && data.nestusd.data.status === "live"),
+              )}
+            >
+              {data?.nestusd.ok
+                ? data.nestusd.data.status === "live"
+                  ? "Live metrics"
+                  : "Paused"
+                : data && !data.nestusd.ok
+                  ? "Unavailable"
+                  : "…"}
+            </em>
           </header>
-          <p>{nestDetail}</p>
+          <p>
+            {data?.nestusd.ok
+              ? `${data.nestusd.data.collaterals.length} collaterals · mint nUSD on NestUSD app · not Nest.credit`
+              : data && !data.nestusd.ok
+                ? (data.nestusd.detail ?? data.nestusd.reason)
+                : "Live risk API when reachable"}
+          </p>
         </div>
       </div>
       <p className="mkt-note">
@@ -186,10 +208,7 @@ function Page() {
           : "Optional: append ?inspect=<pubkey> for ephemeral mainnet-read capacity without a session secret."}
       </p>
       <p className="mkt-links">
-        <Link
-          to="/desk/credit"
-          search={inspect ? { inspect } : {}}
-        >
+        <Link to="/desk/credit" search={inspect ? { inspect } : {}}>
           Open live credit desk →
         </Link>
       </p>

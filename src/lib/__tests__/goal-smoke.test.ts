@@ -67,11 +67,21 @@ describe("goal-smoke", () => {
     expect(rows.every((r) => r.status === "done")).toBe(true);
   });
 
-  it("never marks NestUSD-ready theater as honest", () => {
+  it("never marks NestUSD FOLIO-CPI Ready theater as honest", () => {
     const rows = classifyGoalRequirements({
       ...base,
       nestUsdUnavailable: false,
+      nestUsdHonest: false,
     });
     expect(rows.find((r) => r.id === "honesty")?.status).toBe("partial");
+  });
+
+  it("treats NestUSD live-external as honest", () => {
+    const rows = classifyGoalRequirements({
+      ...base,
+      nestUsdUnavailable: false,
+      nestUsdHonest: true,
+    });
+    expect(rows.find((r) => r.id === "honesty")?.status).toBe("done");
   });
 });

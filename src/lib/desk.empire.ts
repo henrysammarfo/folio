@@ -171,8 +171,18 @@ export type CreditBundle = {
   /** Ephemeral inspect pubkey when no session/watch-wallet bound. */
   inspectWallet: string | null;
   walletSource: WalletBindingSource;
-  /** Honest label — no local fork harness shipped; borrow stays off until funded. */
-  borrowExecution: "unavailable-until-funded";
+  /**
+   * Borrow rails status.
+   * - kamino-external: live Kamino xStocks market + deep-link execute
+   * - nestusd-external: live NestUSD metrics + app deep-link (no FOLIO CPI)
+   * - unavailable: neither rail live
+   */
+  borrowExecution:
+    | "kamino-external"
+    | "nestusd-external"
+    | "unavailable";
+  kaminoBorrowUrl: string | null;
+  nestusdAppUrl: string | null;
 };
 
 export type ActivityEvent = {
@@ -579,13 +589,31 @@ export const getCreditBundle = createServerFn({ method: "GET" })
 
     const label = usedWalletQty ? ("wallet-read" as const) : ("paper" as const);
     const inspectActive = walletSource === "inspect" ? displayWallet : null;
+
+    const kaminoLive = kamino.ok;
+    const nestLive =
+      nestusd.ok &&
+      nestusd.data.status === "live" &&
+      !nestusd.data.protocolPaused;
+    const borrowExecution = kaminoLive
+      ? ("kamino-external" as const)
+      : nestLive
+        ? ("nestusd-external" as const)
+        : ("unavailable" as const);
+
     let note: string;
-    if (usedWalletQty) {
-      note = `Estimate from your wallet balances × live max LTV. Borrowing is not enabled yet.`;
+    if (kaminoLive) {
+      note = usedWalletQty
+        ? "Live Kamino xStocks LTV × your wallet collateral. Open Kamino to deposit & borrow (FOLIO does not sign the borrow CPI)."
+        : "Live Kamino xStocks LTV. Connect a wallet for your collateral estimate, then borrow on Kamino.";
+    } else if (usedWalletQty) {
+      note =
+        "Estimate from your wallet balances × live max LTV. Borrow rails unavailable.";
     } else if (displayWallet && walletBalances && !walletBalances.ok) {
-      note = `Wallet connected but balances unavailable — showing estimates × live max LTV. Borrowing is not enabled yet.`;
+      note =
+        "Wallet connected but balances unavailable — showing estimates × live max LTV.";
     } else {
-      note = "Estimate until you connect a wallet. Borrowing is not enabled yet.";
+      note = "Estimate until you connect a wallet.";
     }
 
     return {
@@ -600,7 +628,9 @@ export const getCreditBundle = createServerFn({ method: "GET" })
         illustrativeBorrowUsd,
         note,
       },
-      borrowExecution: "unavailable-until-funded",
+      borrowExecution,
+      kaminoBorrowUrl: kamino.ok ? kamino.data.borrowUrl : null,
+      nestusdAppUrl: nestusd.ok ? nestusd.data.appUrl : null,
       watchWallet: watch.ok ? watch.data.wallet : null,
       inspectWallet: inspectActive,
       walletSource,
