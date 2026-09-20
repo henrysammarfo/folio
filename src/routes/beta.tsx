@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent } from "react";
 import { PublicShell } from "@/components/public-page";
+import { joinBetaWaitlist } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
 import { primaryXHandle, primaryXUrl, SOCIALS } from "@/lib/socials";
 
@@ -30,13 +32,15 @@ function loadLocal(): Entry[] {
 }
 
 function Page() {
+  const joinWaitlist = useServerFn(joinBetaWaitlist);
   const [email, setEmail] = useState("");
   const [wallet, setWallet] = useState("");
   const [note, setNote] = useState("");
   const [done, setDone] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  function submit(e: FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault();
     setErr(null);
     const em = email.trim().toLowerCase();
@@ -44,15 +48,31 @@ function Page() {
       setErr("Enter a valid email.");
       return;
     }
-    const entry: Entry = { email: em, at: new Date().toISOString() };
-    const w = wallet.trim();
-    const n = note.trim();
-    if (w) entry.wallet = w;
-    if (n) entry.note = n;
-    const prev = loadLocal();
-    const next = [entry, ...prev.filter((x) => x.email !== em)].slice(0, 200);
-    localStorage.setItem("folio_beta_waitlist", JSON.stringify(next));
-    setDone(true);
+    setBusy(true);
+    try {
+      const w = wallet.trim();
+      const n = note.trim();
+      const res = await joinWaitlist({
+        data: {
+          email: em,
+          ...(w ? { wallet: w } : {}),
+          ...(n ? { note: n } : {}),
+        },
+      });
+      if (!res.ok) {
+        setErr(res.detail ?? "Couldn’t join — try again shortly.");
+        return;
+      }
+      const entry: Entry = { email: em, at: new Date().toISOString() };
+      if (w) entry.wallet = w;
+      if (n) entry.note = n;
+      const prev = loadLocal();
+      const next = [entry, ...prev.filter((x) => x.email !== em)].slice(0, 200);
+      localStorage.setItem("folio_beta_waitlist", JSON.stringify(next));
+      setDone(true);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -65,7 +85,7 @@ function Page() {
     >
       <div className="fx-beta">
         {!done ? (
-          <form className="fx-beta-form" onSubmit={submit}>
+          <form className="fx-beta-form" onSubmit={(e) => void submit(e)}>
             <label className="fx-field">
               Email
               <input
@@ -95,12 +115,16 @@ function Page() {
               />
             </label>
             {err ? <p className="fx-checks">{err}</p> : null}
-            <button type="submit" className="fx-btn fx-btn-primary">
-              Join waitlist
+            <button
+              type="submit"
+              className="fx-btn fx-btn-primary"
+              disabled={busy}
+            >
+              {busy ? "Joining…" : "Join waitlist"}
             </button>
             <p className="fx-ticket-sub">
-              Stored in this browser for now — Henry exports / invites in batches.
-              Follow {primaryXHandle()} for invite waves.
+              Rate-limited server check · stored in this browser until server
+              waitlist ships. Follow {primaryXHandle()} for invite waves.
             </p>
           </form>
         ) : (
@@ -129,7 +153,7 @@ function Page() {
           <ul>
             <li>Live Markets board + Buy lanes (mega / IPO / meme / pairs)</li>
             <li>PreStocks + Tessera desks (kept separate on purpose)</li>
-            <li>Scaled UI share truth · wash fail-closed · quote-only</li>
+            <li>Scaled UI share truth · wash refuse · quote-only</li>
             <li>Fills &amp; borrows paused until funded — labeled honestly</li>
           </ul>
           <p>

@@ -115,6 +115,9 @@ Settings/Account becomes the home for: profile, linked wallets, backup, export, 
 - Every settings control audited: if it doesn’t do anything, remove or wire it.
 
 ### Phase D — Route protection · rate limits · speed
+
+**Status (2026-09-20):** Execute + prefs + agent hard-gated on `folio_session` · in-memory rate limits on quote/execute/agent/waitlist · shared session-bundle query key.
+
 - Hard-gate private desk actions (buy execute, prefs write, agent) on verified `folio_session`.  
 - Public READ (truth multipliers, markets list) can stay soft with labels.  
 - Per-user + IP rate limits on: quote, execute, agent, waitlist.  

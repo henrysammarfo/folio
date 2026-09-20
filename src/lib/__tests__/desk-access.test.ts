@@ -3,6 +3,8 @@ import {
   agentBlockedReason,
   bootstrapBlockedReason,
   deskAccessFromSession,
+  executeBlockedReason,
+  prefsSessionBlockedReason,
 } from "../auth/desk-access";
 import type { FolioSession } from "../auth/session";
 import { errResult, okResult } from "../adapters/types";
@@ -36,7 +38,7 @@ describe("deskAccessFromSession", () => {
     );
     expect(access.signedIn).toBe(false);
     expect(access.tenantCount).toBe(0);
-    expect(access.note).toMatch(/without a signed session/i);
+    expect(access.note).toMatch(/Open App/i);
   });
 
   it("surfaces active tenant role", () => {
@@ -54,12 +56,35 @@ describe("agentBlockedReason", () => {
   it("blocks anonymous agent runs", () => {
     expect(
       agentBlockedReason(errResult("folio.session", "missing_cookie")),
-    ).toMatch(/signed session/i);
+    ).toMatch(/Open App/i);
   });
   it("allows verified sessions", () => {
     expect(
       agentBlockedReason(okResult("mainnet-read", "folio.session", session())),
     ).toBeNull();
+  });
+});
+
+describe("executeBlockedReason", () => {
+  it("blocks anonymous execute", () => {
+    expect(
+      executeBlockedReason(errResult("folio.session", "missing_cookie")),
+    ).toMatch(/Open App/i);
+  });
+  it("allows verified sessions", () => {
+    expect(
+      executeBlockedReason(
+        okResult("mainnet-read", "folio.session", session()),
+      ),
+    ).toBeNull();
+  });
+});
+
+describe("prefsSessionBlockedReason", () => {
+  it("blocks anonymous prefs writes", () => {
+    expect(
+      prefsSessionBlockedReason(errResult("folio.session", "missing_cookie")),
+    ).toMatch(/Open App/i);
   });
 });
 

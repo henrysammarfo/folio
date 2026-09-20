@@ -25,7 +25,7 @@ export function OpenAppButton({
   const shellReady = usePrivyShellReady();
   const fetchSession = useServerFn(getSessionBundle);
   const { data, refetch } = useQuery({
-    queryKey: ["session-bundle", "open-app"],
+    queryKey: ["session-bundle"],
     queryFn: () => fetchSession(),
     staleTime: 30_000,
   });

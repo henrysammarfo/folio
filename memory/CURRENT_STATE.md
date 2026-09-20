@@ -21,6 +21,7 @@
 - **Phase A on main (`72c446e`):** Jupiter Swap V2 `/order`; `/execute` gated by broadcast pause — no FOLIO program; Jupiter Swap V2 gasless / JupiterZ / later Kora; each tester brings own ~$10.
 - **Phase B in progress:** Desk-wide Privy Open App (email embedded Solana + connect wallet) · Account link/export custody · branch `cursor/folio-phase-b-open-app-f1ec`.
 - **Phase C in progress:** Consumer Account vs Ops (`FOLIO_OPS=1`) · scrub BITQUERY/fail-closed from Buy/Account/Activity · Desk mode card · branch `cursor/folio-phase-c-consumer-settings-f1ec`.
+- **Phase D in progress:** Execute/prefs/agent hard-gated on `folio_session` · rate limits (quote/execute/agent/waitlist) · shared session query · branch `cursor/folio-phase-d-route-limits-f1ec`.
 - **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
 - Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).

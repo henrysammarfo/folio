@@ -60,8 +60,14 @@ import {
   agentBlockedReason,
   bootstrapBlockedReason,
   deskAccessFromSession,
+  prefsSessionBlockedReason,
   type DeskAccess,
 } from "./auth/desk-access";
+import { readClientIp } from "./auth/client-ip";
+import {
+  rateLimitCheck,
+  rateLimitClientKey,
+} from "./auth/rate-limit";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
@@ -842,6 +848,16 @@ export const runDeskAgent = createServerFn({ method: "POST" })
     if (blocked) {
       return errResult("folio.agent.paper", "agent_requires_session", blocked);
     }
+    const rl = rateLimitCheck(
+      "agent",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return errResult("folio.agent.paper", "rate_limited", rl.detail);
+    }
     return runPaperAgent(data.prompt);
   });
 
@@ -860,6 +876,14 @@ export const updateDeskPreferences = createServerFn({ method: "POST" })
   .validator(PrefsInput)
   .handler(async ({ data }) => {
     const session = readVerifiedSession();
+    const sessionBlock = prefsSessionBlockedReason(session);
+    if (sessionBlock) {
+      return errResult(
+        "folio.prefs.save",
+        "prefs_require_session",
+        sessionBlock,
+      );
+    }
     if (!session.ok) {
       return errResult(
         "folio.prefs.save",
@@ -1173,3 +1197,40 @@ export const clearWatchWallet = createServerFn({ method: "POST" }).handler(
     }
   },
 );
+
+const WaitlistInput = z.object({
+  email: z.string().email().max(200),
+  wallet: z.string().max(88).optional(),
+  note: z.string().max(280).optional(),
+});
+
+/**
+ * Rate-limited beta waitlist intake. Persistence stays client-local until Phase F;
+ * this gate stops spam before local write.
+ */
+export const joinBetaWaitlist = createServerFn({ method: "POST" })
+  .validator(WaitlistInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSession();
+    const rl = rateLimitCheck(
+      "waitlist",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
+    return {
+      ok: true as const,
+      data: {
+        email: data.email.trim().toLowerCase(),
+        note: "Accepted under rate limit — client may persist locally until server waitlist ships.",
+      },
+    };
+  });
