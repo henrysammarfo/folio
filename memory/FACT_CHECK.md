@@ -1,4 +1,14 @@
 
+## 2026-09-20 — Marketing layout system
+
+| Claim | Status |
+|---|---|
+| Landing first viewport is stencil-only (no hero copy overlay) | Verified — screenshots `layout-home.png` |
+| Below-fold home story = pitch → path 01/02/03 → desk | Verified — `index.tsx` + `layout-home-full.png` |
+| PublicShell nav = Markets/Truth/Credit/Pre-IPO/About | Verified — `public-page.tsx` |
+| Markets is numbered directory (not card wall) | Verified — `layout-markets.png` |
+| Marketing status uses lines not pill badges | Verified — Truth/Execution/Credit strip ModeBadge/StatusBadge |
+
 ## 2026-09-19 — Stock pairs + Pre-IPO claims
 
 | Claim | Status |
