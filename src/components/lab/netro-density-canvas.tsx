@@ -84,6 +84,12 @@ export function NetroDensityCanvas({
 
   const flowItem = findCatalogItem(flowSymbol);
   const flowUnderlying = flowItem?.underlying ?? flowSymbol.replace(/x$/i, "");
+  /** Overview Jupiter quote is AAPLx-sized — never relabel it as another symbol. */
+  const quoteIsForFlow = flowSymbol === "AAPLx";
+  const quoteReceiveLabel = quoteIsForFlow
+    ? gates.quoteOut
+    : "Open Buy for quote";
+  const chartQuoteLabel = quoteIsForFlow ? gates.quoteOut : "—";
 
   useEffect(() => {
     setInspectInput(initialInspect ?? "");
