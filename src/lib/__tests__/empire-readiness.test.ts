@@ -17,6 +17,7 @@ describe("readEmpireReadiness", () => {
     expect(r.sessionSecretPresent).toBe(true);
     expect(r.broadcastPaused).toBe(true);
     expect(r.approvedLabUi).toBe("netro-density");
+    expect(r.opsWallEnabled).toBe(false);
   });
 
   it("arms multi-tenant flags only when Privy + Supabase both set", () => {
@@ -29,10 +30,12 @@ describe("readEmpireReadiness", () => {
       SUPABASE_ANON_KEY: "anon",
       SUPABASE_SERVICE_ROLE_KEY: "service",
       SUPABASE_JWT_SECRET: "y".repeat(16),
+      FOLIO_OPS: "1",
     } as NodeJS.ProcessEnv);
     expect(r.privyConfigured).toBe(true);
     expect(r.privyAppId).toBe("did:privy:test");
     expect(r.supabaseConfigured).toBe(true);
     expect(r.supabaseJwtConfigured).toBe(true);
+    expect(r.opsWallEnabled).toBe(true);
   });
 });

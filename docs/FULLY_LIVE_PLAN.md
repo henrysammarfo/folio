@@ -91,6 +91,9 @@
 **Henry gate before A ships live:** confirm `BROADCAST_PAUSED=false` (or arm flag) on a **preview** first, then prod.
 
 ### Phase B — Open App auth (Web2 + Web3)
+
+**Status (2026-09-20):** Desk-wide `PrivyAppProvider` · header **Open App** · Account link/export custody · nested PrivyProvider removed.
+
 **Goal:** Open App → Privy modal. Two doors + later link.
 
 | Persona | Flow |
@@ -103,12 +106,18 @@
 Settings/Account becomes the home for: profile, linked wallets, backup, export, network mode — **not** API keys.
 
 ### Phase C — Consumer Settings + copy cleanup
+
+**Status (2026-09-20):** Ops wall gated by `FOLIO_OPS=1` · Buy/Account/Activity scrub key names + fail-closed jargon · Desk mode card on Account.
+
 - Split **Account** (user) vs **Ops** (you only — hide behind `FOLIO_OPS=1` or role).  
 - Remove key names / “fail-closed BITQUERY” from consumer UI.  
 - Positions / fills / credit cards: professional copy, no lab jargon.  
 - Every settings control audited: if it doesn’t do anything, remove or wire it.
 
 ### Phase D — Route protection · rate limits · speed
+
+**Status (2026-09-20):** Execute + prefs + agent hard-gated on `folio_session` · in-memory rate limits on quote/execute/agent/waitlist · shared session-bundle query key.
+
 - Hard-gate private desk actions (buy execute, prefs write, agent) on verified `folio_session`.  
 - Public READ (truth multipliers, markets list) can stay soft with labels.  
 - Per-user + IP rate limits on: quote, execute, agent, waitlist.  
@@ -116,6 +125,9 @@ Settings/Account becomes the home for: profile, linked wallets, backup, export, 
 - Cache + parallel loaders; kill duplicate fetches.
 
 ### Phase E — Partner charts (PreStocks + Tessera) — rethink
+
+**Status (2026-09-20):** Overview partner lane tabs (Stocks / Pre-IPO / Tessera) · honesty strips · Buy lane links · separate desk URLs kept. Beta waitlist = **server Supabase only** (no localStorage).
+
 **Problem:** desks exist; overview doesn’t use them as product story.
 
 Meaningful use (proposal — pick on approve):
@@ -126,8 +138,11 @@ Meaningful use (proposal — pick on approve):
 5. Stocklana bounty tracks: keep desks separate URLs for judges, but **linked from overview** so demos aren’t “orphan pages.”
 
 ### Phase F — Closed beta page
+
+**Status (2026-09-20):** Waitlist persistence moved to Supabase `beta_waitlist` (no localStorage). Contrast polish still open.
+
 - Fix contrast (input + Join visible on cinematic bg).  
-- Replace localStorage with server waitlist (Supabase table or email provider).  
+- ~~Replace localStorage with server waitlist~~ **done** (`joinBetaWaitlist` + migration).  
 - Confirmation state that actually persists.
 
 ### Phase G — Product analytics + admin

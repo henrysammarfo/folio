@@ -66,7 +66,7 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
       blockedReasons.push("Wash pressure blocked");
     } else if (input.wash.reason === "bitquery_key_missing") {
       blockedReasons.push(
-        "Wash gate: BITQUERY_API_KEY missing · fail-closed (set on Vercel + .env)",
+        "Market tape unavailable — buy paused until wash checks are live",
       );
     } else {
       blockedReasons.push(`Wash gate: ${input.wash.reason}`);
@@ -89,48 +89,48 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
     if (input.strictFailClosed) {
       divergeOk = false;
       blockedReasons.push(
-        "Strict fail-closed: live equity reference required before review",
+        "Live equity reference required before review",
       );
     }
   } else if (input.diverge.kind === "unavailable" && input.strictFailClosed) {
     divergeOk = false;
     blockedReasons.push(
-      "Strict fail-closed: venue diverge unresolved · review blocked",
+      "Price check unresolved — review paused",
     );
   }
 
   if (input.pools?.kind === "ok") {
     honestyNotes.push(
-      `Raydium: ${input.pools.poolCount} pool(s) observed · awareness only · not a route guarantee · wash still required`,
+      `Pool awareness: ${input.pools.poolCount} pool(s) seen · not a route guarantee`,
     );
   } else if (input.pools?.kind === "empty") {
     honestyNotes.push(
-      "Raydium: zero pools observed for mint · awareness only · Jupiter quote remains the path; wash still required",
+      "No pools observed for this mint · quote path still used when clear",
     );
   } else if (input.pools?.kind === "unavailable") {
     honestyNotes.push(
-      `Raydium pool awareness unavailable (${input.pools.reason}) · Jupiter quote remains the path; wash still required`,
+      "Pool awareness unavailable · quote path still used when clear",
     );
   }
 
   if (input.scaledUi?.kind === "match") {
-    honestyNotes.push(`Scaled UI: ${input.scaledUi.note}`);
+    honestyNotes.push(`Share count on-chain matches API`);
   } else if (input.scaledUi?.kind === "mismatch") {
     honestyNotes.push(
-      `Scaled UI mismatch: ${input.scaledUi.note} · labeled (does not alone block review unless Strict)`,
+      `Share count on-chain differs from API · labeled`,
     );
     if (input.strictFailClosed) {
       blockedReasons.push(
-        "Strict fail-closed: API ↔ on-chain Scaled UI mismatch · review blocked",
+        "Share-count mismatch on-chain — review paused",
       );
     }
   } else if (input.scaledUi?.kind === "unavailable") {
     honestyNotes.push(
-      `Scaled UI: ${input.scaledUi.note} · labeled (does not invent an on-chain pass)`,
+      "On-chain share count pending · labeled",
     );
     if (input.strictFailClosed) {
       blockedReasons.push(
-        "Strict fail-closed: on-chain Scaled UI unavailable · review blocked",
+        "On-chain share count unavailable — review paused",
       );
     }
   }

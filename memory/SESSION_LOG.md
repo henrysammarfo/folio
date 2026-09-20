@@ -1,6 +1,34 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Phase E partner lanes + kill beta localStorage
+
+- Henry: no localStorage on beta — waitlist now upserts Supabase `beta_waitlist` via service-role (migration `20260920_beta_waitlist.sql`). Fail-closed if keys/table missing.
+- Overview Netro: Stocks / Pre-IPO / Tessera partner tabs with honesty strips + desk links.
+- Buy lane row: Pre-IPO + Tessera jump links (catalogs stay on separate desks).
+- Branch: `cursor/folio-phase-e-partner-lanes-f1ec` (stacked on Phase D).
+
+## 2026-09-20 — Phase D route protection · rate limits · speed
+
+- Hard-gate `executeJupiterSwap` on verified `folio_session` (+ existing prefs/agent gates).
+- In-memory sliding-window rate limits: quote · execute · agent · waitlist (user id or IP).
+- Beta join calls rate-limited `joinBetaWaitlist` before localStorage write.
+- Shared `["session-bundle"]` query key for Open App + Account (fewer duplicate fetches).
+- Branch: `cursor/folio-phase-d-route-limits-f1ec` (stacked on Phase C).
+
+## 2026-09-20 — Phase C consumer settings + copy cleanup
+
+- Ops wall gated: `/desk/settings?wall=ops` only when `FOLIO_OPS=1` (else consumer Account).
+- Buy policy review: no BITQUERY_API_KEY / canReview true-false / fail-closed labels.
+- Account Desk mode card; humanize wash/gate strings; Borrow Nest copy softened.
+- Branch: `cursor/folio-phase-c-consumer-settings-f1ec` (stacked on Phase B).
+
+## 2026-09-20 — Phase B Open App (Privy doors + custody)
+
+- Merged Phase A PR #28 → main (`72c446e`).
+- Desk-wide `PrivyAppProvider` (Solana embedded + external connectors); header **Open App**; Account **Security & custody** (link wallet + export with warnings).
+- De-nested `PrivySessionMint` (no second PrivyProvider). Branch: `cursor/folio-phase-b-open-app-f1ec`.
+
 ## 2026-09-20 — Phase A begin + ecosystem field (Uniswap/peers)
 
 - Henry approved A→G order; begin Phase A.

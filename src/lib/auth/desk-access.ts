@@ -1,6 +1,6 @@
 /**
  * Desk access helpers — soft gate for UI, hard gate for metered / mutating ops.
- * Desk READ stays public (demo); writes + agent spend require a verified session.
+ * Desk READ stays public (demo); writes + agent spend + execute require a verified session.
  */
 
 import type { AdapterResult } from "../adapters/types";
@@ -27,7 +27,7 @@ export function deskAccessFromSession(
       activeTenantId: null,
       role: null,
       tenantCount: 0,
-      note: "Browsing without a signed session — connect on Account to save prefs or run the agent.",
+      note: "Browsing without a signed session — Open App to save prefs or run the agent.",
     };
   }
   const membership = activeMembership(session.data);
@@ -48,7 +48,27 @@ export function agentBlockedReason(
   session: AdapterResult<FolioSession>,
 ): string | null {
   if (!session.ok) {
-    return "Paper agent requires a signed session — connect on Account, then retry.";
+    return "Agent requires a signed session — Open App, then retry.";
+  }
+  return null;
+}
+
+/** Hard gate for Jupiter /execute — never broadcast without a verified session. */
+export function executeBlockedReason(
+  session: AdapterResult<FolioSession>,
+): string | null {
+  if (!session.ok) {
+    return "Execute requires a signed session — Open App, then retry.";
+  }
+  return null;
+}
+
+/** Prefs / tenant switch — verified session required (role checks separate). */
+export function prefsSessionBlockedReason(
+  session: AdapterResult<FolioSession>,
+): string | null {
+  if (!session.ok) {
+    return "Saving prefs requires a signed session — Open App, then retry.";
   }
   return null;
 }

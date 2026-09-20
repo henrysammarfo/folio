@@ -19,6 +19,11 @@ import {
 } from "@/lib/netro-live-gates";
 import type { NetroOwnershipSummary } from "@/lib/netro-ownership";
 import { findCatalogItem } from "@/lib/xstock-catalog";
+import {
+  PartnerLanePanel,
+  PartnerLaneTabs,
+  type PartnerLaneId,
+} from "@/components/partner-lane-panel";
 
 type Props = {
   multiplierLabel: string;
@@ -78,6 +83,7 @@ export function NetroDensityCanvas({
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [flowSymbol, setFlowSymbol] = useState<string>("AAPLx");
   const [spendChip, setSpendChip] = useState("1");
+  const [partnerLane, setPartnerLane] = useState<PartnerLaneId>("stocks");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [inspectInput, setInspectInput] = useState(initialInspect ?? "");
   const [ownershipOpen, setOwnershipOpen] = useState(Boolean(initialInspect));
@@ -455,6 +461,14 @@ export function NetroDensityCanvas({
             style={delay(9)}
             data-testid="netro-markets-flow"
           >
+            <PartnerLaneTabs
+              lane={partnerLane}
+              onChange={setPartnerLane}
+            />
+            {partnerLane !== "stocks" ? (
+              <PartnerLanePanel lane={partnerLane} />
+            ) : (
+              <>
             <div className="netro-density-market-bar">
               <strong>
                 {flowUnderlying}
@@ -565,6 +579,8 @@ export function NetroDensityCanvas({
                 {scaledUiStripLabel}
               </span>
             </div>
+              </>
+            )}
           </div>
         </div>
 

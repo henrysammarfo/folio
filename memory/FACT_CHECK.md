@@ -1,3 +1,45 @@
+## 2026-09-20 — Phase E partner lanes + server waitlist
+
+| Claim | Status |
+|---|---|
+| Beta waitlist never uses localStorage | Verified — server upsert only |
+| Fail-closed without Supabase keys / migration | Verified — unit tests |
+| Overview partner tabs: Stocks / Pre-IPO / Tessera | Implemented — `partner-lane-panel.tsx` |
+| Pre-IPO truth = mark/token/premium; Tessera = loan participation | Implemented |
+| Separate `/desk/preipo` + `/desk/tessera` URLs kept | Verified |
+| Henry must apply `20260920_beta_waitlist.sql` on Supabase | Action required |
+
+## 2026-09-20 — Phase D route protection · rate limits
+
+| Claim | Status |
+|---|---|
+| Execute requires verified folio_session | Verified — `executeBlockedReason` + executeJupiterSwap |
+| Quote/execute/agent/waitlist rate-limited per user or IP | Verified — `rate-limit.ts` + unit tests |
+| Prefs/agent already session-gated; messaging → Open App | Verified |
+| Beta waitlist hits server rate limit before local persist | Superseded — server Supabase upsert only (no localStorage) |
+| Rate limit store is per-process (not global CDN WAF) | Honest residual |
+
+## 2026-09-20 — Phase C consumer settings + copy
+
+| Claim | Status |
+|---|---|
+| Ops wall hidden unless FOLIO_OPS=1 | Verified — `opsWallEnabled` + settings gate |
+| Buy review no longer shows BITQUERY_API_KEY / fail-closed | Verified — acquire-gates + desk.acquire |
+| Account Desk mode card (reads · fills paused) | Implemented |
+| humanizeGateReason / scrubOpsJargon for consumer surfaces | Verified — unit tests |
+
+## 2026-09-20 — Phase B Open App + custody
+
+| Claim | Status |
+|---|---|
+| Capsule ≠ path — stay Privy embedded Solana | Decision — Phase B |
+| Desk-wide PrivyAppProvider wraps `/desk` | Verified — `desk.tsx` + `privy-app-provider.tsx` |
+| Open App = email/social embedded or connect Phantom/Solflare | Implemented — header + Account Sign in |
+| Account link wallet + export key with ack warnings | Implemented — `AccountCustodyPanel` |
+| Nested PrivyProvider removed from session mint | Verified — uses shell context |
+| Privy Solana peers (`@solana/kit`, program packages) required for `/solana` import | Verified — desk blank without them |
+| Localhost Open App modal needs Privy Allowed Origins | Residual — CSP frame-ancestors prod-only until allowlisted |
+
 ## 2026-09-20 — Phase A Jupiter V2 + ecosystem
 
 | Claim | Status |

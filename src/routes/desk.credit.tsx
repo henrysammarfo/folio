@@ -55,11 +55,11 @@ function Page() {
   const ltv = data?.paper.maxLtvUsed;
   const collateral = data?.paper.collateralUsd;
   const nestusdNote = data?.nestusd?.ok
-    ? "NestUSD risk-labeled · not verified ready"
-    : "NestUSD capacity unavailable · not verified";
+    ? "NestUSD is risk-labeled and not ready to borrow against yet"
+    : "NestUSD capacity isn’t available yet";
   const nestEarn = data?.nestCredit?.ok
-    ? `Nest.credit earn · ${data.nestCredit.data.vaultCount} vaults`
-    : "Nest.credit earn unavailable";
+    ? `Nest earn shows ${data.nestCredit.data.vaultCount} vaults (read-only)`
+    : "Nest earn rates aren’t available yet";
 
   return (
     <DeskShell title="Borrow">
@@ -135,7 +135,7 @@ function Page() {
         ) : null}
 
         <p className="fx-sub" style={{ marginTop: "1.25rem" }}>
-          {nestEarn}. {nestusdNote}. Borrowing is paused — not enabled yet.
+          {nestEarn}. {nestusdNote}. Borrowing stays off until we turn it on.
         </p>
 
         <div className="fx-foot">

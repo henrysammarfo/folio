@@ -60,11 +60,19 @@ import {
   agentBlockedReason,
   bootstrapBlockedReason,
   deskAccessFromSession,
+  prefsSessionBlockedReason,
   type DeskAccess,
 } from "./auth/desk-access";
+import { readClientIp } from "./auth/client-ip";
+import {
+  rateLimitCheck,
+  rateLimitClientKey,
+} from "./auth/rate-limit";
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
+import { isFolioOpsEnabled } from "./auth/ops-access";
+import { upsertBetaWaitlist } from "./auth/beta-waitlist";
 import { readApprovedLabShader, readApprovedLabUi } from "./lab-pick";
 
 const WATCHLIST = ["AAPLx", "NVDAx", "TSLAx"] as const;
@@ -244,6 +252,8 @@ export type EmpireReadiness = {
   supabaseSchemaReady: boolean;
   /** Honest probe detail for Settings (never invents ready). */
   supabaseSchemaDetail: string;
+  /** FOLIO_OPS=1 — ops wall at /desk/settings?wall=ops. Consumer Account otherwise. */
+  opsWallEnabled: boolean;
 };
 
 export function readEmpireReadiness(
@@ -274,6 +284,7 @@ export function readEmpireReadiness(
     /** Sync path defaults false — enrich via loadEmpireReadiness. */
     supabaseSchemaReady: false,
     supabaseSchemaDetail: "Not probed",
+    opsWallEnabled: isFolioOpsEnabled(env),
   };
 }
 
@@ -838,6 +849,16 @@ export const runDeskAgent = createServerFn({ method: "POST" })
     if (blocked) {
       return errResult("folio.agent.paper", "agent_requires_session", blocked);
     }
+    const rl = rateLimitCheck(
+      "agent",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return errResult("folio.agent.paper", "rate_limited", rl.detail);
+    }
     return runPaperAgent(data.prompt);
   });
 
@@ -856,6 +877,14 @@ export const updateDeskPreferences = createServerFn({ method: "POST" })
   .validator(PrefsInput)
   .handler(async ({ data }) => {
     const session = readVerifiedSession();
+    const sessionBlock = prefsSessionBlockedReason(session);
+    if (sessionBlock) {
+      return errResult(
+        "folio.prefs.save",
+        "prefs_require_session",
+        sessionBlock,
+      );
+    }
     if (!session.ok) {
       return errResult(
         "folio.prefs.save",
@@ -1169,3 +1198,52 @@ export const clearWatchWallet = createServerFn({ method: "POST" }).handler(
     }
   },
 );
+
+const WaitlistInput = z.object({
+  email: z.string().email().max(200),
+  wallet: z.string().max(88).optional(),
+  note: z.string().max(280).optional(),
+});
+
+/**
+ * Rate-limited beta waitlist — persists to Supabase beta_waitlist (service-role).
+ * Never localStorage. Fail-closed when keys/migration missing.
+ */
+export const joinBetaWaitlist = createServerFn({ method: "POST" })
+  .validator(WaitlistInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSession();
+    const rl = rateLimitCheck(
+      "waitlist",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
+    const saved = await upsertBetaWaitlist({
+      email: data.email,
+      wallet: data.wallet,
+      note: data.note,
+    });
+    if (!saved.ok) {
+      return {
+        ok: false as const,
+        reason: saved.reason,
+        detail: saved.detail ?? "Waitlist unavailable.",
+      };
+    }
+    return {
+      ok: true as const,
+      data: {
+        email: saved.data.email,
+        note: "Saved on FOLIO servers — you’ll get invite waves from the desk.",
+      },
+    };
+  });

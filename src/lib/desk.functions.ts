@@ -41,10 +41,28 @@ import {
 import {
   FOLIO_SESSION_COOKIE,
   loadDeskPreferences,
+  parseFolioSessionCookie,
   resolveActiveTenantId,
   verifyFolioSessionCookieValue,
+  type FolioSession,
 } from "./auth/session";
+import { executeBlockedReason } from "./auth/desk-access";
+import { readClientIp } from "./auth/client-ip";
+import {
+  rateLimitCheck,
+  rateLimitClientKey,
+} from "./auth/rate-limit";
 export { isBroadcastPaused } from "./broadcast";
+
+function readVerifiedSessionLocal(): AdapterResult<FolioSession> {
+  try {
+    const value = getCookie(FOLIO_SESSION_COOKIE);
+    return verifyFolioSessionCookieValue(value);
+  } catch {
+    const g = globalThis as { __FOLIO_COOKIE_HEADER__?: string };
+    return parseFolioSessionCookie(g.__FOLIO_COOKIE_HEADER__ ?? null);
+  }
+}
 
 /** Load strictFailClosed from active-tenant prefs when a session exists; else false. */
 async function loadStrictFailClosedPref(): Promise<{
@@ -285,6 +303,55 @@ export const getTruthBundle = createServerFn({ method: "GET" })
 export const getAcquireBundle = createServerFn({ method: "GET" })
   .validator(QuoteInput)
   .handler(async ({ data }): Promise<AcquireBundle> => {
+    const session = readVerifiedSessionLocal();
+    const rl = rateLimitCheck(
+      "quote",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      const denied = errResult("folio.rate-limit", "rate_limited", rl.detail);
+      return {
+        symbol: data.symbol,
+        paySymbol: "USDC",
+        spendUsdc: data.spendUsdc ?? 1,
+        payAmount: data.amount ?? data.spendUsdc ?? 1,
+        mode: "usdc",
+        payAsset: null,
+        asset: denied as AdapterResult<XStockAsset>,
+        multiplier: denied as AdapterResult<XStockMultiplier>,
+        pyth: denied as AdapterResult<PythPrice>,
+        equityRef: denied as AdapterResult<EquityRefPrice>,
+        jupiterPrice: denied as AdapterResult<JupiterTokenPrice>,
+        wash: denied as AdapterResult<WashVerdict>,
+        jupiter: denied as AdapterResult<JupiterQuote>,
+        pools: denied as AdapterResult<PoolAwareness>,
+        scaledUi: denied as AdapterResult<ScaledUiOnchain>,
+        scaledUiCompare: {
+          status: "unavailable",
+          apiMultiplier: null,
+          onchainEffective: null,
+          deltaBps: null,
+          note: rl.detail,
+        },
+        strictFailClosed: false,
+        prefsFromSession: false,
+        broadcastPaused: isBroadcastPaused(),
+        gates: {
+          truthOk: false,
+          washOk: false,
+          quoteOk: false,
+          divergeOk: false,
+          scaledUiOk: false,
+          canReview: false,
+          blockedReasons: [rl.detail],
+          honestyNotes: [],
+        },
+      };
+    }
+
     const symbol = data.symbol;
     const payRaw = data.paySymbol?.trim();
     const isPair = Boolean(payRaw && payRaw.toUpperCase() !== "USDC");
@@ -429,14 +496,14 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
     const honestyNotes = [
       ...gateMsgs.honestyNotes,
       isPair
-        ? `Stock↔stock · ${paySymbol} → ${symbol} · Jupiter Swap V2 /order (quote-only until fills arm)`
+        ? `Stock ↔ stock · ${paySymbol} → ${symbol} · quote only until fills turn on`
         : null,
       jupiter.ok && jupiter.data.router
         ? `Router ${jupiter.data.router}${jupiter.data.gasless ? " · gasless path" : ""}`
         : null,
       isBroadcastPaused()
-        ? "Broadcast paused — /execute refused until BROADCAST_PAUSED=false"
-        : "Broadcast armed — /execute available after wallet sign",
+        ? "Fills paused — review only until FOLIO arms buys"
+        : "Fills armed — sign in wallet to execute",
     ].filter(Boolean) as string[];
 
     return {
@@ -479,17 +546,41 @@ const ExecuteSwapInput = z.object({
 
 /**
  * Land a user-signed Jupiter Swap V2 order.
- * Fail-closed while BROADCAST_PAUSED≠false. Does not sign — client must sign first.
+ * Requires verified folio_session · fail-closed while BROADCAST_PAUSED≠false.
+ * Does not sign — client must sign first.
  */
 export const executeJupiterSwap = createServerFn({ method: "POST" })
   .inputValidator(ExecuteSwapInput)
   .handler(async ({ data }) => {
+    const session = readVerifiedSessionLocal();
+    const sessionBlock = executeBlockedReason(session);
+    if (sessionBlock) {
+      return {
+        ok: false as const,
+        reason: "execute_requires_session",
+        detail: sessionBlock,
+      };
+    }
+    const rl = rateLimitCheck(
+      "execute",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
     if (isBroadcastPaused()) {
       return {
         ok: false as const,
         reason: "broadcast_paused",
         detail:
-          "Fills paused · set BROADCAST_PAUSED=false to arm /execute (preview first).",
+          "Fills paused — FOLIO arms buys on a preview first, then production.",
       };
     }
     const res = await fetchJupiterExecute({
@@ -627,6 +718,7 @@ export {
   bootstrapDemoDeskSession,
   bindWatchWallet,
   clearWatchWallet,
+  joinBetaWaitlist,
 } from "./desk.empire";
 export { getPreipoBundle, getTesseraBundle } from "./desk.markets";
 export { getMarketsBoard, getScreenerBundle } from "./desk.screener";

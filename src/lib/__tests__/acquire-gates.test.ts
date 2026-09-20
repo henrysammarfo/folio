@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildAcquireGateMessages } from "../acquire-gates";
 
 describe("buildAcquireGateMessages", () => {
-  it("names BITQUERY_API_KEY when wash adapter is missing the key", () => {
+  it("blocks wash when market tape key is missing — consumer wording", () => {
     const g = buildAcquireGateMessages({
       truthOk: true,
       tradingHalted: false,
@@ -13,7 +13,8 @@ describe("buildAcquireGateMessages", () => {
       diverge: { kind: "unavailable" },
     });
     expect(g.canReview).toBe(false);
-    expect(g.blockedReasons.join(" ")).toMatch(/BITQUERY_API_KEY/);
+    expect(g.blockedReasons.join(" ")).toMatch(/Market tape unavailable/i);
+    expect(g.blockedReasons.join(" ")).not.toMatch(/BITQUERY/i);
     expect(g.honestyNotes).toEqual([]);
   });
 
@@ -46,7 +47,7 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(g.divergeOk).toBe(false);
     expect(g.canReview).toBe(false);
-    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed.*equity/i);
+    expect(g.blockedReasons.join(" ")).toMatch(/equity reference required/i);
     expect(g.honestyNotes.join(" ")).toMatch(/equity ref|Yahoo|Finnhub/i);
   });
 
@@ -63,7 +64,7 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(g.divergeOk).toBe(false);
     expect(g.canReview).toBe(false);
-    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed/i);
+    expect(g.blockedReasons.join(" ")).toMatch(/Price check unresolved/i);
   });
 
   it("blocks review on live diverge outside band", () => {
@@ -106,7 +107,7 @@ describe("buildAcquireGateMessages", () => {
       pools: { kind: "ok", poolCount: 5 },
     });
     expect(g.canReview).toBe(true);
-    expect(g.honestyNotes.join(" ")).toMatch(/Raydium.*awareness only|not a route guarantee/i);
+    expect(g.honestyNotes.join(" ")).toMatch(/Pool awareness|not a route guarantee/i);
   });
 
   it("labels empty/unavailable Raydium without inventing a hard block", () => {
@@ -121,7 +122,7 @@ describe("buildAcquireGateMessages", () => {
       pools: { kind: "empty" },
     });
     expect(empty.canReview).toBe(true);
-    expect(empty.honestyNotes.join(" ")).toMatch(/zero pools|awareness only/i);
+    expect(empty.honestyNotes.join(" ")).toMatch(/No pools observed|quote path/i);
 
     const down = buildAcquireGateMessages({
       truthOk: true,
@@ -135,7 +136,7 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(down.canReview).toBe(true);
     expect(down.blockedReasons).toEqual([]);
-    expect(down.honestyNotes.join(" ")).toMatch(/Raydium pool awareness unavailable/i);
+    expect(down.honestyNotes.join(" ")).toMatch(/Pool awareness unavailable/i);
   });
 
   it("labels Scaled UI match/mismatch without inventing a hard block", () => {
@@ -150,7 +151,7 @@ describe("buildAcquireGateMessages", () => {
       scaledUi: { kind: "match", note: "API ↔ on-chain within 1 bps" },
     });
     expect(match.canReview).toBe(true);
-    expect(match.honestyNotes.join(" ")).toMatch(/Scaled UI/);
+    expect(match.honestyNotes.join(" ")).toMatch(/Share count on-chain matches/i);
 
     const mismatch = buildAcquireGateMessages({
       truthOk: true,
@@ -164,7 +165,7 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(mismatch.canReview).toBe(true);
     expect(mismatch.blockedReasons).toEqual([]);
-    expect(mismatch.honestyNotes.join(" ")).toMatch(/mismatch/i);
+    expect(mismatch.honestyNotes.join(" ")).toMatch(/differs|mismatch/i);
   });
 
   it("blocks Scaled UI mismatch when strictFailClosed is on", () => {
@@ -180,6 +181,6 @@ describe("buildAcquireGateMessages", () => {
       scaledUi: { kind: "mismatch", note: "diverge 50 bps" },
     });
     expect(g.canReview).toBe(false);
-    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed.*Scaled UI/i);
+    expect(g.blockedReasons.join(" ")).toMatch(/Share-count mismatch/i);
   });
 });
