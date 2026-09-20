@@ -14,9 +14,9 @@
 ## Desk UI (product)
 
 - Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
-- Buy **Netro-depth**: swap details sheet (route/impact/slip/gas) + settings sheet (slippage + gas pref: best / USDC-only / SOL-native). Fills still paused.
+- Buy **Netro-depth**: short Details (route/impact/gas/fill) + settings (slippage + gas chips). Fills still paused.
 - **/desk/markets** live Jupiter board + **flow strip** (quick Buy chips) — square lane filters, list-style pairs.
-- Netro overview: **markets flow icon strip** (drives chart/quote) + **AI modal** expand from yellow rail.
+- Netro overview: **FOLIO watermark** over TradingView (NetroBNB CryptoMarketCard pattern) · tight Buy sheet · AI modal.
 - Live-trade research: `docs/LIVE_TRADE_NO_PROGRAM.md` — no FOLIO program; Jupiter Swap V2 gasless / JupiterZ / later Kora; each tester brings own ~$10.
 - **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.

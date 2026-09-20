@@ -139,13 +139,6 @@ function Page() {
         ? "mismatch"
         : "off";
 
-  const gasHint =
-    gasPref === "usdc"
-      ? "USDC-only: Jupiter gasless kicks in on ~$10+ swaps when wallet SOL is under 0.01. Sub-$10 probes may quote but fail execute until you add a little SOL or size up."
-      : gasPref === "sol"
-        ? "SOL-native: pay gas in SOL for best routes. You can also swap SOL → xStock when fills arm — no FOLIO program needed."
-        : "Best quotes: keep USDC + ~0.02–0.05 SOL. USDC-only still works via Jupiter gasless on ~$10+ fills.";
-
   const checkLines = [
     ...(data?.gates.blockedReasons ?? []),
     ...(data?.gates.honestyNotes ?? []),
@@ -187,12 +180,19 @@ function Page() {
       <section className="fx-buy fx-page">
         <div className="fx-buy-stack">
           <div className="fx-card fx-buy-chart">
-            <TradingViewChart
-              symbol={receive}
-              height={380}
-              interval="60"
-              theme="light"
-            />
+            <div className="fx-buy-chart-stage">
+              <TradingViewChart
+                symbol={receive}
+                height={380}
+                interval="60"
+                theme="light"
+                hideAttr
+              />
+              <div className="fx-buy-chart-mark" aria-hidden>
+                <img src="/folio-mark.svg" alt="" />
+                <span>FOLIO</span>
+              </div>
+            </div>
           </div>
 
           <div className="fx-card fx-picker">
@@ -484,12 +484,9 @@ function Page() {
               aria-expanded={detailsOpen}
               onClick={() => setDetailsOpen((v) => !v)}
             >
-              <span>Swap details</span>
+              <span>Details</span>
               <em>
-                {slippageBps / 100}% slip
-                {impactPct != null && Number.isFinite(impactPct)
-                  ? ` · ${impactPct.toFixed(3)}% impact`
-                  : ""}
+                {slippageBps / 100}% · paused
               </em>
               <ChevronDown size={16} strokeWidth={2.2} />
             </button>
@@ -499,39 +496,34 @@ function Page() {
                   <dt>Route</dt>
                   <dd>
                     {data?.jupiter.ok
-                      ? `${routeHops ?? 0} hop${routeHops === 1 ? "" : "s"} · Jupiter`
+                      ? `${routeHops ?? "—"} · Jupiter`
                       : isFetching
-                        ? "Quoting…"
-                        : "No route yet"}
+                        ? "…"
+                        : "—"}
                   </dd>
                 </div>
                 <div>
-                  <dt>Price impact</dt>
+                  <dt>Impact</dt>
                   <dd>
                     {impactPct != null && Number.isFinite(impactPct)
-                      ? `${impactPct.toFixed(4)}%`
+                      ? `${impactPct.toFixed(2)}%`
                       : "—"}
                   </dd>
-                </div>
-                <div>
-                  <dt>Slippage</dt>
-                  <dd>{slippageBps / 100}% (settings)</dd>
                 </div>
                 <div>
                   <dt>Gas</dt>
                   <dd>
                     {gasPref === "usdc"
-                      ? "USDC-only · Jupiter gasless when eligible"
+                      ? "USDC only"
                       : gasPref === "sol"
-                        ? "User pays SOL"
-                        : "Best · tiny SOL preferred"}
+                        ? "SOL"
+                        : "USDC + SOL"}
                   </dd>
                 </div>
                 <div>
-                  <dt>Broadcast</dt>
-                  <dd>Paused · quote-only</dd>
+                  <dt>Fill</dt>
+                  <dd>Paused</dd>
                 </div>
-                <p className="fx-swap-sheet-note">{gasHint}</p>
               </dl>
             ) : null}
           </div>
@@ -678,7 +670,6 @@ function Page() {
 
             <section className="fx-sheet-section">
               <h3>Slippage</h3>
-              <p>Max price move you accept on fill. Quote path still uses live Jupiter; this preference arms with broadcast.</p>
               <div className="fx-chip-row">
                 {SLIPPAGE_CHIPS.map((c) => (
                   <button
@@ -694,17 +685,13 @@ function Page() {
             </section>
 
             <section className="fx-sheet-section">
-              <h3>Gas preference</h3>
-              <p>
-                No FOLIO program. Each tester brings their own ~$10. We do not
-                sponsor other wallets&apos; gas.
-              </p>
-              <div className="fx-gas-prefs" role="radiogroup" aria-label="Gas preference">
+              <h3>Gas</h3>
+              <div className="fx-gas-prefs" role="radiogroup" aria-label="Gas">
                 {(
                   [
-                    ["best", "Best quotes", "USDC + tiny SOL"],
-                    ["usdc", "USDC only", "Jupiter gasless ≥~$10"],
-                    ["sol", "SOL native", "Pay gas · swap SOL"],
+                    ["best", "Best", "USDC + SOL"],
+                    ["usdc", "USDC only", "Gasless ≥~$10"],
+                    ["sol", "SOL", "Pay gas in SOL"],
                   ] as const
                 ).map(([id, title, blurb]) => (
                   <button
@@ -720,7 +707,6 @@ function Page() {
                   </button>
                 ))}
               </div>
-              <p className="fx-sheet-foot">{gasHint}</p>
             </section>
 
             <button
