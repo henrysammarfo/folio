@@ -68,12 +68,13 @@ function Page() {
           maximumFractionDigits: 0,
         })
       : "—";
+  const nestStatus = data && !data.nestusd.ok ? "Unverified" : data?.nestusd.ok ? "Probed" : "…";
   const nestDetail =
     data && !data.nestusd.ok
-      ? data.nestusd.detail ?? data.nestusd.reason
+      ? "NestUSD borrow capacity stays hidden until a verified public metrics endpoint exists. Nest.credit vault TVL is a different product."
       : data?.nestusd.ok
-        ? "Probed · risk-labeled"
-        : "Risk / unverified";
+        ? "Probed · risk-labeled — still not NestUSD borrow capacity"
+        : "Capacity hidden until verified NestUSD borrow metrics";
 
   return (
     <PublicShell
@@ -111,57 +112,75 @@ function Page() {
         </div>
       }
     >
-      <div className="protocol-list">
+      <div className="protocol-list" aria-label="Credit protocol reads">
         <div>
-          <span>Kamino</span>
-          <em data-ok={String(Boolean(data?.kamino.ok))}>
-            {data?.kamino.ok
-              ? "Mainnet read"
-              : data && !data.kamino.ok
-                ? data.kamino.reason
-                : "…"}
-          </em>
-          <b>
+          <header>
+            <span>Kamino</span>
+            <em data-ok={String(Boolean(data?.kamino.ok))}>
+              {data?.kamino.ok
+                ? "Mainnet read"
+                : data && !data.kamino.ok
+                  ? "Unavailable"
+                  : "…"}
+            </em>
+          </header>
+          <p>
             {data?.kamino.ok
               ? `${data.kamino.data.reserves.length} xStocks reserves · AAPLx LTV ${
                   aaplLtv != null ? `${(aaplLtv * 100).toFixed(0)}%` : "—"
                 }`
-              : "xStocks market reserves (live LTV/APY when reachable)"}
-          </b>
+              : data && !data.kamino.ok
+                ? data.kamino.reason
+                : "xStocks market reserves (live LTV/APY when reachable)"}
+          </p>
         </div>
         <div>
-          <span>Jupiter Lend</span>
-          <em data-ok={String(Boolean(data?.jupiterLend.ok))}>
+          <header>
+            <span>Jupiter Lend</span>
+            <em data-ok={String(Boolean(data?.jupiterLend.ok))}>
+              {data?.jupiterLend.ok
+                ? "Earn vaults"
+                : data && !data.jupiterLend.ok
+                  ? "Unavailable"
+                  : "…"}
+            </em>
+          </header>
+          <p>
             {data?.jupiterLend.ok
-              ? "Earn vaults"
+              ? "Earn vaults observed — not an xStock borrow path"
               : data && !data.jupiterLend.ok
                 ? data.jupiterLend.reason
-                : "…"}
-          </em>
-          <b>Earn vaults observed — not an xStock borrow path</b>
+                : "Earn vaults when reachable"}
+          </p>
         </div>
         <div>
-          <span>Nest.credit</span>
-          <em data-ok={String(Boolean(data?.nestCredit.ok))}>
-            {data?.nestCredit.ok
-              ? `${data.nestCredit.data.vaultCount} vaults`
-              : data && !data.nestCredit.ok
-                ? data.nestCredit.reason
-                : "…"}
-          </em>
-          <b>
+          <header>
+            <span>Nest.credit</span>
+            <em data-ok={String(Boolean(data?.nestCredit.ok))}>
+              {data?.nestCredit.ok
+                ? `${data.nestCredit.data.vaultCount} vaults`
+                : data && !data.nestCredit.ok
+                  ? "Unavailable"
+                  : "…"}
+            </em>
+          </header>
+          <p>
             {data?.nestCredit.ok
               ? `Indexed TVL ~$${Math.round(data.nestCredit.data.totalTvlUsd).toLocaleString()} · ${data.nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
-              : "Vault awareness when reachable — not NestUSD capacity"}
-          </b>
+              : data && !data.nestCredit.ok
+                ? data.nestCredit.reason
+                : "Vault awareness when reachable — not NestUSD capacity"}
+          </p>
         </div>
         <div>
-          <span>NestUSD</span>
-          <em data-ok="false">{nestDetail}</em>
-          <b>Capacity hidden until verified NestUSD borrow metrics</b>
+          <header>
+            <span>NestUSD</span>
+            <em data-ok="false">{nestStatus}</em>
+          </header>
+          <p>{nestDetail}</p>
         </div>
       </div>
-      <p className="mt-4 text-sm opacity-80">
+      <p className="mkt-note">
         {data?.walletSource === "inspect"
           ? "Capacity uses ephemeral inspect wallet-read qty (not auth / not multi-tenant)."
           : "Optional: append ?inspect=<pubkey> for ephemeral mainnet-read capacity without a session secret."}
