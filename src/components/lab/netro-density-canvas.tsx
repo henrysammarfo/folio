@@ -78,7 +78,7 @@ export function NetroDensityCanvas({
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [flowSymbol, setFlowSymbol] = useState<string>("AAPLx");
   const [spendChip, setSpendChip] = useState("1");
-  const [sheetOpen, setSheetOpen] = useState(true);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [inspectInput, setInspectInput] = useState(initialInspect ?? "");
   const [ownershipOpen, setOwnershipOpen] = useState(Boolean(initialInspect));
   const runAgent = useServerFn(runDeskAgent);
