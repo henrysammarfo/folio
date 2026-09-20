@@ -6,6 +6,7 @@
 | NetroBNB centers brand watermark over TV with opacity ~0.11, z-10 | Verified — `CryptoMarketCard.tsx` |
 | FOLIO mark overlays TV stage (not under iframe / not on stats strip) | Verified — screenshot `netro-overview-chart-watermark.png` |
 | Buy desk chart also carries FOLIO mark | Verified — `netro-acquire-chart-watermark.png` |
+| Overview TV theme light like NetroBNB | Verified — theme=light; screenshot folio-tv-light-watermark.png |
 | Prod `/desk` shows FOLIO mark; no gasless essay / Welcome dump | Verified — `folio-tawny-one` after main merge `ae31fa1`; `prod-chart-watermark.png` · `prod-buy-sheet.png` |
 
 ## 2026-09-20 — Live trade / gasless (no FOLIO program)

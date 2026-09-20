@@ -487,16 +487,16 @@ export function NetroDensityCanvas({
               <em>{multiplierLabel.replace(/\s*live$/i, "")}</em>
             </div>
             <div
-              className="netro-density-chart netro-density-chart-dark netro-density-chart-tv"
+              className="netro-density-chart netro-density-chart-tv"
               data-testid="netro-truth-strip"
             >
-              {/* NetroBNB CryptoMarketCard: watermark only over the TV stage */}
+              {/* NetroBNB CryptoMarketCard: light TV + dark brand watermark */}
               <div className="netro-density-chart-stage">
                 <TradingViewChart
                   symbol={flowSymbol}
                   height={300}
                   interval="60"
-                  theme="dark"
+                  theme="light"
                   hideAttr
                 />
                 <div className="netro-density-chart-mark" aria-hidden>
@@ -530,7 +530,7 @@ export function NetroDensityCanvas({
                 </div>
               </div>
               <div
-                className="netro-density-flow-icons netro-density-flow-icons-dark"
+                className="netro-density-flow-icons"
                 role="listbox"
                 aria-label="Symbols"
               >

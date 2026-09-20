@@ -1,6 +1,11 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Light TradingView (Netro match)
+
+- Chart was dark because we set `theme="dark"` — NetroBNB uses `theme: "light"` + dark `#1C1C1C` watermark @ 0.11.
+- Switched overview TV to light; mark no longer inverted white-on-black blob.
+
 ## 2026-09-20 — FOLIO watermark shipped to main/prod
 
 - User still saw old wordy Buy sheet — that was **main/prod**, not PR #26 preview.
@@ -91,6 +96,11 @@
 - Build + 147 unit tests green.
 
 # FOLIO — SESSION LOG
+
+## 2026-09-20 — Light TradingView (Netro match)
+
+- Chart was dark because we set `theme="dark"` — NetroBNB uses `theme: "light"` + dark `#1C1C1C` watermark @ 0.11.
+- Switched overview TV to light; mark no longer inverted white-on-black blob.
 
 ## 2026-09-15 — Plan lock + execution start
 

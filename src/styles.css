@@ -480,13 +480,6 @@
   flex:0 0 auto;margin-left:.15rem;font-size:.72rem;font-weight:700;
   color:#066A84;text-decoration:none;white-space:nowrap;padding:.55rem .35rem;
 }
-.netro-density-chart-stats{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem .75rem;
-  padding:.65rem .85rem;border-top:1px solid #222;background:#0d0d0d;
-}
-@media(min-width:640px){.netro-density-chart-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
-.netro-density-chart-stats span{display:block;font-size:.62rem;color:#8d8a95;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.04em}
-.netro-density-chart-stats b{display:block;font-size:.82rem;font-weight:650;color:#fff;font-variant-numeric:tabular-nums}
 .netro-density-rail-expand{
   margin-left:auto;border:1px solid rgba(28,28,28,.18);background:#fff;
   border-radius:8px;padding:.28rem .55rem;font-size:.65rem;font-weight:700;
@@ -535,12 +528,13 @@
 .netro-pill-on{background:var(--netro-yellow,#0EA5C9);border-color:var(--netro-yellow,#0EA5C9);color:var(--netro-yellow-ink,#1c1c1c);font-weight:550}
 .netro-density-card b{font-size:1.05rem;font-weight:500;font-variant-numeric:tabular-nums}
 .netro-density-card small{font-size:.72rem;color:#6b7280}
-.netro-density-market{background:#111;border:1px solid #111;border-radius:14px;padding:0;box-shadow:0 1px 5px rgba(0,0,0,.08);color:#fff;overflow:hidden}
+.netro-density-market{background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:0;box-shadow:0 1px 5px rgba(0,0,0,.06);color:#1c1c1c;overflow:hidden}
+/* NetroBNB: black header strip + light chart body */
 .netro-density-market-bar{
   display:flex;flex-wrap:wrap;align-items:center;gap:.55rem .75rem;
-  padding:.75rem 1rem;background:#0A0A0A;
+  padding:.75rem 1rem;background:#0A0A0A;color:#fff;
 }
-.netro-density-market-bar strong{font-size:1rem;font-weight:700}
+.netro-density-market-bar strong{font-size:1rem;font-weight:700;color:#fff}
 .netro-density-market-sym{font-weight:500;color:rgba(255,255,255,.55);font-size:.8rem;margin-left:.2rem}
 .netro-density-market-tabs{
   display:flex;flex-wrap:wrap;align-items:center;gap:.15rem;flex:1;min-width:0;
@@ -555,21 +549,28 @@
   text-decoration:none;white-space:nowrap;
 }
 .netro-density-market-bar em{margin-left:auto;font-style:normal;font-variant-numeric:tabular-nums;font-weight:700;color:var(--netro-yellow,#0EA5C9)}
-.netro-density-chart{background:#0a0a0a;border:0;border-radius:0;overflow:hidden;position:relative}
-/* NetroBNB CryptoMarketCard: stage wraps TV; mark sits above iframe (z-10) */
+.netro-density-chart{background:#fff;border:0;border-radius:0;overflow:hidden;position:relative}
+/* NetroBNB CryptoMarketCard: light TV stage; dark mark @ ~0.11 */
 .netro-density-chart-stage{position:relative;z-index:0;width:100%}
-.netro-density-chart-stage .folio-tv-chart{position:relative;z-index:0;isolation:auto}
+.netro-density-chart-stage .folio-tv-chart{position:relative;z-index:0;isolation:auto;background:#fff}
 .netro-density-chart-mark{
   position:absolute;inset:0;z-index:10;pointer-events:none;user-select:none;
-  display:flex;align-items:center;justify-content:center;gap:.9rem;
-  opacity:.22;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;gap:.875rem;
+  opacity:.11;white-space:nowrap;
 }
-.netro-density-chart-mark img{height:3.75rem;width:auto;display:block;filter:brightness(0) invert(1);opacity:.95}
+.netro-density-chart-mark img{height:4rem;width:auto;display:block;filter:none}
 .netro-density-chart-mark span{
-  font-size:2.75rem;font-weight:900;letter-spacing:-.04em;color:#fff;line-height:1;
-  font-family:inherit;text-shadow:0 0 1px rgba(0,0,0,.35);
+  font-size:2.75rem;font-weight:900;letter-spacing:-.04em;color:#1c1c1c;line-height:1;
+  font-family:inherit;text-shadow:none;
 }
 .netro-density-chart-dark{min-height:12rem}
+.netro-density-chart-stats{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem .75rem;
+  padding:.65rem .85rem;border-top:1px solid #f0f0f0;background:#fff;
+}
+@media(min-width:640px){.netro-density-chart-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.netro-density-chart-stats span{display:block;font-size:.62rem;color:#8d8a95;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.04em}
+.netro-density-chart-stats b{display:block;font-size:.82rem;font-weight:650;color:#1c1c1c;font-variant-numeric:tabular-nums}
 /* Buy desk chart mark (light TV) — same Netro dead-center pattern */
 .fx-buy-chart-stage{position:relative;z-index:0}
 .fx-buy-chart-stage .folio-tv-chart{position:relative;z-index:0;isolation:auto}
@@ -1757,16 +1758,16 @@ button.fx-swap-mid:disabled{opacity:.4;cursor:default}
 .fx-panel-fold[data-open="0"] .fx-panel-body{display:none}
 .fx-panel-toggle{font-size:.72rem;color:var(--fx-muted)}
 
-/* Netro home: TradingView in market strip */
+/* Netro home: TradingView in market strip — light like CryptoMarketCard */
 .netro-density-chart-tv{padding-bottom:.15rem}
 .netro-density-chart-tv .folio-tv-chart{
-  border:0;border-radius:0;box-shadow:none;background:#0a0a0a;
+  border:0;border-radius:0;box-shadow:none;background:#fff;
 }
 .netro-density-chart-tv .folio-tv-chart-attr{
   display:none;
 }
 .netro-density-chart-tv .folio-tv-chart-skeleton{
-  background:linear-gradient(180deg,#111,#0a0a0a);color:#a3a3a3;
+  background:linear-gradient(180deg,#f8fafb,#fff);color:#8d8a95;
 }
 .netro-density-chart-tv .tradingview-widget-container__widget{
   height:100% !important;
