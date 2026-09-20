@@ -3,8 +3,10 @@
 
 - Killed PublicShell pill nav, dark intros, three-features/metric card walls, Benefits + Glow landing sections.
 - Brand-first home hero (FOLIO signal + headline + CTA in first viewport); editorial strip; light mkt atmosphere.
-- Desk: square lane filters; markets pair links as list not cards; truth badge cluster trimmed.
-- Branch: `cursor/folio-marketing-desk-redo-f1ec`.
+- Desk: text top-nav; square lane filters; markets asides as links not cards; truth badge cluster trimmed.
+- Fixed CSS brace break that blanked Vite HMR; hero bottom scrim for contrast.
+- Branch/PR: `cursor/folio-marketing-desk-redo-f1ec` · https://github.com/henrysammarfo/folio/pull/20
+
 
 
 - Buy Pairs tab: true Jupiter stock↔stock (pay mint → receive mint), lane explainers for Mega/IPO/Meme.
