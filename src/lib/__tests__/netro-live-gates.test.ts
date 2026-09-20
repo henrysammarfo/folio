@@ -93,7 +93,7 @@ describe("buildNetroLiveGateLabels", () => {
       ],
       broadcastPaused: true,
       jupiterOutUi: 0.002994,
-      jupiterSource: "api.jup.ag/swap/v1/quote · cached 12s",
+      jupiterSource: "api.jup.ag/swap/v2/order · cached 12s",
     });
     expect(labels.quoteOut).toBe("0.002994 AAPLx");
     expect(labels.quoteMeta).toMatch(/cached/);

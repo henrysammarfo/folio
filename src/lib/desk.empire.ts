@@ -74,7 +74,7 @@ function unavailablePrice(reason: string): AdapterResult<JupiterTokenPrice> {
 }
 
 function unavailableQuote(reason: string): AdapterResult<JupiterQuote> {
-  return errResult("api.jup.ag/swap/v1/quote", reason);
+  return errResult("api.jup.ag/swap/v2/order", reason);
 }
 
 function readVerifiedSession(): AdapterResult<FolioSession> {

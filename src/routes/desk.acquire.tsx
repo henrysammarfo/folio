@@ -496,7 +496,7 @@ function Page() {
                   <dt>Route</dt>
                   <dd>
                     {data?.jupiter.ok
-                      ? `${routeHops ?? "—"} · Jupiter`
+                      ? `${data.jupiter.data.router ?? "Jupiter"}${data.jupiter.data.gasless ? " · gasless" : ""}`
                       : isFetching
                         ? "…"
                         : "—"}
@@ -513,16 +513,22 @@ function Page() {
                 <div>
                   <dt>Gas</dt>
                   <dd>
-                    {gasPref === "usdc"
-                      ? "USDC only"
-                      : gasPref === "sol"
-                        ? "SOL"
-                        : "USDC + SOL"}
+                    {data?.jupiter.ok && data.jupiter.data.gasless
+                      ? "Gasless path"
+                      : gasPref === "usdc"
+                        ? "USDC only"
+                        : gasPref === "sol"
+                          ? "SOL"
+                          : "USDC + SOL"}
                   </dd>
                 </div>
                 <div>
                   <dt>Fill</dt>
-                  <dd>Paused</dd>
+                  <dd>
+                    {data && "broadcastPaused" in data && data.broadcastPaused === false
+                      ? "Armed · sign to execute"
+                      : "Paused"}
+                  </dd>
                 </div>
               </dl>
             ) : null}

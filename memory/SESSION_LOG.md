@@ -1,6 +1,12 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Phase A begin + ecosystem field (Uniswap/peers)
+
+- Henry approved A→G order; begin Phase A.
+- Ecosystem: `docs/ECOSYSTEM_FIELD.md` — Uniswap/UniswapX+Ondo, Dinari, xStocks, PreStocks, Tessera, Superstate, Robinhood. Live arm stays Solana+Jupiter.
+- Jupiter **`swap/v2/order`** + gated **`/execute`** (`executeJupiterSwap`). Wallet sign = Phase B. Vitest green.
+
 ## 2026-09-20 — Light TradingView (Netro match)
 
 - Chart was dark because we set `theme="dark"` — NetroBNB uses `theme: "light"` + dark `#1C1C1C` watermark @ 0.11.
