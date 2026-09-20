@@ -18,18 +18,15 @@
 - **/desk/markets** live Jupiter board + **flow strip** (quick Buy chips) — square lane filters, list-style pairs.
 - Netro overview: **FOLIO watermark** over TradingView (NetroBNB CryptoMarketCard pattern) · tight Buy sheet · AI modal.
 - Live-trade research: `docs/LIVE_TRADE_NO_PROGRAM.md` · field map `docs/ECOSYSTEM_FIELD.md`
-- **Phase A on main (`72c446e`):** Jupiter Swap V2 `/order`; `/execute` gated by broadcast pause — no FOLIO program; Jupiter Swap V2 gasless / JupiterZ / later Kora; each tester brings own ~$10.
-- **Phase B in progress:** Desk-wide Privy Open App (email embedded Solana + connect wallet) · Account link/export custody · branch `cursor/folio-phase-b-open-app-f1ec`.
-- **Phase C in progress:** Consumer Account vs Ops (`FOLIO_OPS=1`) · scrub BITQUERY/fail-closed from Buy/Account/Activity · Desk mode card · branch `cursor/folio-phase-c-consumer-settings-f1ec`.
-- **Phase D in progress:** Execute/prefs/agent hard-gated on `folio_session` · rate limits (quote/execute/agent/waitlist) · shared session query · branch `cursor/folio-phase-d-route-limits-f1ec`.
-- **Phase E in progress:** Overview Stocks / Pre-IPO / Tessera partner lanes · Buy lane links · beta waitlist **server-only** (Supabase `beta_waitlist`, no localStorage) · branch `cursor/folio-phase-e-partner-lanes-f1ec`.
+- **Phases A–E on main (`4a35b13`):** Swap V2 `/order` + gated `/execute` · Privy Open App (email/embedded Solana + link/export) · consumer settings scrub (`FOLIO_OPS=1`) · session/rate-limit gates · overview Stocks/Pre-IPO/Tessera partner lanes · beta waitlist **server-only** (Supabase `beta_waitlist`, no localStorage).
+- Prod: https://folio-tawny-one.vercel.app (deploy `dpl_HqyyW2D1Tm67kdGdvhB1hdgQJ9Bf` READY).
+- Henry still: apply `beta_waitlist` migration · Privy allowed origins.
 - **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
 - Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).
 - Soft access banner → **Open App**; Account tenant switcher; agent session-gated.
 - **/whitepaper** · **/beta** waitlist · docs: `FOLIO_WHITEPAPER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
 - Human wash copy (no raw `bitquery_*` in PreStocks/Tessera consumer UI).
-- Branch (active): `cursor/folio-phase-b-open-app-f1ec`.
 
 ## Launch path (Stocklana → Colosseum → beta)
 

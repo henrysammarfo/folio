@@ -1,6 +1,12 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Phases B–E merged to main · prod READY
+
+- Merged tip `cursor/folio-phase-e-partner-lanes-f1ec` → main `4a35b13` (Open App · consumer copy · gates · partner lanes · server waitlist).
+- Prod deploy READY: https://folio-tawny-one.vercel.app (`dpl_HqyyW2D1Tm67kdGdvhB1hdgQJ9Bf`).
+- PRs #29 MERGED; #30–#32 closed after tip merge. Henry: `beta_waitlist` migration + Privy origins.
+
 ## 2026-09-20 — Phase E partner lanes + kill beta localStorage
 
 - Henry: no localStorage on beta — waitlist now upserts Supabase `beta_waitlist` via service-role (migration `20260920_beta_waitlist.sql`). Fail-closed if keys/table missing.
