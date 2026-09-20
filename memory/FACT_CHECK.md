@@ -1,4 +1,17 @@
 
+## 2026-09-20 — Fully-live plan research
+
+| Claim | Status |
+|---|---|
+| Jupiter live path is still `swap/v1/quote` in adapter | Verified — `src/lib/adapters/jupiter.ts` |
+| Swap V2 happy path is `/order` then `/execute` + `requestId` | Verified — developers.jup.ag |
+| Capsule ≠ Privy; Capsule org → Para MPC export | Verified — docs + getpara/mpc-export |
+| Privy supports Solana embedded export (Base58) + HD seed docs | Verified — docs.privy.io wallets/export |
+| Stocklana judges: working demo, real use case, Solana-native | Verified — hackathons.solana.com/stocklana |
+| Beta waitlist is localStorage-only | Verified — `src/routes/beta.tsx` |
+| Product analytics today = consent-gated Vercel Analytics only | Verified — `consent-analytics.tsx` |
+| Plan doc for Henry approval | `docs/FULLY_LIVE_PLAN.md` |
+
 ## 2026-09-20 — FOLIO TradingView watermark (Netro pattern)
 
 | Claim | Status |
