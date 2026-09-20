@@ -529,6 +529,47 @@
 .netro-density-card b{font-size:1.05rem;font-weight:500;font-variant-numeric:tabular-nums}
 .netro-density-card small{font-size:.72rem;color:#6b7280}
 .netro-density-market{background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:0;box-shadow:0 1px 5px rgba(0,0,0,.06);color:#1c1c1c;overflow:hidden}
+.netro-partner-tabs{
+  display:flex;flex-wrap:wrap;gap:.35rem;padding:.65rem .85rem .15rem;
+  background:#f8fafb;border-bottom:1px solid #eef0f2;
+}
+.netro-partner-tab{
+  border:1px solid #e5e7eb;background:#fff;border-radius:8px;
+  padding:.35rem .7rem;font-size:.75rem;font-weight:650;cursor:pointer;
+  font-family:inherit;color:#374151;
+}
+.netro-partner-tab.is-on{
+  background:#0B1220;border-color:#0B1220;color:#fff;
+}
+.netro-partner-panel{padding:.85rem 1rem 1rem}
+.netro-partner-head{
+  display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;
+  gap:.75rem;margin-bottom:.75rem;
+}
+.netro-partner-head strong{display:block;font-size:.95rem}
+.netro-partner-head p{margin:.2rem 0 0;font-size:.78rem;color:#6b7280}
+.netro-partner-truth{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem;
+  margin-bottom:.85rem;
+}
+.netro-partner-truth div{
+  background:#f8fafb;border:1px solid #eef0f2;border-radius:10px;padding:.55rem .65rem;
+}
+.netro-partner-truth span{display:block;font-size:.65rem;color:#6b7280;margin-bottom:.15rem}
+.netro-partner-truth b{font-size:.85rem;font-weight:700;font-variant-numeric:tabular-nums}
+.netro-partner-list{list-style:none;margin:0;padding:0;display:grid;gap:.35rem}
+.netro-partner-row{
+  display:grid;grid-template-columns:auto 1fr auto;gap:.35rem .65rem;align-items:center;
+  padding:.55rem .65rem;border-radius:10px;border:1px solid #eef0f2;text-decoration:none;color:inherit;
+}
+.netro-partner-row:hover{border-color:#d1d5db;background:#fafafa}
+.netro-partner-row strong{font-size:.85rem}
+.netro-partner-row small{font-size:.72rem;color:#6b7280;grid-column:2}
+.netro-partner-row em{font-style:normal;font-weight:700;font-variant-numeric:tabular-nums;font-size:.8rem}
+.netro-partner-foot{margin:.75rem 0 0;font-size:.72rem;color:#6b7280}
+@media (max-width:720px){
+  .netro-partner-truth{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 /* NetroBNB: black header strip + light chart body */
 .netro-density-market-bar{
   display:flex;flex-wrap:wrap;align-items:center;gap:.55rem .75rem;
@@ -1447,6 +1488,7 @@ a.fx-asset:hover{background:#F8FAFB}
   cursor:pointer;
 }
 .fx-lane.is-on{background:var(--fx-azure,#0EA5C9);border-color:transparent;color:#fff}
+.fx-lane-link{text-decoration:none;display:inline-flex;align-items:center}
 .fx-lane-explain{
   padding:.65rem 1rem .85rem;border-bottom:1px solid var(--fx-line);
   background:#F8FBFC;

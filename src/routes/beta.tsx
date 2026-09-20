@@ -18,19 +18,6 @@ export const Route = createFileRoute("/beta")({
   component: Page,
 });
 
-type Entry = { email: string; wallet?: string; note?: string; at: string };
-
-function loadLocal(): Entry[] {
-  try {
-    const raw = localStorage.getItem("folio_beta_waitlist");
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as Entry[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
 function Page() {
   const joinWaitlist = useServerFn(joinBetaWaitlist);
   const [email, setEmail] = useState("");
@@ -63,12 +50,6 @@ function Page() {
         setErr(res.detail ?? "Couldn’t join — try again shortly.");
         return;
       }
-      const entry: Entry = { email: em, at: new Date().toISOString() };
-      if (w) entry.wallet = w;
-      if (n) entry.note = n;
-      const prev = loadLocal();
-      const next = [entry, ...prev.filter((x) => x.email !== em)].slice(0, 200);
-      localStorage.setItem("folio_beta_waitlist", JSON.stringify(next));
       setDone(true);
     } finally {
       setBusy(false);
@@ -123,8 +104,8 @@ function Page() {
               {busy ? "Joining…" : "Join waitlist"}
             </button>
             <p className="fx-ticket-sub">
-              Rate-limited server check · stored in this browser until server
-              waitlist ships. Follow {primaryXHandle()} for invite waves.
+              Saved on FOLIO servers (rate-limited). Follow {primaryXHandle()}{" "}
+              for invite waves.
             </p>
           </form>
         ) : (

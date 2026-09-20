@@ -1,0 +1,252 @@
+/**
+ * Overview partner lanes — PreStocks (SPV) + Tessera (loan participation).
+ * Keeps separate desk URLs for Stocklana bounty judges; overview links in.
+ */
+import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getPreipoBundle, getTesseraBundle } from "@/lib/desk.functions";
+import { humanizeWashNote } from "@/lib/humanize-copy";
+
+export type PartnerLaneId = "stocks" | "preipo" | "tessera";
+
+const LANES: { id: PartnerLaneId; label: string }[] = [
+  { id: "stocks", label: "Stocks" },
+  { id: "preipo", label: "Pre-IPO" },
+  { id: "tessera", label: "Tessera" },
+];
+
+export function PartnerLaneTabs({
+  lane,
+  onChange,
+}: {
+  lane: PartnerLaneId;
+  onChange: (id: PartnerLaneId) => void;
+}) {
+  return (
+    <div
+      className="netro-partner-tabs"
+      role="tablist"
+      aria-label="Market partner lane"
+      data-testid="partner-lane-tabs"
+    >
+      {LANES.map((l) => (
+        <button
+          key={l.id}
+          type="button"
+          role="tab"
+          aria-selected={lane === l.id}
+          className={`netro-partner-tab${lane === l.id ? " is-on" : ""}`}
+          onClick={() => onChange(l.id)}
+        >
+          {l.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function PartnerLanePanel({ lane }: { lane: PartnerLaneId }) {
+  if (lane === "stocks") return null;
+  if (lane === "preipo") return <PreipoLanePanel />;
+  return <TesseraLanePanel />;
+}
+
+function money(n: number, digits = 2) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: digits,
+  });
+}
+
+function PreipoLanePanel() {
+  const fetchPreipo = useServerFn(getPreipoBundle);
+  const { data, isFetching } = useQuery({
+    queryKey: ["partner-lane", "preipo"],
+    queryFn: () => fetchPreipo({ data: { spendUsdc: 1 } }),
+    staleTime: 30_000,
+  });
+
+  const rows = data?.catalog.ok ? data.catalog.data.rows.slice(0, 6) : [];
+  const selected = data?.selected;
+  const premium =
+    selected?.tokenPrice != null &&
+    selected?.markPrice != null &&
+    selected.markPrice > 0
+      ? ((selected.tokenPrice - selected.markPrice) / selected.markPrice) * 100
+      : null;
+
+  return (
+    <section
+      className="netro-partner-panel"
+      data-testid="partner-lane-preipo"
+      aria-label="Pre-IPO PreStocks"
+    >
+      <header className="netro-partner-head">
+        <div>
+          <strong>Pre-IPO · PreStocks</strong>
+          <p>SPV economic exposure — not share equity. Quote-only.</p>
+        </div>
+        <Link to="/desk/preipo" className="fx-btn fx-btn-dark fx-btn-sm">
+          Open Pre-IPO desk
+        </Link>
+      </header>
+
+      <div className="netro-partner-truth" aria-label="PreStocks truth">
+        <div>
+          <span>Token</span>
+          <b>
+            {selected?.tokenPrice != null
+              ? money(selected.tokenPrice)
+              : isFetching
+                ? "…"
+                : "—"}
+          </b>
+        </div>
+        <div>
+          <span>Mark</span>
+          <b>
+            {selected?.markPrice != null ? money(selected.markPrice) : "—"}
+          </b>
+        </div>
+        <div>
+          <span>Premium</span>
+          <b>
+            {premium != null
+              ? `${premium >= 0 ? "+" : ""}${premium.toFixed(1)}%`
+              : "—"}
+          </b>
+        </div>
+        <div>
+          <span>Wash</span>
+          <b>{data ? (data.washOk ? "Clear" : "Paused") : "…"}</b>
+        </div>
+      </div>
+
+      {!data?.catalog.ok ? (
+        <p className="fx-sub">
+          {data?.catalog && !data.catalog.ok
+            ? humanizeWashNote(data.catalog.reason)
+            : "Loading PreStocks…"}
+        </p>
+      ) : (
+        <ul className="netro-partner-list">
+          {rows.map((row) => {
+            const prem =
+              row.tokenPrice != null &&
+              row.markPrice != null &&
+              row.markPrice > 0
+                ? ((row.tokenPrice - row.markPrice) / row.markPrice) * 100
+                : null;
+            return (
+              <li key={row.mint}>
+                <Link
+                  to="/desk/preipo"
+                  className="netro-partner-row"
+                >
+                  <strong>{row.symbol}</strong>
+                  <small>{row.name}</small>
+                  <em>
+                    {prem != null
+                      ? `${prem >= 0 ? "+" : ""}${prem.toFixed(0)}%`
+                      : row.tokenPrice != null
+                        ? money(row.tokenPrice, 0)
+                        : "—"}
+                  </em>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      <p className="netro-partner-foot">
+        Stocklana PreStocks track · separate desk URL for judges ·{" "}
+        {data?.washNote ? humanizeWashNote(data.washNote) : "wash gated"}
+      </p>
+    </section>
+  );
+}
+
+function TesseraLanePanel() {
+  const fetchTessera = useServerFn(getTesseraBundle);
+  const { data, isFetching } = useQuery({
+    queryKey: ["partner-lane", "tessera"],
+    queryFn: () => fetchTessera({ data: { spendUsdc: 1 } }),
+    staleTime: 30_000,
+  });
+
+  const rows = data?.catalog.ok ? data.catalog.data.rows.slice(0, 6) : [];
+  const selected = data?.selected;
+
+  return (
+    <section
+      className="netro-partner-panel"
+      data-testid="partner-lane-tessera"
+      aria-label="Tessera T-tokens"
+    >
+      <header className="netro-partner-head">
+        <div>
+          <strong>Tessera · T-tokens</strong>
+          <p>Loan participation — not equity shares. Quote-only.</p>
+        </div>
+        <Link to="/desk/tessera" className="fx-btn fx-btn-dark fx-btn-sm">
+          Open Tessera desk
+        </Link>
+      </header>
+
+      <div className="netro-partner-truth" aria-label="Tessera truth">
+        <div>
+          <span>Structure</span>
+          <b>Loan participation</b>
+        </div>
+        <div>
+          <span>Mark</span>
+          <b>
+            {selected?.markPrice != null
+              ? money(selected.markPrice)
+              : isFetching
+                ? "…"
+                : "—"}
+          </b>
+        </div>
+        <div>
+          <span>Holders</span>
+          <b>{selected?.holders != null ? selected.holders : "—"}</b>
+        </div>
+        <div>
+          <span>Wash</span>
+          <b>{data ? (data.washOk ? "Clear" : "Paused") : "…"}</b>
+        </div>
+      </div>
+
+      {!data?.catalog.ok ? (
+        <p className="fx-sub">
+          {data?.catalog && !data.catalog.ok
+            ? humanizeWashNote(data.catalog.reason)
+            : "Loading Tessera…"}
+        </p>
+      ) : (
+        <ul className="netro-partner-list">
+          {rows.map((row) => (
+            <li key={row.mint}>
+              <Link to="/desk/tessera" className="netro-partner-row">
+                <strong>{row.symbol}</strong>
+                <small>
+                  {row.sector ?? row.name} · loan participation
+                </small>
+                <em>
+                  {row.markPrice != null ? money(row.markPrice, 0) : "—"}
+                </em>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="netro-partner-foot">
+        Stocklana Tessera track · not Scaled UI equity ·{" "}
+        {data?.washNote ? humanizeWashNote(data.washNote) : "wash gated"}
+      </p>
+    </section>
+  );
+}

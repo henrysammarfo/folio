@@ -72,6 +72,7 @@ import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
 import { isFolioOpsEnabled } from "./auth/ops-access";
+import { upsertBetaWaitlist } from "./auth/beta-waitlist";
 import { readApprovedLabShader, readApprovedLabUi } from "./lab-pick";
 
 const WATCHLIST = ["AAPLx", "NVDAx", "TSLAx"] as const;
@@ -1205,8 +1206,8 @@ const WaitlistInput = z.object({
 });
 
 /**
- * Rate-limited beta waitlist intake. Persistence stays client-local until Phase F;
- * this gate stops spam before local write.
+ * Rate-limited beta waitlist — persists to Supabase beta_waitlist (service-role).
+ * Never localStorage. Fail-closed when keys/migration missing.
  */
 export const joinBetaWaitlist = createServerFn({ method: "POST" })
   .validator(WaitlistInput)
@@ -1226,11 +1227,23 @@ export const joinBetaWaitlist = createServerFn({ method: "POST" })
         detail: rl.detail,
       };
     }
+    const saved = await upsertBetaWaitlist({
+      email: data.email,
+      wallet: data.wallet,
+      note: data.note,
+    });
+    if (!saved.ok) {
+      return {
+        ok: false as const,
+        reason: saved.reason,
+        detail: saved.detail ?? "Waitlist unavailable.",
+      };
+    }
     return {
       ok: true as const,
       data: {
-        email: data.email.trim().toLowerCase(),
-        note: "Accepted under rate limit — client may persist locally until server waitlist ships.",
+        email: saved.data.email,
+        note: "Saved on FOLIO servers — you’ll get invite waves from the desk.",
       },
     };
   });

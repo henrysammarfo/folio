@@ -1,3 +1,14 @@
+## 2026-09-20 — Phase E partner lanes + server waitlist
+
+| Claim | Status |
+|---|---|
+| Beta waitlist never uses localStorage | Verified — server upsert only |
+| Fail-closed without Supabase keys / migration | Verified — unit tests |
+| Overview partner tabs: Stocks / Pre-IPO / Tessera | Implemented — `partner-lane-panel.tsx` |
+| Pre-IPO truth = mark/token/premium; Tessera = loan participation | Implemented |
+| Separate `/desk/preipo` + `/desk/tessera` URLs kept | Verified |
+| Henry must apply `20260920_beta_waitlist.sql` on Supabase | Action required |
+
 ## 2026-09-20 — Phase D route protection · rate limits
 
 | Claim | Status |
@@ -5,7 +16,7 @@
 | Execute requires verified folio_session | Verified — `executeBlockedReason` + executeJupiterSwap |
 | Quote/execute/agent/waitlist rate-limited per user or IP | Verified — `rate-limit.ts` + unit tests |
 | Prefs/agent already session-gated; messaging → Open App | Verified |
-| Beta waitlist hits server rate limit before local persist | Implemented — `joinBetaWaitlist` |
+| Beta waitlist hits server rate limit before local persist | Superseded — server Supabase upsert only (no localStorage) |
 | Rate limit store is per-process (not global CDN WAF) | Honest residual |
 
 ## 2026-09-20 — Phase C consumer settings + copy

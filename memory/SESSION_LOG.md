@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Phase E partner lanes + kill beta localStorage
+
+- Henry: no localStorage on beta — waitlist now upserts Supabase `beta_waitlist` via service-role (migration `20260920_beta_waitlist.sql`). Fail-closed if keys/table missing.
+- Overview Netro: Stocks / Pre-IPO / Tessera partner tabs with honesty strips + desk links.
+- Buy lane row: Pre-IPO + Tessera jump links (catalogs stay on separate desks).
+- Branch: `cursor/folio-phase-e-partner-lanes-f1ec` (stacked on Phase D).
+
 ## 2026-09-20 — Phase D route protection · rate limits · speed
 
 - Hard-gate `executeJupiterSwap` on verified `folio_session` (+ existing prefs/agent gates).

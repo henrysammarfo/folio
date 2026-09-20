@@ -125,6 +125,9 @@ Settings/Account becomes the home for: profile, linked wallets, backup, export, 
 - Cache + parallel loaders; kill duplicate fetches.
 
 ### Phase E — Partner charts (PreStocks + Tessera) — rethink
+
+**Status (2026-09-20):** Overview partner lane tabs (Stocks / Pre-IPO / Tessera) · honesty strips · Buy lane links · separate desk URLs kept. Beta waitlist = **server Supabase only** (no localStorage).
+
 **Problem:** desks exist; overview doesn’t use them as product story.
 
 Meaningful use (proposal — pick on approve):
@@ -135,8 +138,11 @@ Meaningful use (proposal — pick on approve):
 5. Stocklana bounty tracks: keep desks separate URLs for judges, but **linked from overview** so demos aren’t “orphan pages.”
 
 ### Phase F — Closed beta page
+
+**Status (2026-09-20):** Waitlist persistence moved to Supabase `beta_waitlist` (no localStorage). Contrast polish still open.
+
 - Fix contrast (input + Join visible on cinematic bg).  
-- Replace localStorage with server waitlist (Supabase table or email provider).  
+- ~~Replace localStorage with server waitlist~~ **done** (`joinBetaWaitlist` + migration).  
 - Confirmation state that actually persists.
 
 ### Phase G — Product analytics + admin

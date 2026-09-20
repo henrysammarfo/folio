@@ -244,6 +244,20 @@ function Page() {
                   {label}
                 </button>
               ))}
+              <Link
+                to="/desk/preipo"
+                className="fx-lane fx-lane-link"
+                title="PreStocks Pre-IPO desk"
+              >
+                Pre-IPO
+              </Link>
+              <Link
+                to="/desk/tessera"
+                className="fx-lane fx-lane-link"
+                title="Tessera T-token desk"
+              >
+                Tessera
+              </Link>
             </div>
 
             <div className="fx-lane-explain">

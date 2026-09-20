@@ -22,6 +22,7 @@
 - **Phase B in progress:** Desk-wide Privy Open App (email embedded Solana + connect wallet) · Account link/export custody · branch `cursor/folio-phase-b-open-app-f1ec`.
 - **Phase C in progress:** Consumer Account vs Ops (`FOLIO_OPS=1`) · scrub BITQUERY/fail-closed from Buy/Account/Activity · Desk mode card · branch `cursor/folio-phase-c-consumer-settings-f1ec`.
 - **Phase D in progress:** Execute/prefs/agent hard-gated on `folio_session` · rate limits (quote/execute/agent/waitlist) · shared session query · branch `cursor/folio-phase-d-route-limits-f1ec`.
+- **Phase E in progress:** Overview Stocks / Pre-IPO / Tessera partner lanes · Buy lane links · beta waitlist **server-only** (Supabase `beta_waitlist`, no localStorage) · branch `cursor/folio-phase-e-partner-lanes-f1ec`.
 - **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
 - Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).
