@@ -1,4 +1,17 @@
 
+## 2026-09-20 — Marketing layout polish (no pills)
+
+- Truth / Execution / Credit: replace ModeBadge/StatusBadge clusters with `mkt-status-line` + protocol `em` status.
+- Keeps ledger/metrics; drops pill walls on public marketing pages.
+- PR #21 on `cursor/folio-mkt-layout-redo-f1ec`.
+
+## 2026-09-20 — Marketing layout system redo
+
+- Landing: keep stencil-only viewport; rebuild below-fold as pitch → numbered path → desk entry; drop glass video footer.
+- PublicShell: shorter nav, intro±aside, `MktSection` numbered blocks, organized footer cols.
+- Markets/pairs/preipo/about/execution/truth/credit rewritten to the layout system.
+- Branch: `cursor/folio-mkt-layout-redo-f1ec`.
+
 ## 2026-09-20 — Marketing + desk slop redo
 
 - Killed PublicShell pill nav, dark intros, three-features/metric card walls, Benefits + Glow landing sections.

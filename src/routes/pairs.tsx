@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PublicShell } from "@/components/public-page";
+import { PublicShell, MktSection } from "@/components/public-page";
 import { XSTOCK_SWAP_PAIRS } from "@/lib/xstock-catalog";
 
 export const Route = createFileRoute("/pairs")({
@@ -21,35 +21,39 @@ function Page() {
     <PublicShell
       tone="execution"
       eyebrow="Stock ↔ stock"
-      title="Pay Apple. Receive Microsoft. One route."
-      intro="Pair mode on Buy sets Jupiter’s input mint to the stock you pay and the output mint to the stock you receive. That is not two USDC buys glued together — it is a single quote-only path."
+      title="Pay one stock. Receive another."
+      intro="Pair mode on Buy sets Jupiter’s input mint to the stock you pay and the output mint to the stock you receive — a single quote-only path."
     >
-      <ol className="mkt-stack">
-        <li>
-          <h2>Mega rotations</h2>
-          <p>
-            AAPL → MSFT, NVDA → AVGO, COIN → HOOD — liquid names for clean pair
-            discovery.
-          </p>
-        </li>
-        <li>
-          <h2>IPO ↔ mega</h2>
-          <p>
-            ARM → NVDA, RDDT → META — recent public listings into mega-cap
-            exposure. Still xStocks, not PreStocks private.
-          </p>
-        </li>
-        <li>
-          <h2>Meme ↔ mega</h2>
-          <p>
-            GME → AAPL / TSLA — high-beta into calmer mega. Same wash + Scaled UI
-            gates; never a soft-sold fill.
-          </p>
-        </li>
-      </ol>
+      <MktSection n="01" title="What pairs are for">
+        <ul className="mkt-dir mkt-dir-plain">
+          <li>
+            <div>
+              <h3>Mega rotations</h3>
+              <p>AAPL → MSFT, NVDA → AVGO, COIN → HOOD — liquid names.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>IPO ↔ mega</h3>
+              <p>
+                ARM → NVDA, RDDT → META — recent public listings into mega-cap.
+                Still xStocks, not PreStocks.
+              </p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Meme ↔ mega</h3>
+              <p>
+                GME → AAPL / TSLA — high-beta into calmer mega. Same wash +
+                Scaled UI gates.
+              </p>
+            </div>
+          </li>
+        </ul>
+      </MktSection>
 
-      <section className="mkt-block">
-        <h2>Preset board</h2>
+      <MktSection n="02" title="Preset board">
         <ul className="mkt-pair-list">
           {XSTOCK_SWAP_PAIRS.map((p) => (
             <li key={`${p.pay}-${p.receive}`}>
@@ -61,7 +65,7 @@ function Page() {
         <p className="mkt-links">
           <Link to="/desk/acquire">Trade pairs on Buy →</Link>
         </p>
-      </section>
+      </MktSection>
     </PublicShell>
   );
 }

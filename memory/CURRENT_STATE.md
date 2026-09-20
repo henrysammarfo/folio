@@ -1,13 +1,15 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-19 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
+> Updated: 2026-09-20 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
 > Doctrine: honest security only — **never claim unhackable / NK-proof**.
 
 ## Marketing / landing (product)
 
-- Landing: brand-first liquid stencil hero (FOLIO wordmark + one headline + CTA) · editorial “three moves” strip · no Benefits/Glow card walls · glass footer on `/` only.
-- Marketing PublicShell: text nav (no pills), light atmospheric intros with brand signal, editorial stacks (no card grids), clean foot on all public pages.
-- Routes: `/markets` `/preipo` `/pairs` `/truth` `/execution` `/credit` `/about` `/whitepaper` `/beta`.
+- Landing: stencil-only first viewport · planned below-fold story (pitch → path 01/02/03 → desk) · simple footer (no glass video).
+- Marketing PublicShell: short nav (Markets/Truth/Credit/Pre-IPO/About), intro + optional live aside, numbered `MktSection` body, 3-col foot.
+- Live status on Truth/Execution/Credit uses plain status lines — no pill/badge clusters on marketing.
+- Routes organized as directories: `/markets` `/truth` `/credit` `/preipo` `/pairs` `/execution` `/about` `/whitepaper` `/beta`.
+- Branch: `cursor/folio-mkt-layout-redo-f1ec` · PR #21.
 
 ## Desk UI (product)
 

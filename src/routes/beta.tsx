@@ -58,6 +58,7 @@ function Page() {
   return (
     <PublicShell
       tone="about"
+      compactIntro
       eyebrow="Closed beta"
       title="Mainnet-close desk. Quote-only until fills unlock."
       intro="Join the waitlist for FOLIO closed beta — live share truth, wash refuse, Jupiter quotes. Broadcast stays paused on purpose until we’re funded."

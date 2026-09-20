@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PublicShell } from "@/components/public-page";
+import { PublicShell, MktSection } from "@/components/public-page";
 import { LANE_META, XSTOCK_SWAP_PAIRS } from "@/lib/xstock-catalog";
 
 export const Route = createFileRoute("/markets")({
@@ -23,47 +23,49 @@ function Page() {
     <PublicShell
       tone="truth"
       eyebrow="Market map"
-      title="Public xStocks. Private pre-IPO. Real pairs."
-      intro="FOLIO organizes Solana stock exposure into honest lanes — mega caps, IPO-era listings, meme beta, stock↔stock swaps, plus separate PreStocks and Tessera desks."
+      title="Where every stock lives on FOLIO."
+      intro="Public xStocks in mega, IPO, and meme lanes. Stock↔stock pairs on Buy. Private PreStocks and Tessera stay on separate desks."
     >
-      <ol className="mkt-stack">
-        {lanes.map((lane) => (
-          <li key={lane.id}>
-            <h2>{lane.title}</h2>
-            <p>{lane.body}</p>
-          </li>
-        ))}
-      </ol>
+      <MktSection n="01" title="Public lanes">
+        <ul className="mkt-dir">
+          {lanes.map((lane) => (
+            <li key={lane.id}>
+              <div>
+                <h3>{lane.title}</h3>
+                <p>{lane.body}</p>
+              </div>
+              <Link to="/desk/markets">{lane.label} board →</Link>
+            </li>
+          ))}
+        </ul>
+      </MktSection>
 
-      <section className="mkt-block" aria-label="Pairs">
-        <h2>Stock ↔ stock — not two cash buys</h2>
+      <MktSection n="02" title="Stock ↔ stock">
         <p>
-          Pair presets route Jupiter with the pay mint as input and the receive
-          mint as output. Examples:{" "}
+          One Jupiter route: pay mint in, receive mint out — not two USDC buys
+          glued together. Presets include{" "}
           {XSTOCK_SWAP_PAIRS.slice(0, 3)
             .map((p) => p.label)
-            .join(" · ")}
+            .join(", ")}
           .
         </p>
         <p className="mkt-links">
-          <Link to="/desk/acquire">Open Buy pairs →</Link>
           <Link to="/pairs">How pairs work →</Link>
+          <Link to="/desk/acquire">Trade on Buy →</Link>
         </p>
-      </section>
+      </MktSection>
 
-      <section className="mkt-block" aria-label="Pre-IPO">
-        <h2>Pre-IPO tracks stay separate</h2>
+      <MktSection n="03" title="Private pre-IPO">
         <p>
-          <b>PreStocks</b> (Anduril, Anthropic, OpenAI…) and <b>Tessera</b>{" "}
-          (T-OpenAI, T-Kalshi, T-SpaceX) each get their own desk so Stocklana
-          bounty eligibility is never mixed.
+          <b>PreStocks</b> and <b>Tessera</b> each get their own desk so
+          Stocklana bounty tracks never mix with public IPO-era listings.
         </p>
         <p className="mkt-links">
           <Link to="/preipo">Pre-IPO explainer →</Link>
           <Link to="/desk/preipo">PreStocks desk →</Link>
           <Link to="/desk/tessera">Tessera desk →</Link>
         </p>
-      </section>
+      </MktSection>
     </PublicShell>
   );
 }

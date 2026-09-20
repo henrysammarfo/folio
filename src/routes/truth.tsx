@@ -3,8 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, CheckCircle2, Database, FileClock } from "lucide-react";
 import { PublicShell, Metric } from "@/components/public-page";
-import { StatusBadge } from "@/components/folio-brand";
-import { ModeBadge } from "@/components/mode-badge";
 import { getTruthBundle } from "@/lib/desk.functions";
 
 export const Route = createFileRoute("/truth")({
@@ -52,37 +50,42 @@ function Page() {
       eyebrow="Corporate-action ledger"
       title="One balance. Every truth behind it."
       intro="Token balances alone can lie after dividends and splits. FOLIO reads the live xStocks Scaled UI multiplier on Solana mainnet and shows raw vs economic ownership — no fixture 4.0× theater."
+      aside={
+        <div className="mkt-status-col" aria-label="Feed status">
+          <div className="mkt-status-line" data-ok={String(Boolean(mult?.ok))}>
+            <b>xStocks</b>
+            <span>{mult?.ok ? "Live multiplier" : "Unavailable"}</span>
+          </div>
+          <div
+            className="mkt-status-line"
+            data-ok={String(
+              Boolean(data?.scaledUi?.ok) && data?.scaledUiCompare?.status !== "mismatch",
+            )}
+          >
+            <b>Scaled UI</b>
+            <span>
+              {data?.scaledUi?.ok
+                ? data.scaledUiCompare?.status === "mismatch"
+                  ? "Mismatch"
+                  : data.scaledUiCompare?.status === "match"
+                    ? "Matches API"
+                    : "Live on-chain"
+                : "Off"}
+            </span>
+          </div>
+          <div className="mkt-status-line" data-ok={String(Boolean(data?.jupiterPrice.ok))}>
+            <b>Jupiter</b>
+            <span>
+              {!data?.jupiterPrice.ok
+                ? "Off"
+                : data.jupiterPrice.source.includes("stale")
+                  ? "Stale-aware"
+                  : "Live venue"}
+            </span>
+          </div>
+        </div>
+      }
     >
-      <div className="mkt-status-row">
-        <ModeBadge mode={mult?.ok ? mult.mode : "unavailable"}>
-          {mult?.ok ? "xStocks live" : "Multiplier unavailable"}
-        </ModeBadge>
-        <ModeBadge
-          mode={
-            data?.scaledUi?.ok
-              ? data.scaledUi.mode
-              : data?.scaledUiCompare?.status === "mismatch"
-                ? "unavailable"
-                : "unavailable"
-          }
-        >
-          {data?.scaledUi?.ok
-            ? data.scaledUiCompare?.status === "mismatch"
-              ? "Scaled UI mismatch"
-              : data.scaledUiCompare?.status === "match"
-                ? "Scaled UI match"
-                : "Scaled UI live"
-            : "Scaled UI off"}
-        </ModeBadge>
-        <ModeBadge mode={data?.jupiterPrice.ok ? data.jupiterPrice.mode : "unavailable"}>
-          {!data?.jupiterPrice.ok
-            ? "Jupiter off"
-            : data.jupiterPrice.source.includes("stale")
-              ? "Jupiter stale"
-              : "Jupiter live"}
-        </ModeBadge>
-      </div>
-
       <div className="metrics-grid">
         <Metric
           label="Paper raw balance"
@@ -148,7 +151,9 @@ function Page() {
       {(isError || (data && !mult?.ok)) && (
         <section className="feature-band mt-6">
           <div>
-            <StatusBadge tone="amber">Fail closed</StatusBadge>
+            <p className="mkt-eyebrow-row">
+              Fail closed <em>truth feed</em>
+            </p>
             <h2>Truth feed issue</h2>
             <p>
               {isError
@@ -163,9 +168,9 @@ function Page() {
 
       <section className="feature-band">
         <div>
-          <StatusBadge tone={mult?.ok ? "green" : "amber"}>
-            {mult?.ok ? "Live" : "Blocked"}
-          </StatusBadge>
+          <p className="mkt-eyebrow-row">
+            {mult?.ok ? "Live" : "Blocked"} <em>ownership math</em>
+          </p>
           <h2>{asset?.ok ? asset.data.name : "AAPLx"} ownership math</h2>
           <p>
             {asset?.ok

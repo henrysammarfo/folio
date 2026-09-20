@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { PublicShell, Metric } from "@/components/public-page";
+import { PublicShell, Metric, MktSection } from "@/components/public-page";
 import { getPreipoBundle } from "@/lib/desk.functions";
 
 export const Route = createFileRoute("/preipo")({
@@ -37,44 +37,47 @@ function Page() {
     <PublicShell
       tone="credit"
       eyebrow="PreStocks · Stocklana"
-      title="Own the private name. Keep the lanes honest."
-      intro="Pre-IPO on FOLIO means PreStocks issued tokens — live from prestocks.com. Tessera T-tokens live on a separate desk so each Stocklana bounty stays eligible."
+      title="Private names. Separate desks."
+      intro="Pre-IPO on FOLIO means PreStocks issued tokens — live from prestocks.com. Tessera T-tokens live on their own desk so each bounty stays eligible."
+      aside={
+        <div className="metrics-grid metrics-grid-aside">
+          <Metric
+            label="PreStocks live"
+            value={count != null ? String(count) : "—"}
+            detail="prestocks.com catalog"
+          />
+          <Metric
+            label="Sample mark"
+            value={
+              sample?.tokenPrice != null
+                ? `$${sample.tokenPrice.toFixed(0)}`
+                : "—"
+            }
+            detail={sample ? sample.symbol : "Awaiting catalog"}
+          />
+          <Metric
+            label="Fills"
+            value="Paused"
+            detail="Quote-only · ≤~$1 budget"
+          />
+        </div>
+      }
     >
-      <div className="metrics-grid">
-        <Metric
-          label="PreStocks live"
-          value={count != null ? String(count) : "—"}
-          detail="Rows from prestocks.com/api/prestocks"
-        />
-        <Metric
-          label="Sample mark"
-          value={
-            sample?.tokenPrice != null
-              ? `$${sample.tokenPrice.toFixed(0)}`
-              : "—"
-          }
-          detail={sample ? sample.symbol : "Awaiting catalog"}
-        />
-        <Metric
-          label="Fills"
-          value="Paused"
-          detail="Jupiter quote-only · ≤~$1 Stocklana budget"
-        />
-      </div>
-
-      <section className="mkt-block">
-        <h2>What “IPO lane” is not</h2>
+      <MktSection n="01" title="What IPO lane is not">
         <p>
           Buy → <b>IPO</b> is for <em>public</em> recent listings (Arm, Reddit
           xStocks). Private companies are PreStocks / Tessera — never silently
           mixed into the public IPO chip.
         </p>
+      </MktSection>
+
+      <MktSection n="02" title="Open the desks">
         <p className="mkt-links">
-          <Link to="/desk/preipo">Open PreStocks desk →</Link>
+          <Link to="/desk/preipo">PreStocks desk →</Link>
           <Link to="/desk/tessera">Tessera desk →</Link>
           <Link to="/markets">Full market map →</Link>
         </p>
-      </section>
+      </MktSection>
     </PublicShell>
   );
 }
