@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Prod fills armed + rough edges on main
+
+- Merged ship-rough-edges → main `6344cb4`.
+- Vercel `BROADCAST_PAUSED=false` on production/preview/development (user-signed Jupiter only; no FOLIO payer).
+- NestUSD / borrow CPI still fail-closed / unfunded — not inventable.
+- Henry: run all 3 Supabase migrations if not already; Privy origins claimed done for tawny.
+
 ## 2026-09-20 — Ship rough edges (fills path · F · G · honesty)
 
 - Wired `prepareJupiterSwap` + Buy CTA Privy `signTransaction` → `executeJupiterSwap` (still env-gated by `BROADCAST_PAUSED`).
