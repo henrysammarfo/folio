@@ -130,14 +130,16 @@ export function NexeusCinematicLanding({
       </div>
       <div className="nx-scrim" aria-hidden />
       <div className="nx-stage">
-        <p className="nx-abs nx-eyebrow">{eyebrow}</p>
-        <div className="nx-abs nx-headline-mask">
-          <h1 className="nx-headline">{title}</h1>
+        <div className="nx-hero">
+          <p className="nx-eyebrow">{eyebrow}</p>
+          <div className="nx-headline-mask">
+            <h1 className="nx-headline">{title}</h1>
+          </div>
+          <p className="nx-lede">{lede}</p>
+          <Link className="nx-cta" to={ctaTo}>
+            <span>{ctaLabel}</span>
+          </Link>
         </div>
-        <p className="nx-abs nx-lede">{lede}</p>
-        <Link className="nx-abs nx-cta" to={ctaTo}>
-          <span>{ctaLabel}</span>
-        </Link>
       </div>
       <div className="nx-foot-slot">
         <div className="nx-foot-inner">
