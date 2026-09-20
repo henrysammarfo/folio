@@ -49,7 +49,7 @@ function Page() {
       tone="truth"
       eyebrow="Corporate-action ledger"
       title="One balance. Every truth behind it."
-      intro="Token balances alone can lie after dividends and splits. FOLIO reads the live xStocks Scaled UI multiplier on Solana mainnet and shows raw vs economic ownership — no fixture 4.0× theater."
+      intro="Token balances alone can lie after dividends and splits. FOLIO reconciles the live xStocks Scaled UI multiplier (API ↔ on-chain Token-2022) — our share-truth / PoR-analogue. Not issuer proof-of-reserves; Backed holds that layer."
       aside={
         <div className="mkt-status-col" aria-label="Feed status">
           <div className="mkt-status-line" data-ok={String(Boolean(mult?.ok))}>
@@ -62,13 +62,13 @@ function Page() {
               Boolean(data?.scaledUi?.ok) && data?.scaledUiCompare?.status !== "mismatch",
             )}
           >
-            <b>Scaled UI</b>
+            <b>Reconcile</b>
             <span>
               {data?.scaledUi?.ok
                 ? data.scaledUiCompare?.status === "mismatch"
                   ? "Mismatch"
                   : data.scaledUiCompare?.status === "match"
-                    ? "Matches API"
+                    ? "API ↔ chain OK"
                     : "Live on-chain"
                 : "Off"}
             </span>
@@ -90,12 +90,12 @@ function Page() {
         <Metric
           label="Paper raw balance"
           value={raw != null ? raw.toFixed(4) : isLoading ? "…" : "—"}
-          detail="Illustrative paper qty — not wallet truth until Privy binding"
+          detail="Illustrative paper qty — not wallet truth until you connect"
         />
         <Metric
           label="Economic shares"
           value={economic != null ? economic.toFixed(4) : isLoading ? "…" : "—"}
-          detail="raw × live multiplier"
+          detail="raw × live multiplier (desk recon)"
         />
         <Metric
           label="Live action multiplier"

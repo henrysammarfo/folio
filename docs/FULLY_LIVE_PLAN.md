@@ -139,17 +139,20 @@ Meaningful use (proposal — pick on approve):
 
 ### Phase F — Closed beta page
 
-**Status (2026-09-20):** Waitlist persistence moved to Supabase `beta_waitlist` (no localStorage). Contrast polish still open.
+**Status (2026-09-20):** Waitlist persistence + cine contrast CSS shipped on rough-edges branch.
 
 - Fix contrast (input + Join visible on cinematic bg).  
 - ~~Replace localStorage with server waitlist~~ **done** (`joinBetaWaitlist` + migration).  
 - Confirmation state that actually persists.
 
 ### Phase G — Product analytics + admin
-- Event schema: `page_view` · `cta_click` · `buy_review` · `buy_execute` · `agent_ask` · `wallet_connect` · `export_wallet` · partner lane switches.  
+
+**Status (2026-09-20):** `trackFolioEvent` (consent-gated Vercel Analytics) · `/desk/admin` ops schema wall.
+
+- Event schema: `page_view` · `cta_click` · `buy_review` · `buy_prepare` · `buy_execute` · `agent_ask` · `wallet_connect` · `export_wallet` · partner lane switches.  
 - Identity: hashed user id when sessioned; anonymous id otherwise.  
 - Consent-gated.  
-- Admin `/desk/admin` (ops role only): funnels, top features, error rates — not raw PII.
+- Admin `/desk/admin` (ops role only): schema + fill-arm status — funnels live in Vercel Analytics (not a second warehouse).
 
 ### Deferred — Stocklana paste pack
 When you say go: live prod checklist + submit URLs against judging criteria (working demo, Solana-native, honesty).

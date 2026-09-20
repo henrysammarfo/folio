@@ -99,6 +99,16 @@ const QuoteInput = z.object({
   amount: z.number().positive().max(25).optional(),
 });
 
+const PrepareSwapInput = z.object({
+  symbol: z.string().min(2).max(16),
+  spendUsdc: z.number().positive().max(25).optional(),
+  paySymbol: z.string().min(2).max(16).optional(),
+  amount: z.number().positive().max(25).optional(),
+  /** Solana pubkey that will sign — required for Swap V2 assembled tx. */
+  taker: z.string().min(32).max(64),
+  slippageBps: z.number().int().min(1).max(500).optional(),
+});
+
 export type TruthBundle = {
   symbol: string;
   asset: AdapterResult<XStockAsset>;
@@ -545,6 +555,132 @@ const ExecuteSwapInput = z.object({
 });
 
 /**
+ * Assemble a signable Swap V2 order for the session wallet.
+ * Requires folio_session · fail-closed while fills paused · never broadcasts.
+ */
+export const prepareJupiterSwap = createServerFn({ method: "POST" })
+  .inputValidator(PrepareSwapInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSessionLocal();
+    const sessionBlock = executeBlockedReason(session);
+    if (sessionBlock) {
+      return {
+        ok: false as const,
+        reason: "execute_requires_session",
+        detail: sessionBlock,
+      };
+    }
+    const rl = rateLimitCheck(
+      "execute",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
+    if (isBroadcastPaused()) {
+      return {
+        ok: false as const,
+        reason: "broadcast_paused",
+        detail:
+          "Fills paused — set BROADCAST_PAUSED=false on preview, then prod.",
+      };
+    }
+
+    const payRaw = data.paySymbol?.trim();
+    const isPair = Boolean(payRaw && payRaw.toUpperCase() !== "USDC");
+    const paySymbol = isPair ? payRaw! : "USDC";
+    const payAmount = data.amount ?? data.spendUsdc ?? (isPair ? 0.01 : 1);
+    const slippageBps = data.slippageBps ?? 50;
+
+    const [asset, payAssetRes] = await Promise.all([
+      fetchXStockAsset(data.symbol),
+      isPair ? fetchXStockAsset(paySymbol) : Promise.resolve(null),
+    ]);
+    if (!asset.ok || !asset.data.solanaMint) {
+      return {
+        ok: false as const,
+        reason: "xstock_mint_missing",
+        detail: "Receive mint unavailable — cannot assemble order.",
+      };
+    }
+    const payAsset =
+      payAssetRes && typeof payAssetRes === "object" && "ok" in payAssetRes
+        ? payAssetRes
+        : null;
+    if (isPair && (!payAsset?.ok || !payAsset.data.solanaMint)) {
+      return {
+        ok: false as const,
+        reason: "pay_mint_missing",
+        detail: "Pay mint unavailable — cannot assemble stock↔stock order.",
+      };
+    }
+    if (isPair && payAsset?.ok && payAsset.data.solanaMint === asset.data.solanaMint) {
+      return {
+        ok: false as const,
+        reason: "same_mint_pair",
+        detail: "Pay and receive must be different stocks.",
+      };
+    }
+
+    const decimals =
+      asset.data.decimals != null ? asset.data.decimals : 8;
+    const payDecimals =
+      isPair && payAsset?.ok && payAsset.data.decimals != null
+        ? payAsset.data.decimals
+        : 6;
+    const amountRaw = Math.round(payAmount * 10 ** (isPair ? payDecimals : 6));
+
+    const order = await fetchJupiterQuote({
+      inputMint: isPair && payAsset?.ok ? payAsset.data.solanaMint! : undefined,
+      outputMint: asset.data.solanaMint,
+      amountRaw,
+      slippageBps,
+      outputDecimals: decimals,
+      inputDecimals: isPair ? payDecimals : 6,
+      taker: data.taker.trim(),
+    });
+    if (!order.ok) {
+      return {
+        ok: false as const,
+        reason: order.reason,
+        detail: order.detail ?? null,
+        source: order.source,
+      };
+    }
+    if (!order.data.transaction || !order.data.requestId) {
+      return {
+        ok: false as const,
+        reason: "order_missing_transaction",
+        detail:
+          "Jupiter returned quote without a signable tx — check wallet SOL/USDC or try ≥~$10 for gasless.",
+        source: order.source,
+      };
+    }
+    return {
+      ok: true as const,
+      source: order.source,
+      mode: order.mode,
+      data: {
+        requestId: order.data.requestId,
+        transaction: order.data.transaction,
+        outUiAmount: order.data.outUiAmount,
+        inUiAmount: order.data.inUiAmount,
+        gasless: order.data.gasless,
+        signatureFeePayer: order.data.signatureFeePayer,
+        router: order.data.router,
+        feeBps: order.data.feeBps,
+      },
+    };
+  });
+
+/**
  * Land a user-signed Jupiter Swap V2 order.
  * Requires verified folio_session · fail-closed while BROADCAST_PAUSED≠false.
  * Does not sign — client must sign first.
@@ -684,7 +820,9 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         multiTenantKeysPresent,
         sessionSecretPresent,
         solanaRpcPublicFallback: rpc.publicFallback,
+        /** FOLIO does not sponsor gas/treasury at ≤~$1 — user-signed only when unpaused. */
         broadcastFunded: false,
+        broadcastPaused: isBroadcastPaused(),
       }),
       broadcastPaused: isBroadcastPaused(),
     };

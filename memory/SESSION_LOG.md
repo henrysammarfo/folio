@@ -1,6 +1,17 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Ship rough edges (fills path · F · G · honesty)
+
+- Wired `prepareJupiterSwap` + Buy CTA Privy `signTransaction` → `executeJupiterSwap` (still env-gated by `BROADCAST_PAUSED`).
+- Positions: `positionStatusLabel` on list/detail · paper vs wallet copy.
+- Partner lanes: surface Jupiter `$1` out amount on Pre-IPO/Tessera truth strips.
+- Phase F: `/beta` cine contrast for inputs/Join.
+- Phase G: `trackFolioEvent` + `/desk/admin` (FOLIO_OPS) event schema.
+- Truth: reconcile / PoR-analogue wording (Scaled UI ≠ issuer PoR).
+- Credit: unavailable-until-funded CTA · Nest.credit ≠ NestUSD.
+- Rate limits stay in-memory (no Upstash keys). Branch: `cursor/folio-ship-rough-edges-f1ec`.
+
 ## 2026-09-20 — Phases B–E merged to main · prod READY
 
 - Merged tip `cursor/folio-phase-e-partner-lanes-f1ec` → main `4a35b13` (Open App · consumer copy · gates · partner lanes · server waitlist).

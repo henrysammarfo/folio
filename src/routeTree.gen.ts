@@ -26,6 +26,7 @@ import { Route as WhitepaperRouteImport } from './routes/whitepaper'
 import { Route as DeskIndexRouteImport } from './routes/desk.index'
 import { Route as DeskAcquireRouteImport } from './routes/desk.acquire'
 import { Route as DeskActivityRouteImport } from './routes/desk.activity'
+import { Route as DeskAdminRouteImport } from './routes/desk.admin'
 import { Route as DeskCreditRouteImport } from './routes/desk.credit'
 import { Route as DeskMarketsRouteImport } from './routes/desk.markets'
 import { Route as DeskPositionsRouteImport } from './routes/desk.positions'
@@ -121,6 +122,11 @@ const DeskActivityRoute = DeskActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => DeskRoute,
 } as any)
+const DeskAdminRoute = DeskAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => DeskRoute,
+} as any)
 const DeskCreditRoute = DeskCreditRouteImport.update({
   id: '/credit',
   path: '/credit',
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/whitepaper': typeof WhitepaperRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
+  '/desk/admin': typeof DeskAdminRoute
   '/desk/credit': typeof DeskCreditRoute
   '/desk/markets': typeof DeskMarketsRoute
   '/desk/positions': typeof DeskPositionsRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/whitepaper': typeof WhitepaperRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
+  '/desk/admin': typeof DeskAdminRoute
   '/desk/credit': typeof DeskCreditRoute
   '/desk/markets': typeof DeskMarketsRoute
   '/desk/positions': typeof DeskPositionsRoute
@@ -240,6 +248,7 @@ export interface FileRoutesById {
   '/whitepaper': typeof WhitepaperRoute
   '/desk/acquire': typeof DeskAcquireRoute
   '/desk/activity': typeof DeskActivityRoute
+  '/desk/admin': typeof DeskAdminRoute
   '/desk/credit': typeof DeskCreditRoute
   '/desk/markets': typeof DeskMarketsRoute
   '/desk/positions': typeof DeskPositionsRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/whitepaper'
     | '/desk/acquire'
     | '/desk/activity'
+    | '/desk/admin'
     | '/desk/credit'
     | '/desk/markets'
     | '/desk/positions'
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/whitepaper'
     | '/desk/acquire'
     | '/desk/activity'
+    | '/desk/admin'
     | '/desk/credit'
     | '/desk/markets'
     | '/desk/positions'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/whitepaper'
     | '/desk/acquire'
     | '/desk/activity'
+    | '/desk/admin'
     | '/desk/credit'
     | '/desk/markets'
     | '/desk/positions'
@@ -477,6 +489,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeskActivityRouteImport
       parentRoute: typeof DeskRoute
     }
+    '/desk/admin': {
+      id: '/desk/admin'
+      path: '/admin'
+      fullPath: '/desk/admin'
+      preLoaderRoute: typeof DeskAdminRouteImport
+      parentRoute: typeof DeskRoute
+    }
     '/desk/credit': {
       id: '/desk/credit'
       path: '/credit'
@@ -546,6 +565,7 @@ declare module '@tanstack/react-router' {
 interface DeskRouteChildren {
   DeskAcquireRoute: typeof DeskAcquireRoute
   DeskActivityRoute: typeof DeskActivityRoute
+  DeskAdminRoute: typeof DeskAdminRoute
   DeskCreditRoute: typeof DeskCreditRoute
   DeskMarketsRoute: typeof DeskMarketsRoute
   DeskPositionsRoute: typeof DeskPositionsRoute
@@ -559,6 +579,7 @@ interface DeskRouteChildren {
 const DeskRouteChildren: DeskRouteChildren = {
   DeskAcquireRoute: DeskAcquireRoute,
   DeskActivityRoute: DeskActivityRoute,
+  DeskAdminRoute: DeskAdminRoute,
   DeskCreditRoute: DeskCreditRoute,
   DeskMarketsRoute: DeskMarketsRoute,
   DeskPositionsRoute: DeskPositionsRoute,

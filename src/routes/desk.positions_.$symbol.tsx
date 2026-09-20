@@ -6,7 +6,7 @@ import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { getPositionsBundle } from "@/lib/desk.functions";
-import { scaledUiHealthLabel } from "@/lib/position-health";
+import { scaledUiHealthLabel, positionStatusLabel } from "@/lib/position-health";
 import { siteMeta } from "@/lib/site-meta";
 
 const detailSearchSchema = z.object({
@@ -93,6 +93,18 @@ function Page() {
               <b>
                 {row ? row.qty.toFixed(4) : "—"}{" "}
                 {row?.qtySource === "wallet-read" ? "" : "est."}
+              </b>
+            </li>
+            <li data-testid="position-status">
+              <span>Status</span>
+              <b>
+                {row
+                  ? positionStatusLabel({
+                      health: row.health,
+                      qtySource: row.qtySource,
+                      scaledUiStatus: row.scaledUiCompare.status,
+                    })
+                  : "—"}
               </b>
             </li>
             <li>

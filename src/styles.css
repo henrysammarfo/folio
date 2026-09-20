@@ -2539,6 +2539,23 @@ html.js-enter .nx-headline{transform:translate3d(0,118%,0)}
 .mkt-cine .home-simple-foot > p{color:rgba(255,255,255,.68)}
 .mkt-cine .fx-beta-form,.mkt-cine .fx-beta-done,.mkt-cine .fx-beta-aside{border-top-color:rgba(255,255,255,.18)}
 .mkt-cine .fx-beta-aside ul,.mkt-cine .fx-whitepaper p,.mkt-cine .fx-whitepaper li{color:rgba(255,255,255,.72)}
+.mkt-cine .fx-beta-form .fx-field{color:rgba(255,255,255,.88)}
+.mkt-cine .fx-beta-form .fx-field input{
+  color:#0B1220;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.55);
+  box-shadow:0 1px 0 rgba(0,0,0,.12);
+}
+.mkt-cine .fx-beta-form .fx-field input::placeholder{color:rgba(11,18,32,.45)}
+.mkt-cine .fx-beta-form .fx-btn-primary{
+  background:#fff;
+  color:#0B1220;
+  border:1px solid #fff;
+}
+.mkt-cine .fx-beta-form .fx-btn-primary:hover{background:#e8f7fb}
+.mkt-cine .fx-beta-form .fx-checks,.mkt-cine .fx-beta-form .fx-ticket-sub{color:rgba(255,255,255,.78)}
+.mkt-cine .fx-beta-done h2{color:#fff}
+.mkt-cine .fx-beta-done p{color:rgba(255,255,255,.78)}
 .mkt-cine .fx-whitepaper b{color:#fff}
 .mkt-cine .fx-whitepaper a{color:#9FE0F0}
 .mkt-cine .legal-doc h2{color:#fff}

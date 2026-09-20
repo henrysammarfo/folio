@@ -8,7 +8,7 @@ import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { getPositionsBundle } from "@/lib/desk.functions";
-import { scaledUiHealthLabel } from "@/lib/position-health";
+import { scaledUiHealthLabel, positionStatusLabel } from "@/lib/position-health";
 import { siteMeta } from "@/lib/site-meta";
 
 const positionsSearchSchema = z.object({
@@ -70,13 +70,13 @@ function Page() {
       <section className="fx-page">
         <header className="fx-hero">
           <h1 className="fx-hero-kicker">
-            {walletRead ? "Holdings" : "Holdings · estimated"}
+            {walletRead ? "Holdings · wallet" : "Holdings · paper estimate"}
           </h1>
           <p className="fx-hero-value">{total > 0 ? money(total) : "—"}</p>
           <p className="fx-hero-sub">
             {walletRead
-              ? "Live balances from your wallet"
-              : "Connect a wallet to verify holdings"}
+              ? "Live balances from your wallet — Verified only when on-chain share count matches"
+              : "Paper quantities for demo — not owned shares until you connect a wallet"}
           </p>
         </header>
 
@@ -96,6 +96,11 @@ function Page() {
           <ul className="fx-list" aria-label="Holdings">
             {rows.map((p) => {
               const chain = scaledUiHealthLabel(p.scaledUiCompare.status);
+              const status = positionStatusLabel({
+                health: p.health,
+                qtySource: p.qtySource,
+                scaledUiStatus: p.scaledUiCompare.status,
+              });
               return (
                 <li key={p.symbol}>
                   <Link
@@ -111,6 +116,10 @@ function Page() {
                         {p.name} ·{" "}
                         {p.qty.toFixed(4)}{" "}
                         {p.qtySource === "wallet-read" ? "shares" : "est. shares"}
+                        {" · "}
+                        <span data-testid={`positions-status-${p.symbol}`}>
+                          {status}
+                        </span>
                       </small>
                     </span>
                     <span className="fx-asset-right">

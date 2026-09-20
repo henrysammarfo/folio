@@ -70,14 +70,15 @@ function Page() {
             {borrow != null ? money(borrow) : "—"}
           </h1>
           <p className="fx-hero-sub">
-            Keep your stocks. Borrow cash when we turn borrowing on.
+            Keep your stocks. Borrow stays off until NestUSD capacity is verified
+            and CPI is funded — LTV below is mainnet-read only.
           </p>
         </header>
 
         {ltv != null ? (
           <div className="fx-card fx-card-pad" style={{ marginBottom: "1rem" }}>
             <p className="fx-section-title" style={{ marginBottom: ".35rem" }}>
-              Loan-to-value
+              Loan-to-value (illustrative)
             </p>
             <div className="fx-meter">
               <div className="fx-meter-track">
@@ -98,7 +99,7 @@ function Page() {
 
         <div className="fx-actions">
           <button type="button" className="fx-btn fx-btn-primary" disabled>
-            Borrow — coming soon
+            Borrow — unavailable until funded
           </button>
           <Link to="/desk/positions" className="fx-btn fx-btn-ghost">
             View holdings
@@ -135,7 +136,8 @@ function Page() {
         ) : null}
 
         <p className="fx-sub" style={{ marginTop: "1.25rem" }}>
-          {nestEarn}. {nestusdNote}. Borrowing stays off until we turn it on.
+          {nestEarn}. {nestusdNote}. Nest.credit vault TVL is not NestUSD borrow
+          capacity. No FOLIO claim that borrowing is live.
         </p>
 
         <div className="fx-foot">

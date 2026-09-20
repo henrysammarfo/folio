@@ -19,8 +19,9 @@
 - Netro overview: **FOLIO watermark** over TradingView (NetroBNB CryptoMarketCard pattern) · tight Buy sheet · AI modal.
 - Live-trade research: `docs/LIVE_TRADE_NO_PROGRAM.md` · field map `docs/ECOSYSTEM_FIELD.md`
 - **Phases A–E on main (`4a35b13`):** Swap V2 `/order` + gated `/execute` · Privy Open App (email/embedded Solana + link/export) · consumer settings scrub (`FOLIO_OPS=1`) · session/rate-limit gates · overview Stocks/Pre-IPO/Tessera partner lanes · beta waitlist **server-only** (Supabase `beta_waitlist`, no localStorage).
-- Prod: https://folio-tawny-one.vercel.app (deploy `dpl_HqyyW2D1Tm67kdGdvhB1hdgQJ9Bf` READY).
-- Henry still: apply `beta_waitlist` migration · Privy allowed origins.
+- **Ship rough edges (branch `cursor/folio-ship-rough-edges-f1ec`):** Buy prepare→Privy sign→execute CTA · positions Verified/paper labels · partner $1 quote strip · beta cine contrast · Phase G analytics events + `/desk/admin` · Truth reconcile/PoR-analogue copy · credit unavailable-until-funded honesty.
+- Prod: https://folio-tawny-one.vercel.app
+- Henry still: apply `beta_waitlist` migration · Privy allowed origins · flip `BROADCAST_PAUSED=false` on **preview first**, then prod (user-signed fills; no FOLIO payer). NestUSD/borrow CPI still unfunded.
 - **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
 - Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).

@@ -27,7 +27,7 @@ export function deskAccessFromSession(
       activeTenantId: null,
       role: null,
       tenantCount: 0,
-      note: "Browsing without a signed session — Open App to save prefs or run the agent.",
+      note: "Browse the desk freely — Open App to buy, save prefs, or run the agent. Inspect wallets stay public.",
     };
   }
   const membership = activeMembership(session.data);
@@ -41,6 +41,16 @@ export function deskAccessFromSession(
       ? `Signed in · ${membership.role} on ${membership.slug ?? membership.displayName ?? membership.tenantId.slice(0, 8)}…`
       : "Signed in · no active tenant membership.",
   };
+}
+
+/** Soft gate for Buy execute UI — hard gate remains executeBlockedReason. */
+export function buyRequiresSessionNote(
+  session: AdapterResult<FolioSession>,
+): string | null {
+  if (!session.ok) {
+    return "Open App to assemble and sign a live buy.";
+  }
+  return null;
 }
 
 /** Hard gate for paper agent — metered / spine spend requires a verified session. */

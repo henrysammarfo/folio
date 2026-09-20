@@ -1,3 +1,20 @@
+## 2026-09-20 — Ship rough edges (fills · F · G · honesty)
+
+| Claim | Status |
+|---|---|
+| Buy CTA calls prepare → Privy sign → execute when fills armed | Implemented — `buy-execute-button.tsx` |
+| prepareJupiterSwap requires session + !BROADCAST_PAUSED + taker | Implemented — `desk.functions.ts` |
+| Fills still env-gated until BROADCAST_PAUSED=false | Residual — Henry preview-then-prod |
+| Positions show positionStatusLabel (Verified / Live · est.) | Implemented |
+| Partner lanes show Jupiter $1 out amount | Implemented |
+| Beta cine inputs/Join high contrast | Implemented — `styles.css` |
+| trackFolioEvent consent-gated via @vercel/analytics | Implemented |
+| /desk/admin ops-only (FOLIO_OPS) | Implemented |
+| Truth reconcile ≠ issuer PoR | Honest copy |
+| NestUSD / borrow still unavailable-until-funded | Unchanged — no fake capacity |
+| Rate limits still in-memory (no Upstash) | Honest residual |
+| Privy Allowed Origins + beta_waitlist migration | Action required (Henry) |
+
 ## 2026-09-20 — Phase E partner lanes + server waitlist
 
 | Claim | Status |
