@@ -1,4 +1,11 @@
 
+## 2026-09-20 — Nexeus cinematic landing + marketing
+
+- Pixel-exact Nexeus standalone at `public/nexeus/index.html` (video/poster/scrim/entrance per spec).
+- FOLIO `/` rebuilt as cinematic hero (same media + motion) with **unchanged** FolioSimpleFooter.
+- All PublicShell marketing pages share cinematic video bg; footer swapped to FolioSimpleFooter.
+- Branch: `cursor/folio-nexeus-landing-f1ec`.
+
 ## 2026-09-20 — Marketing layout polish (no pills)
 
 - Truth / Execution / Credit: replace ModeBadge/StatusBadge clusters with `mkt-status-line` + protocol `em` status.

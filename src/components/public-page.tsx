@@ -1,5 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { FolioMark } from "./folio-brand";
+import { FolioSimpleFooter } from "./nexeus-cinematic";
+
+const VIDEO =
+  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260826_123836_11a3c5e0-713f-4bef-a8e9-7dd93bdea3b0.mp4";
+const POSTER =
+  "https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/693205bf-8048-456a-879e-4e0a1b85a098.webp";
 
 /** Primary marketing IA — keep short so layout stays scannable. */
 const nav = [
@@ -39,7 +45,19 @@ export function PublicShell({
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <div className={`mkt mkt-tone-${tone}`}>
+    <div className={`mkt mkt-cine mkt-tone-${tone}`}>
+      <div className="mkt-cine-bg" aria-hidden>
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster={POSTER}
+          src={VIDEO}
+        />
+        <div className="mkt-cine-scrim" />
+      </div>
+
       <header className="mkt-top">
         <Link to="/" className="mkt-brand" aria-label="FOLIO home">
           <FolioMark className="mkt-brand-mark" title="FOLIO" />
@@ -84,41 +102,7 @@ export function PublicShell({
         <div className="mkt-body">{children}</div>
       </main>
 
-      <footer className="mkt-foot">
-        <div className="mkt-foot-brand">
-          <Link to="/" className="mkt-brand" aria-label="FOLIO home">
-            <FolioMark className="mkt-brand-mark" title="FOLIO" />
-            <b>FOLIO</b>
-          </Link>
-          <p>Honest share counts for Solana xStocks.</p>
-        </div>
-        <nav className="mkt-foot-cols" aria-label="Footer">
-          <div>
-            <strong>Product</strong>
-            <Link to="/desk">Desk</Link>
-            <Link to="/desk/acquire">Buy</Link>
-            <Link to="/desk/markets">Live board</Link>
-            <Link to="/desk/credit">Borrow</Link>
-          </div>
-          <div>
-            <strong>Learn</strong>
-            <Link to="/truth">Truth</Link>
-            <Link to="/execution">Execution</Link>
-            <Link to="/pairs">Pairs</Link>
-            <Link to="/preipo">Pre-IPO</Link>
-            <Link to="/whitepaper">Whitepaper</Link>
-          </div>
-          <div>
-            <strong>Company</strong>
-            <Link to="/about">About</Link>
-            <Link to="/beta">Beta</Link>
-            <Link to="/network">Network</Link>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-          </div>
-        </nav>
-        <p className="mkt-foot-by">Built by Henry Sam Marfo · Accra</p>
-      </footer>
+      <FolioSimpleFooter />
     </div>
   );
 }
@@ -130,18 +114,17 @@ export function Metric({
 }: {
   label: string;
   value: string;
-  detail: string;
+  detail?: string;
 }) {
   return (
     <article className="metric">
       <p>{label}</p>
       <strong>{value}</strong>
-      <span>{detail}</span>
+      {detail ? <span>{detail}</span> : null}
     </article>
   );
 }
 
-/** Numbered editorial section — one job per block. */
 export function MktSection({
   n,
   title,

@@ -5,11 +5,11 @@
 
 ## Marketing / landing (product)
 
-- Landing: stencil-only first viewport · planned below-fold story (pitch → path 01/02/03 → desk) · simple footer (no glass video).
-- Marketing PublicShell: short nav (Markets/Truth/Credit/Pre-IPO/About), intro + optional live aside, numbered `MktSection` body, 3-col foot.
-- Live status on Truth/Execution/Credit uses plain status lines — no pill/badge clusters on marketing.
-- Routes organized as directories: `/markets` `/truth` `/credit` `/preipo` `/pairs` `/execution` `/about` `/whitepaper` `/beta`.
-- Branch: `cursor/folio-mkt-layout-redo-f1ec` · PR #21.
+- Landing: **Nexeus cinematic** — looping CloudFront video + left hero + glass foot slot. FOLIO simple footer preserved (Whitepaper/Beta/About/Privacy/Desk).
+- Standalone pixel template: `/nexeus/index.html` (exact Nexeus spec).
+- Marketing PublicShell: same video/scrim language, dark type on cinema, **same FolioSimpleFooter** (not the old 3-col mkt foot).
+- Nav: Markets/Truth/Credit/Pre-IPO/About.
+- Branch: `cursor/folio-nexeus-landing-f1ec`.
 
 ## Desk UI (product)
 
