@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildAcquireGateMessages } from "../acquire-gates";
 
 describe("buildAcquireGateMessages", () => {
-  it("names BITQUERY_API_KEY when wash adapter is missing the key", () => {
+  it("blocks wash when market tape key is missing — consumer wording", () => {
     const g = buildAcquireGateMessages({
       truthOk: true,
       tradingHalted: false,
@@ -13,7 +13,8 @@ describe("buildAcquireGateMessages", () => {
       diverge: { kind: "unavailable" },
     });
     expect(g.canReview).toBe(false);
-    expect(g.blockedReasons.join(" ")).toMatch(/BITQUERY_API_KEY/);
+    expect(g.blockedReasons.join(" ")).toMatch(/Market tape unavailable/i);
+    expect(g.blockedReasons.join(" ")).not.toMatch(/BITQUERY/i);
     expect(g.honestyNotes).toEqual([]);
   });
 
@@ -46,7 +47,7 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(g.divergeOk).toBe(false);
     expect(g.canReview).toBe(false);
-    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed.*equity/i);
+    expect(g.blockedReasons.join(" ")).toMatch(/equity reference required/i);
     expect(g.honestyNotes.join(" ")).toMatch(/equity ref|Yahoo|Finnhub/i);
   });
 
@@ -63,7 +64,7 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(g.divergeOk).toBe(false);
     expect(g.canReview).toBe(false);
-    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed/i);
+    expect(g.blockedReasons.join(" ")).toMatch(/Price check unresolved/i);
   });
 
   it("blocks review on live diverge outside band", () => {
@@ -180,6 +181,6 @@ describe("buildAcquireGateMessages", () => {
       scaledUi: { kind: "mismatch", note: "diverge 50 bps" },
     });
     expect(g.canReview).toBe(false);
-    expect(g.blockedReasons.join(" ")).toMatch(/Strict fail-closed.*Scaled UI/i);
+    expect(g.blockedReasons.join(" ")).toMatch(/Share-count mismatch/i);
   });
 });

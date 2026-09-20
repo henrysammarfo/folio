@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Phase C consumer settings + copy cleanup
+
+- Ops wall gated: `/desk/settings?wall=ops` only when `FOLIO_OPS=1` (else consumer Account).
+- Buy policy review: no BITQUERY_API_KEY / canReview true-false / fail-closed labels.
+- Account Desk mode card; humanize wash/gate strings; Borrow Nest copy softened.
+- Branch: `cursor/folio-phase-c-consumer-settings-f1ec` (stacked on Phase B).
+
 ## 2026-09-20 — Phase B Open App (Privy doors + custody)
 
 - Merged Phase A PR #28 → main (`72c446e`).

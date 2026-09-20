@@ -106,6 +106,9 @@
 Settings/Account becomes the home for: profile, linked wallets, backup, export, network mode — **not** API keys.
 
 ### Phase C — Consumer Settings + copy cleanup
+
+**Status (2026-09-20):** Ops wall gated by `FOLIO_OPS=1` · Buy/Account/Activity scrub key names + fail-closed jargon · Desk mode card on Account.
+
 - Split **Account** (user) vs **Ops** (you only — hide behind `FOLIO_OPS=1` or role).  
 - Remove key names / “fail-closed BITQUERY” from consumer UI.  
 - Positions / fills / credit cards: professional copy, no lab jargon.  

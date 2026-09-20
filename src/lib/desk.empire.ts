@@ -65,6 +65,7 @@ import {
 import { runPaperAgent } from "./agent/paper-agent";
 import { paperRawFor } from "./market";
 import { isBroadcastPaused } from "./broadcast";
+import { isFolioOpsEnabled } from "./auth/ops-access";
 import { readApprovedLabShader, readApprovedLabUi } from "./lab-pick";
 
 const WATCHLIST = ["AAPLx", "NVDAx", "TSLAx"] as const;
@@ -244,6 +245,8 @@ export type EmpireReadiness = {
   supabaseSchemaReady: boolean;
   /** Honest probe detail for Settings (never invents ready). */
   supabaseSchemaDetail: string;
+  /** FOLIO_OPS=1 — ops wall at /desk/settings?wall=ops. Consumer Account otherwise. */
+  opsWallEnabled: boolean;
 };
 
 export function readEmpireReadiness(
@@ -274,6 +277,7 @@ export function readEmpireReadiness(
     /** Sync path defaults false — enrich via loadEmpireReadiness. */
     supabaseSchemaReady: false,
     supabaseSchemaDetail: "Not probed",
+    opsWallEnabled: isFolioOpsEnabled(env),
   };
 }
 

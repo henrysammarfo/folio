@@ -7,6 +7,10 @@ import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { getAcquireBundle } from "@/lib/desk.functions";
+import {
+  humanizeGateReason,
+  humanizeHonestyNote,
+} from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 import {
   XSTOCK_CATALOG,
@@ -134,14 +138,14 @@ function Page() {
 
   const scaledStatus =
     data?.scaledUiCompare.status === "match"
-      ? "match"
+      ? "Match"
       : data?.scaledUiCompare.status === "mismatch"
-        ? "mismatch"
-        : "off";
+        ? "Mismatch"
+        : "Pending";
 
   const checkLines = [
-    ...(data?.gates.blockedReasons ?? []),
-    ...(data?.gates.honestyNotes ?? []),
+    ...(data?.gates.blockedReasons ?? []).map(humanizeGateReason),
+    ...(data?.gates.honestyNotes ?? []).map(humanizeHonestyNote),
     !selected?.buyable
       ? selected?.blurb ?? "Watchlist only — mint not confirmed"
       : null,
@@ -583,10 +587,10 @@ function Page() {
               <ul>
                 <li>
                   <span>Mode</span>
-                  <b>{isPair ? "stock↔stock" : "USDC buy"}</b>
+                  <b>{isPair ? "Stock ↔ stock" : "USDC buy"}</b>
                 </li>
                 <li>
-                  <span>Truth (API)</span>
+                  <span>Share count</span>
                   <b>
                     {data?.gates.truthOk
                       ? data.multiplier.ok
@@ -596,24 +600,20 @@ function Page() {
                   </b>
                 </li>
                 <li data-testid="acquire-scaled-ui-gate">
-                  <span>On-chain Scaled UI</span>
+                  <span>On-chain check</span>
                   <b>{scaledStatus}</b>
                 </li>
                 <li>
-                  <span>Route</span>
+                  <span>Route safety</span>
                   <b>
                     {data?.gates.washOk
                       ? "Clear"
-                      : data?.gates.blockedReasons.some((r) =>
-                            /BITQUERY/i.test(r),
-                          )
-                        ? "BITQUERY_API_KEY"
-                        : "Fail-closed"}
+                      : "Paused — tape check"}
                   </b>
                 </li>
                 <li>
-                  <span>canReview</span>
-                  <b>{data?.gates.canReview ? "true" : "false · blocked"}</b>
+                  <span>Ready to review</span>
+                  <b>{data?.gates.canReview ? "Yes" : "Not yet"}</b>
                 </li>
               </ul>
               {checkLines.length > 0 ? (
@@ -628,7 +628,7 @@ function Page() {
                   ? isPair
                     ? "Swap stocks — fills paused"
                     : "Swap — fills paused"
-                  : "Blocked · fail-closed"}
+                  : "Blocked for safety"}
               </button>
               <button
                 type="button"

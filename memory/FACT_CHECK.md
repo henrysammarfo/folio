@@ -1,3 +1,12 @@
+## 2026-09-20 — Phase C consumer settings + copy
+
+| Claim | Status |
+|---|---|
+| Ops wall hidden unless FOLIO_OPS=1 | Verified — `opsWallEnabled` + settings gate |
+| Buy review no longer shows BITQUERY_API_KEY / fail-closed | Verified — acquire-gates + desk.acquire |
+| Account Desk mode card (reads · fills paused) | Implemented |
+| humanizeGateReason / scrubOpsJargon for consumer surfaces | Verified — unit tests |
+
 ## 2026-09-20 — Phase B Open App + custody
 
 | Claim | Status |

@@ -66,7 +66,7 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
       blockedReasons.push("Wash pressure blocked");
     } else if (input.wash.reason === "bitquery_key_missing") {
       blockedReasons.push(
-        "Wash gate: BITQUERY_API_KEY missing · fail-closed (set on Vercel + .env)",
+        "Market tape unavailable — buy paused until wash checks are live",
       );
     } else {
       blockedReasons.push(`Wash gate: ${input.wash.reason}`);
@@ -89,13 +89,13 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
     if (input.strictFailClosed) {
       divergeOk = false;
       blockedReasons.push(
-        "Strict fail-closed: live equity reference required before review",
+        "Live equity reference required before review",
       );
     }
   } else if (input.diverge.kind === "unavailable" && input.strictFailClosed) {
     divergeOk = false;
     blockedReasons.push(
-      "Strict fail-closed: venue diverge unresolved · review blocked",
+      "Price check unresolved — review paused",
     );
   }
 
@@ -121,7 +121,7 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
     );
     if (input.strictFailClosed) {
       blockedReasons.push(
-        "Strict fail-closed: API ↔ on-chain Scaled UI mismatch · review blocked",
+        "Share-count mismatch on-chain — review paused",
       );
     }
   } else if (input.scaledUi?.kind === "unavailable") {
@@ -130,7 +130,7 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
     );
     if (input.strictFailClosed) {
       blockedReasons.push(
-        "Strict fail-closed: on-chain Scaled UI unavailable · review blocked",
+        "On-chain share count unavailable — review paused",
       );
     }
   }

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Bell, KeyRound, Shield, Wallet } from "lucide-react";
+import { Bell, KeyRound, Radio, Shield, Wallet } from "lucide-react";
 import { lazy, Suspense, useState } from "react";
 import { z } from "zod";
 import { AccountCustodyPanel } from "@/components/account-custody-panel";
@@ -18,6 +18,7 @@ import {
   type SessionBundle,
 } from "@/lib/desk.functions";
 import { canWriteDeskPrefs } from "@/lib/auth/role-gates";
+import { scrubOpsJargon } from "@/lib/humanize-copy";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { siteMeta } from "@/lib/site-meta";
 
@@ -53,7 +54,8 @@ export const Route = createFileRoute("/desk/settings")({
 function Page() {
   const initial = Route.useLoaderData();
   const { wall } = Route.useSearch();
-  if (wall === "ops") {
+  const opsOk = Boolean(initial.readiness.opsWallEnabled);
+  if (wall === "ops" && opsOk) {
     return (
       <DeskShell title="Operator">
         <Suspense fallback={<p className="fx-sub">Loading…</p>}>
@@ -102,6 +104,8 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
     : false;
   const signedIn = Boolean(data?.auth.ok && data.auth.data.sessionReady);
   const appId = data?.readiness.privyAppId ?? "";
+  const watchBindReady = Boolean(data?.sessionSecretPresent);
+  const fillsPaused = data?.readiness.broadcastPaused !== false;
   const shortWallet = data?.watchWallet
     ? `${data.watchWallet.slice(0, 4)}…${data.watchWallet.slice(-4)}`
     : null;
@@ -153,7 +157,11 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                 setMsg("");
                 try {
                   const res = await bindWatch({ data: { wallet: next } });
-                  setMsg(res.ok ? "Wallet saved." : res.reason);
+                  setMsg(
+                    res.ok
+                      ? "Wallet saved."
+                      : scrubOpsJargon(res.reason || "Couldn’t save wallet."),
+                  );
                   if (res.ok) {
                     setWallet("");
                     await refresh();
@@ -174,11 +182,17 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               <button
                 type="submit"
                 className="fx-btn fx-btn-dark fx-btn-sm"
-                disabled={busy || !data?.sessionSecretPresent}
+                disabled={busy || !watchBindReady}
               >
                 {busy ? "…" : "Save"}
               </button>
             </form>
+            {!watchBindReady ? (
+              <p className="fx-sub" style={{ marginTop: ".65rem" }}>
+                Wallet save isn’t available on this host yet — use Open App to
+                sign in instead.
+              </p>
+            ) : null}
             {data?.watchWallet ? (
               <button
                 type="button"
@@ -226,7 +240,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                 />
               </Suspense>
             ) : (
-              <p className="fx-sub">Sign-in opens when Privy is configured.</p>
+              <p className="fx-sub">Sign-in opens when the desk is configured.</p>
             )}
             {signedIn ? (
               <button
@@ -253,6 +267,24 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               </div>
             </header>
             <AccountCustodyPanel />
+          </article>
+
+          <article className="fx-card fx-account-card">
+            <header className="fx-account-card-head">
+              <Radio size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Desk mode</h2>
+                <p>
+                  {fillsPaused
+                    ? "Live reads · buys paused"
+                    : "Live reads · fills armed"}
+                </p>
+              </div>
+            </header>
+            <p className="fx-sub">
+              Markets and share counts update live. Broadcast fills stay off
+              until FOLIO turns them on for your session.
+            </p>
           </article>
 
           <article className="fx-card fx-account-card fx-account-card-row">

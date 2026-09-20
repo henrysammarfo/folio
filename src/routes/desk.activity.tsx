@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { DeskShell } from "@/components/desk-shell";
 import { getActivityBundle } from "@/lib/desk.functions";
+import { humanizeHonestyNote, humanizeWashNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/desk/activity")({
@@ -16,6 +17,11 @@ export const Route = createFileRoute("/desk/activity")({
   loader: async () => getActivityBundle(),
   component: Page,
 });
+
+function humanizeActivityDetail(title: string, detail: string): string {
+  if (/wash/i.test(title)) return humanizeWashNote(detail);
+  return humanizeHonestyNote(detail) || detail;
+}
 
 function Page() {
   const initial = Route.useLoaderData();
@@ -45,7 +51,7 @@ function Page() {
                 </span>
                 <div>
                   <strong>{e.title}</strong>
-                  <p>{e.detail}</p>
+                  <p>{humanizeActivityDetail(e.title, e.detail)}</p>
                 </div>
                 <time dateTime={e.at}>
                   {new Date(e.at).toLocaleTimeString("en-US", {
@@ -59,7 +65,7 @@ function Page() {
         </div>
         {data?.note ? (
           <p className="fx-sub" style={{ marginTop: "1rem" }}>
-            {data.note}
+            {humanizeHonestyNote(data.note)}
           </p>
         ) : null}
       </section>
