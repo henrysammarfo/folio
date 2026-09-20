@@ -107,7 +107,7 @@ describe("buildAcquireGateMessages", () => {
       pools: { kind: "ok", poolCount: 5 },
     });
     expect(g.canReview).toBe(true);
-    expect(g.honestyNotes.join(" ")).toMatch(/Raydium.*awareness only|not a route guarantee/i);
+    expect(g.honestyNotes.join(" ")).toMatch(/Pool awareness|not a route guarantee/i);
   });
 
   it("labels empty/unavailable Raydium without inventing a hard block", () => {
@@ -122,7 +122,7 @@ describe("buildAcquireGateMessages", () => {
       pools: { kind: "empty" },
     });
     expect(empty.canReview).toBe(true);
-    expect(empty.honestyNotes.join(" ")).toMatch(/zero pools|awareness only/i);
+    expect(empty.honestyNotes.join(" ")).toMatch(/No pools observed|quote path/i);
 
     const down = buildAcquireGateMessages({
       truthOk: true,
@@ -136,7 +136,7 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(down.canReview).toBe(true);
     expect(down.blockedReasons).toEqual([]);
-    expect(down.honestyNotes.join(" ")).toMatch(/Raydium pool awareness unavailable/i);
+    expect(down.honestyNotes.join(" ")).toMatch(/Pool awareness unavailable/i);
   });
 
   it("labels Scaled UI match/mismatch without inventing a hard block", () => {
@@ -151,7 +151,7 @@ describe("buildAcquireGateMessages", () => {
       scaledUi: { kind: "match", note: "API ↔ on-chain within 1 bps" },
     });
     expect(match.canReview).toBe(true);
-    expect(match.honestyNotes.join(" ")).toMatch(/Scaled UI/);
+    expect(match.honestyNotes.join(" ")).toMatch(/Share count on-chain matches/i);
 
     const mismatch = buildAcquireGateMessages({
       truthOk: true,
@@ -165,7 +165,7 @@ describe("buildAcquireGateMessages", () => {
     });
     expect(mismatch.canReview).toBe(true);
     expect(mismatch.blockedReasons).toEqual([]);
-    expect(mismatch.honestyNotes.join(" ")).toMatch(/mismatch/i);
+    expect(mismatch.honestyNotes.join(" ")).toMatch(/differs|mismatch/i);
   });
 
   it("blocks Scaled UI mismatch when strictFailClosed is on", () => {

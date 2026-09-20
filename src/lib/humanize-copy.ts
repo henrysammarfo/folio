@@ -84,10 +84,14 @@ export function scrubOpsJargon(text: string): string {
   t = t.replace(/FOLIO_SESSION_SECRET/gi, "session signing");
   t = t.replace(/JUPITER_API_KEY/gi, "quote auth");
   t = t.replace(/PRIVY_APP_(ID|SECRET)/gi, "sign-in");
+  t = t.replace(/BROADCAST_PAUSED(?:=false)?/gi, "fills arm");
+  t = t.replace(/\/execute/gi, "fill");
   t = t.replace(/fail-closed/gi, "paused for safety");
   t = t.replace(/Strict fail-closed:?/gi, "Strict mode:");
   t = t.replace(/\s*·\s*set on Vercel\s*\+\s*\.env/gi, "");
   t = t.replace(/\s*on Vercel\s*\+\s*\.env/gi, "");
+  t = t.replace(/\bRaydium:\s*/gi, "Pool awareness: ");
+  t = t.replace(/\bScaled UI:?\s*/gi, "Share count: ");
   // snake_case adapter codes → spaces
   if (/^[a-z][a-z0-9_]+$/i.test(t) && t.includes("_")) {
     return t.replace(/_/g, " ");

@@ -429,14 +429,14 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
     const honestyNotes = [
       ...gateMsgs.honestyNotes,
       isPair
-        ? `Stock↔stock · ${paySymbol} → ${symbol} · Jupiter Swap V2 /order (quote-only until fills arm)`
+        ? `Stock ↔ stock · ${paySymbol} → ${symbol} · quote only until fills turn on`
         : null,
       jupiter.ok && jupiter.data.router
         ? `Router ${jupiter.data.router}${jupiter.data.gasless ? " · gasless path" : ""}`
         : null,
       isBroadcastPaused()
-        ? "Broadcast paused — /execute refused until BROADCAST_PAUSED=false"
-        : "Broadcast armed — /execute available after wallet sign",
+        ? "Fills paused — review only until FOLIO arms buys"
+        : "Fills armed — sign in wallet to execute",
     ].filter(Boolean) as string[];
 
     return {

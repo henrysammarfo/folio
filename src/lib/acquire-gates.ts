@@ -101,23 +101,23 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
 
   if (input.pools?.kind === "ok") {
     honestyNotes.push(
-      `Raydium: ${input.pools.poolCount} pool(s) observed · awareness only · not a route guarantee · wash still required`,
+      `Pool awareness: ${input.pools.poolCount} pool(s) seen · not a route guarantee`,
     );
   } else if (input.pools?.kind === "empty") {
     honestyNotes.push(
-      "Raydium: zero pools observed for mint · awareness only · Jupiter quote remains the path; wash still required",
+      "No pools observed for this mint · quote path still used when clear",
     );
   } else if (input.pools?.kind === "unavailable") {
     honestyNotes.push(
-      `Raydium pool awareness unavailable (${input.pools.reason}) · Jupiter quote remains the path; wash still required`,
+      "Pool awareness unavailable · quote path still used when clear",
     );
   }
 
   if (input.scaledUi?.kind === "match") {
-    honestyNotes.push(`Scaled UI: ${input.scaledUi.note}`);
+    honestyNotes.push(`Share count on-chain matches API`);
   } else if (input.scaledUi?.kind === "mismatch") {
     honestyNotes.push(
-      `Scaled UI mismatch: ${input.scaledUi.note} · labeled (does not alone block review unless Strict)`,
+      `Share count on-chain differs from API · labeled`,
     );
     if (input.strictFailClosed) {
       blockedReasons.push(
@@ -126,7 +126,7 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
     }
   } else if (input.scaledUi?.kind === "unavailable") {
     honestyNotes.push(
-      `Scaled UI: ${input.scaledUi.note} · labeled (does not invent an on-chain pass)`,
+      "On-chain share count pending · labeled",
     );
     if (input.strictFailClosed) {
       blockedReasons.push(
