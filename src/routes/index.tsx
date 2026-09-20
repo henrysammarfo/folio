@@ -3,10 +3,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { FolioMark } from "@/components/folio-brand";
 import { FolioLiquidStencil } from "@/components/folio-liquid-stencil";
-import { BenefitsSection } from "@/components/landing-benefits";
 import { LandingGlassFooter } from "@/components/landing-glass-footer";
-import { GlowingFeaturesSection } from "@/components/landing-glow-features";
-import { LandingProductTriptych } from "@/components/landing-product-triptych";
 import { getTruthBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
 
@@ -14,7 +11,8 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: siteMeta({
       title: "FOLIO — Buy tokenized stocks on Solana",
-      description: "Honest share counts, safe routes, and credit without selling.",
+      description:
+        "Honest share counts, safe routes, and credit without selling.",
       path: "/",
     }),
   }),
@@ -109,22 +107,49 @@ function Home() {
             </Link>
           </div>
         </div>
-        <aside className="home-live-chip home-live-chip-light" aria-label="Live signal">
-          <span>Live</span>
+        <aside className="home-live-signal" aria-label="Live signal">
+          <span>Live · AAPLx</span>
           <strong>
             {mult?.ok
               ? `${mult.data.currentMultiplier.toFixed(6)}×`
               : "Pending"}
           </strong>
-          <small>AAPLx share count</small>
+          <small>Share-count multiplier</small>
         </aside>
       </section>
 
-      <LandingProductTriptych />
-
-      <BenefitsSection />
-
-      <GlowingFeaturesSection />
+      <section className="home-strip" aria-label="How FOLIO works">
+        <header>
+          <p className="home-eyebrow">How it works</p>
+          <h2>Three moves. One desk.</h2>
+        </header>
+        <ol className="home-strip-list">
+          <li>
+            <b>Honest share counts</b>
+            <span>
+              Live multipliers checked against Solana Scaled UI — raw balances
+              never silently lie after splits.
+            </span>
+            <Link to="/truth">Open truth →</Link>
+          </li>
+          <li>
+            <b>Safe buy path</b>
+            <span>
+              Dirty tape stops the route. Jupiter quotes stay labeled.
+              Quote-only until broadcast unlocks.
+            </span>
+            <Link to="/desk/acquire">Open buy →</Link>
+          </li>
+          <li>
+            <b>Credit without selling</b>
+            <span>
+              Keep the shares. See borrow capacity from live Kamino reads —
+              broadcast paused on purpose.
+            </span>
+            <Link to="/desk/credit">Open borrow →</Link>
+          </li>
+        </ol>
+      </section>
 
       <section className="home-section home-section-soft-light" aria-label="Desk">
         <div className="home-desk-tease">
@@ -134,26 +159,11 @@ function Home() {
             <p>
               Holdings, charts, quotes, and credit — logos, swap ticket, honest
               labels. Mega, IPO, and meme lanes with pair compares on Buy.
+              PreStocks and Tessera stay on separate desks.
             </p>
             <Link to="/desk" className="home-desk-preview-cta">
               Enter the desk <ArrowRight size={16} />
             </Link>
-          </div>
-          <div className="home-desk-preview" aria-hidden>
-            <div className="home-desk-preview-row">
-              <div className="home-desk-preview-card soft">
-                <span>Share count</span>
-                <b>Live × before trade</b>
-              </div>
-              <div className="home-desk-preview-card dark">
-                <span>Market</span>
-                <b>AAPLx · TradingView</b>
-              </div>
-            </div>
-            <div className="home-desk-preview-card">
-              <span>Swap</span>
-              <b>USDC → AAPLx · live quote</b>
-            </div>
           </div>
         </div>
       </section>

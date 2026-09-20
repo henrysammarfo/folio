@@ -5,13 +5,14 @@
 
 ## Marketing / landing (product)
 
-- Landing: liquid stencil hero + Falcon-style triptych + **BenefitsSection** + **GlowingFeaturesSection** + **LandingGlassFooter**.
-- Marketing PublicShell tones + glass footer; new routes **/markets**, **/preipo**, **/pairs**.
+- Landing: brand-first liquid stencil hero (FOLIO wordmark + one headline + CTA) · editorial “three moves” strip · no Benefits/Glow card walls · glass footer on `/` only.
+- Marketing PublicShell: text nav (no pills), light atmospheric intros with brand signal, editorial stacks (no card grids), clean foot on all public pages.
+- Routes: `/markets` `/preipo` `/pairs` `/truth` `/execution` `/credit` `/about` `/whitepaper` `/beta`.
 
 ## Desk UI (product)
 
 - Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
-- **/desk/markets** live Jupiter board (venue + liq + session + vs-ref) — not a Finviz clone.
+- **/desk/markets** live Jupiter board (venue + liq + session + vs-ref) — square lane filters, list-style pairs.
 - **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
 - Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).

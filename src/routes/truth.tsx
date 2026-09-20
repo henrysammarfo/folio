@@ -53,7 +53,7 @@ function Page() {
       title="One balance. Every truth behind it."
       intro="Token balances alone can lie after dividends and splits. FOLIO reads the live xStocks Scaled UI multiplier on Solana mainnet and shows raw vs economic ownership — no fixture 4.0× theater."
     >
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mkt-status-row">
         <ModeBadge mode={mult?.ok ? mult.mode : "unavailable"}>
           {mult?.ok ? "xStocks live" : "Multiplier unavailable"}
         </ModeBadge>
@@ -68,31 +68,18 @@ function Page() {
         >
           {data?.scaledUi?.ok
             ? data.scaledUiCompare?.status === "mismatch"
-              ? "On-chain Scaled UI mismatch"
+              ? "Scaled UI mismatch"
               : data.scaledUiCompare?.status === "match"
-                ? "On-chain Scaled UI match"
-                : "On-chain Scaled UI live"
-            : "On-chain Scaled UI off"}
+                ? "Scaled UI match"
+                : "Scaled UI live"
+            : "Scaled UI off"}
         </ModeBadge>
         <ModeBadge mode={data?.jupiterPrice.ok ? data.jupiterPrice.mode : "unavailable"}>
           {!data?.jupiterPrice.ok
-            ? "Jupiter price unavailable"
+            ? "Jupiter off"
             : data.jupiterPrice.source.includes("stale")
-              ? "Jupiter price stale-cache"
-              : data.jupiterPrice.source.includes("cached")
-                ? "Jupiter price cached"
-                : "Jupiter price live"}
-        </ModeBadge>
-        <ModeBadge mode="unavailable">Pyth off ship path</ModeBadge>
-        <ModeBadge mode={data?.equityRef?.ok ? data.equityRef.mode : "unavailable"}>
-          {data?.equityRef?.ok
-            ? `Diverge · ${data.equityRef.data.provider}`
-            : "Diverge equity ref off"}
-        </ModeBadge>
-        <ModeBadge mode={data?.xStockRef?.ok ? data.xStockRef.mode : "unavailable"}>
-          {data?.xStockRef?.ok
-            ? data.xStockRef.data.feedSymbol
-            : "CoinGecko xStock off"}
+              ? "Jupiter stale"
+              : "Jupiter live"}
         </ModeBadge>
       </div>
 
