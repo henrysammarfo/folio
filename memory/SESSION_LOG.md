@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Fully-live plan draft (Henry approval gate)
+
+- User: Stocklana paste pack **later**; Swap V2/$10 arm **yes** but **plan first** — no freestyle implement.
+- Research: Jupiter `/order`+`/execute`+gasless; Privy embedded export (not Capsule/Para); Stocklana judges = working demo; retail asks liquidity/dividends/Scaled UI/freeze.
+- Honest audit: still `swap/v1/quote`; settings shows API keys; beta=localStorage; analytics=Vercel pageviews only; partner desks orphaned from overview; desk routes soft-open.
+- Wrote `docs/FULLY_LIVE_PLAN.md` phases A–G. Waiting for Henry phase pick.
+
 ## 2026-09-20 — Light TradingView (Netro match)
 
 - Chart was dark because we set `theme="dark"` — NetroBNB uses `theme: "light"` + dark `#1C1C1C` watermark @ 0.11.
