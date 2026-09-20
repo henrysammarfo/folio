@@ -75,23 +75,6 @@ function Home() {
               </Link>
             </div>
           </header>
-
-          <div className="home-hero-copy">
-            <p className="home-hero-brand">FOLIO</p>
-            <h1>Buy US stocks on Solana — with honest share counts.</h1>
-            <p>
-              Live multipliers, wash refuse, and Jupiter quotes before you size.
-              Fills stay paused until funded.
-            </p>
-            <div className="home-cta-row">
-              <Link to="/desk" className="home-cta">
-                Open the desk <ArrowRight />
-              </Link>
-              <Link to="/desk/acquire" className="home-cta-ghost-on-dark">
-                Buy AAPLx
-              </Link>
-            </div>
-          </div>
         </div>
 
         <div className="home-horizon" aria-label="Status">
@@ -102,7 +85,7 @@ function Home() {
             <LocalTime />
           </div>
           <p className="home-scroll-hint">
-            Scroll <span aria-hidden>↓</span>
+            Scroll to explore <span aria-hidden>↓</span>
           </p>
         </div>
       </section>
@@ -115,6 +98,14 @@ function Home() {
             {liveLine} FOLIO shows real share counts, refuses dirty tape, and
             quotes a live Solana route before you buy.
           </p>
+          <div className="home-cta-row">
+            <Link to="/desk" className="home-cta home-cta-ink">
+              Open the desk <ArrowRight />
+            </Link>
+            <Link to="/desk/acquire" className="home-cta-ghost">
+              Buy AAPLx
+            </Link>
+          </div>
         </div>
         <aside className="home-live-signal" aria-label="Live signal">
           <span>Live · AAPLx</span>
