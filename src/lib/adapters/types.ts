@@ -2,6 +2,7 @@
 
 export type IntegrationMode =
   | "mainnet-read"
+  | "mainnet-write"
   | "quote-only"
   | "fork"
   | "paper"

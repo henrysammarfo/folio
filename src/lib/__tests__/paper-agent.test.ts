@@ -186,7 +186,7 @@ describe("runPaperAgent live spine", () => {
         );
       }
       if (isSolanaRpc(url, init)) return scaledUiRpcResponse(1.003269);
-      if (url.includes("api.jup.ag/swap/v1/quote")) {
+      if (url.includes("api.jup.ag/swap/v2/order")) {
         return new Response(
           JSON.stringify({
             inputMint: FIXTURE_USDC,
@@ -270,7 +270,7 @@ describe("runPaperAgent live spine", () => {
         );
       }
       if (isSolanaRpc(url, init)) return scaledUiRpcResponse(1.003269);
-      if (url.includes("api.jup.ag/swap/v1/quote")) {
+      if (url.includes("api.jup.ag/swap/v2/order")) {
         return new Response(
           JSON.stringify({
             inputMint: FIXTURE_USDC,

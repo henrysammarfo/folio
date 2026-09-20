@@ -9,7 +9,7 @@ import {
   type EquityRefPrice,
   type XStockRefPrice,
 } from "./adapters/equity-ref";
-import { fetchJupiterQuote, fetchJupiterTokenPrice } from "./adapters/jupiter";
+import { fetchJupiterQuote, fetchJupiterTokenPrice, fetchJupiterExecute } from "./adapters/jupiter";
 import { evaluateWashGate, washAllowsSize } from "./adapters/wash";
 import { buildAcquireGateMessages } from "./acquire-gates";
 import { buildNetworkMatrix, type MatrixRow } from "./adapters/network-matrix";
@@ -344,7 +344,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         ok: false,
         mode: "unavailable",
         asOf: new Date().toISOString(),
-        source: "api.jup.ag/swap/v1/quote",
+        source: "api.jup.ag/swap/v2/order",
         reason: "xstock_mint_missing",
         detail: "Cannot quote without Solana mint from xStocks deployments",
       };
@@ -353,7 +353,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         ok: false,
         mode: "unavailable",
         asOf: new Date().toISOString(),
-        source: "api.jup.ag/swap/v1/quote",
+        source: "api.jup.ag/swap/v2/order",
         reason: "pay_mint_missing",
         detail: `Cannot stock-pair quote without pay mint for ${paySymbol}`,
       };
@@ -362,7 +362,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         ok: false,
         mode: "unavailable",
         asOf: new Date().toISOString(),
-        source: "api.jup.ag/swap/v1/quote",
+        source: "api.jup.ag/swap/v2/order",
         reason: "same_mint_pair",
         detail: "Pay and receive must be different stocks",
       };
@@ -429,8 +429,14 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
     const honestyNotes = [
       ...gateMsgs.honestyNotes,
       isPair
-        ? `Stock↔stock · ${paySymbol} → ${symbol} · Jupiter quote-only (not two USDC buys)`
+        ? `Stock↔stock · ${paySymbol} → ${symbol} · Jupiter Swap V2 /order (quote-only until fills arm)`
         : null,
+      jupiter.ok && jupiter.data.router
+        ? `Router ${jupiter.data.router}${jupiter.data.gasless ? " · gasless path" : ""}`
+        : null,
+      isBroadcastPaused()
+        ? "Broadcast paused — /execute refused until BROADCAST_PAUSED=false"
+        : "Broadcast armed — /execute available after wallet sign",
     ].filter(Boolean) as string[];
 
     return {
@@ -452,6 +458,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       scaledUiCompare,
       strictFailClosed: prefs.strictFailClosed,
       prefsFromSession: prefs.prefsFromSession,
+      broadcastPaused: isBroadcastPaused(),
       gates: {
         truthOk,
         washOk,
@@ -462,6 +469,46 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         blockedReasons: gateMsgs.blockedReasons,
         honestyNotes,
       },
+    };
+  });
+
+const ExecuteSwapInput = z.object({
+  signedTransaction: z.string().min(32).max(20_000),
+  requestId: z.string().min(8).max(200),
+});
+
+/**
+ * Land a user-signed Jupiter Swap V2 order.
+ * Fail-closed while BROADCAST_PAUSED≠false. Does not sign — client must sign first.
+ */
+export const executeJupiterSwap = createServerFn({ method: "POST" })
+  .inputValidator(ExecuteSwapInput)
+  .handler(async ({ data }) => {
+    if (isBroadcastPaused()) {
+      return {
+        ok: false as const,
+        reason: "broadcast_paused",
+        detail:
+          "Fills paused · set BROADCAST_PAUSED=false to arm /execute (preview first).",
+      };
+    }
+    const res = await fetchJupiterExecute({
+      signedTransaction: data.signedTransaction,
+      requestId: data.requestId,
+    });
+    if (!res.ok) {
+      return {
+        ok: false as const,
+        reason: res.reason,
+        detail: res.detail ?? null,
+        source: res.source,
+      };
+    }
+    return {
+      ok: true as const,
+      source: res.source,
+      mode: res.mode,
+      data: res.data,
     };
   });
 
@@ -513,7 +560,7 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
           ok: false,
           mode: "unavailable",
           asOf: new Date().toISOString(),
-          source: "api.jup.ag/swap/v1/quote",
+          source: "api.jup.ag/swap/v2/order",
           reason: "xstock_mint_missing",
         } as const);
 

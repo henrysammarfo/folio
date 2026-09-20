@@ -1,3 +1,13 @@
+## 2026-09-20 — Phase A Jupiter V2 + ecosystem
+
+| Claim | Status |
+|---|---|
+| Uniswap lists Ondo (+ peers) tokenized securities; UniswapX API | Verified — ondo.finance + blog.uniswap.org |
+| FOLIO Phase A rail = Solana Jupiter V2 (not Eth Uniswap) | Decision — `docs/ECOSYSTEM_FIELD.md` |
+| Quotes via `api.jup.ag/swap/v2/order` | Verified — adapter + unit tests |
+| `/execute` refused while broadcast paused | Verified — `executeJupiterSwap` |
+| Client wallet sign for armed fills | Pending Phase B |
+
 
 ## 2026-09-20 — FOLIO TradingView watermark (Netro pattern)
 
