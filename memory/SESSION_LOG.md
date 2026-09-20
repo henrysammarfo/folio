@@ -1,6 +1,12 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Phase B Open App (Privy doors + custody)
+
+- Merged Phase A PR #28 → main (`72c446e`).
+- Desk-wide `PrivyAppProvider` (Solana embedded + external connectors); header **Open App**; Account **Security & custody** (link wallet + export with warnings).
+- De-nested `PrivySessionMint` (no second PrivyProvider). Branch: `cursor/folio-phase-b-open-app-f1ec`.
+
 ## 2026-09-20 — Phase A begin + ecosystem field (Uniswap/peers)
 
 - Henry approved A→G order; begin Phase A.

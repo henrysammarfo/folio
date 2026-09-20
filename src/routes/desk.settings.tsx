@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Bell, Shield, Wallet } from "lucide-react";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Bell, KeyRound, Shield, Wallet } from "lucide-react";
+import { lazy, Suspense, useState } from "react";
 import { z } from "zod";
+import { AccountCustodyPanel } from "@/components/account-custody-panel";
 import { DeskShell } from "@/components/desk-shell";
+import { usePrivyShellReady } from "@/components/privy-app-provider";
 import { Switch } from "@/components/ui/switch";
 import {
   bindWatchWallet,
@@ -83,8 +85,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const [tenantBusy, setTenantBusy] = useState(false);
-  const [privyClient, setPrivyClient] = useState(false);
-  useEffect(() => setPrivyClient(true), []);
+  const shellReady = usePrivyShellReady();
 
   const tenants = data?.session.ok ? data.session.data.tenants : [];
   const activeTenantId = data?.activeTenantId ?? null;
@@ -125,7 +126,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
             <p className="fx-sub">
               {signedIn
                 ? "Signed in · wallet prefs save to your desk."
-                : "Connect a wallet to see verified holdings."}
+                : "Open App to sign in with email or connect a wallet."}
             </p>
           </div>
         </header>
@@ -212,7 +213,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                 </p>
               </div>
             </header>
-            {privyClient && appId ? (
+            {shellReady && appId ? (
               <Suspense fallback={null}>
                 <PrivySessionMint
                   appId={appId}
@@ -241,6 +242,17 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                 Sign out
               </button>
             ) : null}
+          </article>
+
+          <article className="fx-card fx-account-card">
+            <header className="fx-account-card-head">
+              <KeyRound size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Security &amp; custody</h2>
+                <p>Link a wallet or export your embedded key</p>
+              </div>
+            </header>
+            <AccountCustodyPanel />
           </article>
 
           <article className="fx-card fx-account-card fx-account-card-row">

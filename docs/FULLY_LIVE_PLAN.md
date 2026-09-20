@@ -91,6 +91,9 @@
 **Henry gate before A ships live:** confirm `BROADCAST_PAUSED=false` (or arm flag) on a **preview** first, then prod.
 
 ### Phase B — Open App auth (Web2 + Web3)
+
+**Status (2026-09-20):** Desk-wide `PrivyAppProvider` · header **Open App** · Account link/export custody · nested PrivyProvider removed.
+
 **Goal:** Open App → Privy modal. Two doors + later link.
 
 | Persona | Flow |

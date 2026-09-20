@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FolioMark } from "./folio-brand";
-import { DeskWalletPill } from "./desk-wallet-pill";
+import { OpenAppButton } from "./open-app-button";
 import {
   ShaderBackground,
   type ShaderLabVariant,
@@ -291,7 +291,7 @@ export function DeskShell({
       {deskAccess && !deskAccess.signedIn ? (
         <div className="fx-access-banner" role="status">
           <span>{deskAccess.note}</span>
-          <Link to="/desk/settings">Account</Link>
+          <OpenAppButton className="fx-text-btn" />
         </div>
       ) : deskAccess?.signedIn && deskAccess.tenantCount > 0 ? (
         <div className="fx-access-banner fx-access-banner-in" role="status">
@@ -328,7 +328,7 @@ export function DeskShell({
           <Link to="/desk/acquire" className="fx-btn fx-btn-primary fx-btn-sm">
             Buy
           </Link>
-          <DeskWalletPill />
+          <OpenAppButton />
         </div>
       </header>
 

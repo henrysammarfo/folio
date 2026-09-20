@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Panel } from "@/components/desk-shell";
 import { StatusBadge } from "@/components/folio-brand";
+import { usePrivyShellReady } from "@/components/privy-app-provider";
 import { Switch } from "@/components/ui/switch";
 import {
   attachDemoTenantMembership,
@@ -61,10 +62,7 @@ export function DeskOpsSettings({ initial }: { initial: SessionBundle }) {
   const [prefsMsg, setPrefsMsg] = useState("");
   const [tenantBusy, setTenantBusy] = useState(false);
   const [tenantMsg, setTenantMsg] = useState("");
-  const [privyClient, setPrivyClient] = useState(false);
-  useEffect(() => {
-    setPrivyClient(true);
-  }, []);
+  const shellReady = usePrivyShellReady();
   const tenants = data?.session.ok ? data.session.data.tenants : [];
   const activeTenantId = data?.activeTenantId ?? null;
   const prefsTenant =
@@ -679,7 +677,7 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
             Requires <code>FOLIO_ALLOW_BOOTSTRAP_DEMO=1</code> — disabled by default.
           </p>
         </div>
-        {privyClient && data?.readiness.privyAppId ? (
+        {shellReady && data?.readiness.privyAppId ? (
           <Suspense fallback={<p className="mb-3 text-sm opacity-70">Loading Privy…</p>}>
             <PrivySessionMint
               appId={data.readiness.privyAppId}

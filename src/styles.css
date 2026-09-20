@@ -1719,6 +1719,12 @@ button.fx-swap-mid:disabled{opacity:.4;cursor:default}
   display:flex;align-items:center;justify-content:space-between;gap:1rem;
 }
 .fx-account-card-row .fx-account-card-head{margin:0;flex:1;min-width:0}
+.fx-custody-warn{
+  padding:.85rem .9rem;
+  border:1px solid color-mix(in oklab, var(--fx-line) 80%, #c45c26 20%);
+  border-radius:10px;
+  background:color-mix(in oklab, var(--fx-panel) 92%, #c45c26 8%);
+}
 
 .fx-account-block{padding:1.2rem 1.25rem;border-bottom:1px solid var(--fx-line)}
 .fx-account-block:last-child{border-bottom:0}

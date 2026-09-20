@@ -1,6 +1,7 @@
-import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
+import { usePrivy } from "@privy-io/react-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
+import { usePrivyShellReady } from "@/components/privy-app-provider";
 import { createSessionFromPrivyToken } from "@/lib/desk.functions";
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
 
 /**
  * Client-only Privy login → getAccessToken → server mint httpOnly folio_session.
+ * Expects desk-wide PrivyAppProvider (no nested PrivyProvider).
  * Never mounts App Secret; paste-token path remains as fallback on ops wall.
  */
 export function PrivySessionMint({
@@ -24,23 +26,15 @@ export function PrivySessionMint({
   onMinted,
   variant = "ops",
 }: Props) {
-  if (!appId.trim()) return null;
+  const shellReady = usePrivyShellReady();
+  if (!appId.trim() || !shellReady) return null;
   return (
-    <PrivyProvider
-      appId={appId}
-      config={{
-        appearance: { theme: "light", accentColor: "#0EA5C9" },
-        loginMethods: ["email", "wallet", "google"],
-        embeddedWallets: { createOnLogin: "users-without-wallets" },
-      }}
-    >
-      <PrivyMintInner
-        mintReady={mintReady}
-        allowedOrigin={allowedOrigin}
-        onMinted={onMinted}
-        variant={variant}
-      />
-    </PrivyProvider>
+    <PrivyMintInner
+      mintReady={mintReady}
+      allowedOrigin={allowedOrigin}
+      onMinted={onMinted}
+      variant={variant}
+    />
   );
 }
 
@@ -119,7 +113,7 @@ function PrivyMintInner({
                 ? "Sign-in unavailable"
                 : busy
                   ? "Signing in…"
-                  : "Sign in"}
+                  : "Open App"}
           </button>
         ) : (
           <button

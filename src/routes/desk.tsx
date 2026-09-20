@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { PrivyAppProvider } from "@/components/privy-app-provider";
 import {
   getAcquireBundle,
   getCreditBundle,
@@ -47,5 +48,10 @@ export const Route = createFileRoute("/desk")({
 });
 
 function DeskLayout() {
-  return <Outlet />;
+  const { readiness } = Route.useLoaderData();
+  return (
+    <PrivyAppProvider appId={readiness.privyAppId}>
+      <Outlet />
+    </PrivyAppProvider>
+  );
 }

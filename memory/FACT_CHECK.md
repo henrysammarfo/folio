@@ -1,3 +1,13 @@
+## 2026-09-20 — Phase B Open App + custody
+
+| Claim | Status |
+|---|---|
+| Capsule ≠ path — stay Privy embedded Solana | Decision — Phase B |
+| Desk-wide PrivyAppProvider wraps `/desk` | Verified — `desk.tsx` + `privy-app-provider.tsx` |
+| Open App = email/social embedded or connect Phantom/Solflare | Implemented — header + Account Sign in |
+| Account link wallet + export key with ack warnings | Implemented — `AccountCustodyPanel` |
+| Nested PrivyProvider removed from session mint | Verified — uses shell context |
+
 ## 2026-09-20 — Phase A Jupiter V2 + ecosystem
 
 | Claim | Status |
