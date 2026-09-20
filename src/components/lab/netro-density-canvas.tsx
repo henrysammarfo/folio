@@ -77,6 +77,8 @@ export function NetroDensityCanvas({
   const [agentMeta, setAgentMeta] = useState<string | null>(null);
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [flowSymbol, setFlowSymbol] = useState<string>("AAPLx");
+  const [spendChip, setSpendChip] = useState("1");
+  const [sheetOpen, setSheetOpen] = useState(true);
   const [inspectInput, setInspectInput] = useState(initialInspect ?? "");
   const [ownershipOpen, setOwnershipOpen] = useState(Boolean(initialInspect));
   const runAgent = useServerFn(runDeskAgent);
@@ -84,12 +86,14 @@ export function NetroDensityCanvas({
 
   const flowItem = findCatalogItem(flowSymbol);
   const flowUnderlying = flowItem?.underlying ?? flowSymbol.replace(/x$/i, "");
-  /** Overview Jupiter quote is AAPLx-sized — never relabel it as another symbol. */
-  const quoteIsForFlow = flowSymbol === "AAPLx";
+  /** Overview Jupiter quote is AAPLx @$1 — never relabel it as another symbol/size. */
+  const quoteIsForFlow = flowSymbol === "AAPLx" && spendChip === "1";
   const quoteReceiveLabel = quoteIsForFlow
     ? gates.quoteOut
-    : "Open Buy for quote";
+    : "Open Buy for live quote";
   const chartQuoteLabel = quoteIsForFlow ? gates.quoteOut : "—";
+  const gasNote =
+    "USDC + tiny SOL = best quotes. USDC-only OK via Jupiter gasless on ~$10+. No FOLIO program.";
 
   useEffect(() => {
     setInspectInput(initialInspect ?? "");
@@ -164,6 +168,8 @@ export function NetroDensityCanvas({
     gates.quoteOut,
     gates.kaminoLtv,
     flowSymbol,
+    sheetOpen,
+    spendChip,
   ]);
 
   async function submitPaperAgent(prompt: string) {
@@ -377,7 +383,7 @@ export function NetroDensityCanvas({
               <div
                 className="netro-density-flow netro-density-item"
                 style={delay(4)}
-                data-testid="netro-markets-flow"
+                data-testid="netro-live-snapshot"
               >
                 <div className="netro-density-flow-head">
                   <div>
@@ -416,39 +422,6 @@ export function NetroDensityCanvas({
                       {gates.kaminoLtv ? `${gates.kaminoLtv} LTV` : "View"}
                     </b>
                   </div>
-                </div>
-                <div
-                  className="netro-density-flow-icons"
-                  role="listbox"
-                  aria-label="Market flow symbols"
-                >
-                  {FLOW_SYMBOLS.map((sym) => {
-                    const item = findCatalogItem(sym);
-                    const on = sym === flowSymbol;
-                    return (
-                      <button
-                        key={sym}
-                        type="button"
-                        role="option"
-                        aria-selected={on}
-                        className={`netro-density-flow-icon${on ? " is-on" : ""}`}
-                        onClick={() => setFlowSymbol(sym)}
-                        title={item?.name ?? sym}
-                      >
-                        <AssetLogo
-                          symbol={sym}
-                          {...(item?.underlying
-                            ? { underlying: item.underlying }
-                            : {})}
-                          size={28}
-                        />
-                        <span>{sym.replace(/x$/i, "")}</span>
-                      </button>
-                    );
-                  })}
-                  <Link to="/desk/markets" className="netro-density-flow-more">
-                    All →
-                  </Link>
                 </div>
               </div>
 
@@ -523,9 +496,33 @@ export function NetroDensityCanvas({
           <div
             className="netro-density-market netro-density-item"
             style={delay(9)}
+            data-testid="netro-markets-flow"
           >
+            <div className="netro-density-market-tabs" role="tablist" aria-label="Market symbols">
+              {FLOW_SYMBOLS.map((sym) => {
+                const on = sym === flowSymbol;
+                return (
+                  <button
+                    key={sym}
+                    type="button"
+                    role="tab"
+                    aria-selected={on}
+                    className={`netro-density-market-tab${on ? " is-on" : ""}`}
+                    onClick={() => setFlowSymbol(sym)}
+                  >
+                    {sym.replace(/x$/i, "")}
+                  </button>
+                );
+              })}
+              <Link to="/desk/markets" className="netro-density-market-all">
+                All markets
+              </Link>
+            </div>
             <div className="netro-density-market-head">
-              <strong>{flowSymbol}</strong>
+              <strong>
+                {flowUnderlying}{" "}
+                <span className="netro-density-market-sym">{flowSymbol}</span>
+              </strong>
               <span>Share count</span>
               <em>{multiplierLabel.replace(/\s*live$/i, "")}</em>
             </div>
@@ -563,7 +560,7 @@ export function NetroDensityCanvas({
                 </div>
                 <div>
                   <span>Quote</span>
-                  <b>{gates.quoteOut}</b>
+                  <b>{chartQuoteLabel}</b>
                 </div>
                 <div>
                   <span>Credit</span>
@@ -571,6 +568,39 @@ export function NetroDensityCanvas({
                     {gates.kaminoLtv ? `${gates.kaminoLtv} LTV` : "View"}
                   </b>
                 </div>
+              </div>
+              <div
+                className="netro-density-flow-icons netro-density-flow-icons-dark"
+                role="listbox"
+                aria-label="Market flow symbols"
+              >
+                {FLOW_SYMBOLS.map((sym) => {
+                  const item = findCatalogItem(sym);
+                  const on = sym === flowSymbol;
+                  return (
+                    <button
+                      key={sym}
+                      type="button"
+                      role="option"
+                      aria-selected={on}
+                      className={`netro-density-flow-icon${on ? " is-on" : ""}`}
+                      onClick={() => setFlowSymbol(sym)}
+                      title={item?.name ?? sym}
+                    >
+                      <AssetLogo
+                        symbol={sym}
+                        {...(item?.underlying
+                          ? { underlying: item.underlying }
+                          : {})}
+                        size={28}
+                      />
+                      <span>{sym.replace(/x$/i, "")}</span>
+                    </button>
+                  );
+                })}
+                <Link to="/desk/markets" className="netro-density-flow-more">
+                  All →
+                </Link>
               </div>
               <div className="netro-density-chart-foot">
                 <span data-testid="netro-scaled-ui-strip">
@@ -593,11 +623,15 @@ export function NetroDensityCanvas({
           <div
             className="netro-density-quote netro-density-item"
             style={delay(5)}
+            data-testid="netro-buy-sheet"
           >
             <div className="netro-density-quote-head">
               <strong>Buy</strong>
-              <span>Live quote</span>
+              <span>Swap sheet</span>
             </div>
+            <p className="netro-density-quote-pair-label">
+              USDC → {flowSymbol}
+            </p>
             <div
               className="netro-density-quote-pair"
               data-testid="netro-live-quote"
@@ -605,7 +639,7 @@ export function NetroDensityCanvas({
               <div>
                 <span>You pay</span>
                 <b>USDC</b>
-                <em>$1.00</em>
+                <em>${spendChip}.00</em>
               </div>
               <div className="netro-density-quote-swap" aria-hidden>
                 ↕
@@ -613,14 +647,60 @@ export function NetroDensityCanvas({
               <div>
                 <span>You receive</span>
                 <b>{flowSymbol}</b>
-                <em>{gates.quoteOut}</em>
+                <em>{quoteReceiveLabel}</em>
               </div>
             </div>
+            <div className="netro-density-quote-chips" role="group" aria-label="Spend USDC">
+              {(["1", "5", "10", "25"] as const).map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  className={`netro-density-quote-chip${spendChip === c ? " is-on" : ""}`}
+                  onClick={() => setSpendChip(c)}
+                >
+                  ${c}
+                </button>
+              ))}
+            </div>
+            <div className="netro-density-quote-sheet">
+              <button
+                type="button"
+                className={`netro-density-quote-sheet-toggle${sheetOpen ? " is-open" : ""}`}
+                aria-expanded={sheetOpen}
+                data-testid="netro-buy-sheet-toggle"
+                onClick={() => setSheetOpen((v) => !v)}
+              >
+                <span>Swap details</span>
+                <em>0.5% slip · gasless ready ≥~$10</em>
+              </button>
+              {sheetOpen ? (
+                <dl className="netro-density-quote-sheet-body">
+                  <div>
+                    <dt>Route</dt>
+                    <dd>
+                      {/live|clear|pass/i.test(gates.wash)
+                        ? "Clear · Jupiter"
+                        : "Checking"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Gas</dt>
+                    <dd>USDC + tiny SOL preferred</dd>
+                  </div>
+                  <div>
+                    <dt>Broadcast</dt>
+                    <dd>Paused · quote-only</dd>
+                  </div>
+                  <p>{gasNote}</p>
+                </dl>
+              ) : null}
+            </div>
             <Link to="/desk/acquire" className="netro-density-quote-cta">
-              Buy {flowSymbol}
+              Review {flowSymbol} buy
             </Link>
             <p className="netro-density-quote-foot">
-              Live quote · ready to review
+              Live quote · fills paused ·{" "}
+              <Link to="/desk/acquire">full Buy desk →</Link>
             </p>
           </div>
 
@@ -640,7 +720,7 @@ export function NetroDensityCanvas({
               <div>
                 <p className="netro-density-rail-title">FOLIO agent</p>
                 <p className="netro-density-rail-sub">
-                  Ask anything about {flowSymbol}
+                  Asset intelligence · {flowSymbol}
                 </p>
               </div>
               {enablePaperAgent ? (
@@ -655,9 +735,12 @@ export function NetroDensityCanvas({
               ) : null}
             </div>
             <div className="netro-density-rail-welcome">
+              <div className="netro-density-rail-mark" aria-hidden>
+                F
+              </div>
               <p>
                 {agentReply ??
-                  `Ask about share counts, a buy quote, or borrowing against ${flowSymbol}.`}
+                  `Welcome — ask about ${flowSymbol} share counts, a USDC buy quote, or borrowing without selling.`}
               </p>
               {agentMeta ? (
                 <small className="netro-density-rail-meta">{agentMeta}</small>
@@ -699,7 +782,7 @@ export function NetroDensityCanvas({
                     className="netro-density-rail-input"
                     value={agentPrompt}
                     onChange={(e) => setAgentPrompt(e.target.value)}
-                    placeholder="Ask FOLIO…"
+                    placeholder={`Ask about ${flowSymbol}…`}
                     aria-label="Ask FOLIO agent"
                   />
                   <button
@@ -710,7 +793,11 @@ export function NetroDensityCanvas({
                   </button>
                 </form>
               </>
-            ) : null}
+            ) : (
+              <p className="netro-density-rail-meta">
+                Sign in on Account to ask live.
+              </p>
+            )}
           </aside>
         </div>
       </div>
@@ -731,7 +818,7 @@ export function NetroDensityCanvas({
           >
             <header className="netro-ai-modal-head">
               <div>
-                <p className="netro-density-rail-sub">Asset intelligence</p>
+                <p className="netro-density-rail-sub">Asset intelligence agent</p>
                 <h2 id="netro-ai-modal-title">FOLIO agent</h2>
               </div>
               <button
@@ -780,6 +867,22 @@ export function NetroDensityCanvas({
                 Get quote
                 <em>$1 USDC</em>
               </button>
+              <button
+                type="button"
+                disabled={agentBusy}
+                onClick={() => {
+                  const p = `credit ${flowSymbol}`;
+                  setAgentPrompt(p);
+                  void submitPaperAgent(p);
+                }}
+              >
+                Borrow
+                <em>Credit desk</em>
+              </button>
+              <Link to="/desk/acquire" className="netro-ai-modal-buy">
+                Open Buy
+                <em>{flowSymbol}</em>
+              </Link>
             </div>
             <form className="netro-density-rail-form" onSubmit={onAgentSubmit}>
               <input
@@ -788,7 +891,6 @@ export function NetroDensityCanvas({
                 onChange={(e) => setAgentPrompt(e.target.value)}
                 placeholder={`Ask about ${flowSymbol}…`}
                 aria-label="Ask FOLIO agent"
-                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
               />
               <button
