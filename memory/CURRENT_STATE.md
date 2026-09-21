@@ -20,8 +20,9 @@
 - Live-trade research: `docs/LIVE_TRADE_NO_PROGRAM.md` · field map `docs/ECOSYSTEM_FIELD.md`
 - **Phases A–E on main (`4a35b13`):** Swap V2 `/order` + gated `/execute` · Privy Open App (email/embedded Solana + link/export) · consumer settings scrub (`FOLIO_OPS=1`) · session/rate-limit gates · overview Stocks/Pre-IPO/Tessera partner lanes · beta waitlist **server-only** (Supabase `beta_waitlist`, no localStorage).
 - **Ship rough edges (branch `cursor/folio-ship-rough-edges-f1ec`):** Buy prepare→Privy sign→execute CTA · positions Verified/paper labels · partner $1 quote strip · beta cine contrast · Phase G analytics events + `/desk/admin` · Truth reconcile/PoR-analogue copy · credit unavailable-until-funded honesty.
+- **Credit in-house (branch `cursor/folio-credit-inhouse-logos-f1ec`):** `/desk/credit` Buy-style rates + ticket · AssetLogo · Kamino ktx deposit/borrow signed in-desk (no Kamino/Nest redirect CTA). NestUSD metrics-only.
 - Prod: https://folio-tawny-one.vercel.app
-- Henry still: apply `beta_waitlist` migration · Privy allowed origins · flip `BROADCAST_PAUSED=false` on **preview first**, then prod (user-signed fills; no FOLIO payer). NestUSD/borrow CPI still unfunded.
+- Henry still: apply `beta_waitlist` migration · Privy allowed origins · `BROADCAST_PAUSED=false` arms Jupiter fills + Kamino ktx borrow (user-signed; no FOLIO payer/CPI). NestUSD execute still external.
 - **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
 - Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).
@@ -56,9 +57,9 @@
 | Jupiter price + swap quote | **Mainnet READ / quote-only** |
 | Wash / Bitquery | **Mainnet READ**, fail-closed until keyed+wired |
 | Kamino xStocks / Jupiter Lend earn / Raydium pools | **Mainnet READ** (labeled) |
-| NestUSD capacity | **Unavailable** until verified endpoint |
-| Swap / borrow broadcast | **Disabled** (≤~$1 budget) |
-| Borrow CPI proofs | **Unavailable until funded** (no fork harness shipped) |
+| NestUSD capacity | **Mainnet READ** metrics (risk API) · execute still NestUSD app |
+| Swap / borrow broadcast | **User-signed** when `BROADCAST_PAUSED=false` (Jupiter + Kamino ktx) |
+| Borrow CPI proofs | **Kamino ktx** assembles (no FOLIO program) · NestUSD unfunded |
 | Custom program mainnet deploy | **Out** (rent ≫ $1) |
 | Optional policy harness | Devnet OK if labeled |
 

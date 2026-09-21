@@ -173,16 +173,19 @@ export type CreditBundle = {
   walletSource: WalletBindingSource;
   /**
    * Borrow rails status.
-   * - kamino-external: live Kamino xStocks market + deep-link execute
-   * - nestusd-external: live NestUSD metrics + app deep-link (no FOLIO CPI)
+   * - kamino-inhouse: live Kamino xStocks + ktx deposit/borrow signed in-desk
+   * - nestusd-metrics: NestUSD LTV metrics only (no NestUSD in-desk execute yet)
    * - unavailable: neither rail live
    */
   borrowExecution:
-    | "kamino-external"
-    | "nestusd-external"
+    | "kamino-inhouse"
+    | "nestusd-metrics"
     | "unavailable";
+  /** Reference deep-link only — desk borrow is in-house via ktx. */
   kaminoBorrowUrl: string | null;
   nestusdAppUrl: string | null;
+  /** Same arm as Jupiter fills — ktx sign/send fail-closed while true. */
+  broadcastPaused: boolean;
 };
 
 export type ActivityEvent = {
@@ -596,16 +599,16 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       nestusd.data.status === "live" &&
       !nestusd.data.protocolPaused;
     const borrowExecution = kaminoLive
-      ? ("kamino-external" as const)
+      ? ("kamino-inhouse" as const)
       : nestLive
-        ? ("nestusd-external" as const)
+        ? ("nestusd-metrics" as const)
         : ("unavailable" as const);
 
     let note: string;
     if (kaminoLive) {
       note = usedWalletQty
-        ? "Live Kamino xStocks LTV × your wallet collateral. Open Kamino to deposit & borrow (FOLIO does not sign the borrow CPI)."
-        : "Live Kamino xStocks LTV. Connect a wallet for your collateral estimate, then borrow on Kamino.";
+        ? "Live Kamino xStocks LTV × your wallet collateral. Deposit & borrow USDC in FOLIO — your wallet signs on Kamino rails."
+        : "Live Kamino xStocks LTV. Connect a wallet for your collateral estimate, then deposit & borrow in-desk.";
     } else if (usedWalletQty) {
       note =
         "Estimate from your wallet balances × live max LTV. Borrow rails unavailable.";
@@ -631,6 +634,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       borrowExecution,
       kaminoBorrowUrl: kamino.ok ? kamino.data.borrowUrl : null,
       nestusdAppUrl: nestusd.ok ? nestusd.data.appUrl : null,
+      broadcastPaused: isBroadcastPaused(),
       watchWallet: watch.ok ? watch.data.wallet : null,
       inspectWallet: inspectActive,
       walletSource,
