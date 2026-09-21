@@ -1,11 +1,11 @@
--- FOLIO — run ALL migrations in Supabase SQL Editor (top → bottom).
--- Safe to re-run: uses IF NOT EXISTS / DROP POLICY IF EXISTS / GRANT.
-
--- =============================================================================
--- 1) 20260915_folio_tenants.sql
--- =============================================================================
+-- FOLIO — idempotent ALL migrations (safe to re-run).
+-- Fixes ERROR 42710: policy already exists by dropping policies first.
 
 create extension if not exists "pgcrypto";
+
+-- =============================================================================
+-- Tenants / members / prefs
+-- =============================================================================
 
 create table if not exists public.tenants (
   id uuid primary key default gen_random_uuid(),
@@ -42,6 +42,7 @@ alter table public.tenants enable row level security;
 alter table public.tenant_members enable row level security;
 alter table public.desk_preferences enable row level security;
 
+drop policy if exists tenants_member_select on public.tenants;
 create policy tenants_member_select on public.tenants
   for select using (
     exists (
@@ -51,10 +52,15 @@ create policy tenants_member_select on public.tenants
     )
   );
 
+drop policy if exists tenant_members_self_select on public.tenant_members;
 create policy tenant_members_self_select on public.tenant_members
   for select using (user_id = coalesce(auth.jwt() ->> 'sub', ''));
 
 drop policy if exists desk_prefs_self_all on public.desk_preferences;
+drop policy if exists desk_prefs_self_select on public.desk_preferences;
+drop policy if exists desk_prefs_writer_insert on public.desk_preferences;
+drop policy if exists desk_prefs_writer_update on public.desk_preferences;
+drop policy if exists desk_prefs_writer_delete on public.desk_preferences;
 
 create policy desk_prefs_self_select on public.desk_preferences
   for select using (user_id = coalesce(auth.jwt() ->> 'sub', ''));
@@ -109,18 +115,7 @@ grant select on public.tenant_members to anon, authenticated;
 grant select, insert, update, delete on public.desk_preferences to anon, authenticated;
 
 -- =============================================================================
--- 2) 20260916_folio_tenants_grants.sql  (re-assert grants if tables already existed)
--- =============================================================================
-
-grant select, insert, update, delete on public.tenants to service_role;
-grant select, insert, update, delete on public.tenant_members to service_role;
-grant select, insert, update, delete on public.desk_preferences to service_role;
-grant select on public.tenants to anon, authenticated;
-grant select on public.tenant_members to anon, authenticated;
-grant select, insert, update, delete on public.desk_preferences to anon, authenticated;
-
--- =============================================================================
--- 3) 20260920_beta_waitlist.sql
+-- Beta waitlist (new)
 -- =============================================================================
 
 create table if not exists public.beta_waitlist (
