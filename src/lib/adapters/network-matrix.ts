@@ -126,7 +126,7 @@ export function buildNetworkMatrix(input: {
       capability: "Kamino xStocks market (read)",
       mode: modeOf(input.kamino),
       detail: input.kamino.ok
-        ? `${input.kamino.source} · borrow via Kamino UI deep-link (no FOLIO CPI)`
+        ? `${input.kamino.source} · in-desk ktx deposit/borrow · user-signed (no FOLIO CPI)`
         : detailOf(input.kamino),
     },
     {
@@ -195,7 +195,7 @@ export function buildNetworkMatrix(input: {
       detail: input.broadcastFunded
         ? "Funded wallet path (still requires explicit user confirm)"
         : input.broadcastPaused === false
-          ? "User-signed Jupiter fills armed · no FOLIO payer · borrow CPI still unfunded"
+          ? "User-signed Jupiter fills + Kamino ktx borrow armed · no FOLIO payer/CPI"
           : "Not funded · ≤~$1 budget · quote-only · BROADCAST_PAUSED",
     },
     {

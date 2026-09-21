@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-21 — Credit in-house (Kamino ktx) + logos + layout
+
+- `/desk/credit`: Buy-style board + ticket — AssetLogo on rates; deposit collateral + borrow USDC in-desk.
+- `prepareKaminoDeposit` / `prepareKaminoBorrow` via `api.kamino.finance/ktx/klend/*`; Privy `signAndSendTransaction` (no outbound Kamino/Nest CTA).
+- Honesty: Kamino builds txs · user signs · no FOLIO borrow CPI. NestUSD stays metrics-only.
+- Branch: `cursor/folio-credit-inhouse-logos-f1ec`.
+
 ## 2026-09-20 — Credit live: NestUSD metrics + Kamino borrow CTA
 
 - NestUSD: wired `api.nestusd.com/v1/risk` + `/v1/config` (live collateral LTV). Execute = NestUSD app deep-link (no FOLIO CPI).

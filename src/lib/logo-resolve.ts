@@ -25,6 +25,10 @@ const UNDERLYING_DOMAIN: Record<string, string> = {
   AMD: "amd.com",
   SPY: "ssga.com",
   QQQ: "invesco.com",
+  CRCL: "circle.com",
+  MSTR: "microstrategy.com",
+  COST: "costco.com",
+  CPCL: "costco.com",
   // PreStocks / Tessera name hints (API rarely ships logos for Tessera)
   OPENAI: "openai.com",
   SPACEX: "spacex.com",
