@@ -126,7 +126,7 @@ export function buildNetworkMatrix(input: {
       capability: "Kamino xStocks market (read)",
       mode: modeOf(input.kamino),
       detail: input.kamino.ok
-        ? `${input.kamino.source} · borrow CPI unavailable until funded (no fork harness)`
+        ? `${input.kamino.source} · borrow via Kamino UI deep-link (no FOLIO CPI)`
         : detailOf(input.kamino),
     },
     {
@@ -147,10 +147,10 @@ export function buildNetworkMatrix(input: {
       capability: "NestUSD capacity",
       mode: modeOf(input.nestusd),
       detail: input.nestusd.ok
-        ? detailOf(input.nestusd)
+        ? `${input.nestusd.source} · live collateral LTV · execute on NestUSD app (no FOLIO CPI)`
         : input.nestusd.detail
           ? `${input.nestusd.reason} — ${input.nestusd.detail}`
-          : "Unverified NestUSD borrow metrics · risk-labeled · fail-closed",
+          : "NestUSD metrics unavailable · fail-closed",
     },
     {
       capability: "Multi-tenant sessions (Privy + Supabase)",

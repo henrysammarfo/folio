@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-20 — Credit live: NestUSD metrics + Kamino borrow CTA
+
+- NestUSD: wired `api.nestusd.com/v1/risk` + `/v1/config` (live collateral LTV). Execute = NestUSD app deep-link (no FOLIO CPI).
+- Kamino: primary Credit CTA → `kamino.com/borrow/<xStocks market>` with live LTV/APY.
+- Combined SQL paste file: `supabase/ALL_MIGRATIONS.sql`.
+- Branch: `cursor/folio-credit-live-kamino-nest-f1ec`.
+
 ## 2026-09-20 — Prod fills armed + rough edges on main
 
 - Merged ship-rough-edges → main `6344cb4`.

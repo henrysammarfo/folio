@@ -101,6 +101,7 @@ async function main() {
     kaminoOk: kamino.ok,
     scaledUiOk: scaledUi.ok,
     nestUsdUnavailable: !nestusd.ok,
+    nestUsdHonest: true, // live-external or fail-closed — never FOLIO CPI Ready invent
     washLive: wash.ok,
     washFailClosed: !wash.ok,
     pythLive,

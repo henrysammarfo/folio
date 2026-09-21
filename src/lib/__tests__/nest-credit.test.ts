@@ -7,12 +7,76 @@ describe("Nest.credit vs NestUSD honesty", () => {
     vi.unstubAllGlobals();
   });
 
-  it("keeps NestUSD borrow capacity fail-closed (never invents Ready)", async () => {
+  it("reads live NestUSD risk+config without claiming FOLIO CPI", async () => {
+    const risk = {
+      generatedAt: "2026-09-20T23:00:00.000Z",
+      stats: {
+        paused: false,
+        nusdSupply: "1000",
+        totalDebt: "100",
+      },
+      collateralRows: [
+        {
+          symbol: "AAPLx",
+          borrowLtvBps: 5000,
+          liquidationThresholdBps: 6000,
+          depositsPaused: false,
+          borrowsPaused: false,
+          withdrawsPaused: false,
+          totalDebt: "10",
+          totalDepositsRaw: "100",
+        },
+      ],
+    };
+    const cfg = {
+      cluster: "mainnet-beta",
+      mints: { nUSD: "BKvheJ3skKvXqUbfroAgCf8dFfUKJM4W38raUaygLiUS" },
+      collateral: [
+        {
+          symbol: "AAPLx",
+          mint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+        },
+      ],
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/v1/risk")) {
+          return new Response(JSON.stringify(risk), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+        if (url.includes("/v1/config")) {
+          return new Response(JSON.stringify(cfg), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+        return new Response("{}", { status: 404 });
+      }),
+    );
+
+    const res = await fetchNestUsdStatus();
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.mode).toBe("mainnet-read");
+    expect(res.data.status).toBe("live");
+    expect(res.data.collaterals[0]?.symbol).toBe("AAPLx");
+    expect(res.data.collaterals[0]?.borrowLtv).toBeCloseTo(0.5);
+    expect(res.data.appUrl).toMatch(/nestusd\.com/);
+  });
+
+  it("fail-closes NestUSD when risk API is down", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("nope", { status: 503 })),
+    );
     const res = await fetchNestUsdStatus();
     expect(res.ok).toBe(false);
     if (res.ok) return;
-    expect(res.reason).toBe("nestusd_endpoint_unverified");
-    expect(res.detail ?? "").toMatch(/Nest\.credit|not NestUSD|fail-closed/i);
+    expect(res.reason).toMatch(/nestusd_/);
   });
 
   it("reads Nest.credit vault TVL without claiming NestUSD borrow", async () => {
