@@ -24,6 +24,7 @@ import {
   type TesseraTokenRow,
 } from "./adapters/tessera";
 import { evaluateWashGate, washAllowsSize } from "./adapters/wash";
+import { isBroadcastPaused } from "./broadcast";
 
 function unavailablePrice(reason: string): AdapterResult<JupiterTokenPrice> {
   return {
@@ -51,6 +52,7 @@ export type PreipoBundle = {
   /** Assumed decimals when mint metadata is unknown — labeled. */
   assumedDecimals: number;
   note: string;
+  broadcastPaused: boolean;
 };
 
 export type TesseraBundle = {
@@ -63,6 +65,7 @@ export type TesseraBundle = {
   washNote: string;
   assumedDecimals: number;
   note: string;
+  broadcastPaused: boolean;
 };
 
 /** PreStocks desk — PreStocks API only (Stocklana PreStocks bounty). */
@@ -85,6 +88,7 @@ export const getPreipoBundle = createServerFn({ method: "GET" })
         washNote: "Catalog unavailable",
         assumedDecimals,
         note: "PreStocks catalog fail-closed — no invented private-company tokens.",
+        broadcastPaused: isBroadcastPaused(),
       };
     }
     const want = data.symbol?.trim().toUpperCase();
@@ -103,6 +107,7 @@ export const getPreipoBundle = createServerFn({ method: "GET" })
         washNote: "No rows",
         assumedDecimals,
         note: catalog.data.note,
+        broadcastPaused: isBroadcastPaused(),
       };
     }
 
@@ -135,6 +140,7 @@ export const getPreipoBundle = createServerFn({ method: "GET" })
         : wash.reason,
       assumedDecimals,
       note: `${catalog.data.note} · decimals assumed ${assumedDecimals} until mint meta lands.`,
+      broadcastPaused: isBroadcastPaused(),
     };
   });
 
@@ -158,6 +164,7 @@ export const getTesseraBundle = createServerFn({ method: "GET" })
         washNote: "Catalog unavailable",
         assumedDecimals,
         note: "Tessera catalog fail-closed.",
+        broadcastPaused: isBroadcastPaused(),
       };
     }
     const want = data.symbol?.trim();
@@ -182,6 +189,7 @@ export const getTesseraBundle = createServerFn({ method: "GET" })
         washNote: "No rows",
         assumedDecimals,
         note: catalog.data.note,
+        broadcastPaused: isBroadcastPaused(),
       };
     }
 
@@ -214,5 +222,6 @@ export const getTesseraBundle = createServerFn({ method: "GET" })
         : wash.reason,
       assumedDecimals,
       note: `${catalog.data.note} · decimals assumed ${assumedDecimals}.`,
+      broadcastPaused: isBroadcastPaused(),
     };
   });

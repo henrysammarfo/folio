@@ -194,6 +194,19 @@ export type ActivityEvent = {
   detail: string;
   tone: "green" | "blue" | "amber" | "neutral";
   mode: string;
+  /** Feed glyph — logos when symbol set, else Lucide kind. */
+  icon:
+    | "share"
+    | "chain"
+    | "ca"
+    | "alert"
+    | "quote"
+    | "wash"
+    | "credit"
+    | "earn"
+    | "borrow"
+    | "pool";
+  symbol?: string;
 };
 
 export type ActivityBundle = {
@@ -703,6 +716,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         detail: multiplier.ok ? "Live market feed" : multiplier.reason,
         tone: multiplier.ok ? "green" : "amber",
         mode: multiplier.ok ? multiplier.mode : "unavailable",
+        icon: "share",
+        symbol,
       },
       (() => {
         const compare = compareApiOnchainMultiplier(
@@ -725,6 +740,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
                 ? ("amber" as const)
                 : ("neutral" as const),
           mode: scaledUi.ok ? scaledUi.mode : ("unavailable" as const),
+          icon: "chain" as const,
+          symbol,
         };
       })(),
       {
@@ -747,6 +764,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         tone:
           multiplier.ok && multiplier.data.pendingMultiplier != null ? "amber" : "neutral",
         mode: multiplier.ok ? multiplier.mode : "unavailable",
+        icon: "ca",
+        symbol,
       },
       {
         at: now,
@@ -760,6 +779,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           : "Connect in Settings to save alert preferences.",
         tone: prefsFromSession && corporateActionAlerts ? "blue" : "neutral",
         mode: prefsFromSession ? "paper" : "unavailable",
+        icon: "alert",
       },
       {
         at: now,
@@ -771,6 +791,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           : jupiterQuote.reason,
         tone: jupiterQuote.ok ? "blue" : "amber",
         mode: jupiterQuote.ok ? jupiterQuote.mode : "unavailable",
+        icon: "quote",
+        symbol,
       },
       {
         at: now,
@@ -780,6 +802,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           : "Route check unavailable",
         tone: wash.ok && wash.data.pass ? "green" : "amber",
         mode: wash.ok ? wash.mode : "unavailable",
+        icon: "wash",
       },
       {
         at: now,
@@ -787,10 +810,11 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           ? "Credit markets live"
           : "Credit markets unavailable",
         detail: kamino.ok
-          ? `${kamino.data.reserves.length} reserves · borrow not enabled yet`
+          ? `${kamino.data.reserves.length} reserves · deposit & borrow in-desk when fills arm`
           : kamino.reason,
         tone: kamino.ok ? "blue" : "amber",
         mode: kamino.ok ? kamino.mode : "unavailable",
+        icon: "credit",
       },
       {
         at: now,
@@ -798,19 +822,21 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           ? "Earn vaults available"
           : "Earn vaults unavailable",
         detail: nestCredit.ok
-          ? `Nest.credit vault awareness · ${nestCredit.data.vaultCount} vaults · not NestUSD`
+          ? `Nest.credit vault awareness · ${nestCredit.data.vaultCount} vaults · read-only`
           : `Nest.credit vault awareness · ${nestCredit.reason}`,
         tone: nestCredit.ok ? "blue" : "amber",
         mode: nestCredit.ok ? nestCredit.mode : "unavailable",
+        icon: "earn",
       },
       {
         at: now,
         title: "Borrow capacity",
         detail: nestusd.ok
-          ? "NestUSD risk-labeled · not verified ready"
+          ? "NestUSD risk metrics · collateral LTV labeled in Borrow"
           : "NestUSD capacity not verified · unavailable",
         tone: "amber",
         mode: "unavailable",
+        icon: "borrow",
       },
       {
         at: now,
@@ -822,12 +848,14 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           : pools.reason,
         tone: pools.ok ? "neutral" : "amber",
         mode: pools.ok ? pools.mode : "unavailable",
+        icon: "pool",
+        symbol,
       },
     ];
 
     return {
       events,
-      note: "Live desk events from market feeds. Buying and borrowing stay paused until enabled for your account.",
+      note: "Live desk events from market feeds. Buys and borrows arm when fills are on for your account.",
       corporateActionAlerts,
       prefsFromSession,
     };
@@ -883,13 +911,20 @@ export const runDeskAgent = createServerFn({ method: "POST" })
     if (blocked) {
       return errResult("folio.agent.paper", "agent_requires_session", blocked);
     }
-    const rl = rateLimitCheck(
-      "agent",
-      rateLimitClientKey({
-        userId: session.ok ? session.data.userId : null,
-        ip: readClientIp(),
-      }),
-    );
+    const clientKey = rateLimitClientKey({
+      userId: session.ok ? session.data.userId : null,
+      ip: readClientIp(),
+    });
+    /** Per-account daily AI budget — 5 messages / 24h (keyed by userId when present). */
+    const daily = rateLimitCheck("agent_daily", clientKey);
+    if (!daily.ok) {
+      return errResult(
+        "folio.agent.paper",
+        "agent_daily_limit",
+        `Daily agent limit reached (5 messages). Resets in ~${Math.ceil(daily.retryAfterSec / 3600)}h.`,
+      );
+    }
+    const rl = rateLimitCheck("agent", clientKey);
     if (!rl.ok) {
       return errResult("folio.agent.paper", "rate_limited", rl.detail);
     }

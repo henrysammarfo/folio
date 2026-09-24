@@ -944,8 +944,13 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
             try {
               const res = await runAgent({ data: { prompt: promptText } });
               if (!res.ok) {
+                const daily =
+                  res.reason === "agent_daily_limit" ||
+                  /daily agent limit/i.test(res.detail ?? "");
                 setAgentOut(
-                  `${res.reason}${res.detail ? ` — ${res.detail}` : ""}\n[nl=failed · broadcast=false · live spine unavailable]`,
+                  daily
+                    ? `${res.detail ?? "Daily agent limit reached (5 messages). Try again tomorrow."}\n[agent=capped · 5 / day · broadcast=false]`
+                    : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}\n[nl=failed · broadcast=false · live spine unavailable]`,
                 );
                 return;
               }

@@ -117,7 +117,10 @@ export function FolioAgentChat({
         ) : (
           <div className="folio-agent-empty">
             <Sparkles size={18} strokeWidth={1.8} aria-hidden />
-            <p>Ask about share counts, quotes, credit, or network — never fills.</p>
+            <p>
+              Ask about share counts, quotes, credit, or network — 5 messages
+              per account per day.
+            </p>
           </div>
         )}
       </div>

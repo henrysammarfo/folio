@@ -1,6 +1,9 @@
 /**
  * Live markets board — Jupiter venue prices + xStocks trading period.
  * Not a Finviz clone; desk-native board for the catalog we actually trade.
+ *
+ * Price fetches are staggered (not Promise.all) to avoid Jupiter 429 storms
+ * that blank Liq / Venue columns.
  */
 
 import { createServerFn } from "@tanstack/react-start";
@@ -50,12 +53,32 @@ function catalogSlice(lane: "all" | XStockLane): readonly XStockCatalogItem[] {
   return XSTOCK_CATALOG.filter((s) => s.lane === lane);
 }
 
+const PRICE_STAGGER_MS = 90;
+
+function sleep(ms: number) {
+  return new Promise<void>((r) => setTimeout(r, ms));
+}
+
+async function mapStaggered<T, R>(
+  items: readonly T[],
+  fn: (item: T, index: number) => Promise<R>,
+  gapMs: number,
+): Promise<R[]> {
+  const out: R[] = [];
+  for (let i = 0; i < items.length; i++) {
+    if (i > 0 && gapMs > 0) await sleep(gapMs);
+    out.push(await fn(items[i]!, i));
+  }
+  return out;
+}
+
 export const getMarketsBoard = createServerFn({ method: "GET" })
   .validator(BoardInput)
   .handler(async ({ data }): Promise<MarketsBoardBundle> => {
     const slice = catalogSlice(data.lane);
-    const rows: MarketsBoardRow[] = await Promise.all(
-      slice.map(async (item) => {
+    const rows: MarketsBoardRow[] = await mapStaggered(
+      slice,
+      async (item) => {
         const asset = await fetchXStockAsset(item.symbol);
         const mint = asset.ok ? asset.data.solanaMint : null;
         const logo = asset.ok ? asset.data.logo : null;
@@ -111,16 +134,27 @@ export const getMarketsBoard = createServerFn({ method: "GET" })
               ? "cached"
               : "live",
         };
-      }),
+      },
+      PRICE_STAGGER_MS,
     );
 
+    const priced = rows.filter((r) => r.usdPrice != null).length;
+    const limited = rows.filter((r) =>
+      /rate_limited/i.test(r.priceNote),
+    ).length;
     const anyOpen = rows.some((r) => r.openNow === true);
+    const paceNote =
+      limited > 0
+        ? ` · ${limited} venue quotes cooling (pace refresh)`
+        : priced < rows.filter((r) => r.buyable).length
+          ? " · some venues still loading"
+          : "";
     return {
       rows,
       asOf: new Date().toISOString(),
       note: anyOpen
-        ? "Underlying session open · Jupiter venue prices (24/7 on Solana)"
-        : "Underlying session closed · Jupiter venue still quotes 24/7 on Solana",
+        ? `Underlying session open · Jupiter venue prices (24/7 on Solana)${paceNote}`
+        : `Underlying session closed · Jupiter venue still quotes 24/7 on Solana${paceNote}`,
     };
   });
 

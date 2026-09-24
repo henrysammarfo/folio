@@ -2,11 +2,13 @@
 
 | Claim | Status |
 |---|---|
-| Credit in-house Kamino ktx + AssetLogo | Merged |
-| Activity icons/logos (not letter tiles) | Shipping this branch |
-| Markets staggered fetch + soft 429 copy | Shipping this branch |
-| PreStocks / Tessera in-FOLIO buy (no external CTA) | Shipping this branch |
-| Agent ≤5 messages / account / day | Shipping this branch |
+| Credit in-house Kamino ktx + AssetLogo | Merged onto demo-lock |
+| Activity icons/logos (not letter tiles) | Verified — `ActivityEvent.icon` + Lucide/AssetLogo on `/desk/activity` |
+| Markets staggered fetch + soft 429 copy | Verified — `mapStaggered` in `desk.screener.ts` · `humanizeVenueNote` |
+| PreStocks / Tessera in-FOLIO buy (no external CTA) | Verified — `outputMint` prepare path · BuyExecuteButton · Tessera app link removed |
+| Agent ≤5 messages / account / day | Verified — `agent_daily` bucket wired in `runDeskAgent` |
+| Credit faces SPY/QQQ/GOOGL/cbBTC | Verified — direct logo + favicon fallbacks in `logo-resolve` |
+| Soft wash / venue copy (no Gecko/jupiter_rate_limited dump) | Verified — `humanizeWashNote` + `humanizeVenueNote` |
 
 ## 2026-09-21 — Credit in-house Kamino ktx
 

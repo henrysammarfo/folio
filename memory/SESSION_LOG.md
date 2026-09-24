@@ -4,7 +4,11 @@
 ## 2026-09-24 — Demo lock (desk polish + agent daily cap)
 
 - Credit in-house + launch polish merged onto `cursor/folio-demo-lock-f1ec`.
-- Activity icons · markets 429 soften · PreStocks/Tessera in-FOLIO · agent 5/day/account.
+- Activity: Lucide + AssetLogo glyphs; events stamped with `icon`/`symbol`.
+- Markets: staggered Jupiter price fetches; venue column humanized (`Cooling — refresh soon`).
+- PreStocks / Tessera: in-desk BuyExecute via partner `outputMint`; removed Tessera/PreStocks app CTAs.
+- Agent: `agent_daily` = 5 msgs / account / 24h (plus burst `agent` window).
+- Soft copy + logo domains for cbBTC / PreStocks names.
 
 ## 2026-09-24 — Bible sync + launch polish 20 + agent chat
 

@@ -21,6 +21,17 @@ describe("logo-resolve", () => {
     expect(initialsForSymbol("T-SpaceX")).toBe("SP");
   });
 
+  it("resolves credit-board faces for SPY / QQQ / GOOGL / cbBTC", () => {
+    expect(underlyingKey("cbBTC")).toBe("CBBTC");
+    expect(underlyingKey("SPYx")).toBe("SPY");
+    const spy = logoCandidates({ symbol: "SPYx", underlying: "SPY" });
+    expect(spy.some((u) => /ssga|clearbit/i.test(u))).toBe(true);
+    const btc = logoCandidates({ symbol: "cbBTC" });
+    expect(btc.some((u) => /cbbtc|coinbase|coingecko/i.test(u))).toBe(true);
+    const goog = logoCandidates({ symbol: "GOOGLx", underlying: "GOOGL" });
+    expect(goog.some((u) => u.includes("google.com"))).toBe(true);
+  });
+
   it("prefers provided logo then CDN then favicon", () => {
     const c = logoCandidates({
       symbol: "AAPLx",

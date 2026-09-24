@@ -3,9 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
+import { BuyExecuteButton } from "@/components/buy-execute-button";
 import { DeskShell } from "@/components/desk-shell";
 import { getTesseraBundle } from "@/lib/desk.functions";
-import { humanizeWashNote } from "@/lib/humanize-copy";
+import { humanizeHonestyNote, humanizeWashNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/desk/tessera")({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/desk/tessera")({
     meta: siteMeta({
       title: "Tessera T-tokens — FOLIO",
       description:
-        "OpenAI, Kalshi, SpaceX Tessera T-tokens with Jupiter quote-only on Solana.",
+        "OpenAI, Kalshi, SpaceX Tessera T-tokens — quote and buy inside FOLIO on Solana.",
       path: "/desk/tessera",
     }),
   }),
@@ -41,6 +42,8 @@ function Page() {
   const fetchTessera = useServerFn(getTesseraBundle);
   const [symbol, setSymbol] = useState(initial.selected?.symbol ?? "T-OpenAI");
   const [amount, setAmount] = useState("1");
+  const [err, setErr] = useState<string | null>(null);
+  const [lastSig, setLastSig] = useState<string | null>(null);
   const spendUsdc = Number(amount);
   const ready = Number.isFinite(spendUsdc) && spendUsdc > 0 && spendUsdc <= 25;
 
@@ -61,6 +64,10 @@ function Page() {
   const out = data?.jupiter.ok
     ? data.jupiter.data.outUiAmount.toFixed(6)
     : null;
+  const broadcastPaused = data?.broadcastPaused !== false;
+  const canBuy = Boolean(
+    ready && data?.jupiter.ok && data.washOk && selected?.mint,
+  );
 
   return (
     <DeskShell title="Tessera">
@@ -69,8 +76,8 @@ function Page() {
           <p className="fx-hero-kicker">Tessera T-tokens</p>
           <h1>SpaceX, OpenAI, Kalshi — loan-participation quotes.</h1>
           <p className="fx-sub">
-            Stocklana Tessera bounty path — economic exposure via loan
-            participation, not PreStocks SPV shares. Quote-only · fills paused.{" "}
+            Stocklana Tessera bounty — economic exposure via loan participation,
+            not PreStocks SPV shares. Buy stays inside FOLIO.{" "}
             <Link to="/desk/preipo">PreStocks desk →</Link>
           </p>
         </header>
@@ -81,7 +88,7 @@ function Page() {
             {!data?.catalog.ok ? (
               <p className="fx-checks">
                 {data?.catalog && !data.catalog.ok
-                  ? data.catalog.reason
+                  ? humanizeHonestyNote(data.catalog.reason)
                   : "Loading…"}
               </p>
             ) : (
@@ -93,7 +100,11 @@ function Page() {
                       <button
                         type="button"
                         className={`fx-preipo-item${on ? " is-on" : ""}`}
-                        onClick={() => setSymbol(row.symbol)}
+                        onClick={() => {
+                          setSymbol(row.symbol);
+                          setErr(null);
+                          setLastSig(null);
+                        }}
                       >
                         <AssetLogo symbol={row.symbol} size={36} />
                         <span>
@@ -117,7 +128,7 @@ function Page() {
             <div className="fx-ticket-brand">
               <AssetLogo symbol={selected?.symbol ?? "T-"} size={44} />
               <div>
-                <p className="fx-hero-kicker">Buy</p>
+                <p className="fx-hero-kicker">Buy in FOLIO</p>
                 <h2>USDC → {selected?.symbol ?? "—"}</h2>
               </div>
             </div>
@@ -177,27 +188,49 @@ function Page() {
                 ? "clear"
                 : humanizeWashNote(data?.washNote)}
               {" · "}
-              {data?.note}
+              {humanizeHonestyNote(data?.note)}
             </p>
+            {err ? <p className="fx-checks" role="alert">{err}</p> : null}
+            {lastSig ? (
+              <p className="fx-checks">
+                Landed ·{" "}
+                <a
+                  href={`https://solscan.io/tx/${lastSig}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  view on Solscan
+                </a>
+              </p>
+            ) : null}
+            <BuyExecuteButton
+              canBuy={canBuy}
+              isPair={false}
+              broadcastPaused={broadcastPaused}
+              symbol={selected?.symbol ?? "T-"}
+              paySymbol="USDC"
+              amount={spendUsdc}
+              slippageBps={100}
+              outputMint={selected?.mint}
+              outputDecimals={data?.assumedDecimals ?? 9}
+              pausedLabel="Quote ready — fills paused"
+              confirmLabel={`Buy ${selected?.symbol ?? "T-token"}`}
+              onError={setErr}
+              onSuccess={(sig) => {
+                setLastSig(sig);
+                setErr(null);
+                void refetch();
+              }}
+            />
             <button
               type="button"
-              className="fx-btn fx-btn-primary fx-btn-block"
-              disabled={!ready || !data?.jupiter.ok}
+              className="fx-btn fx-btn-ghost fx-btn-block"
+              style={{ marginTop: "0.5rem" }}
+              disabled={!ready}
               onClick={() => void refetch()}
             >
-              {data?.jupiter.ok
-                ? "Quote ready — fills paused"
-                : "Refresh quote"}
+              Refresh quote
             </button>
-            <p className="fx-ticket-sub">
-              <a
-                href="https://app.tessera.pe"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Tessera app
-              </a>
-            </p>
           </aside>
         </div>
       </section>

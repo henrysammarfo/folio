@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { getMarketsBoard } from "@/lib/desk.functions";
+import { humanizeVenueNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 import { LANE_META, type XStockLane } from "@/lib/xstock-catalog";
 
@@ -199,14 +200,14 @@ function Page() {
                         <>
                           <strong>{money(row.usdPrice)}</strong>
                           <small>
-                            {row.priceNote}
+                            {humanizeVenueNote(row.priceNote)}
                             {vsRef != null
                               ? ` · ${vsRef >= 0 ? "+" : ""}${vsRef.toFixed(1)}% vs ref`
                               : ""}
                           </small>
                         </>
                       ) : (
-                        <small>{row.priceNote}</small>
+                        <small>{humanizeVenueNote(row.priceNote)}</small>
                       )}
                     </span>
                   </Link>
