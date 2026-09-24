@@ -122,9 +122,10 @@ export function humanizeVenueNote(raw: string | null | undefined): string {
   if (/jupiter_rate_limited|rate_limited/i.test(t)) {
     return "Cooling — refresh soon";
   }
-  if (/^live$/i.test(t)) return "live";
-  if (/^cached$/i.test(t)) return "cached";
-  if (/^stale$/i.test(t)) return "stale cache";
+  if (/Venue cooling/i.test(t)) return "Cooling — refresh soon";
+  if (/^live$/i.test(t) || /^live ·/i.test(t)) return t.replace(/^live/i, "live");
+  if (/^cached/i.test(t)) return t;
+  if (/^stale/i.test(t)) return t.replace(/^stale$/i, "stale cache");
   if (/^Watchlist$/i.test(t)) return "Watchlist";
   return scrubOpsJargon(t);
 }

@@ -65,7 +65,8 @@ function Page() {
             <p className="fx-hero-kicker">Live board</p>
             <h1>Markets</h1>
             <p className="fx-sub">
-              {data?.note ?? "Jupiter venue prices for the desk catalog."}
+              {data?.note ??
+                "Jupiter + free-tape venue prices for the desk catalog."}
               {isFetching ? " · refreshing…" : ""}
             </p>
           </div>

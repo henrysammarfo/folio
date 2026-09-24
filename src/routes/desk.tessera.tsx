@@ -76,8 +76,8 @@ function Page() {
           <p className="fx-hero-kicker">Tessera T-tokens</p>
           <h1>SpaceX, OpenAI, Kalshi — loan-participation quotes.</h1>
           <p className="fx-sub">
-            Stocklana Tessera bounty — economic exposure via loan participation,
-            not PreStocks SPV shares. Buy stays inside FOLIO.{" "}
+            Stocklana Tessera bounty — loan-participation quotes for SpaceX,
+            OpenAI, Kalshi. Confirm buys inside FOLIO — no Tessera app hop.{" "}
             <Link to="/desk/preipo">PreStocks desk →</Link>
           </p>
         </header>

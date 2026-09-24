@@ -52,20 +52,26 @@ const DIRECT_LOGO: Record<string, string> = {
   QQQ: "https://logo.clearbit.com/invesco.com",
   GOOGL: "https://www.google.com/s2/favicons?domain=google.com&sz=128",
   GOOG: "https://www.google.com/s2/favicons?domain=google.com&sz=128",
-  SPACEX: "https://logo.clearbit.com/spacex.com",
+  SPACEX: "https://www.google.com/s2/favicons?domain=spacex.com&sz=128",
   OPENAI: "https://logo.clearbit.com/openai.com",
   KALSHI: "https://logo.clearbit.com/kalshi.com",
+  ANDURIL: "https://logo.clearbit.com/anduril.com",
+  ANTHROPIC: "https://logo.clearbit.com/anthropic.com",
+  FIGUREAI: "https://logo.clearbit.com/figure.ai",
+  NEURALINK: "https://logo.clearbit.com/neuralink.com",
+  POLYMARKET: "https://logo.clearbit.com/polymarket.com",
 };
 
 /** Strip T- / trailing x so Tessera + xStock symbols map to company domains. */
 export function underlyingKey(symbol: string, underlying?: string): string {
   if (underlying?.trim()) return underlying.trim().toUpperCase();
-  return symbol
-    .trim()
-    .replace(/\s+/g, "")
-    .replace(/^T-?/i, "")
-    .replace(/x+$/i, "")
-    .toUpperCase();
+  const raw = symbol.trim().replace(/\s+/g, "");
+  // Tessera T-tokens: T-SpaceX → SPACEX (do NOT strip trailing X from SpaceX)
+  if (/^T-/i.test(raw)) {
+    return raw.replace(/^T-/i, "").toUpperCase();
+  }
+  // xStocks: AAPLx → AAPL (only strip trailing xStock suffix)
+  return raw.replace(/x$/i, "").toUpperCase();
 }
 
 export function xStockLogoUrl(symbol: string): string {
@@ -102,9 +108,11 @@ export function logoCandidates(opts: {
 }
 
 export function initialsForSymbol(symbol: string): string {
-  const base = symbol
-    .replace(/\s+/g, "")
-    .replace(/x+$/i, "")
-    .replace(/^T-?/i, "");
+  const raw = symbol.trim().replace(/\s+/g, "");
+  if (/^T-/i.test(raw)) {
+    const base = raw.replace(/^T-/i, "");
+    return (base.slice(0, 2) || "?").toUpperCase();
+  }
+  const base = raw.replace(/x$/i, "");
   return (base.slice(0, 2) || "?").toUpperCase();
 }

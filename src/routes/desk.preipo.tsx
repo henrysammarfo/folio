@@ -85,7 +85,7 @@ function Page() {
           <h1>Private companies. Live Solana quotes.</h1>
           <p className="fx-sub">
             Stocklana PreStocks bounty — SPV-backed economic exposure, not
-            Tessera T-tokens. Buy stays inside FOLIO.{" "}
+            Tessera T-tokens. Search the catalog, size in USDC, confirm in FOLIO.{" "}
             <Link to="/desk/tessera">Tessera desk →</Link>
           </p>
         </header>
