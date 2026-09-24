@@ -16,8 +16,11 @@ describe("logo-resolve", () => {
 
   it("maps Tessera T-symbols to company domains", () => {
     expect(underlyingKey("T-OpenAI")).toBe("OPENAI");
+    expect(underlyingKey("T-SpaceX")).toBe("SPACEX");
     const c = logoCandidates({ symbol: "T-OpenAI" });
     expect(c.some((u) => u.includes("openai.com"))).toBe(true);
+    const sx = logoCandidates({ symbol: "T-SpaceX" });
+    expect(sx.some((u) => /spacex/i.test(u))).toBe(true);
     expect(initialsForSymbol("T-SpaceX")).toBe("SP");
   });
 

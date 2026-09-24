@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-24 — Desk UX pass (token select + markets venues)
+
+- Buy: searchable TokenSelect on pay/receive · flip arrow always works.
+- Markets: GeckoTerminal free-tape price fallback when Jupiter cools; catalog +CRCLx/MSTRx/COSTx.
+- Logo: T-SpaceX → SPACEX (stop stripping X from SpaceX).
+- Branch: `cursor/folio-desk-ux-pass-f1ec`.
+
 ## 2026-09-24 — Demo lock (desk polish + agent daily cap)
 
 - Credit in-house + launch polish merged onto `cursor/folio-demo-lock-f1ec`.

@@ -1,3 +1,13 @@
+## 2026-09-24 — Desk UX pass
+
+| Claim | Status |
+|---|---|
+| Buy pay/receive searchable token dropdown | Implemented — `token-select-button.tsx` |
+| Swap flip works from USDC buys | Implemented — flips into stock↔stock |
+| Markets free-tape fallback when Jupiter 429 | Implemented — `gecko-price.ts` labeled |
+| T-SpaceX logo key SPACEX (not SPACE) | Fixed — `underlyingKey` Tessera path |
+| Catalog +CRCLx MSTRx COSTx | Added |
+
 ## 2026-09-24 — Demo lock (desk UX + agent cap)
 
 | Claim | Status |

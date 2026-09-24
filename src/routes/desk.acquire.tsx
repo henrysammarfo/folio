@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { BuyExecuteButton } from "@/components/buy-execute-button";
 import { DeskShell } from "@/components/desk-shell";
+import { TokenSelectButton } from "@/components/token-select-button";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { trackFolioEvent } from "@/lib/analytics";
 import { getAcquireBundle } from "@/lib/desk.functions";
@@ -174,12 +175,52 @@ function Page() {
   }
 
   function flipPair() {
-    if (!isPair) return;
-    const nextPay = receive;
-    const nextRecv = pay;
-    setPay(nextPay);
-    setReceive(nextRecv);
+    if (isPair) {
+      const nextPay = receive;
+      const nextRecv = pay;
+      setPay(nextPay);
+      setReceive(nextRecv);
+      setReviewed(false);
+      setErr(null);
+      return;
+    }
+    // USDC → stock: flip into stock↔stock with this stock as pay
+    const stock = receive;
+    const other =
+      XSTOCK_CATALOG.find((i) => i.buyable && i.symbol !== stock)?.symbol ??
+      "MSFTx";
+    setTab("pairs");
+    setPay(stock);
+    setReceive(other);
+    setAmount("0.01");
     setReviewed(false);
+    setErr(null);
+  }
+
+  function onPayToken(sym: string) {
+    if (sym.toUpperCase() === "USDC") {
+      setPay("USDC");
+      setAmount((a) => (Number(a) <= 0.25 ? "1" : a));
+      if (tab === "pairs") setTab("all");
+    } else {
+      setPay(sym);
+      setTab("pairs");
+      if (receive === sym) {
+        const other =
+          XSTOCK_CATALOG.find((i) => i.buyable && i.symbol !== sym)?.symbol ??
+          "AAPLx";
+        setReceive(other);
+      }
+      setAmount((a) => (Number(a) >= 1 ? "0.01" : a));
+    }
+    setReviewed(false);
+    setErr(null);
+  }
+
+  function onReceiveToken(sym: string) {
+    if (sym.toUpperCase() === "USDC") return;
+    pickReceive(sym);
+    if (pay === sym) setPay("USDC");
   }
 
   return (
@@ -367,9 +408,13 @@ function Page() {
               </h1>
               <p className="fx-ticket-sub">
                 {isPair
-                  ? "True Jupiter pair route · fills paused"
+                  ? data && "broadcastPaused" in data && data.broadcastPaused === false
+                    ? "True Jupiter pair route · user-signed fills"
+                    : "True Jupiter pair route · fills arm when enabled"
                   : selected.blurb ??
-                    "Live Jupiter quote · fills pause until enabled"}
+                    (data && "broadcastPaused" in data && data.broadcastPaused === false
+                      ? "Live Jupiter quote · confirm to fill"
+                      : "Live Jupiter quote · fills arm when enabled")}
               </p>
             </div>
             <button
@@ -415,30 +460,13 @@ function Page() {
             <div className="fx-swap-leg">
               <span>You pay</span>
               <div className="fx-swap-row">
-                <strong className="fx-swap-token">
-                  {isPair ? (
-                    <>
-                      <AssetLogo
-                        symbol={pay}
-                        {...(payItem?.underlying
-                          ? { underlying: payItem.underlying }
-                          : {})}
-                        size={28}
-                      />
-                      {pay}
-                    </>
-                  ) : (
-                    <>
-                      <span
-                        className="fx-logo fx-logo-fallback fx-logo-usdc"
-                        aria-hidden
-                      >
-                        $
-                      </span>
-                      USDC
-                    </>
-                  )}
-                </strong>
+                <TokenSelectButton
+                  value={isPair ? pay : "USDC"}
+                  allowUsdc
+                  exclude={[receive]}
+                  aria-label="Pay token"
+                  onChange={onPayToken}
+                />
                 <input
                   className="fx-swap-amt"
                   value={amount}
@@ -456,8 +484,7 @@ function Page() {
             <button
               type="button"
               className="fx-swap-mid"
-              aria-label="Flip pair"
-              disabled={!isPair}
+              aria-label="Flip pay and receive"
               onClick={flipPair}
             >
               <ArrowDownUp size={16} strokeWidth={2.2} />
@@ -466,14 +493,13 @@ function Page() {
             <div className="fx-swap-leg">
               <span>You receive</span>
               <div className="fx-swap-row">
-                <strong className="fx-swap-token">
-                  <AssetLogo
-                    symbol={selected.symbol}
-                    underlying={selected.underlying}
-                    size={28}
-                  />
-                  {selected.symbol}
-                </strong>
+                <TokenSelectButton
+                  value={selected.symbol}
+                  allowUsdc={false}
+                  exclude={isPair ? [pay] : []}
+                  aria-label="Receive token"
+                  onChange={onReceiveToken}
+                />
                 <b className="fx-swap-out">
                   {isFetching ? "…" : out ? out : "—"}
                 </b>

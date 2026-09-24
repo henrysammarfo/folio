@@ -1,13 +1,13 @@
 /**
- * Live markets board — Jupiter venue prices + xStocks trading period.
+ * Live markets board — Jupiter venue prices + free-tape fallback when Jupiter cools.
  * Not a Finviz clone; desk-native board for the catalog we actually trade.
  *
- * Price fetches are staggered (not Promise.all) to avoid Jupiter 429 storms
- * that blank Liq / Venue columns.
+ * Price fetches are staggered (not Promise.all) to avoid Jupiter 429 storms.
  */
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { fetchGeckoTerminalTokenPrice } from "./adapters/gecko-price";
 import { fetchXStockAsset } from "./adapters/xstocks";
 import { fetchJupiterTokenPrice } from "./adapters/jupiter";
 import {
@@ -53,7 +53,7 @@ function catalogSlice(lane: "all" | XStockLane): readonly XStockCatalogItem[] {
   return XSTOCK_CATALOG.filter((s) => s.lane === lane);
 }
 
-const PRICE_STAGGER_MS = 90;
+const PRICE_STAGGER_MS = 70;
 
 function sleep(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
@@ -70,6 +70,38 @@ async function mapStaggered<T, R>(
     out.push(await fn(items[i]!, i));
   }
   return out;
+}
+
+async function resolveVenuePrice(mint: string): Promise<{
+  usdPrice: number;
+  stockRefPrice: number | null;
+  liquidity: number | null;
+  priceNote: string;
+} | null> {
+  const jup = await fetchJupiterTokenPrice(mint);
+  if (jup.ok) {
+    return {
+      usdPrice: jup.data.usdPrice,
+      stockRefPrice: jup.data.stockRefPrice,
+      liquidity: jup.data.liquidity,
+      priceNote: jup.source.includes("stale")
+        ? "stale · Jupiter"
+        : jup.source.includes("cached")
+          ? "cached · Jupiter"
+          : "live · Jupiter",
+    };
+  }
+  // Free-tape fallback when Jupiter cools / misses — labeled, never invented
+  const gecko = await fetchGeckoTerminalTokenPrice(mint);
+  if (gecko.ok) {
+    return {
+      usdPrice: gecko.data.usdPrice,
+      stockRefPrice: null,
+      liquidity: gecko.data.liquidity,
+      priceNote: "live · free tape",
+    };
+  }
+  return null;
 }
 
 export const getMarketsBoard = createServerFn({ method: "GET" })
@@ -112,40 +144,34 @@ export const getMarketsBoard = createServerFn({ method: "GET" })
           };
         }
 
-        const price = await fetchJupiterTokenPrice(mint);
-        if (!price.ok) {
+        const venue = await resolveVenuePrice(mint);
+        if (!venue) {
           return {
             ...base,
             usdPrice: null,
             stockRefPrice: null,
             liquidity: null,
-            priceNote: price.reason,
+            priceNote: "Venue cooling — refresh soon",
           };
         }
 
         return {
           ...base,
-          usdPrice: price.data.usdPrice,
-          stockRefPrice: price.data.stockRefPrice,
-          liquidity: price.data.liquidity,
-          priceNote: price.source.includes("stale")
-            ? "stale"
-            : price.source.includes("cached")
-              ? "cached"
-              : "live",
+          usdPrice: venue.usdPrice,
+          stockRefPrice: venue.stockRefPrice,
+          liquidity: venue.liquidity,
+          priceNote: venue.priceNote,
         };
       },
       PRICE_STAGGER_MS,
     );
 
     const priced = rows.filter((r) => r.usdPrice != null).length;
-    const limited = rows.filter((r) =>
-      /rate_limited/i.test(r.priceNote),
-    ).length;
+    const freeTape = rows.filter((r) => /free tape/i.test(r.priceNote)).length;
     const anyOpen = rows.some((r) => r.openNow === true);
     const paceNote =
-      limited > 0
-        ? ` · ${limited} venue quotes cooling (pace refresh)`
+      freeTape > 0
+        ? ` · ${freeTape} via free tape (Jupiter cool)`
         : priced < rows.filter((r) => r.buyable).length
           ? " · some venues still loading"
           : "";
@@ -153,8 +179,8 @@ export const getMarketsBoard = createServerFn({ method: "GET" })
       rows,
       asOf: new Date().toISOString(),
       note: anyOpen
-        ? `Underlying session open · Jupiter venue prices (24/7 on Solana)${paceNote}`
-        : `Underlying session closed · Jupiter venue still quotes 24/7 on Solana${paceNote}`,
+        ? `Session open · Jupiter + free-tape venues (24/7 on Solana)${paceNote}`
+        : `Session closed · Solana venues still quote 24/7${paceNote}`,
     };
   });
 

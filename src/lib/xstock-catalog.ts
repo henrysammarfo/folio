@@ -105,6 +105,28 @@ export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
     buyable: true,
     blurb: "High-beta media · verify size against wash gate",
   },
+  {
+    symbol: "CRCLx",
+    name: "Circle xStock",
+    underlying: "CRCL",
+    lane: "ipo",
+    buyable: true,
+    blurb: "IPO-era Circle · public listing",
+  },
+  {
+    symbol: "MSTRx",
+    name: "MicroStrategy xStock",
+    underlying: "MSTR",
+    lane: "mega",
+    buyable: true,
+  },
+  {
+    symbol: "COSTx",
+    name: "Costco xStock",
+    underlying: "COST",
+    lane: "mega",
+    buyable: true,
+  },
 ] as const;
 
 /**
