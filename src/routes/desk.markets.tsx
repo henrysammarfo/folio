@@ -143,7 +143,7 @@ function Page() {
             <span>Lane</span>
             <span>Session</span>
             <span>Liq</span>
-            <span>Venue</span>
+            <span>Mark · venues</span>
           </div>
           <ul className="fx-board-list">
             {rows.map((row) => {
@@ -200,16 +200,37 @@ function Page() {
                       {row.usdPrice != null ? (
                         <>
                           <strong>{money(row.usdPrice)}</strong>
-                          <small>
-                            {humanizeVenueNote(row.priceNote)}
-                            {vsRef != null
-                              ? ` · ${vsRef >= 0 ? "+" : ""}${vsRef.toFixed(1)}% vs ref`
-                              : ""}
-                          </small>
+                          {vsRef != null ? (
+                            <small>
+                              {vsRef >= 0 ? "+" : ""}
+                              {vsRef.toFixed(1)}% vs cash ref
+                            </small>
+                          ) : null}
                         </>
                       ) : (
                         <small>{humanizeVenueNote(row.priceNote)}</small>
                       )}
+                      {row.venues.length > 0 ? (
+                        <span
+                          className="fx-venue-strip"
+                          aria-label="Venues"
+                        >
+                          {row.venues.map((v) => (
+                            <em
+                              key={v.id}
+                              className={`fx-venue-pill is-${v.status}`}
+                              title={v.note}
+                            >
+                              {v.label}
+                              {v.usdPrice != null
+                                ? ` ${money(v.usdPrice)}`
+                                : v.liquidity != null
+                                  ? ` ${shortLiq(v.liquidity)}`
+                                  : ""}
+                            </em>
+                          ))}
+                        </span>
+                      ) : null}
                     </span>
                   </Link>
                 </li>

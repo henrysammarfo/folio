@@ -1,6 +1,16 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-24 — Multi-venue + SDK depth (Henry follow-up)
+
+- Markets: `resolveMultiVenuePrice` — Jupiter · Gecko free-tape · Raydium liq awareness · Solami Blur REST (`api.solami.dev`) when keyed; venue pills on board (not faint dots).
+- Solami: real Blur `/data/token/price` · fractional strings parsed · fail-closed without DataApi key · RPC tape labeled otherwise.
+- Meteora: official `@meteora-ag/dynamic-bonding-curve-sdk` buildCurveWithMarketCap (fixed 100bps stock fee) + mainnet program executable probe.
+- Overview: holdings logos + connect CTA · quote AssetLogos · cash-session week strip · stronger AI rail · soft Tape/Borrow labels.
+- Credit/Holdings soft CTAs · `memory/FLAWS_AND_WORKAROUNDS.md` documents bugs/workarounds.
+- Tests: 199+ multi-venue · build green · preview routes 200.
+- Branch: `cursor/folio-netro-depth-bible-f1ec`.
+
 ## 2026-09-24 — Netro depth + Bible spine (Henry screenshots)
 
 - Doctrine: `memory/HENRY_DESK_CREATIVE.md` — factorize every feature · no rush · screenshot-verify · research keys in `.env` only (rotated after chat paste).

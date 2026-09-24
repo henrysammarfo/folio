@@ -17,10 +17,15 @@ See `memory/HENRY_DESK_CREATIVE.md` — factorize every feature against Bible + 
 | Piece | Status |
 |---|---|
 | Soft pitch + pitch order | Live in copy |
-| **Cash session weekend refuse** | **Wired** — `session-gate.ts` → acquire gates + `/network` |
-| **Meteora DBC stock-curve config** | **Wired (config truth)** — `stock-curve.ts` · demo pool pending · no fake mainnet volume |
-| **Solami / mainnet tape** | **Wired (RPC probe labeled)** — `solami-tape.ts` · Blur client still fail-closed until keyed+shipped |
+| **Cash session weekend refuse** | **Wired** — `session-gate.ts` → acquire gates + `/network` + overview week strip |
+| **Meteora DBC stock-curve** | **Live SDK** — `@meteora-ag/dynamic-bonding-curve-sdk` `buildCurveWithMarketCap` + program executable on RPC · demo pool pending · no fake volume |
+| **Solami Blur tape** | **Live REST when `SOLAMI_API_KEY`** — `api.solami.dev/data/token/price` · else labeled RPC sigs |
+| **Multi-venue markets** | **Live** — Jupiter + free tape + Raydium awareness + Solami · board venue pills |
 | Panta | Out (correct) |
+
+## Flaws ledger
+
+See `memory/FLAWS_AND_WORKAROUNDS.md` — Jupiter 429s, Raydium no mid, Solami DataApi key, NestUSD metrics-only, DBC demo pool pending.
 
 ## Live product (production)
 
@@ -29,7 +34,7 @@ See `memory/HENRY_DESK_CREATIVE.md` — factorize every feature against Bible + 
 | Surface | Status |
 |---|---|
 | Buy | USDC→stock / stock↔stock · searchable pickers · flip · user-signed fills when armed |
-| Markets | Live board · Jupiter + free-tape fallback when Jupiter cools |
+| Markets | Multi-venue board · Jupiter + free-tape + Raydium awareness + Solami (when keyed) |
 | Borrow | Kamino deposit/borrow in-desk (you sign) · NestUSD metrics-only |
 | Pre-IPO | PreStocks + Tessera desks · buys stay inside FOLIO |
 | Activity | Lucide + AssetLogo (no letter tiles) |

@@ -998,8 +998,10 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
       (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
 
     const cashSession = evaluateCashSession();
-    const stockCurve = folioStockCurveStatus();
-    const solamiTape = await fetchSolamiTape({ mint });
+    const [stockCurve, solamiTape] = await Promise.all([
+      folioStockCurveStatus(),
+      fetchSolamiTape({ mint }),
+    ]);
 
     return {
       rows: buildNetworkMatrix({

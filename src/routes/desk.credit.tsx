@@ -105,7 +105,7 @@ function Page() {
               <h1>{borrow != null ? money(borrow) : "—"}</h1>
               <p className="fx-sub">
                 {data?.paper.note ??
-                  "Deposit xStock collateral and borrow USDC in FOLIO — Kamino rails, your wallet signs."}
+                  "Keep the shares. Unlock USDC inside FOLIO — you sign every step."}
               </p>
             </div>
             {ltv != null ? (

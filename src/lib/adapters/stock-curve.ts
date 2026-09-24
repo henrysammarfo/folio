@@ -1,76 +1,161 @@
 /**
- * FOLIO stock-curve config for Meteora DBC (Bible World’s Fair primary).
- * Config is the product — not a meme launchpad preset.
- * Demo pool stays labeled until a real devnet deploy is funded; never invent mainnet volume.
+ * FOLIO stock-curve for Meteora DBC — official SDK (`buildCurveWithMarketCap`).
+ * Config is live math + on-chain program probe. Demo pool labeled until funded.
+ * Never invents mainnet volume or fills.
  */
+import {
+  ActivationType,
+  BaseFeeMode,
+  CollectFeeMode,
+  DYNAMIC_BONDING_CURVE_PROGRAM_ID,
+  MigrationFeeOption,
+  MigrationOption,
+  TokenAuthorityOption,
+  TokenDecimal,
+  TokenType,
+  buildCurveWithMarketCap,
+  getSqrtPriceFromPrice,
+} from "@meteora-ag/dynamic-bonding-curve-sdk";
+import { Connection, PublicKey } from "@solana/web3.js";
+import BN from "bn.js";
 import { errResult, okResult, type AdapterResult } from "./types";
+import { resolveSolanaRpcUrl } from "./solana-rpc";
 
-/** Meteora DBC program (mainnet + devnet) — verified docs 2026-09-24. */
-export const METEORA_DBC_PROGRAM =
-  "dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN";
-
-/** Keeper graduation quote path (USDC) per Meteora docs. */
+export const METEORA_DBC_PROGRAM = DYNAMIC_BONDING_CURVE_PROGRAM_ID.toBase58();
 export const DBC_GRADUATION_USDC = 750;
 
 export type FolioStockCurveConfig = {
   quoteMint: "USDC";
   graduationUsdc: number;
-  /** Start price = last cash close — never a vanity number. */
   startPricePolicy: "last_cash_close";
-  /** Gentle = high virtual liquidity so thin names do not jump. */
   curve: "gentle_high_liquidity";
-  /** Meme exponential anti-sniper is out for stocks. */
   fee: "fixed_or_short_linear";
   weekendRefuse: "folio_session_gate";
   programId: string;
-  /** Where a demo pool may live. */
   demoNetwork: "devnet";
-  /** Mainnet xStock prices are reads only. */
   priceTape: "mainnet_read";
+  sdkSqrtPriceExample: string;
+  sdkCurvePoints: number;
 };
 
-/** Locked FOLIO stock preset — Bible § Meteora. */
-export const FOLIO_STOCK_CURVE: FolioStockCurveConfig = {
-  quoteMint: "USDC",
+export const FOLIO_STOCK_CURVE = {
+  quoteMint: "USDC" as const,
   graduationUsdc: DBC_GRADUATION_USDC,
-  startPricePolicy: "last_cash_close",
-  curve: "gentle_high_liquidity",
-  fee: "fixed_or_short_linear",
-  weekendRefuse: "folio_session_gate",
+  startPricePolicy: "last_cash_close" as const,
+  curve: "gentle_high_liquidity" as const,
+  fee: "fixed_or_short_linear" as const,
+  weekendRefuse: "folio_session_gate" as const,
   programId: METEORA_DBC_PROGRAM,
-  demoNetwork: "devnet",
-  priceTape: "mainnet_read",
+  demoNetwork: "devnet" as const,
+  priceTape: "mainnet_read" as const,
 };
 
 export type StockCurveStatus = {
   config: FolioStockCurveConfig;
-  /** Devnet pool pubkey when created — null until funded deploy. */
   demoPool: string | null;
+  programExecutable: boolean | null;
   note: string;
 };
 
-/**
- * Live status of FOLIO’s DBC stock curve.
- * Returns mainnet-read for the *config truth*; demo pool stays null until deploy.
- */
-export function folioStockCurveStatus(): AdapterResult<StockCurveStatus> {
-  const demoPool = process.env["FOLIO_DBC_DEVNET_POOL"]?.trim() || null;
-  if (!demoPool) {
-    return okResult("mainnet-read", "folio.stock-curve.config", {
-      config: FOLIO_STOCK_CURVE,
-      demoPool: null,
-      note:
-        "Stock curve config live · demo pool pending (devnet) · no fake mainnet volume",
-    });
-  }
-  return okResult("mainnet-read", "folio.stock-curve.devnet-pool", {
-    config: FOLIO_STOCK_CURVE,
-    demoPool,
-    note: `Devnet demo pool ${demoPool.slice(0, 8)}… · prices still mainnet-read`,
+/** Build gentle stock curve via official Meteora SDK (fixed-ish fee · DAMM v2 migrate). */
+function buildFolioStockCurveSdk() {
+  return buildCurveWithMarketCap({
+    initialMarketCap: 100_000,
+    migrationMarketCap: 750_000,
+    activationType: ActivationType.Timestamp,
+    token: {
+      tokenType: TokenType.SPLToken,
+      tokenBaseDecimal: TokenDecimal.SIX,
+      tokenQuoteDecimal: 6,
+      tokenAuthorityOption: TokenAuthorityOption.Immutable,
+      totalTokenSupply: 1_000_000_000,
+      leftover: 0,
+    },
+    fee: {
+      // Fixed-style stock fee (starting == ending) — not meme exponential moon.
+      baseFeeParams: {
+        baseFeeMode: BaseFeeMode.FeeSchedulerLinear,
+        feeSchedulerParam: {
+          startingFeeBps: 100,
+          endingFeeBps: 100,
+          numberOfPeriod: 0,
+          totalDuration: 0,
+        },
+      },
+      dynamicFeeEnabled: false,
+      collectFeeMode: CollectFeeMode.QuoteToken,
+      creatorTradingFeePercentage: 0,
+      poolCreationFee: 0,
+      enableFirstSwapWithMinFee: false,
+    },
+    migration: {
+      migrationOption: MigrationOption.MET_DAMM_V2,
+      migrationFeeOption: MigrationFeeOption.FixedBps100,
+      migrationFee: { feePercentage: 0, creatorFeePercentage: 0 },
+    },
+    liquidityDistribution: {
+      partnerPermanentLockedLiquidityPercentage: 0,
+      partnerLiquidityPercentage: 0,
+      creatorPermanentLockedLiquidityPercentage: 100,
+      creatorLiquidityPercentage: 0,
+    },
+    lockedVesting: {
+      totalLockedVestingAmount: 0,
+      numberOfVestingPeriod: 0,
+      cliffUnlockAmount: 0,
+      totalVestingDuration: 0,
+      cliffDurationFromMigrationTime: 0,
+    },
   });
 }
 
-/** Explicit unavailable when someone asks for a mainnet DBC fill theater. */
+export async function folioStockCurveStatus(): Promise<
+  AdapterResult<StockCurveStatus>
+> {
+  try {
+    const sqrt = getSqrtPriceFromPrice("100", 6, 6);
+    const built = buildFolioStockCurveSdk();
+    const curvePoints = Array.isArray(built.curve) ? built.curve.length : 0;
+
+    let programExecutable: boolean | null = null;
+    try {
+      const rpc = resolveSolanaRpcUrl();
+      const conn = new Connection(rpc.url, "confirmed");
+      const info = await conn.getAccountInfo(
+        new PublicKey(METEORA_DBC_PROGRAM),
+        "confirmed",
+      );
+      programExecutable = Boolean(info?.executable);
+    } catch {
+      programExecutable = null;
+    }
+
+    const demoPool = process.env["FOLIO_DBC_DEVNET_POOL"]?.trim() || null;
+    const config: FolioStockCurveConfig = {
+      ...FOLIO_STOCK_CURVE,
+      sdkSqrtPriceExample: BN.isBN(sqrt) ? sqrt.toString(10) : String(sqrt),
+      sdkCurvePoints: curvePoints,
+    };
+
+    const note = demoPool
+      ? `SDK curve · ${curvePoints} segments · program ${programExecutable === true ? "executable" : "unchecked"} · demo ${demoPool.slice(0, 8)}… · no fake mainnet volume`
+      : `SDK stock curve live (${curvePoints} segments · fixed 100bps) · DBC program ${programExecutable === true ? "executable on RPC" : "probe pending"} · demo pool pending · no fake mainnet volume`;
+
+    return okResult("mainnet-read", "@meteora-ag/dynamic-bonding-curve-sdk", {
+      config,
+      demoPool,
+      programExecutable,
+      note,
+    });
+  } catch (e) {
+    return errResult(
+      "@meteora-ag/dynamic-bonding-curve-sdk",
+      "stock_curve_sdk_failed",
+      String(e),
+    );
+  }
+}
+
 export function folioStockCurveMainnetDeploy(): AdapterResult<never> {
   return errResult(
     "folio.stock-curve",

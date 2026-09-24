@@ -1,3 +1,15 @@
+## 2026-09-24 — Multi-venue + SDK depth
+
+| Claim | Status |
+|---|---|
+| Markets multi-venue (Jupiter + free tape + Raydium + Solami) | Implemented — `multi-venue.ts` + board pills |
+| Solami Blur REST live when SOLAMI_API_KEY | Implemented — `api.solami.dev/data/token/price` |
+| Meteora DBC SDK builds FOLIO stock curve | Implemented — `buildCurveWithMarketCap` · program executable verified |
+| Overview Netro depth beyond thin gauge | Holdings logos · week strip · quote logos · stronger AI rail |
+| Flaws/workarounds documented | `memory/FLAWS_AND_WORKAROUNDS.md` |
+| No invented prices / fake DBC volume / Nest fills | Holds — fail-closed + labeled |
+| Unit tests + production build | Green |
+
 ## 2026-09-24 — Netro depth + Bible spine
 
 | Claim | Status |

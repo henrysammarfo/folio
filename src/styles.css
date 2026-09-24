@@ -393,6 +393,24 @@
 .netro-density-ownership-metrics span{display:block;font-size:.65rem;color:#6b7280;margin-bottom:.2rem}
 .netro-density-ownership-metrics b{display:block;font-size:.88rem;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.15}
 .netro-density-ownership-metrics small{display:block;font-size:.68rem;color:#6b7280;margin-top:.15rem}
+.netro-density-own-row{display:flex;align-items:center;gap:.55rem}
+.netro-density-own-row>div{min-width:0;flex:1}
+.netro-density-own-cta{
+  display:inline-flex;margin-top:.65rem;font-size:.75rem;font-weight:700;color:#0B6B8A;text-decoration:none;
+}
+.netro-density-own-cta:hover{text-decoration:underline}
+.netro-density-week{
+  padding:.55rem .95rem .85rem;border-top:1px solid #eef0f2;background:#fff;
+}
+.netro-density-week strong{display:block;font-size:.78rem;font-weight:700;margin-bottom:.4rem}
+.netro-density-week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.3rem}
+.netro-density-week-cell{
+  text-align:center;font-size:.62rem;font-weight:700;padding:.4rem .1rem;border-radius:8px;border:1px solid #e5e7eb;
+}
+.netro-density-week-cell.is-open{background:#e8f7fb;border-color:#9ED8E8;color:#0B6B8A}
+.netro-density-week-cell.is-closed{background:#f3f4f6;color:#6b7280}
+.netro-density-week small{display:block;margin-top:.45rem;font-size:.68rem;color:#6b7280;line-height:1.35}
+.netro-density-quote-asset{display:inline-flex;align-items:center;gap:.4rem}
 .netro-density-keys{margin:0 0 var(--netro-gap,1.1rem);padding:.85rem 1rem;background:#111;color:#fff;border:1px solid #1e1e1e;border-radius:14px;box-shadow:0 1px 5px rgba(0,0,0,.08);min-width:0}
 .netro-density-keys-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.55rem 1rem;align-items:flex-start;margin-bottom:.65rem}
 .netro-density-keys-head strong{display:block;font-size:.95rem;font-weight:650}
@@ -716,7 +734,12 @@
 .netro-density-quote-cta{display:block;box-sizing:border-box;text-align:center;text-decoration:none;width:100%;border:0;border-radius:12px;background:var(--netro-yellow,#0EA5C9);color:var(--netro-on-accent,#fff);font-weight:600;font-size:.95rem;padding:.85rem;cursor:pointer;box-shadow:0 2px 10px rgba(14,165,201,.16)}
 .netro-density-quote-foot{margin:0;font-size:.68rem;color:#77747e;border-top:1px solid rgba(255,255,255,.04);padding-top:.55rem}
 .netro-density-quote-foot a{color:var(--netro-yellow,#0EA5C9);font-weight:650;text-decoration:none}
-.netro-density-rail{background:var(--netro-yellow-soft,#B8E8F3);border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.75rem;min-height:18rem;flex:1;box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid rgba(14,165,201,.28);overflow:hidden}
+.netro-density-rail{
+  background:linear-gradient(165deg,#7dd3e8 0%,#B8E8F3 42%,#e8f7fb 100%);
+  border-radius:16px;padding:1.1rem;display:flex;flex-direction:column;gap:.85rem;
+  min-height:22rem;flex:1;box-shadow:0 8px 28px rgba(14,165,201,.18);
+  border:1px solid rgba(14,165,201,.35);overflow:hidden;
+}
 .netro-density-rail-head{display:flex;align-items:center;gap:.65rem;flex-shrink:0}
 .netro-density-rail-avatar{width:2.15rem;height:2.15rem;border-radius:8px;background:#1c1c1c;color:var(--netro-yellow,#0EA5C9);display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem}
 .netro-density-rail-title{margin:0;font-weight:600;font-size:1.05rem;line-height:1.1}
@@ -1417,6 +1440,18 @@
 .fx-board-price{text-align:right}
 .fx-board-price strong{display:block;font-variant-numeric:tabular-nums;font-size:.95rem}
 .fx-board-price small{display:block;font-size:.68rem;color:var(--fx-muted)}
+.fx-venue-strip{
+  display:flex;flex-wrap:wrap;gap:.3rem;justify-content:flex-end;margin-top:.35rem;
+}
+.fx-venue-pill{
+  font-style:normal;font-size:.62rem;font-weight:700;letter-spacing:.02em;
+  padding:.2rem .45rem;border-radius:999px;border:1px solid #e5e7eb;background:#f8fafb;color:#374151;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.fx-venue-pill.is-live,.fx-venue-pill.is-cached{border-color:#99e0ef;background:#e8f7fb;color:#0b6b8a}
+.fx-venue-pill.is-stale{border-color:#fde68a;background:#fffbeb;color:#92400e}
+.fx-venue-pill.is-cooling{border-color:#fed7aa;background:#fff7ed;color:#9a3412}
+.fx-venue-pill.is-off{opacity:.55;font-weight:600}
 @media(max-width:720px){
   .fx-board-head{display:none}
   .fx-board-row{

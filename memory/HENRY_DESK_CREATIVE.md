@@ -42,10 +42,11 @@ Bible **World’s Fair side tracks** added 2026-09-24:
 
 | Track | Bible job | Repo reality | Usefulness if unfinished |
 |---|---|---|---|
-| **Meteora DBC** | Stock curve config · USDC · gentle · fixed/short linear fee · cash-close start · weekend refuse in FOLIO · devnet demo pool | **Docs only** — no adapter, no desk surface, no config module | Low. Judges cannot see the stock curve. Pitch dies without DBC. |
-| **Solami** | Mainnet tape proof (Blur/Yellowstone/RPC read) · pool vs Thursday close | **Docs only** — no Solami adapter | Low. “Live tape” claim is empty without a labeled probe. |
+| **Meteora DBC** | Stock curve config · USDC · gentle · fixed/short linear fee · cash-close start · weekend refuse in FOLIO · devnet demo pool | **Live SDK** — `buildCurveWithMarketCap` + program executable on RPC · demo pool env pending | High when demo pool + Solami keyed |
+| **Solami** | Mainnet tape proof (Blur/Yellowstone/RPC read) · pool vs Thursday close | **Live Blur REST** with DataApi key · else labeled RPC | High with key; medium without |
 | **Panta** | Not taken | Correct — leave out | N/A |
-| Cash-close + closed-session block | Mandatory spine with DBC | **Not found in `src/`** | High priority — Bible 8-second demo needs weekend block + cash-close start |
+| Cash-close + closed-session block | Mandatory spine with DBC | **Wired** — session-gate + acquire + overview week strip | Done |
+| Multi-venue markets | Jupiter + free tape honesty | **Four venues** on board pills | Done |
 
 **Honest stance:** syncing the Bible text without wiring DBC/Solami/cash-close was incomplete. Plan: ship labeled fail-closed adapters + desk/network surfaces first; real devnet DBC pool when RPC + rent allow — never fake mainnet volume.
 

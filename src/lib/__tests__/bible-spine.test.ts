@@ -11,7 +11,7 @@ import {
 
 describe("cash session gate", () => {
   it("returns a labeled mainnet-read session", () => {
-    const s = evaluateCashSession(new Date("2026-09-24T15:00:00Z")); // Wed afternoon UTC
+    const s = evaluateCashSession(new Date("2026-09-24T15:00:00Z"));
     expect(s.ok).toBe(true);
     if (!s.ok) return;
     expect(s.mode).toBe("mainnet-read");
@@ -20,7 +20,7 @@ describe("cash session gate", () => {
   });
 
   it("refuses size when session closed", () => {
-    const closed = evaluateCashSession(new Date("2026-09-26T18:00:00Z")); // Sat
+    const closed = evaluateCashSession(new Date("2026-09-26T18:00:00Z"));
     expect(closed.ok).toBe(true);
     if (!closed.ok) return;
     expect(closed.data.open).toBe(false);
@@ -29,7 +29,7 @@ describe("cash session gate", () => {
   });
 });
 
-describe("FOLIO stock curve (Meteora DBC)", () => {
+describe("FOLIO stock curve (Meteora DBC SDK)", () => {
   it("locks USDC gentle fixed/short-linear cash-close preset", () => {
     expect(FOLIO_STOCK_CURVE.quoteMint).toBe("USDC");
     expect(FOLIO_STOCK_CURVE.curve).toBe("gentle_high_liquidity");
@@ -39,14 +39,19 @@ describe("FOLIO stock curve (Meteora DBC)", () => {
     expect(FOLIO_STOCK_CURVE.graduationUsdc).toBe(750);
   });
 
-  it("reports config live with demo pool pending by default", () => {
+  it("builds live SDK curve + probes DBC program executable", async () => {
     const prev = process.env["FOLIO_DBC_DEVNET_POOL"];
     delete process.env["FOLIO_DBC_DEVNET_POOL"];
-    const st = folioStockCurveStatus();
+    const st = await folioStockCurveStatus();
     expect(st.ok).toBe(true);
     if (!st.ok) return;
     expect(st.data.demoPool).toBeNull();
-    expect(st.data.note).toMatch(/demo pool pending/i);
+    expect(st.data.config.sdkCurvePoints).toBeGreaterThan(0);
+    expect(st.data.note).toMatch(/SDK stock curve live/i);
+    // Mainnet program should be executable when RPC responds
+    if (st.data.programExecutable != null) {
+      expect(st.data.programExecutable).toBe(true);
+    }
     if (prev !== undefined) process.env["FOLIO_DBC_DEVNET_POOL"] = prev;
-  });
+  }, 20_000);
 });
