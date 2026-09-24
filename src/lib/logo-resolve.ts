@@ -7,7 +7,8 @@ const UNDERLYING_DOMAIN: Record<string, string> = {
   AAPL: "apple.com",
   NVDA: "nvidia.com",
   TSLA: "tesla.com",
-  GOOGL: "abc.xyz",
+  GOOGL: "google.com",
+  GOOG: "google.com",
   META: "meta.com",
   AMZN: "amazon.com",
   MSFT: "microsoft.com",
@@ -25,12 +26,35 @@ const UNDERLYING_DOMAIN: Record<string, string> = {
   AMD: "amd.com",
   SPY: "ssga.com",
   QQQ: "invesco.com",
+  CRCL: "circle.com",
+  MSTR: "microstrategy.com",
+  COST: "costco.com",
+  CPCL: "costco.com",
+  CBBTC: "coinbase.com",
+  BTC: "bitcoin.org",
   // PreStocks / Tessera name hints (API rarely ships logos for Tessera)
   OPENAI: "openai.com",
   SPACEX: "spacex.com",
   KALSHI: "kalshi.com",
   ANDURIL: "anduril.com",
   ANTHROPIC: "anthropic.com",
+  FIGUREAI: "figure.ai",
+  NEURALINK: "neuralink.com",
+  POLYMARKET: "polymarket.com",
+};
+
+/** Extra direct logo URLs when CDN / favicon are flaky (credit board faces). */
+const DIRECT_LOGO: Record<string, string> = {
+  CBBTC:
+    "https://assets.coingecko.com/coins/images/40143/small/cbbtc.webp",
+  BTC: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png",
+  SPY: "https://logo.clearbit.com/ssga.com",
+  QQQ: "https://logo.clearbit.com/invesco.com",
+  GOOGL: "https://www.google.com/s2/favicons?domain=google.com&sz=128",
+  GOOG: "https://www.google.com/s2/favicons?domain=google.com&sz=128",
+  SPACEX: "https://logo.clearbit.com/spacex.com",
+  OPENAI: "https://logo.clearbit.com/openai.com",
+  KALSHI: "https://logo.clearbit.com/kalshi.com",
 };
 
 /** Strip T- / trailing x so Tessera + xStock symbols map to company domains. */
@@ -38,6 +62,7 @@ export function underlyingKey(symbol: string, underlying?: string): string {
   if (underlying?.trim()) return underlying.trim().toUpperCase();
   return symbol
     .trim()
+    .replace(/\s+/g, "")
     .replace(/^T-?/i, "")
     .replace(/x+$/i, "")
     .toUpperCase();
@@ -66,14 +91,20 @@ export function logoCandidates(opts: {
   if (/xx+$/i.test(symbol)) {
     push(xStockLogoUrl(symbol.replace(/x+$/i, "x")));
   }
+  // Known flaky faces (cbBTC, SPY, QQQ, SpaceX) — prefer direct before favicon
+  push(DIRECT_LOGO[und]);
   const domain = UNDERLYING_DOMAIN[und];
   if (domain) {
     push(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`);
+    push(`https://icons.duckduckgo.com/ip3/${domain}.ico`);
   }
   return out;
 }
 
 export function initialsForSymbol(symbol: string): string {
-  const base = symbol.replace(/x+$/i, "").replace(/^T-?/i, "");
+  const base = symbol
+    .replace(/\s+/g, "")
+    .replace(/x+$/i, "")
+    .replace(/^T-?/i, "");
   return (base.slice(0, 2) || "?").toUpperCase();
 }

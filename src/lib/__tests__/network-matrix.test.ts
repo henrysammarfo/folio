@@ -61,7 +61,7 @@ describe("buildNetworkMatrix honesty", () => {
 
     expect(byCap["Kamino xStocks market (read)"]?.mode).toBe("mainnet-read");
     expect(byCap["Kamino xStocks market (read)"]?.detail).toMatch(
-      /Kamino UI|deep-link|no FOLIO CPI/i,
+      /in-desk|ktx|no FOLIO CPI/i,
     );
     expect(byCap["Watch-wallet mainnet-read qty"]?.mode).toBe("mainnet-read");
     expect(byCap["Ephemeral wallet inspect"]?.mode).toBe("mainnet-read");

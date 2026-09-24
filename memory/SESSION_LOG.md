@@ -1,6 +1,30 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-24 — Demo lock (desk polish + agent daily cap)
+
+- Credit in-house + launch polish merged onto `cursor/folio-demo-lock-f1ec`.
+- Activity: Lucide + AssetLogo glyphs; events stamped with `icon`/`symbol`.
+- Markets: staggered Jupiter price fetches; venue column humanized (`Cooling — refresh soon`).
+- PreStocks / Tessera: in-desk BuyExecute via partner `outputMint`; removed Tessera/PreStocks app CTAs.
+- Agent: `agent_daily` = 5 msgs / account / 24h (plus burst `agent` window).
+- Soft copy + logo domains for cbBTC / PreStocks names.
+
+## 2026-09-24 — Bible sync + launch polish 20 + agent chat
+
+- Synced `docs/FOLIO_BIBLE.md` (Meteora DBC primary · Solami tape · Panta out · soft pitch lock).
+- Field note: Aqua0 multi-strategy LP on tokenized equities ≠ FOLIO honesty-desk wedge.
+- Launch checklist `docs/LAUNCH_POLISH_20.md` — privacy/terms/HSTS/cookies/meta/og/favicon/sitemap/404/analytics/honeypot/CTA audited + gaps closed.
+- Soft pitch: truth meta + landing slide; beta honeypot; expanded sitemap; FolioAgentChat (thinking/stream/composer) on settings agent.
+- Branch: `cursor/folio-launch-polish-agent-f1ec`.
+
+## 2026-09-21 — Credit in-house (Kamino ktx) + logos + layout
+
+- `/desk/credit`: Buy-style board + ticket — AssetLogo on rates; deposit collateral + borrow USDC in-desk.
+- `prepareKaminoDeposit` / `prepareKaminoBorrow` via `api.kamino.finance/ktx/klend/*`; Privy `signAndSendTransaction` (no outbound Kamino/Nest CTA).
+- Honesty: Kamino builds txs · user signs · no FOLIO borrow CPI. NestUSD stays metrics-only.
+- Branch: `cursor/folio-credit-inhouse-logos-f1ec`.
+
 ## 2026-09-20 — Credit live: NestUSD metrics + Kamino borrow CTA
 
 - NestUSD: wired `api.nestusd.com/v1/risk` + `/v1/config` (live collateral LTV). Execute = NestUSD app deep-link (no FOLIO CPI).

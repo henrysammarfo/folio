@@ -3,9 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
+import { BuyExecuteButton } from "@/components/buy-execute-button";
 import { DeskShell } from "@/components/desk-shell";
 import { getPreipoBundle } from "@/lib/desk.functions";
-import { humanizeWashNote } from "@/lib/humanize-copy";
+import { humanizeHonestyNote, humanizeWashNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/desk/preipo")({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/desk/preipo")({
     meta: siteMeta({
       title: "Pre-IPO · PreStocks — FOLIO",
       description:
-        "Live PreStocks pre-IPO catalog with Jupiter quote-only buys on Solana.",
+        "Live PreStocks pre-IPO catalog with Jupiter buys inside FOLIO on Solana.",
       path: "/desk/preipo",
     }),
   }),
@@ -43,6 +44,8 @@ function Page() {
     initial.selected?.symbol ?? "OPENAI",
   );
   const [amount, setAmount] = useState("1");
+  const [err, setErr] = useState<string | null>(null);
+  const [lastSig, setLastSig] = useState<string | null>(null);
   const spendUsdc = Number(amount);
   const ready = Number.isFinite(spendUsdc) && spendUsdc > 0 && spendUsdc <= 25;
 
@@ -69,6 +72,10 @@ function Page() {
     selected.markPrice > 0
       ? ((selected.tokenPrice - selected.markPrice) / selected.markPrice) * 100
       : null;
+  const broadcastPaused = data?.broadcastPaused !== false;
+  const canBuy = Boolean(
+    ready && data?.jupiter.ok && data.washOk && selected?.mint,
+  );
 
   return (
     <DeskShell title="Pre-IPO">
@@ -77,8 +84,8 @@ function Page() {
           <p className="fx-hero-kicker">PreStocks only</p>
           <h1>Private companies. Live Solana quotes.</h1>
           <p className="fx-sub">
-            Stocklana PreStocks bounty path — SPV-backed economic exposure, not
-            Tessera T-tokens. Quote-only · fills paused.{" "}
+            Stocklana PreStocks bounty — SPV-backed economic exposure, not
+            Tessera T-tokens. Buy stays inside FOLIO.{" "}
             <Link to="/desk/tessera">Tessera desk →</Link>
           </p>
         </header>
@@ -89,7 +96,7 @@ function Page() {
             {!data?.catalog.ok ? (
               <p className="fx-checks">
                 {data?.catalog && !data.catalog.ok
-                  ? data.catalog.reason
+                  ? humanizeHonestyNote(data.catalog.reason)
                   : "Loading…"}
               </p>
             ) : (
@@ -101,7 +108,11 @@ function Page() {
                       <button
                         type="button"
                         className={`fx-preipo-item${on ? " is-on" : ""}`}
-                        onClick={() => setSymbol(row.symbol)}
+                        onClick={() => {
+                          setSymbol(row.symbol);
+                          setErr(null);
+                          setLastSig(null);
+                        }}
                       >
                         <AssetLogo
                           symbol={row.symbol}
@@ -135,13 +146,13 @@ function Page() {
                 size={44}
               />
               <div>
-                <p className="fx-hero-kicker">Buy</p>
+                <p className="fx-hero-kicker">Buy in FOLIO</p>
                 <h2>USDC → {selected?.symbol ?? "—"}</h2>
               </div>
             </div>
             <p className="fx-ticket-sub">
               {selected?.name ?? "Select a PreStock"}
-              {data?.note ? ` · ${data.note}` : ""}
+              {data?.note ? ` · ${humanizeHonestyNote(data.note)}` : ""}
             </p>
             {selected ? (
               <dl className="fx-preipo-marks">
@@ -199,23 +210,47 @@ function Page() {
               {" · "}
               Decimals assumed {data?.assumedDecimals ?? 9} (labeled)
             </p>
-            <button
-              type="button"
-              className="fx-btn fx-btn-primary fx-btn-block"
-              disabled={!ready || !data?.jupiter.ok}
-              onClick={() => void refetch()}
-            >
-              {data?.jupiter.ok
-                ? "Quote ready — fills paused"
-                : "Refresh quote"}
-            </button>
-            {selected?.externalUrl ? (
-              <p className="fx-ticket-sub">
-                <a href={selected.externalUrl} target="_blank" rel="noreferrer">
-                  PreStocks page
+            {err ? <p className="fx-checks" role="alert">{err}</p> : null}
+            {lastSig ? (
+              <p className="fx-checks">
+                Landed ·{" "}
+                <a
+                  href={`https://solscan.io/tx/${lastSig}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  view on Solscan
                 </a>
               </p>
             ) : null}
+            <BuyExecuteButton
+              canBuy={canBuy}
+              isPair={false}
+              broadcastPaused={broadcastPaused}
+              symbol={selected?.symbol ?? "PRE"}
+              paySymbol="USDC"
+              amount={spendUsdc}
+              slippageBps={100}
+              outputMint={selected?.mint}
+              outputDecimals={data?.assumedDecimals ?? 9}
+              pausedLabel="Quote ready — fills paused"
+              confirmLabel={`Buy ${selected?.symbol ?? "PreStock"}`}
+              onError={setErr}
+              onSuccess={(sig) => {
+                setLastSig(sig);
+                setErr(null);
+                void refetch();
+              }}
+            />
+            <button
+              type="button"
+              className="fx-btn fx-btn-ghost fx-btn-block"
+              style={{ marginTop: "0.5rem" }}
+              disabled={!ready}
+              onClick={() => void refetch()}
+            >
+              Refresh quote
+            </button>
           </aside>
         </div>
       </section>

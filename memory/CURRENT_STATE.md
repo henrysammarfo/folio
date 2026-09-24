@@ -1,7 +1,18 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-20 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
-> Doctrine: honest security only — **never claim unhackable / NK-proof**.
+> Updated: 2026-09-24 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
+> Doctrine: honest security only — **never claim unhackable / NK-proof**. Soft pitch only.
+> Bible: `docs/FOLIO_BIBLE.md` · Launch polish: `docs/LAUNCH_POLISH_20.md`
+
+## World’s Fair side tracks (Bible)
+
+- **Meteora DBC** primary (stock curve config · USDC · gentle · fixed/short linear fee).
+- **Solami** = mainnet tape proof.
+- **Panta** not taken.
+
+## Field (Aqua0)
+
+Aqua0 showed multi-strategy LP on tokenized equities (shared capital across Orca/Raydium). FOLIO stays the honesty desk — do not pitch as LP router.
 
 ## Marketing / landing (product)
 
@@ -13,21 +24,29 @@
 
 ## Desk UI (product)
 
+> **Demo lock (`cursor/folio-demo-lock-f1ec`):** Activity Lucide/AssetLogo · Markets staggered Jupiter (anti-429) · PreStocks/Tessera BuyExecute in-desk (no external app CTAs) · Agent 5 msgs/account/day · stronger credit faces (cbBTC/SPY/QQQ/GOOGL).
+
+
 - Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
-- Buy **Netro-depth**: short Details (route/impact/gas/fill) + settings (slippage + gas chips). Fills still paused.
-- **/desk/markets** live Jupiter board + **flow strip** (quick Buy chips) — square lane filters, list-style pairs.
-- Netro overview: **FOLIO watermark** over TradingView (NetroBNB CryptoMarketCard pattern) · tight Buy sheet · AI modal.
+- Buy **Netro-depth**: short Details (route/impact/gas/fill) + settings (slippage + gas chips). Fills arm when `BROADCAST_PAUSED=false`.
+- **/desk/markets** live Jupiter board + **flow strip** — staggered price fetches (anti-429) · humanized venue notes.
+- **/desk/activity** Lucide + AssetLogo glyphs (no letter tiles).
+- **/desk/preipo** + **/desk/tessera** — BuyExecute in-desk via partner `outputMint` (no PreStocks/Tessera app CTAs).
+- Agent chat: **5 messages / account / 24h** (`agent_daily` rate limit).
+- Netro overview: **FOLIO watermark** over TradingView · tight Buy sheet · AI modal.
 - Live-trade research: `docs/LIVE_TRADE_NO_PROGRAM.md` · field map `docs/ECOSYSTEM_FIELD.md`
-- **Phases A–E on main (`4a35b13`):** Swap V2 `/order` + gated `/execute` · Privy Open App (email/embedded Solana + link/export) · consumer settings scrub (`FOLIO_OPS=1`) · session/rate-limit gates · overview Stocks/Pre-IPO/Tessera partner lanes · beta waitlist **server-only** (Supabase `beta_waitlist`, no localStorage).
-- **Ship rough edges (branch `cursor/folio-ship-rough-edges-f1ec`):** Buy prepare→Privy sign→execute CTA · positions Verified/paper labels · partner $1 quote strip · beta cine contrast · Phase G analytics events + `/desk/admin` · Truth reconcile/PoR-analogue copy · credit unavailable-until-funded honesty.
+- **Phases A–E on main:** Swap V2 + gated `/execute` · Privy Open App · consumer settings · partner lanes · beta waitlist server-only.
+- **Credit in-house:** `/desk/credit` Buy-style rates + ticket · AssetLogo · Kamino ktx deposit/borrow signed in-desk. NestUSD metrics-only.
 - Prod: https://folio-tawny-one.vercel.app
-- Henry still: apply `beta_waitlist` migration · Privy allowed origins · flip `BROADCAST_PAUSED=false` on **preview first**, then prod (user-signed fills; no FOLIO payer). NestUSD/borrow CPI still unfunded.
-- **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
-- **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
-- Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).
+- Henry still: Privy origins · `BROADCAST_PAUSED=false` arms Jupiter fills + Kamino ktx + partner buys (user-signed). NestUSD execute still external.
+- **AssetLogo** chain: API logo → Backed CDN → company favicon (incl. cbBTC / PreStocks names) → initials.
 - Soft access banner → **Open App**; Account tenant switcher; agent session-gated.
-- **/whitepaper** · **/beta** waitlist · docs: `FOLIO_WHITEPAPER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
-- Human wash copy (no raw `bitquery_*` in PreStocks/Tessera consumer UI).
+- **/whitepaper** · **/beta** waitlist · docs: `FOLIO_WHITEOBER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
+- Human wash / venue copy (no raw `jupiter_rate_limited` / `bitquery_*` in consumer UI).
+
+## Demo lock (branch `cursor/folio-demo-lock-f1ec`)
+
+Shipping polish for Stocklana demo + submit: activity icons, markets pace, partner in-FOLIO buy, agent daily cap.
 
 ## Launch path (Stocklana → Colosseum → beta)
 
@@ -56,9 +75,9 @@
 | Jupiter price + swap quote | **Mainnet READ / quote-only** |
 | Wash / Bitquery | **Mainnet READ**, fail-closed until keyed+wired |
 | Kamino xStocks / Jupiter Lend earn / Raydium pools | **Mainnet READ** (labeled) |
-| NestUSD capacity | **Unavailable** until verified endpoint |
-| Swap / borrow broadcast | **Disabled** (≤~$1 budget) |
-| Borrow CPI proofs | **Unavailable until funded** (no fork harness shipped) |
+| NestUSD capacity | **Mainnet READ** metrics (risk API) · execute still NestUSD app |
+| Swap / borrow broadcast | **User-signed** when `BROADCAST_PAUSED=false` (Jupiter + Kamino ktx) |
+| Borrow CPI proofs | **Kamino ktx** assembles (no FOLIO program) · NestUSD unfunded |
 | Custom program mainnet deploy | **Out** (rent ≫ $1) |
 | Optional policy harness | Devnet OK if labeled |
 

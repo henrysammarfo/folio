@@ -1,5 +1,6 @@
 /**
  * Buy CTA — quote-only while fills paused; when armed: prepare → Privy sign → execute.
+ * Supports xStocks catalog buys and partner mint path (PreStocks / Tessera in-desk).
  */
 import { useLogin, usePrivy } from "@privy-io/react-auth";
 import {
@@ -24,6 +25,11 @@ type Props = {
   paySymbol: string;
   amount: number;
   slippageBps: number;
+  /** Partner path — PreStocks / Tessera mint (skip xStocks catalog). */
+  outputMint?: string | null;
+  outputDecimals?: number;
+  pausedLabel?: string;
+  confirmLabel?: string;
   onError: (msg: string) => void;
   onSuccess: (sig: string | null) => void;
 };
@@ -52,9 +58,8 @@ export function BuyExecuteButton(props: Props) {
         disabled
         data-testid="acquire-execute"
       >
-        {props.isPair
-          ? "Swap stocks — fills paused"
-          : "Swap — fills paused"}
+        {props.pausedLabel ??
+          (props.isPair ? "Swap stocks — fills paused" : "Swap — fills paused")}
       </button>
     );
   }
@@ -84,7 +89,9 @@ function BuyExecuteArmed(props: Props) {
   const execute = useServerFn(executeJupiterSwap);
   const [busy, setBusy] = useState(false);
 
-  const label = props.isPair ? "Confirm stock swap" : "Confirm buy";
+  const label =
+    props.confirmLabel ??
+    (props.isPair ? "Confirm stock swap" : "Confirm buy");
 
   async function run() {
     props.onError("");
@@ -108,6 +115,7 @@ function BuyExecuteArmed(props: Props) {
       symbol: props.symbol,
       pair: props.isPair,
       amount: props.amount,
+      partner: Boolean(props.outputMint),
     });
     try {
       const prepared = await prepare({
@@ -115,9 +123,15 @@ function BuyExecuteArmed(props: Props) {
           symbol: props.symbol,
           taker: wallet.address,
           slippageBps: props.slippageBps,
-          ...(props.isPair
-            ? { paySymbol: props.paySymbol, amount: props.amount }
-            : { spendUsdc: props.amount }),
+          ...(props.outputMint
+            ? {
+                spendUsdc: props.amount,
+                outputMint: props.outputMint,
+                outputDecimals: props.outputDecimals ?? 9,
+              }
+            : props.isPair
+              ? { paySymbol: props.paySymbol, amount: props.amount }
+              : { spendUsdc: props.amount }),
         },
       });
       if (!prepared.ok) {

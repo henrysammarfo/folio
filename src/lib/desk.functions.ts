@@ -10,6 +10,10 @@ import {
   type XStockRefPrice,
 } from "./adapters/equity-ref";
 import { fetchJupiterQuote, fetchJupiterTokenPrice, fetchJupiterExecute } from "./adapters/jupiter";
+import {
+  fetchKaminoBorrowTx,
+  fetchKaminoDepositTx,
+} from "./adapters/kamino-ktx";
 import { evaluateWashGate, washAllowsSize } from "./adapters/wash";
 import { buildAcquireGateMessages } from "./acquire-gates";
 import { buildNetworkMatrix, type MatrixRow } from "./adapters/network-matrix";
@@ -100,13 +104,19 @@ const QuoteInput = z.object({
 });
 
 const PrepareSwapInput = z.object({
-  symbol: z.string().min(2).max(16),
+  symbol: z.string().min(2).max(32),
   spendUsdc: z.number().positive().max(25).optional(),
   paySymbol: z.string().min(2).max(16).optional(),
   amount: z.number().positive().max(25).optional(),
   /** Solana pubkey that will sign — required for Swap V2 assembled tx. */
   taker: z.string().min(32).max(64),
   slippageBps: z.number().int().min(1).max(500).optional(),
+  /**
+   * Partner mint path (PreStocks / Tessera) — skip xStocks catalog lookup.
+   * When set, FOLIO quotes USDC → this mint in-desk (no external redirect).
+   */
+  outputMint: z.string().min(32).max(64).optional(),
+  outputDecimals: z.number().int().min(0).max(18).optional(),
 });
 
 export type TruthBundle = {
@@ -598,6 +608,62 @@ export const prepareJupiterSwap = createServerFn({ method: "POST" })
     const paySymbol = isPair ? payRaw! : "USDC";
     const payAmount = data.amount ?? data.spendUsdc ?? (isPair ? 0.01 : 1);
     const slippageBps = data.slippageBps ?? 50;
+    const partnerMint = data.outputMint?.trim() || null;
+    const partnerDecimals =
+      data.outputDecimals != null && Number.isFinite(data.outputDecimals)
+        ? data.outputDecimals
+        : 9;
+
+    if (partnerMint) {
+      if (isPair) {
+        return {
+          ok: false as const,
+          reason: "partner_pair_unsupported",
+          detail: "Partner tokens buy USDC→mint only — no stock↔stock pair.",
+        };
+      }
+      const amountRaw = Math.round(payAmount * 1_000_000);
+      const order = await fetchJupiterQuote({
+        outputMint: partnerMint,
+        amountRaw,
+        slippageBps,
+        outputDecimals: partnerDecimals,
+        inputDecimals: 6,
+        taker: data.taker.trim(),
+      });
+      if (!order.ok) {
+        return {
+          ok: false as const,
+          reason: order.reason,
+          detail: order.detail ?? null,
+          source: order.source,
+        };
+      }
+      if (!order.data.transaction || !order.data.requestId) {
+        return {
+          ok: false as const,
+          reason: "order_missing_transaction",
+          detail:
+            "Jupiter returned quote without a signable tx — check wallet SOL/USDC or try ≥~$10 for gasless.",
+          source: order.source,
+        };
+      }
+      return {
+        ok: true as const,
+        source: order.source,
+        mode: order.mode,
+        data: {
+          requestId: order.data.requestId,
+          transaction: order.data.transaction,
+          outUiAmount: order.data.outUiAmount,
+          inUiAmount: order.data.inUiAmount,
+          gasless: order.data.gasless,
+          signatureFeePayer: order.data.signatureFeePayer,
+          router: order.data.router,
+          feeBps: order.data.feeBps,
+        },
+      };
+    }
 
     const [asset, payAssetRes] = await Promise.all([
       fetchXStockAsset(data.symbol),
@@ -735,6 +801,126 @@ export const executeJupiterSwap = createServerFn({ method: "POST" })
       ok: true as const,
       source: res.source,
       mode: res.mode,
+      data: res.data,
+    };
+  });
+
+const KaminoKtxInput = z.object({
+  wallet: z.string().min(32).max(64),
+  reserve: z.string().min(32).max(64),
+  amount: z.string().min(1).max(32),
+});
+
+/**
+ * Assemble a Kamino Klend deposit (collateral) tx via ktx — signed in-desk.
+ * Requires folio_session · rate-limited · fail-closed while broadcast paused.
+ */
+export const prepareKaminoDeposit = createServerFn({ method: "POST" })
+  .inputValidator(KaminoKtxInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSessionLocal();
+    const sessionBlock = executeBlockedReason(session);
+    if (sessionBlock) {
+      return {
+        ok: false as const,
+        reason: "execute_requires_session",
+        detail: sessionBlock,
+      };
+    }
+    const rl = rateLimitCheck(
+      "execute",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
+    if (isBroadcastPaused()) {
+      return {
+        ok: false as const,
+        reason: "broadcast_paused",
+        detail: "Borrow/deposit paused until FOLIO arms fills.",
+      };
+    }
+    const res = await fetchKaminoDepositTx({
+      wallet: data.wallet,
+      reserve: data.reserve,
+      amount: data.amount,
+    });
+    if (!res.ok) {
+      return {
+        ok: false as const,
+        reason: res.reason,
+        detail: res.detail ?? null,
+        source: res.source,
+      };
+    }
+    return {
+      ok: true as const,
+      source: res.source,
+      data: res.data,
+    };
+  });
+
+/**
+ * Assemble a Kamino Klend borrow (USDC) tx via ktx — signed in-desk.
+ * Obligation must exist (deposit first).
+ */
+export const prepareKaminoBorrow = createServerFn({ method: "POST" })
+  .inputValidator(KaminoKtxInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSessionLocal();
+    const sessionBlock = executeBlockedReason(session);
+    if (sessionBlock) {
+      return {
+        ok: false as const,
+        reason: "execute_requires_session",
+        detail: sessionBlock,
+      };
+    }
+    const rl = rateLimitCheck(
+      "execute",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
+    if (isBroadcastPaused()) {
+      return {
+        ok: false as const,
+        reason: "broadcast_paused",
+        detail: "Borrow paused until FOLIO arms fills.",
+      };
+    }
+    const res = await fetchKaminoBorrowTx({
+      wallet: data.wallet,
+      reserve: data.reserve,
+      amount: data.amount,
+    });
+    if (!res.ok) {
+      return {
+        ok: false as const,
+        reason: res.reason,
+        detail: res.detail ?? null,
+        source: res.source,
+      };
+    }
+    return {
+      ok: true as const,
+      source: res.source,
       data: res.data,
     };
   });

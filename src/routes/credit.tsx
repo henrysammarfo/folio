@@ -12,13 +12,13 @@ export const Route = createFileRoute("/credit")({
       {
         name: "description",
         content:
-          "Live Kamino / NestUSD credit reads — borrow via partner apps (no FOLIO CPI).",
+          "Live Kamino credit in FOLIO — deposit & borrow USDC on Kamino rails (user-signed · no FOLIO CPI).",
       },
       { property: "og:title", content: "Credit Desk — FOLIO" },
       {
         property: "og:description",
         content:
-          "Live Kamino / NestUSD credit reads — borrow via partner apps (no FOLIO CPI).",
+          "Live Kamino credit in FOLIO — deposit & borrow USDC on Kamino rails (user-signed · no FOLIO CPI).",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -73,7 +73,7 @@ function Page() {
       tone="credit"
       eyebrow="Credit without selling"
       title="Keep the shares. Test the liquidity."
-      intro="Credit uses live Kamino + NestUSD metrics. Borrow opens on Kamino / NestUSD apps — FOLIO does not run a custom borrow CPI. Nest.credit vault TVL is a different product."
+      intro="Credit uses live Kamino + NestUSD metrics. Borrow USDC in the FOLIO desk on Kamino rails — your wallet signs; FOLIO does not run a custom borrow CPI. Nest.credit vault TVL is a different product."
       aside={
         <div className="metrics-grid metrics-grid-aside">
           <Metric
@@ -99,17 +99,21 @@ function Page() {
           <Metric
             label="Borrow execution"
             value={
-              data?.borrowExecution === "kamino-external"
-                ? "Kamino live"
-                : data?.borrowExecution === "nestusd-external"
-                  ? "NestUSD app"
+              data?.borrowExecution === "kamino-inhouse"
+                ? data.broadcastPaused
+                  ? "Kamino · paused"
+                  : "Kamino in-desk"
+                : data?.borrowExecution === "nestusd-metrics"
+                  ? "NestUSD metrics"
                   : data?.borrowExecution === "unavailable"
                     ? "Unavailable"
                     : "…"
             }
             detail={
-              data?.kaminoBorrowUrl
-                ? "Deep-link to Kamino · FOLIO does not sign borrow CPI"
+              data?.borrowExecution === "kamino-inhouse"
+                ? data.broadcastPaused
+                  ? "Fills paused · BROADCAST_PAUSED · no broadcast yet"
+                  : "ktx deposit/borrow · user-signed · no FOLIO CPI"
                 : "No live borrow rail"
             }
           />
@@ -132,7 +136,7 @@ function Page() {
             {data?.kamino.ok
               ? `${data.kamino.data.reserves.length} xStocks reserves · AAPLx LTV ${
                   aaplLtv != null ? `${(aaplLtv * 100).toFixed(0)}%` : "—"
-                } · borrow on Kamino`
+                } · borrow in FOLIO desk`
               : data && !data.kamino.ok
                 ? data.kamino.reason
                 : "xStocks market reserves (live LTV/APY when reachable)"}

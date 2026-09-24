@@ -41,4 +41,26 @@ describe("scrubOpsJargon", () => {
   it("replaces fail-closed", () => {
     expect(scrubOpsJargon("Blocked · fail-closed")).toMatch(/paused for safety/i);
   });
+
+  it("humanizes jupiter rate limit codes", () => {
+    expect(scrubOpsJargon("jupiter_rate_limited")).toMatch(/cooling/i);
+  });
+});
+
+describe("humanizeVenueNote", () => {
+  it("softens rate-limit blanks on markets board", async () => {
+    const { humanizeVenueNote } = await import("../humanize-copy");
+    expect(humanizeVenueNote("jupiter_rate_limited")).toMatch(/cooling/i);
+    expect(humanizeVenueNote("live")).toBe("live");
+  });
+});
+
+describe("humanizeWashNote gecko soft", () => {
+  it("scrubs GeckoTerminal jargon from free-path notes", () => {
+    expect(
+      humanizeWashNote(
+        "No recent GeckoTerminal trades for mint — paused for safety.; Free path via GeckoTerminal · pool ANDURIL / USDC",
+      ),
+    ).not.toMatch(/GeckoTerminal/i);
+  });
 });

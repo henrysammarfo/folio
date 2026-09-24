@@ -331,12 +331,15 @@ test.describe("FOLIO Block 0 smoke", () => {
     });
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/estimate|wallet|collateral|ltv|borrow/);
-    expect(body).toMatch(/paused|not enabled|unavailable|estimate/);
+    expect(body).toMatch(/paused|not enabled|unavailable|estimate|armed|in folio|in-desk/);
     expect(body).toMatch(/nestusd|nest credit|earn/);
-    expect(body).toMatch(/not verified|risk|unavailable|paused/);
-    // Never paint NestUSD as ready/live without a verified endpoint.
+    // In-house ticket — no outbound Kamino/Nest CTA as primary borrow path
+    expect(body).toMatch(/deposit|borrow usdc|sign/);
+    await expect(page.getByTestId("credit-borrow-execute")).toBeVisible();
+    expect(body).not.toMatch(/borrow on kamino/);
+    expect(body).not.toMatch(/nestusd app/);
     expect(body).not.toMatch(/nestusd[\s\S]{0,40}ready/);
-    expect(body).not.toMatch(/7vf…2ka/i);
+    expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });
 
 
@@ -398,8 +401,8 @@ test.describe("FOLIO Block 0 smoke", () => {
     expect(body).toMatch(/kamino/);
     expect(body).toMatch(/nestusd/);
     expect(body).toMatch(/nest\.credit|vault|oft|not nestusd/i);
-    expect(body).toMatch(/no broadcast|unavailable|off|unfunded/);
-    expect(body).toMatch(/unverified|risk|fail-closed|hidden|unavailable/);
+    expect(body).toMatch(/no broadcast|unavailable|off|unfunded|paused|in-desk|ktx/);
+    expect(body).toMatch(/unverified|risk|fail-closed|hidden|unavailable|no folio cpi|user-signed/);
     expect(body).not.toMatch(/nestusd[\s\S]{0,40}ready/);
     expect(body).not.toMatch(/unhackable|nation-state|filled on mainnet/);
   });

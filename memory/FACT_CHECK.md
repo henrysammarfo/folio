@@ -1,3 +1,38 @@
+## 2026-09-24 — Demo lock (desk UX + agent cap)
+
+| Claim | Status |
+|---|---|
+| Credit in-house Kamino ktx + AssetLogo | Merged onto demo-lock |
+| Activity icons/logos (not letter tiles) | Verified — `ActivityEvent.icon` + Lucide/AssetLogo on `/desk/activity` |
+| Markets staggered fetch + soft 429 copy | Verified — `mapStaggered` in `desk.screener.ts` · `humanizeVenueNote` |
+| PreStocks / Tessera in-FOLIO buy (no external CTA) | Verified — `outputMint` prepare path · BuyExecuteButton · Tessera app link removed |
+| Agent ≤5 messages / account / day | Verified — `agent_daily` bucket wired in `runDeskAgent` |
+| Credit faces SPY/QQQ/GOOGL/cbBTC | Verified — direct logo + favicon fallbacks in `logo-resolve` |
+| Soft wash / venue copy (no Gecko/jupiter_rate_limited dump) | Verified — `humanizeWashNote` + `humanizeVenueNote` |
+
+## 2026-09-21 — Credit in-house Kamino ktx
+
+| Claim | Status |
+|---|---|
+| Credit desk deposits/borrows in-FOLIO via Kamino ktx | Implemented — `credit-borrow-button.tsx` + `kamino-ktx.ts` |
+| No primary CTA redirect to Kamino / NestUSD app | Implemented — desk ticket only |
+| AssetLogo on Kamino + NestUSD rate rows | Implemented |
+| Still no FOLIO custom borrow CPI | Honest residual |
+| Gated by BROADCAST_PAUSED + folio_session | Same as Jupiter fills |
+| NestUSD execute still metrics/app (not in-desk) | Honest residual |
+
+## 2026-09-24 — Bible · Aqua0 · launch polish
+
+| Claim | Status |
+|---|---|
+| FOLIO_BIBLE synced (DBC primary · Solami tape · soft pitch) | Verified — `docs/FOLIO_BIBLE.md` |
+| Aqua0 $1.1k multi-strategy LP on tokenized equities | Observed — competitor field note; not FOLIO claim |
+| FOLIO wedge ≠ shared-capital LP routing | Decision — honesty desk (truth · wash · buy/borrow) |
+| Launch polish 20 checklist | Done — `docs/LAUNCH_POLISH_20.md` |
+| FolioAgentChat thinking/stream/composer | Implemented — settings agent |
+| Beta honeypot spam trap | Implemented |
+| Sitemap includes markets/beta/whitepaper/preipo/tessera | Implemented |
+
 ## 2026-09-20 — Ship rough edges (fills · F · G · honesty)
 
 | Claim | Status |
