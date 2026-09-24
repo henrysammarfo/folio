@@ -8,6 +8,20 @@
 
 FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
 
+## Creative desk doctrine (binding)
+
+See `memory/HENRY_DESK_CREATIVE.md` — factorize every feature against Bible + Henry screenshots + NetroBNB depth. No bare `Loading…`. Logos on every partner row. Take 4K time. Research via Tavily/Firecrawl/TinyFish (keys in `.env` only).
+
+## Bible spine (World’s Fair · 2026-09-24)
+
+| Piece | Status |
+|---|---|
+| Soft pitch + pitch order | Live in copy |
+| **Cash session weekend refuse** | **Wired** — `session-gate.ts` → acquire gates + `/network` |
+| **Meteora DBC stock-curve config** | **Wired (config truth)** — `stock-curve.ts` · demo pool pending · no fake mainnet volume |
+| **Solami / mainnet tape** | **Wired (RPC probe labeled)** — `solami-tape.ts` · Blur client still fail-closed until keyed+shipped |
+| Panta | Out (correct) |
+
 ## Live product (production)
 
 **URL:** https://folio-tawny-one.vercel.app

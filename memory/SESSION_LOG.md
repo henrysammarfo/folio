@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-24 — Netro depth + Bible spine (Henry screenshots)
+
+- Doctrine: `memory/HENRY_DESK_CREATIVE.md` — factorize every feature · no rush · screenshot-verify · research keys in `.env` only (rotated after chat paste).
+- Honest Bible gap: DBC/Solami/cash-close were docs-only → now adapters + `/network` rows + acquire weekend refuse.
+- Desk polish from Henry shots: partner Pre-IPO/Tessera **AssetLogo rows** · skeleton loaders (no bare Loading…) · shorter Tessera hero · Netro signal gauge · stronger venue labels.
+- Branch: `cursor/folio-netro-depth-bible-f1ec`.
+
 ## 2026-09-24 — Copy refresh (README · marketing · docs)
 
 - Soft plain-English pass across README, home/about/markets/credit/preipo/beta, truth/pairs/network/execution/whitepaper.

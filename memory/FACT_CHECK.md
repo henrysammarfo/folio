@@ -1,3 +1,18 @@
+## 2026-09-24 — Netro depth + Bible spine
+
+| Claim | Status |
+|---|---|
+| Henry creative doctrine in memory | `memory/HENRY_DESK_CREATIVE.md` |
+| Bible DBC/Solami was docs-only before this pass | Corrected — adapters + network rows |
+| Cash session weekend refuse on Buy | Implemented — `session-gate.ts` + acquire gates |
+| FOLIO stock-curve config (USDC · gentle · cash-close start) | Implemented — `stock-curve.ts` · demo pool pending |
+| Solami Blur live stream | Fail-closed until client shipped · RPC recent-sig probe labeled |
+| Partner Pre-IPO/Tessera rows show AssetLogo | Implemented — `partner-lane-panel.tsx` |
+| Skeleton loaders replace bare “Loading…” | Implemented — Tessera/PreStocks + partner lanes |
+| Netro signal gauge on overview | Implemented — live wash/×/LTV |
+| Research keys only in gitignored `.env` | Verified — never committed |
+| Never claim unhackable | Still holds |
+
 ## 2026-09-24 — Copy refresh
 
 | Claim | Status |

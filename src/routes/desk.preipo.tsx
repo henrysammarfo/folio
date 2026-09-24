@@ -93,11 +93,23 @@ function Page() {
         <div className="fx-preipo-grid">
           <div className="fx-card">
             <h2>Catalog</h2>
-            {!data?.catalog.ok ? (
+            {!data?.catalog.ok && isFetching ? (
+              <ul className="fx-preipo-list" aria-busy="true" aria-label="Loading PreStocks">
+                {Array.from({ length: 4 }, (_, i) => (
+                  <li key={i} className="fx-skel-row">
+                    <span className="netro-skel-face" />
+                    <span className="netro-skel-lines">
+                      <i />
+                      <i />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : !data?.catalog.ok ? (
               <p className="fx-checks">
                 {data?.catalog && !data.catalog.ok
                   ? humanizeHonestyNote(data.catalog.reason)
-                  : "Loading…"}
+                  : "Catalog unavailable"}
               </p>
             ) : (
               <ul className="fx-preipo-list">

@@ -1,4 +1,4 @@
-import type { AdapterResult, IntegrationMode } from "./types";
+import { errResult, type AdapterResult, type IntegrationMode } from "./types";
 
 export type MatrixRow = {
   capability: string;
@@ -11,8 +11,20 @@ function modeOf(r: AdapterResult<unknown>): IntegrationMode {
 }
 
 function detailOf(r: AdapterResult<unknown>, okDetail?: string): string {
-  if (r.ok) return okDetail ?? r.source;
+  if (r.ok) {
+    if (okDetail) return okDetail;
+    const data = r.data as { label?: string; note?: string } | null;
+    if (data && typeof data === "object") {
+      if (typeof data.label === "string" && data.label) return `${r.source} · ${data.label}`;
+      if (typeof data.note === "string" && data.note) return data.note;
+    }
+    return r.source;
+  }
   return r.detail ? `${r.reason} — ${r.detail}` : r.reason;
+}
+
+function errUnavailable(source: string): AdapterResult<unknown> {
+  return errResult(source, "unwired");
 }
 
 /**
@@ -50,12 +62,42 @@ export function buildNetworkMatrix(input: {
   broadcastFunded: boolean;
   /** Env arm: BROADCAST_PAUSED=false enables user-signed Jupiter /execute. */
   broadcastPaused?: boolean;
+  /** Cash session (NYSE hours) — weekend refuse lives in FOLIO. */
+  cashSession?: AdapterResult<unknown>;
+  /** FOLIO Meteora DBC stock-curve config (+ optional devnet pool). */
+  stockCurve?: AdapterResult<unknown>;
+  /** Solami / RPC mainnet tape probe. */
+  solamiTape?: AdapterResult<unknown>;
 }): MatrixRow[] {
   return [
     {
       capability: "xStocks multiplier + asset metadata",
       mode: modeOf(input.multiplier),
       detail: detailOf(input.multiplier),
+    },
+    {
+      capability: "Cash session (weekend refuse)",
+      mode: modeOf(input.cashSession ?? errUnavailable("folio.cash-session")),
+      detail: input.cashSession
+        ? detailOf(input.cashSession)
+        : "Unwired · Bible spine requires FOLIO session gate",
+    },
+    {
+      capability: "Meteora DBC stock curve",
+      mode: modeOf(input.stockCurve ?? errUnavailable("folio.stock-curve")),
+      detail: input.stockCurve
+        ? detailOf(
+            input.stockCurve,
+            "USDC · gentle · fixed/short linear · start=cash close · demo pool labeled",
+          )
+        : "Config unwired · World’s Fair primary track",
+    },
+    {
+      capability: "Solami / mainnet tape",
+      mode: modeOf(input.solamiTape ?? errUnavailable("folio.solami-tape")),
+      detail: input.solamiTape
+        ? detailOf(input.solamiTape)
+        : "Unwired · Blur/Yellowstone or labeled RPC probe",
     },
     {
       capability: "On-chain Scaled UI (Token-2022)",

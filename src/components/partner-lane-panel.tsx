@@ -1,10 +1,12 @@
 /**
  * Overview partner lanes — PreStocks (SPV) + Tessera (loan participation).
  * Keeps separate desk URLs for Stocklana bounty judges; overview links in.
+ * Logos + skeleton loaders — never bare "Loading…" (Henry desk doctrine).
  */
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { AssetLogo } from "@/components/asset-logo";
 import { getPreipoBundle, getTesseraBundle } from "@/lib/desk.functions";
 import { trackFolioEvent } from "@/lib/analytics";
 import { humanizeWashNote } from "@/lib/humanize-copy";
@@ -64,9 +66,26 @@ function money(n: number, digits = 2) {
   });
 }
 
+function PartnerSkeleton({ rows = 4 }: { rows?: number }) {
+  return (
+    <ul className="netro-partner-list" aria-busy="true" aria-label="Loading">
+      {Array.from({ length: rows }, (_, i) => (
+        <li key={i} className="netro-partner-skel">
+          <span className="netro-skel-face" />
+          <span className="netro-skel-lines">
+            <i />
+            <i />
+          </span>
+          <span className="netro-skel-chip" />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function PreipoLanePanel() {
   const fetchPreipo = useServerFn(getPreipoBundle);
-  const { data, isFetching } = useQuery({
+  const { data, isFetching, isPending } = useQuery({
     queryKey: ["partner-lane", "preipo"],
     queryFn: () => fetchPreipo({ data: { spendUsdc: 1 } }),
     staleTime: 30_000,
@@ -80,6 +99,7 @@ function PreipoLanePanel() {
     selected.markPrice > 0
       ? ((selected.tokenPrice - selected.markPrice) / selected.markPrice) * 100
       : null;
+  const loading = isPending || (isFetching && !data?.catalog.ok);
 
   return (
     <section
@@ -90,7 +110,7 @@ function PreipoLanePanel() {
       <header className="netro-partner-head">
         <div>
           <strong>Pre-IPO · PreStocks</strong>
-          <p>SPV economic exposure — not share equity. Quote-only.</p>
+          <p>Private-company exposure — not public share equity. Live quotes.</p>
         </div>
         <Link to="/desk/preipo" className="fx-btn fx-btn-dark fx-btn-sm">
           Open Pre-IPO desk
@@ -103,7 +123,7 @@ function PreipoLanePanel() {
           <b>
             {selected?.tokenPrice != null
               ? money(selected.tokenPrice)
-              : isFetching
+              : loading
                 ? "…"
                 : "—"}
           </b>
@@ -131,18 +151,20 @@ function PreipoLanePanel() {
           <b>
             {data?.jupiter.ok
               ? `${data.jupiter.data.outUiAmount.toFixed(4)} tok`
-              : isFetching
+              : loading
                 ? "…"
                 : "—"}
           </b>
         </div>
       </div>
 
-      {!data?.catalog.ok ? (
+      {loading ? (
+        <PartnerSkeleton />
+      ) : !data?.catalog.ok ? (
         <p className="fx-sub">
           {data?.catalog && !data.catalog.ok
             ? humanizeWashNote(data.catalog.reason)
-            : "Loading PreStocks…"}
+            : "Catalog unavailable"}
         </p>
       ) : (
         <ul className="netro-partner-list">
@@ -155,12 +177,12 @@ function PreipoLanePanel() {
                 : null;
             return (
               <li key={row.mint}>
-                <Link
-                  to="/desk/preipo"
-                  className="netro-partner-row"
-                >
-                  <strong>{row.symbol}</strong>
-                  <small>{row.name}</small>
+                <Link to="/desk/preipo" className="netro-partner-row">
+                  <AssetLogo symbol={row.symbol} size={32} />
+                  <span className="netro-partner-copy">
+                    <strong>{row.symbol}</strong>
+                    <small>{row.name}</small>
+                  </span>
                   <em>
                     {prem != null
                       ? `${prem >= 0 ? "+" : ""}${prem.toFixed(0)}%`
@@ -175,7 +197,7 @@ function PreipoLanePanel() {
         </ul>
       )}
       <p className="netro-partner-foot">
-        Stocklana PreStocks track · separate desk URL for judges ·{" "}
+        Stocklana PreStocks track ·{" "}
         {data?.washNote ? humanizeWashNote(data.washNote) : "wash gated"}
       </p>
     </section>
@@ -184,7 +206,7 @@ function PreipoLanePanel() {
 
 function TesseraLanePanel() {
   const fetchTessera = useServerFn(getTesseraBundle);
-  const { data, isFetching } = useQuery({
+  const { data, isFetching, isPending } = useQuery({
     queryKey: ["partner-lane", "tessera"],
     queryFn: () => fetchTessera({ data: { spendUsdc: 1 } }),
     staleTime: 30_000,
@@ -192,6 +214,7 @@ function TesseraLanePanel() {
 
   const rows = data?.catalog.ok ? data.catalog.data.rows.slice(0, 6) : [];
   const selected = data?.selected;
+  const loading = isPending || (isFetching && !data?.catalog.ok);
 
   return (
     <section
@@ -202,7 +225,7 @@ function TesseraLanePanel() {
       <header className="netro-partner-head">
         <div>
           <strong>Tessera · T-tokens</strong>
-          <p>Loan participation — not equity shares. Quote-only.</p>
+          <p>Loan participation — SpaceX, OpenAI, Kalshi. Buys stay in FOLIO.</p>
         </div>
         <Link to="/desk/tessera" className="fx-btn fx-btn-dark fx-btn-sm">
           Open Tessera desk
@@ -219,7 +242,7 @@ function TesseraLanePanel() {
           <b>
             {selected?.markPrice != null
               ? money(selected.markPrice)
-              : isFetching
+              : loading
                 ? "…"
                 : "—"}
           </b>
@@ -237,28 +260,31 @@ function TesseraLanePanel() {
           <b>
             {data?.jupiter.ok
               ? `${data.jupiter.data.outUiAmount.toFixed(4)} T`
-              : isFetching
+              : loading
                 ? "…"
                 : "—"}
           </b>
         </div>
       </div>
 
-      {!data?.catalog.ok ? (
+      {loading ? (
+        <PartnerSkeleton />
+      ) : !data?.catalog.ok ? (
         <p className="fx-sub">
           {data?.catalog && !data.catalog.ok
             ? humanizeWashNote(data.catalog.reason)
-            : "Loading Tessera…"}
+            : "Catalog unavailable"}
         </p>
       ) : (
         <ul className="netro-partner-list">
           {rows.map((row) => (
             <li key={row.mint}>
               <Link to="/desk/tessera" className="netro-partner-row">
-                <strong>{row.symbol}</strong>
-                <small>
-                  {row.sector ?? row.name} · loan participation
-                </small>
+                <AssetLogo symbol={row.symbol} size={32} />
+                <span className="netro-partner-copy">
+                  <strong>{row.symbol}</strong>
+                  <small>{row.sector ?? row.name}</small>
+                </span>
                 <em>
                   {row.markPrice != null ? money(row.markPrice, 0) : "—"}
                 </em>
@@ -268,7 +294,7 @@ function TesseraLanePanel() {
         </ul>
       )}
       <p className="netro-partner-foot">
-        Stocklana Tessera track · not Scaled UI equity ·{" "}
+        Stocklana Tessera track ·{" "}
         {data?.washNote ? humanizeWashNote(data.washNote) : "wash gated"}
       </p>
     </section>

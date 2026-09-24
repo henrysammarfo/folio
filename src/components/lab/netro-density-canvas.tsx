@@ -421,6 +421,52 @@ export function NetroDensityCanvas({
                     <b>{gates.kaminoLtv ? `${gates.kaminoLtv}` : "—"}</b>
                   </div>
                 </div>
+                <div
+                  className="netro-density-signal"
+                  data-testid="netro-signal-rail"
+                  aria-label="Desk signal"
+                >
+                  <div className="netro-density-signal-gauge" aria-hidden>
+                    <svg viewBox="0 0 120 64" role="presentation">
+                      <path
+                        d="M10 54 A50 50 0 0 1 110 54"
+                        fill="none"
+                        stroke="#e5e7eb"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M10 54 A50 50 0 0 1 110 54"
+                        fill="none"
+                        stroke="var(--netro-yellow,#0EA5C9)"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                        strokeDasharray={`${/live|clear|pass/i.test(gates.wash) ? 120 : 48} 160`}
+                      />
+                    </svg>
+                    <strong>
+                      {/live|clear|pass/i.test(gates.wash) ? "Clear" : "Watch"}
+                    </strong>
+                  </div>
+                  <ul>
+                    <li>
+                      <span>Wash</span>
+                      <b>{gates.wash || "…"}</b>
+                    </li>
+                    <li>
+                      <span>Share ×</span>
+                      <b>{multiplierLabel.replace(/\s*live$/i, "")}</b>
+                    </li>
+                    <li>
+                      <span>Credit</span>
+                      <b>
+                        {gates.kaminoLtv
+                          ? `${(Number(gates.kaminoLtv) * 100).toFixed(0)}% LTV`
+                          : "—"}
+                      </b>
+                    </li>
+                  </ul>
+                </div>
               </div>
 
               <div className="netro-density-row">

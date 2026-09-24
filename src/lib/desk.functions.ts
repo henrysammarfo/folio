@@ -29,6 +29,9 @@ import {
 } from "./adapters/scaled-ui";
 import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import { resolveSolanaRpcUrl } from "./adapters/solana-rpc";
+import { evaluateCashSession } from "./adapters/session-gate";
+import { folioStockCurveStatus } from "./adapters/stock-curve";
+import { fetchSolamiTape } from "./adapters/solami-tape";
 import { errResult, type AdapterResult } from "./adapters/types";
 import type { XStockAsset, XStockMultiplier } from "./adapters/xstocks";
 import type { JupiterQuote, JupiterTokenPrice } from "./adapters/jupiter";
@@ -498,6 +501,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         : ({ kind: "ok", poolCount: pools.data.raydium.length } as const);
 
     const prefs = await loadStrictFailClosedPref();
+    const cashSession = evaluateCashSession();
     const gateMsgs = buildAcquireGateMessages({
       truthOk,
       tradingHalted: Boolean(asset.ok && asset.data.isTradingHalted),
@@ -511,6 +515,11 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       strictFailClosed: prefs.strictFailClosed,
       pools: poolsGate,
       scaledUi: scaledUiGate,
+      cashSession: cashSession.ok
+        ? cashSession.data.open
+          ? { kind: "open", label: cashSession.data.label }
+          : { kind: "closed", label: cashSession.data.label }
+        : undefined,
     });
 
     const honestyNotes = [
@@ -988,6 +997,10 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     const sessionSecretPresent =
       (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
 
+    const cashSession = evaluateCashSession();
+    const stockCurve = folioStockCurveStatus();
+    const solamiTape = await fetchSolamiTape({ mint });
+
     return {
       rows: buildNetworkMatrix({
         multiplier,
@@ -1002,6 +1015,9 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         nestCredit,
         scaledUi,
         pools,
+        cashSession,
+        stockCurve,
+        solamiTape,
         bitqueryKeyPresent: Boolean(process.env["BITQUERY_API_KEY"]?.trim()),
         multiTenantKeysPresent,
         sessionSecretPresent,

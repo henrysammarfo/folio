@@ -123,7 +123,10 @@ export function humanizeVenueNote(raw: string | null | undefined): string {
     return "Cooling — refresh soon";
   }
   if (/Venue cooling/i.test(t)) return "Cooling — refresh soon";
-  if (/^live$/i.test(t) || /^live ·/i.test(t)) return t.replace(/^live/i, "live");
+  if (/free.?tape|gecko/i.test(t)) return "live · free tape";
+  if (/^live$/i.test(t)) return "live · Jupiter";
+  if (/^live ·/i.test(t)) return t;
+  if (/jupiter/i.test(t) && /live/i.test(t)) return t;
   if (/^cached/i.test(t)) return t;
   if (/^stale/i.test(t)) return t.replace(/^stale$/i, "stale cache");
   if (/^Watchlist$/i.test(t)) return "Watchlist";
