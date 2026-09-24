@@ -1,69 +1,70 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-24 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
-> Doctrine: honest security only — **never claim unhackable / NK-proof**. Soft pitch only.
-> Bible: `docs/FOLIO_BIBLE.md` · Launch polish: `docs/LAUNCH_POLISH_20.md`
+> Updated: 2026-09-24 · Stocklana deadline **re-check live** (hero has shown **SEP 25, 2026**)
+> Doctrine: honest security only — **never claim unhackable**. Soft pitch only in user-facing copy.
+> Bible: `docs/FOLIO_BIBLE.md` · Demo: `docs/DEMO_SCRIPT.md` · Submit: `docs/STOCKLANA_SUBMIT.md`
+
+## Soft pitch (lock)
+
+FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
+
+## Live product (production)
+
+**URL:** https://folio-tawny-one.vercel.app
+
+| Surface | Status |
+|---|---|
+| Buy | USDC→stock / stock↔stock · searchable pickers · flip · user-signed fills when armed |
+| Markets | Live board · Jupiter + free-tape fallback when Jupiter cools |
+| Borrow | Kamino deposit/borrow in-desk (you sign) · NestUSD metrics-only |
+| Pre-IPO | PreStocks + Tessera desks · buys stay inside FOLIO |
+| Activity | Lucide + AssetLogo (no letter tiles) |
+| Agent | 5 messages / account / day |
+| Truth / Network | Live share multiplier · labeled capability matrix |
+
+## Copy refresh (branch `cursor/folio-copy-refresh-f1ec`)
+
+README, marketing routes, whitepaper, demo/submit docs, and public intros rewritten in soft plain English — no ops jargon in user-facing copy.
+
+## Marketing / landing
+
+- Landing: **Nexeus cinematic** — brand-first hero · Open desk CTA.
+- Nav: Markets / Truth / Credit / Pre-IPO / About.
+- Public pages soft copy: `/`, `/about`, `/markets`, `/credit`, `/preipo`, `/beta`, `/truth`, `/pairs`, `/network`, `/execution`, `/whitepaper`.
+
+## Desk UI (product)
+
+- Buy: Mega / IPO / Meme / **Pairs** · TokenSelect + flip · Netro-depth details.
+- Markets: staggered Jupiter + Gecko free-tape · humanized venue notes.
+- Credit: AssetLogo rates · Kamino ktx in-desk · NestUSD metrics-only (no Nest execute theater).
+- PreStocks / Tessera: in-desk BuyExecute via partner `outputMint` (no external app CTAs).
+- Agent: `agent_daily` = 5 / account / 24h.
+- Logo chain: API → Backed CDN → favicon → initials (SpaceX / Tessera paths fixed).
+- Fills arm when `BROADCAST_PAUSED=false` (user-signed Jupiter + Kamino + partner buys).
+
+## Launch path (Stocklana → Colosseum → beta)
+
+1. Submit Stocklana with production demo URL (re-check hero deadline + counts).
+2. Claim Folio X · judge feedback · closed beta invites.
+3. Traction → Colosseum / World’s Fair submit.
+
+## Stocklana (live)
+
+- Re-check deadline + registered/submission counts before any README claim.
+- FOLIO wedge: honest share counts + safe routes + buy/borrow + PreStocks/Tessera desks.
+
+## Product lock
+
+- **One job:** Honest stock desk on Solana.
+- **Pitch order:** (1) honest share counts (2) won’t buy wash (3) buy on Solana (4) borrow without selling (5) guarded agent.
+- Soft: FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
 
 ## World’s Fair side tracks (Bible)
 
 - **Meteora DBC** primary (stock curve config · USDC · gentle · fixed/short linear fee).
 - **Solami** = mainnet tape proof.
 - **Panta** not taken.
-
-## Field (Aqua0)
-
-Aqua0 showed multi-strategy LP on tokenized equities (shared capital across Orca/Raydium). FOLIO stays the honesty desk — do not pitch as LP router.
-
-## Marketing / landing (product)
-
-- Landing: **Nexeus cinematic** — looping CloudFront video + left hero + glass foot slot. FOLIO simple footer preserved (Whitepaper/Beta/About/Privacy/Desk).
-- Standalone pixel template: `/nexeus/index.html` (exact Nexeus spec).
-- Marketing PublicShell: same video/scrim language, dark type on cinema, **same FolioSimpleFooter** (not the old 3-col mkt foot).
-- Nav: Markets/Truth/Credit/Pre-IPO/About.
-- Branch: `cursor/folio-nexeus-landing-f1ec`.
-
-## Desk UI (product)
-
-> **Demo lock (`cursor/folio-demo-lock-f1ec`):** Activity Lucide/AssetLogo · Markets staggered Jupiter (anti-429) · PreStocks/Tessera BuyExecute in-desk (no external app CTAs) · Agent 5 msgs/account/day · stronger credit faces (cbBTC/SPY/QQQ/GOOGL).
-
-
-- Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
-- Buy **Netro-depth**: short Details (route/impact/gas/fill) + settings (slippage + gas chips). Fills arm when `BROADCAST_PAUSED=false`.
-- **/desk/markets** live Jupiter board + **flow strip** — staggered price fetches (anti-429) · humanized venue notes.
-- **/desk/activity** Lucide + AssetLogo glyphs (no letter tiles).
-- **/desk/preipo** + **/desk/tessera** — BuyExecute in-desk via partner `outputMint` (no PreStocks/Tessera app CTAs).
-- Agent chat: **5 messages / account / 24h** (`agent_daily` rate limit).
-- Netro overview: **FOLIO watermark** over TradingView · tight Buy sheet · AI modal.
-- Live-trade research: `docs/LIVE_TRADE_NO_PROGRAM.md` · field map `docs/ECOSYSTEM_FIELD.md`
-- **Phases A–E on main:** Swap V2 + gated `/execute` · Privy Open App · consumer settings · partner lanes · beta waitlist server-only.
-- **Credit in-house:** `/desk/credit` Buy-style rates + ticket · AssetLogo · Kamino ktx deposit/borrow signed in-desk. NestUSD metrics-only.
-- Prod: https://folio-tawny-one.vercel.app
-- Henry still: Privy origins · `BROADCAST_PAUSED=false` arms Jupiter fills + Kamino ktx + partner buys (user-signed). NestUSD execute still external.
-- **AssetLogo** chain: API logo → Backed CDN → company favicon (incl. cbBTC / PreStocks names) → initials.
-- Soft access banner → **Open App**; Account tenant switcher; agent session-gated.
-- **/whitepaper** · **/beta** waitlist · docs: `FOLIO_WHITEOBER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
-- Human wash / venue copy (no raw `jupiter_rate_limited` / `bitquery_*` in consumer UI).
-
-## Demo lock (branch `cursor/folio-demo-lock-f1ec`)
-
-Shipping polish for Stocklana demo + submit: activity icons, markets pace, partner in-FOLIO buy, agent daily cap.
-
-## Launch path (Stocklana → Colosseum → beta)
-
-1. Submit Stocklana (SEP 25 hero — re-check form) with PR #15 preview if markets routes not on main yet.
-2. Claim Folio X · judge feedback · closed beta invites.
-3. Traction → Colosseum / World’s Fair submit.
-
-## Stocklana (live)
-
-- Deadline extended to **25 Sep 2026 16:00 ET**; prize pool ~$126k; tracks include PreStocks, Tessera, Clawpump, Meteora DBC, Pyth.
-- FOLIO wedge: honest share counts + safe routes + credit + stock pairs + PreStocks/Tessera desks.
-
-## Product lock
-
-- **One job:** Honest stock desk on Solana (truth · safe route · credit).
-- **Pitch order:** (1) honest share counts (2) won’t buy wash (3) buy on Solana (4) borrow without selling (5) guarded agent.
-- Soft: FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
+- Aqua0 = multi-strategy LP competitor field note — FOLIO stays the honesty desk, not an LP router.
 
 ## Network verdict (Stocklana + Colosseum World’s Fair)
 

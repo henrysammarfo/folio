@@ -1,6 +1,14 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-24 — Copy refresh (README · marketing · docs)
+
+- Soft plain-English pass across README, home/about/markets/credit/preipo/beta, truth/pairs/network/execution/whitepaper.
+- Whitepaper v1.1 + DEMO_SCRIPT + STOCKLANA_SUBMIT/SUBMISSION pointed at production `https://folio-tawny-one.vercel.app`.
+- Stripped ops jargon from user-facing intros (no CPI / fail-closed / BROADCAST / ≤$1 theater language in marketing).
+- Memory sync: CURRENT_STATE · FACT_CHECK · this log.
+- Branch: `cursor/folio-copy-refresh-f1ec`.
+
 ## 2026-09-24 — Desk UX pass (token select + markets venues)
 
 - Buy: searchable TokenSelect on pay/receive · flip arrow always works.

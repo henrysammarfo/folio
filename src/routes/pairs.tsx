@@ -9,7 +9,7 @@ export const Route = createFileRoute("/pairs")({
       {
         name: "description",
         content:
-          "Swap one Solana xStock for another on Jupiter — true stock↔stock routes.",
+          "Pay one stock, receive another — rotate without cashing out first.",
       },
     ],
   }),
@@ -22,7 +22,7 @@ function Page() {
       tone="execution"
       eyebrow="Stock ↔ stock"
       title="Pay one stock. Receive another."
-      intro="Pair mode on Buy sets Jupiter’s input mint to the stock you pay and the output mint to the stock you receive — a single quote-only path."
+      intro="Rotate without cashing out first. On Buy, pick the stock you pay and the stock you receive — one clean route, one quote, you confirm."
     >
       <MktSection n="01" title="What pairs are for">
         <ul className="mkt-dir mkt-dir-plain">
@@ -45,8 +45,8 @@ function Page() {
             <div>
               <h3>Meme ↔ mega</h3>
               <p>
-                GME → AAPL / TSLA — high-beta into calmer mega. Same wash +
-                Scaled UI gates.
+                GME → AAPL / TSLA — high-beta into calmer mega. Same honest
+                share count and wash checks.
               </p>
             </div>
           </li>

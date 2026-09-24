@@ -10,15 +10,17 @@ import type { IntegrationMode } from "@/lib/adapters/types";
 export const Route = createFileRoute("/network")({
   head: () => ({
     meta: [
-      { title: "Network Truth — FOLIO" },
+      { title: "Network honesty — FOLIO" },
       {
         name: "description",
-        content: "Exact network availability across the FOLIO stack.",
+        content:
+          "What is live, paused, or unavailable on FOLIO — labeled clearly.",
       },
-      { property: "og:title", content: "Network Truth — FOLIO" },
+      { property: "og:title", content: "Network honesty — FOLIO" },
       {
         property: "og:description",
-        content: "Exact network availability across the FOLIO stack.",
+        content:
+          "What is live, paused, or unavailable on FOLIO — labeled clearly.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -51,21 +53,21 @@ function Page() {
   return (
     <PublicShell
       tone="network"
-      eyebrow="Network matrix"
+      eyebrow="Live status"
       title="No blurred lines between demo and live."
-      intro="Stocklana + Colosseum World’s Fair path: mainnet READ for truth, Jupiter quote-only, borrow CPI unavailable until funded (no fork harness on this budget). Custom mainnet program deploy is out of the ≤~$1 budget. Broadcast stays paused until funded and explicitly confirmed."
+      intro="Every capability is labeled. Share counts and prices read mainnet. Buys and borrows need your signature when armed. NestUSD shows risk metrics; Nest execute stays on their app for now. We never invent a fill."
     >
       <div className="mb-4 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Mainnet-primary truth</ModeBadge>
-        <ModeBadge mode="quote-only">Quote-only swaps</ModeBadge>
+        <ModeBadge mode="mainnet-read">Live mainnet reads</ModeBadge>
+        <ModeBadge mode="quote-only">Live quotes</ModeBadge>
         <ModeBadge mode={data?.broadcastPaused !== false ? "unavailable" : "mainnet-read"}>
-          {data?.broadcastPaused !== false ? "Broadcast paused" : "Broadcast armed"}
+          {data?.broadcastPaused !== false ? "Fills paused" : "Fills armed"}
         </ModeBadge>
       </div>
 
-      {isLoading ? <p>Loading live capability probe…</p> : null}
+      {isLoading ? <p>Loading live status…</p> : null}
       {isError ? (
-        <StatusBadge tone="amber">Matrix error: {String(error)}</StatusBadge>
+        <StatusBadge tone="amber">Status error: {String(error)}</StatusBadge>
       ) : null}
 
       <div className="network-table">
@@ -80,11 +82,11 @@ function Page() {
         ))}
       </div>
       <section className="mkt-aside-band" aria-label="How to read this matrix">
-        <h2>Read the mode, not the marketing</h2>
+        <h2>Read the label, not the hype</h2>
         <p>
-          Mainnet-read means a live probe returned. Quote-only means Jupiter
-          routes without broadcast. Unavailable is intentional — not a broken
-          badge waiting for a screenshot.
+          Live read means a real probe returned. Quote means you can review a
+          route. Unavailable is intentional — not a broken badge waiting for a
+          screenshot.
         </p>
       </section>
     </PublicShell>

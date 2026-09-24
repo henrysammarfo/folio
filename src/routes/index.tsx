@@ -6,9 +6,9 @@ import { siteMeta } from "@/lib/site-meta";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: siteMeta({
-      title: "FOLIO — Buy tokenized stocks on Solana",
+      title: "FOLIO — Buy US stocks on Solana",
       description:
-        "Honest share counts, safe routes, and credit without selling.",
+        "Honest share counts, safe routes, and credit without selling. Open the desk.",
       path: "/",
     }),
   }),
@@ -38,9 +38,9 @@ function Home() {
       </header>
 
       <NexeusCinematicLanding
-        eyebrow="Ready when you are"
-        title="Buy US stocks with honest share counts"
-        lede="From live share-count truth to wash-safe routes and credit without selling — everything you need to size on Solana starts here."
+        eyebrow="The honest stock desk"
+        title="Buy US stocks. Keep the share count true."
+        lede="FOLIO shows the real economic shares after dividends and splits, refuses dirty routes, and lets you borrow cash without selling — all on Solana."
         ctaLabel="Open desk"
         ctaTo="/desk"
       />

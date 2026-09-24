@@ -9,7 +9,7 @@ export const Route = createFileRoute("/markets")({
       {
         name: "description",
         content:
-          "Mega, IPO, meme xStocks, stock↔stock pairs, PreStocks, and Tessera on Solana.",
+          "Mega, IPO, and meme xStocks, stock pairs, PreStocks, and Tessera — organized desks on Solana.",
       },
     ],
   }),
@@ -23,8 +23,8 @@ function Page() {
     <PublicShell
       tone="truth"
       eyebrow="Market map"
-      title="Where every stock lives on FOLIO."
-      intro="Public xStocks in mega, IPO, and meme lanes. Stock↔stock pairs on Buy. Private PreStocks and Tessera stay on separate desks."
+      title="Every stock has a home on FOLIO."
+      intro="Public xStocks in mega, IPO, and meme lanes. Stock↔stock pairs on Buy. Private PreStocks and Tessera stay on their own desks — on purpose."
     >
       <MktSection n="01" title="Public lanes">
         <ul className="mkt-dir">
@@ -42,8 +42,8 @@ function Page() {
 
       <MktSection n="02" title="Stock ↔ stock">
         <p>
-          One Jupiter route: pay mint in, receive mint out — not two USDC buys
-          glued together. Presets include{" "}
+          Rotate without cashing out first — one clean route from the stock you
+          pay to the stock you receive. Presets include{" "}
           {XSTOCK_SWAP_PAIRS.slice(0, 3)
             .map((p) => p.label)
             .join(", ")}
@@ -57,8 +57,8 @@ function Page() {
 
       <MktSection n="03" title="Private pre-IPO">
         <p>
-          <b>PreStocks</b> and <b>Tessera</b> each get their own desk so
-          Stocklana bounty tracks never mix with public IPO-era listings.
+          <b>PreStocks</b> and <b>Tessera</b> each get their own desk so private
+          names never blur into public IPO-era listings.
         </p>
         <p className="mkt-links">
           <Link to="/preipo">Pre-IPO explainer →</Link>

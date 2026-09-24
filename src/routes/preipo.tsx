@@ -11,7 +11,7 @@ export const Route = createFileRoute("/preipo")({
       {
         name: "description",
         content:
-          "PreStocks private-company tokens on Solana — live catalog, quote-only desk.",
+          "Private-company tokens on Solana — PreStocks and Tessera, each on its own FOLIO desk.",
       },
     ],
   }),
@@ -32,19 +32,20 @@ function Page() {
 
   const count = data?.catalog.ok ? data.catalog.data.rows.length : null;
   const sample = data?.selected;
+  const fillsArmed = data?.broadcastPaused === false;
 
   return (
     <PublicShell
       tone="credit"
-      eyebrow="PreStocks · Stocklana"
-      title="Private names. Separate desks."
-      intro="Pre-IPO on FOLIO means PreStocks issued tokens — live from prestocks.com. Tessera T-tokens live on their own desk so each bounty stays eligible."
+      eyebrow="Pre-IPO desks"
+      title="Private names. Separate rooms."
+      intro="PreStocks for SPV-backed private exposure. Tessera for loan-participation T-tokens. Each stays on its own desk so the story stays clean — and the buy stays inside FOLIO."
       aside={
         <div className="metrics-grid metrics-grid-aside">
           <Metric
             label="PreStocks live"
             value={count != null ? String(count) : "—"}
-            detail="prestocks.com catalog"
+            detail="Live catalog"
           />
           <Metric
             label="Sample mark"
@@ -56,18 +57,22 @@ function Page() {
             detail={sample ? sample.symbol : "Awaiting catalog"}
           />
           <Metric
-            label="Fills"
-            value="Paused"
-            detail="Quote-only · ≤~$1 budget"
+            label="Buys"
+            value={fillsArmed ? "In FOLIO" : "Quote ready"}
+            detail={
+              fillsArmed
+                ? "Confirm inside the desk"
+                : "Fills arm when your account is ready"
+            }
           />
         </div>
       }
     >
-      <MktSection n="01" title="What IPO lane is not">
+      <MktSection n="01" title="Public IPO ≠ private pre-IPO">
         <p>
-          Buy → <b>IPO</b> is for <em>public</em> recent listings (Arm, Reddit
-          xStocks). Private companies are PreStocks / Tessera — never silently
-          mixed into the public IPO chip.
+          Buy → <b>IPO</b> is for public recent listings (Arm, Reddit xStocks).
+          Private companies live on PreStocks and Tessera — never mixed into the
+          public board by accident.
         </p>
       </MktSection>
 

@@ -7,17 +7,17 @@ import { getNetworkBundle } from "@/lib/desk.functions";
 export const Route = createFileRoute("/execution")({
   head: () => ({
     meta: [
-      { title: "Guarded Execution — FOLIO" },
+      { title: "Safe routes — FOLIO" },
       {
         name: "description",
         content:
-          "Fail-closed quote routing for Solana xStocks — missing signals stop the path.",
+          "FOLIO checks price, liquidity, and wash pressure before you buy — missing signals pause the path.",
       },
-      { property: "og:title", content: "Guarded Execution — FOLIO" },
+      { property: "og:title", content: "Safe routes — FOLIO" },
       {
         property: "og:description",
         content:
-          "Fail-closed quote routing for Solana xStocks — missing signals stop the path.",
+          "FOLIO checks price, liquidity, and wash pressure before you buy — missing signals pause the path.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -49,9 +49,9 @@ function Page() {
   return (
     <PublicShell
       tone="execution"
-      eyebrow="Execution policy"
-      title="Every gate is labeled. Missing signals stop the path."
-      intro="FOLIO compares reference pricing, venue liquidity, and linked-flow pressure before offering a quote. Green means the live check returned and cleared its band — not a guarantee. Broadcast stays off on the ≤~$1 Stocklana budget."
+      eyebrow="Safe routes"
+      title="Every gate is labeled. Missing signals pause the path."
+      intro="FOLIO checks reference price, venue liquidity, and wash pressure before you buy. Green means the live check cleared — not a guarantee. When a signal is missing or dirty, size pauses instead of going silent green."
       aside={
         <div className="mkt-status-col" aria-label="Execution status">
           <div
@@ -77,29 +77,29 @@ function Page() {
         </div>
       }
     >
-      <MktSection n="01" title="Oracle coherence">
+      <MktSection n="01" title="Price check">
         <p>
           {pyth?.detail ??
-            "Pyth vs venue diverge is scored when both feeds are live. If Pyth is unavailable on this egress, the UI says so — we do not invent a pass."}
+            "When both reference and venue prices are live, we score the gap. If a feed is down, the UI says so — we do not invent a pass."}
         </p>
       </MktSection>
 
       <MktSection n="02" title="Wash pressure">
         <p>
           {wash?.detail ??
-            "Linked-flow heuristics when keyed. Missing key or dirty sample fail-closes size — never a silent green tape."}
+            "We watch linked-flow pressure when the tape is live. Missing or dirty samples pause size — never a silent green light."}
         </p>
       </MktSection>
 
-      <MktSection n="03" title="Jupiter path">
+      <MktSection n="03" title="Buy path">
         <p>
           {quote?.detail ??
-            "Routes are inspected on mainnet. This build does not broadcast swaps or borrows until funding and an explicit unpause land."}{" "}
-          {broadcastPaused ? "Broadcast remains paused." : null}
+            "Routes are inspected on mainnet. You review the quote; your wallet signs the fill when buys are armed."}{" "}
+          {broadcastPaused ? "Fills are paused on this build." : null}
         </p>
         <p className="mkt-links">
-          <Link to="/desk/acquire">Open acquire desk →</Link>
-          <Link to="/network">Full network matrix →</Link>
+          <Link to="/desk/acquire">Open Buy →</Link>
+          <Link to="/network">Live network status →</Link>
         </p>
       </MktSection>
     </PublicShell>

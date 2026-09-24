@@ -1,3 +1,15 @@
+## 2026-09-24 — Copy refresh
+
+| Claim | Status |
+|---|---|
+| README soft pitch + live product table + prod URL | Updated — `README.md` |
+| Marketing routes soft intros (home/about/markets/credit/preipo/beta) | Updated |
+| Truth / pairs / network / execution / whitepaper soft copy | Updated |
+| Whitepaper MD v1.1 matches live desk (Buy/Borrow/Agent 5/day) | Updated — `docs/FOLIO_WHITEPAPER.md` |
+| DEMO_SCRIPT + STOCKLANA_SUBMIT use production URL | Updated — no stale preview URL |
+| No “unhackable” / fake fill claims in marketing | Verified in this pass |
+| NestUSD still metrics-only in copy | Honest residual |
+
 ## 2026-09-24 — Desk UX pass
 
 | Claim | Status |

@@ -1,74 +1,69 @@
 # FOLIO
 
-Honest stock desk on Solana for **xStocks** — truth (Scaled UI multiplier) · safe route (wash fail-closed) · credit without selling.
+**Buy US stocks on Solana — with share counts you can trust.**
+
+FOLIO is an honest stock desk for tokenized equities (xStocks). We show the real share math after dividends and splits, refuse dirty routes, let you buy and rotate stocks in one place, and borrow cash without selling your position.
 
 ## Soft pitch
 
-FOLIO buys the US stocks you want on Solana — keeps your share count honest, won’t buy in shady pools, and lets you borrow cash without selling.
+FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
 
-## Network policy (Stocklana + Colosseum World’s Fair)
+## Live product
 
-- **Mainnet READ** for xStocks / Jupiter price / pool & credit reads  
-- **Quote-only** Jupiter swaps (labeled; no silent broadcast)  
-- **Borrow CPI unavailable** until funded (no fork harness theater on ≤~$1)  
-- **No custom mainnet program deploy** on a ≤~$1 test budget  
-- See [`memory/NETWORK_POLICY.md`](memory/NETWORK_POLICY.md)
+| Surface | What you get |
+|---|---|
+| **Buy** | USDC → stock or stock ↔ stock · searchable token pickers · flip arrow |
+| **Markets** | Live board · Jupiter + free-tape venues when Jupiter cools |
+| **Borrow** | Deposit & borrow USDC in-desk on Kamino rails (you sign) |
+| **Pre-IPO** | PreStocks desk · Tessera T-tokens · buys stay inside FOLIO |
+| **Activity** | Live desk events with real icons and logos |
+| **Agent** | Guarded chat · **5 messages / account / day** |
+
+**Production:** https://folio-tawny-one.vercel.app
+
+## How we stay honest
+
+- **Mainnet reads** for share counts, prices, pools, and credit metrics  
+- **User-signed fills** when armed — FOLIO never invents a fill or a mint  
+- **Wash gate** pauses size when the tape looks dirty or missing  
+- **NestUSD** shows live LTV metrics; Nest execute is still their app  
+- We **never** claim unhackable / nation-state-proof security — see `memory/THREAT_MODEL.md`
 
 ## Develop
 
 ```bash
 npm install
-cp .env.example .env   # fill keys; never commit .env
+cp .env.example .env   # secrets stay local — never commit .env
 npm run dev
 ```
 
 ```bash
-npm run build
-npm run preview
+npm run build && npm run preview
+npm run replay         # tests + e2e + empire smoke + build
 ```
 
-## Live Block 0 spine
+## Pitch order (demo)
 
-Server functions in `src/lib/desk.functions.ts` call fail-closed adapters:
+1. **Truth** — live share multiplier after corporate actions  
+2. **Wash** — we refuse size when the route isn’t clean  
+3. **Buy** — live Jupiter quote · confirm in FOLIO  
+4. **Borrow** — keep the shares · get USDC  
+5. **Agent** — short, metered answers — never silent fills  
 
-- `src/lib/adapters/xstocks.ts` — live multiplier (`network=Solana`)
-- `src/lib/adapters/pyth.ts` — Hermes (may be unavailable on some egress → labeled)
-- `src/lib/adapters/jupiter.ts` — Price v3 + swap quote
-- `src/lib/adapters/wash.ts` — Bitquery gate (fail-closed until keyed)
+## Docs
 
-## Security honesty
+| Doc | Purpose |
+|---|---|
+| [`docs/FOLIO_BIBLE.md`](docs/FOLIO_BIBLE.md) | Product doctrine |
+| [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) | ≤8s spoken demo |
+| [`docs/STOCKLANA_SUBMIT.md`](docs/STOCKLANA_SUBMIT.md) | Submit checklist |
+| [`docs/FOLIO_WHITEPAPER.md`](docs/FOLIO_WHITEPAPER.md) | Long-form whitepaper |
+| [`memory/CURRENT_STATE.md`](memory/CURRENT_STATE.md) | Live product state |
 
-We do **not** claim unhackable / nation-state-proof security. Residual risk is tracked in `memory/THREAT_MODEL.md`.
+## Submit posture
 
-## Keys
+- Stocklana first · Colosseum World’s Fair next  
+- Same honesty on both: working live spine beats fake mainnet theater  
+- Soft pitch only in user-facing copy  
 
-All secrets live in gitignored `.env`. Rotate anything pasted into chat after the hackathon.
-
-
-## One-command live replay
-
-```bash
-npm test
-npm run test:e2e
-npx tsx scripts/smoke-empire.mts
-```
-
-Expect: AAPLx multiplier ≈1.003…, Kamino AAPLx maxLtv 0.40, Jupiter Lend earn list, Raydium pools, wash fail-closed without Bitquery, auth fail-closed without Privy/Supabase.
-
-## Demo pitch order (≤8s)
-
-1. Truth — raw vs economic shares (live Scaled UI)
-2. Wash — size blocked when tape unavailable
-3. Buy — Jupiter quote-only review
-4. Credit — Kamino LTV read, borrow labeled fork/unavailable
-5. Agent — paper default, metered, no broadcast
-
-## Submit
-
-- Stocklana first (deadline 2026-09-18 20:00 UTC)
-- Colosseum World’s Fair next — same mainnet-read honesty posture
-- Do not claim unhackable / nation-state proof
-
-## Stocklana submit
-
-See [`docs/STOCKLANA_SUBMIT.md`](docs/STOCKLANA_SUBMIT.md).
+Built in Accra · shipped for the world.
