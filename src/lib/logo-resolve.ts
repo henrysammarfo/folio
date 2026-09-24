@@ -43,23 +43,24 @@ const UNDERLYING_DOMAIN: Record<string, string> = {
   POLYMARKET: "polymarket.com",
 };
 
-/** Extra direct logo URLs when CDN / favicon are flaky (credit board faces). */
+/** Extra direct logo URLs when CDN / favicon are flaky (credit + Tessera faces). */
 const DIRECT_LOGO: Record<string, string> = {
   CBBTC:
     "https://assets.coingecko.com/coins/images/40143/small/cbbtc.webp",
   BTC: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png",
-  SPY: "https://logo.clearbit.com/ssga.com",
-  QQQ: "https://logo.clearbit.com/invesco.com",
+  SPY: "https://www.google.com/s2/favicons?domain=ssga.com&sz=128",
+  QQQ: "https://www.google.com/s2/favicons?domain=invesco.com&sz=128",
   GOOGL: "https://www.google.com/s2/favicons?domain=google.com&sz=128",
   GOOG: "https://www.google.com/s2/favicons?domain=google.com&sz=128",
+  // Tessera — prefer simpleicons / google over Clearbit (often blocked)
+  OPENAI: "https://cdn.simpleicons.org/openai/412991",
   SPACEX: "https://www.google.com/s2/favicons?domain=spacex.com&sz=128",
-  OPENAI: "https://logo.clearbit.com/openai.com",
-  KALSHI: "https://logo.clearbit.com/kalshi.com",
-  ANDURIL: "https://logo.clearbit.com/anduril.com",
-  ANTHROPIC: "https://logo.clearbit.com/anthropic.com",
-  FIGUREAI: "https://logo.clearbit.com/figure.ai",
-  NEURALINK: "https://logo.clearbit.com/neuralink.com",
-  POLYMARKET: "https://logo.clearbit.com/polymarket.com",
+  KALSHI: "https://www.google.com/s2/favicons?domain=kalshi.com&sz=128",
+  ANDURIL: "https://www.google.com/s2/favicons?domain=anduril.com&sz=128",
+  ANTHROPIC: "https://www.google.com/s2/favicons?domain=anthropic.com&sz=128",
+  FIGUREAI: "https://www.google.com/s2/favicons?domain=figure.ai&sz=128",
+  NEURALINK: "https://www.google.com/s2/favicons?domain=neuralink.com&sz=128",
+  POLYMARKET: "https://www.google.com/s2/favicons?domain=polymarket.com&sz=128",
 };
 
 /** Strip T- / trailing x so Tessera + xStock symbols map to company domains. */
@@ -86,18 +87,20 @@ export function logoCandidates(opts: {
 }): string[] {
   const symbol = opts.symbol.trim();
   const und = underlyingKey(symbol, opts.underlying);
+  const isTessera = /^T-/i.test(symbol);
   const out: string[] = [];
   const push = (u: string | null | undefined) => {
     const t = u?.trim();
     if (t && !out.includes(t)) out.push(t);
   };
   push(opts.logo);
-  push(xStockLogoUrl(symbol));
-  // Double-x typo fallback (ARMXx → ARMx) — CDN returns 403 for *Xx
-  if (/xx+$/i.test(symbol)) {
-    push(xStockLogoUrl(symbol.replace(/x+$/i, "x")));
+  // Tessera: skip Backed xStock CDN (404/403 → broken face flash)
+  if (!isTessera) {
+    push(xStockLogoUrl(symbol));
+    if (/xx+$/i.test(symbol)) {
+      push(xStockLogoUrl(symbol.replace(/x+$/i, "x")));
+    }
   }
-  // Known flaky faces (cbBTC, SPY, QQQ, SpaceX) — prefer direct before favicon
   push(DIRECT_LOGO[und]);
   const domain = UNDERLYING_DOMAIN[und];
   if (domain) {
