@@ -53,7 +53,7 @@ const DIRECT_LOGO: Record<string, string> = {
   GOOGL: "https://www.google.com/s2/favicons?domain=google.com&sz=128",
   GOOG: "https://www.google.com/s2/favicons?domain=google.com&sz=128",
   // Tessera — prefer simpleicons / google over Clearbit (often blocked)
-  OPENAI: "https://cdn.simpleicons.org/openai/412991",
+  OPENAI: "https://www.google.com/s2/favicons?domain=openai.com&sz=128",
   SPACEX: "https://www.google.com/s2/favicons?domain=spacex.com&sz=128",
   KALSHI: "https://www.google.com/s2/favicons?domain=kalshi.com&sz=128",
   ANDURIL: "https://www.google.com/s2/favicons?domain=anduril.com&sz=128",
