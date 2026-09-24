@@ -1,7 +1,18 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-20 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
-> Doctrine: honest security only — **never claim unhackable / NK-proof**.
+> Updated: 2026-09-24 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
+> Doctrine: honest security only — **never claim unhackable / NK-proof**. Soft pitch only.
+> Bible: `docs/FOLIO_BIBLE.md` · Launch polish: `docs/LAUNCH_POLISH_20.md`
+
+## World’s Fair side tracks (Bible)
+
+- **Meteora DBC** primary (stock curve config · USDC · gentle · fixed/short linear fee).
+- **Solami** = mainnet tape proof.
+- **Panta** not taken.
+
+## Field (Aqua0)
+
+Aqua0 showed multi-strategy LP on tokenized equities (shared capital across Orca/Raydium). FOLIO stays the honesty desk — do not pitch as LP router.
 
 ## Marketing / landing (product)
 

@@ -1,6 +1,14 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-24 — Bible sync + launch polish 20 + agent chat
+
+- Synced `docs/FOLIO_BIBLE.md` (Meteora DBC primary · Solami tape · Panta out · soft pitch lock).
+- Field note: Aqua0 multi-strategy LP on tokenized equities ≠ FOLIO honesty-desk wedge.
+- Launch checklist `docs/LAUNCH_POLISH_20.md` — privacy/terms/HSTS/cookies/meta/og/favicon/sitemap/404/analytics/honeypot/CTA audited + gaps closed.
+- Soft pitch: truth meta + landing slide; beta honeypot; expanded sitemap; FolioAgentChat (thinking/stream/composer) on settings agent.
+- Branch: `cursor/folio-launch-polish-agent-f1ec`.
+
 ## 2026-09-20 — Credit live: NestUSD metrics + Kamino borrow CTA
 
 - NestUSD: wired `api.nestusd.com/v1/risk` + `/v1/config` (live collateral LTV). Execute = NestUSD app deep-link (no FOLIO CPI).

@@ -1,3 +1,15 @@
+## 2026-09-24 — Bible · Aqua0 · launch polish
+
+| Claim | Status |
+|---|---|
+| FOLIO_BIBLE synced (DBC primary · Solami tape · soft pitch) | Verified — `docs/FOLIO_BIBLE.md` |
+| Aqua0 $1.1k multi-strategy LP on tokenized equities | Observed — competitor field note; not FOLIO claim |
+| FOLIO wedge ≠ shared-capital LP routing | Decision — honesty desk (truth · wash · buy/borrow) |
+| Launch polish 20 checklist | Done — `docs/LAUNCH_POLISH_20.md` |
+| FolioAgentChat thinking/stream/composer | Implemented — settings agent |
+| Beta honeypot spam trap | Implemented |
+| Sitemap includes markets/beta/whitepaper/preipo/tessera | Implemented |
+
 ## 2026-09-20 — Ship rough edges (fills · F · G · honesty)
 
 | Claim | Status |

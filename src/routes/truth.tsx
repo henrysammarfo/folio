@@ -11,12 +11,14 @@ export const Route = createFileRoute("/truth")({
       { title: "Share Truth — FOLIO" },
       {
         name: "description",
-        content: "Live raw vs economic xStock balances with corporate-action provenance.",
+        content:
+          "Live share counts for tokenized stocks — wallet raw vs economic shares after dividends and splits.",
       },
       { property: "og:title", content: "Share Truth — FOLIO" },
       {
         property: "og:description",
-        content: "Live raw vs economic xStock balances with corporate-action provenance.",
+        content:
+          "Live share counts for tokenized stocks — wallet raw vs economic shares after dividends and splits.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

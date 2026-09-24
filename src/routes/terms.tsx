@@ -26,7 +26,7 @@ function Page() {
       compactIntro
       eyebrow="Legal"
       title="Terms of Use"
-      intro="Last updated September 19, 2026. By using FOLIO you agree to these terms."
+      intro="Last updated September 24, 2026. By using FOLIO you agree to these terms."
     >
       <article className="legal-doc">
         <h2>Service</h2>
