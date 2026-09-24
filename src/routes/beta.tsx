@@ -24,6 +24,7 @@ function Page() {
   const [email, setEmail] = useState("");
   const [wallet, setWallet] = useState("");
   const [note, setNote] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -31,6 +32,7 @@ function Page() {
   async function submit(e: FormEvent) {
     e.preventDefault();
     setErr(null);
+    if (honeypot.trim()) return; // bot filled hidden field
     const em = email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
       setErr("Enter a valid email.");
@@ -95,6 +97,15 @@ function Page() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Stocklana · X · friend…"
+              />
+            </label>
+            <label className="hp-field" aria-hidden="true">
+              Company
+              <input
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
               />
             </label>
             {err ? <p className="fx-checks">{err}</p> : null}

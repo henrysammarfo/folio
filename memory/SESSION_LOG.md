@@ -1,6 +1,19 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-24 — Demo lock (desk polish + agent daily cap)
+
+- Credit in-house + launch polish merged onto `cursor/folio-demo-lock-f1ec`.
+- Activity icons · markets 429 soften · PreStocks/Tessera in-FOLIO · agent 5/day/account.
+
+## 2026-09-24 — Bible sync + launch polish 20 + agent chat
+
+- Synced `docs/FOLIO_BIBLE.md` (Meteora DBC primary · Solami tape · Panta out · soft pitch lock).
+- Field note: Aqua0 multi-strategy LP on tokenized equities ≠ FOLIO honesty-desk wedge.
+- Launch checklist `docs/LAUNCH_POLISH_20.md` — privacy/terms/HSTS/cookies/meta/og/favicon/sitemap/404/analytics/honeypot/CTA audited + gaps closed.
+- Soft pitch: truth meta + landing slide; beta honeypot; expanded sitemap; FolioAgentChat (thinking/stream/composer) on settings agent.
+- Branch: `cursor/folio-launch-polish-agent-f1ec`.
+
 ## 2026-09-21 — Credit in-house (Kamino ktx) + logos + layout
 
 - `/desk/credit`: Buy-style board + ticket — AssetLogo on rates; deposit collateral + borrow USDC in-desk.

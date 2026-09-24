@@ -1,3 +1,13 @@
+## 2026-09-24 — Demo lock (desk UX + agent cap)
+
+| Claim | Status |
+|---|---|
+| Credit in-house Kamino ktx + AssetLogo | Merged |
+| Activity icons/logos (not letter tiles) | Shipping this branch |
+| Markets staggered fetch + soft 429 copy | Shipping this branch |
+| PreStocks / Tessera in-FOLIO buy (no external CTA) | Shipping this branch |
+| Agent ≤5 messages / account / day | Shipping this branch |
+
 ## 2026-09-21 — Credit in-house Kamino ktx
 
 | Claim | Status |
@@ -8,6 +18,18 @@
 | Still no FOLIO custom borrow CPI | Honest residual |
 | Gated by BROADCAST_PAUSED + folio_session | Same as Jupiter fills |
 | NestUSD execute still metrics/app (not in-desk) | Honest residual |
+
+## 2026-09-24 — Bible · Aqua0 · launch polish
+
+| Claim | Status |
+|---|---|
+| FOLIO_BIBLE synced (DBC primary · Solami tape · soft pitch) | Verified — `docs/FOLIO_BIBLE.md` |
+| Aqua0 $1.1k multi-strategy LP on tokenized equities | Observed — competitor field note; not FOLIO claim |
+| FOLIO wedge ≠ shared-capital LP routing | Decision — honesty desk (truth · wash · buy/borrow) |
+| Launch polish 20 checklist | Done — `docs/LAUNCH_POLISH_20.md` |
+| FolioAgentChat thinking/stream/composer | Implemented — settings agent |
+| Beta honeypot spam trap | Implemented |
+| Sitemap includes markets/beta/whitepaper/preipo/tessera | Implemented |
 
 ## 2026-09-20 — Ship rough edges (fills · F · G · honesty)
 
@@ -22,10 +44,10 @@
 | trackFolioEvent consent-gated via @vercel/analytics | Implemented |
 | /desk/admin ops-only (FOLIO_OPS) | Implemented |
 | Truth reconcile ≠ issuer PoR | Honest copy |
-| NestUSD / borrow still unavailable-until-funded | SUPERSEDED 2026-09-21 — NestUSD live metrics; Kamino borrow in-desk via ktx |
+| NestUSD / borrow still unavailable-until-funded | SUPERSEDED 2026-09-20 — NestUSD live metrics + Kamino/NestUSD app CTAs |
 | NestUSD api.nestusd.com/v1/risk live collateral LTV | Verified — live probe + adapter |
-| Kamino borrow deep-link kamino.com/borrow/{market} | SUPERSEDED — in-desk ktx; URL kept as reference only |
-| FOLIO does not assemble Nest/Kamino CPI in-desk | Partial — FOLIO assembles via Kamino ktx API (not FOLIO program); Nest still external |
+| Kamino borrow deep-link kamino.com/borrow/{market} | Verified |
+| FOLIO does not assemble Nest/Kamino CPI in-desk | Honest residual |
 | Rate limits still in-memory (no Upstash) | Honest residual |
 | Privy Allowed Origins + beta_waitlist migration | Action required (Henry) |
 

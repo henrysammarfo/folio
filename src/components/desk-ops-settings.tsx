@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Panel } from "@/components/desk-shell";
+import { FolioAgentChat } from "@/components/folio-agent-chat";
 import { StatusBadge } from "@/components/folio-brand";
 import { usePrivyShellReady } from "@/components/privy-app-provider";
 import { Switch } from "@/components/ui/switch";
@@ -47,7 +48,6 @@ export function DeskOpsSettings({ initial }: { initial: SessionBundle }) {
     initialDataUpdatedAt: Date.now(),
     staleTime: 30_000,
   });
-  const [prompt, setPrompt] = useState("truth AAPLx");
   const [agentOut, setAgentOut] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [privyToken, setPrivyToken] = useState("");
@@ -933,68 +933,56 @@ grant select, insert, update, delete on public.desk_preferences to anon, authent
           intents, and the same acquire wash gates on quote intents. Never
           broadcasts. AgentRouter expands NL only when keyed — if AgentRouter
           returns WAF/HTML or errors, the live spine reply still returns (NL
-          skipped, labeled). Try: truth AAPLx · quote 1 USDC NVDAx · compare
-          AAPLx vs MSFTx · credit · network · positions.
+          skipped, labeled).
         </p>
-        <div className="form-grid">
-          <label>
-            Prompt
-            <input value={prompt} onChange={(e) => setPrompt(e.target.value)} />
-          </label>
-          <button
-            type="button"
-            className="wallet-pill"
-            disabled={busy}
-            onClick={async () => {
-              setBusy(true);
-              try {
-                const res = await runAgent({ data: { prompt } });
-                if (!res.ok) {
-                  setAgentOut(
-                    `${res.reason}${res.detail ? ` — ${res.detail}` : ""}\n[nl=failed · broadcast=false · live spine unavailable]`,
-                  );
-                  return;
-                }
-                const spineBits = [
-                  res.data.spine.truth
-                    ? `truth ×${res.data.spine.truth.multiplier?.toFixed(6) ?? "—"} · pending ${
-                        res.data.spine.truth.pendingMultiplier != null
-                          ? `${res.data.spine.truth.pendingMultiplier.toFixed(6)}×`
-                          : "none"
-                      }`
-                    : null,
-                  res.data.spine.quote
-                    ? `quote ${res.data.spine.quote.cacheLabel} out=${
-                        res.data.spine.quote.outUiAmount?.toFixed(6) ?? "—"
-                      }`
-                    : null,
-                  res.data.spine.gates
-                    ? `gates canReview=${res.data.spine.gates.canReview}`
-                    : null,
-                  `nl=${res.data.nlExpansion}`,
-                ]
-                  .filter(Boolean)
-                  .join(" · ");
+        <FolioAgentChat
+          busy={busy}
+          reply={agentOut || null}
+          placeholder="truth AAPLx · quote 1 USDC NVDAx · compare AAPLx vs MSFTx"
+          onSend={async (promptText) => {
+            setBusy(true);
+            try {
+              const res = await runAgent({ data: { prompt: promptText } });
+              if (!res.ok) {
                 setAgentOut(
-                  `${res.data.reply}\n[${spineBits}; metered ~$${res.data.meteredCostUsd.toFixed(6)}; broadcast=${res.data.caps.broadcast}${
-                    res.data.nlExpansionNote ? `; ${res.data.nlExpansionNote}` : ""
-                  }]`,
+                  `${res.reason}${res.detail ? ` — ${res.detail}` : ""}\n[nl=failed · broadcast=false · live spine unavailable]`,
                 );
-              } catch (err) {
-                setAgentOut(
-                  `paper_agent_client_error — ${err instanceof Error ? err.message : String(err)}\n[nl=failed · broadcast=false]`,
-                );
-              } finally {
-                setBusy(false);
+                return;
               }
-            }}
-          >
-            {busy ? "Running…" : "Run paper agent"}
-          </button>
-        </div>
-        {agentOut ? (
-          <pre className="mt-3 whitespace-pre-wrap text-sm opacity-90">{agentOut}</pre>
-        ) : null}
+              const spineBits = [
+                res.data.spine.truth
+                  ? `truth ×${res.data.spine.truth.multiplier?.toFixed(6) ?? "—"} · pending ${
+                      res.data.spine.truth.pendingMultiplier != null
+                        ? `${res.data.spine.truth.pendingMultiplier.toFixed(6)}×`
+                        : "none"
+                    }`
+                  : null,
+                res.data.spine.quote
+                  ? `quote ${res.data.spine.quote.cacheLabel} out=${
+                      res.data.spine.quote.outUiAmount?.toFixed(6) ?? "—"
+                    }`
+                  : null,
+                res.data.spine.gates
+                  ? `gates canReview=${res.data.spine.gates.canReview}`
+                  : null,
+                `nl=${res.data.nlExpansion}`,
+              ]
+                .filter(Boolean)
+                .join(" · ");
+              setAgentOut(
+                `${res.data.reply}\n[${spineBits}; metered ~$${res.data.meteredCostUsd.toFixed(6)}; broadcast=${res.data.caps.broadcast}${
+                  res.data.nlExpansionNote ? `; ${res.data.nlExpansionNote}` : ""
+                }]`,
+              );
+            } catch (err) {
+              setAgentOut(
+                `paper_agent_client_error — ${err instanceof Error ? err.message : String(err)}\n[nl=failed · broadcast=false]`,
+              );
+            } finally {
+              setBusy(false);
+            }
+          }}
+        />
       </Panel>
       </div>
         </div>
