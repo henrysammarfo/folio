@@ -1077,8 +1077,8 @@
 .wallet-pill-primary{background:#0EA5C9;border-color:#0EA5C9;color:#fff}
 .wallet-pill-primary:disabled{opacity:.45}
 .cookie-banner{position:fixed;z-index:80;left:1rem;right:1rem;bottom:1rem;max-width:42rem;margin:0 auto;display:flex;flex-wrap:wrap;gap:.85rem;align-items:center;justify-content:space-between;padding:1rem 1.1rem;border-radius:16px;background:#0B1220;color:#fff;box-shadow:0 16px 48px rgba(11,18,32,.35);border:1px solid rgba(255,255,255,.08)}
-.cookie-banner-copy{flex:1 1 14rem;font-size:.82rem;line-height:1.45;opacity:.9}
-.cookie-banner-copy a{color:#B8E8F3;text-decoration:underline}
+.cookie-banner-copy{flex:1 1 14rem;font-size:.85rem;line-height:1.5;color:#fff;opacity:1}
+.cookie-banner-copy a{color:#B8E8F3;text-decoration:underline;font-weight:600}
 .cookie-banner-actions{display:flex;gap:.5rem;flex-wrap:wrap}
 .cookie-btn-primary,.cookie-btn-secondary{border-radius:999px;padding:.55rem .95rem;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid transparent}
 .cookie-btn-primary{background:#0EA5C9;color:#fff}
@@ -2563,3 +2563,62 @@ html.js-enter .nx-headline{transform:translate3d(0,118%,0)}
 .mkt-cine .mkt-pair-list li{border-bottom-color:rgba(255,255,255,.16)}
 .mkt-cine .mkt-pair-list b{color:#fff}
 .mkt-cine .mkt-pair-list span{color:rgba(255,255,255,.68)}
+
+/* FOLIO agent chat — thinking → stream → composer */
+.folio-agent-chat{display:flex;flex-direction:column;gap:.75rem}
+.folio-agent-trace{
+  min-height:7.5rem;padding:1rem;border-radius:14px;
+  background:#F7FBFC;border:1px solid var(--fx-line,#E4E9EE);
+}
+.folio-agent-thinking{display:flex;gap:.75rem;align-items:flex-start}
+.folio-agent-spin{color:var(--fx-brand,#0EA5C9);animation:folio-agent-spin .7s linear infinite}
+.folio-agent-spin svg{display:block}
+@keyframes folio-agent-spin{to{transform:rotate(360deg)}}
+.folio-agent-thinking-label{
+  margin:0 0 .45rem;font-size:.82rem;font-weight:650;color:var(--fx-ink,#0B1220);
+  background:linear-gradient(90deg,#5C6570 35%,#0B1220 50%,#5C6570 65%);
+  background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:folio-agent-shimmer 1.4s linear infinite;
+}
+@keyframes folio-agent-shimmer{to{background-position:-200% 0}}
+.folio-agent-thinking ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.25rem}
+.folio-agent-thinking li{font-size:.75rem;color:#9AA3AD;padding-left:.85rem;position:relative}
+.folio-agent-thinking li::before{content:"";position:absolute;left:0;top:.45rem;width:.35rem;height:.35rem;border-radius:50%;background:#D0D6DC}
+.folio-agent-thinking li.is-on{color:#0B1220}
+.folio-agent-thinking li.is-on::before{background:var(--fx-brand,#0EA5C9)}
+.folio-agent-reply p{margin:0;font-size:.88rem;line-height:1.5;color:#0B1220;white-space:pre-wrap}
+.folio-agent-caret{
+  display:inline-block;width:2px;height:.85em;margin-left:2px;vertical-align:-1px;
+  background:#0B1220;animation:folio-agent-blink .9s step-end infinite;
+}
+@keyframes folio-agent-blink{50%{opacity:0}}
+.folio-agent-meta{display:block;margin-top:.55rem;font-size:.72rem;color:#5C6570}
+.folio-agent-empty{display:flex;gap:.65rem;align-items:flex-start;color:#5C6570}
+.folio-agent-empty p{margin:0;font-size:.85rem;line-height:1.45}
+.folio-agent-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.folio-agent-chip{
+  appearance:none;border:1px solid var(--fx-line,#E4E9EE);background:#fff;
+  border-radius:999px;padding:.35rem .75rem;font:inherit;font-size:.75rem;font-weight:600;
+  color:#0B1220;cursor:pointer;
+}
+.folio-agent-chip:hover{border-color:var(--fx-brand,#0EA5C9);background:#F0F9FC}
+.folio-agent-chip:disabled{opacity:.5;cursor:wait}
+.folio-agent-composer{
+  display:flex;gap:.45rem;align-items:center;padding:.35rem .4rem .35rem .85rem;
+  border:1px solid var(--fx-line,#E4E9EE);border-radius:14px;background:#fff;
+}
+.folio-agent-composer:focus-within{border-color:#9FE0F0;box-shadow:0 0 0 3px rgba(14,165,201,.12)}
+.folio-agent-composer input{
+  flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:.85rem;
+  color:#0B1220;outline:none;padding:.45rem 0;
+}
+.folio-agent-composer input::placeholder{color:#9AA3AD}
+.folio-agent-send{
+  flex-shrink:0;display:grid;place-items:center;width:2rem;height:2rem;border:0;border-radius:10px;
+  background:#0B1220;color:#fff;cursor:pointer;
+}
+.folio-agent-send:disabled{background:#D0D6DC;color:#5C6570;cursor:not-allowed}
+.folio-agent-send:not(:disabled):active{transform:scale(.96)}
+@media(prefers-reduced-motion:reduce){
+  .folio-agent-spin,.folio-agent-thinking-label,.folio-agent-caret{animation:none}
+}

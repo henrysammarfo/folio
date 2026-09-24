@@ -26,7 +26,7 @@ function Page() {
       compactIntro
       eyebrow="Legal"
       title="Privacy Policy"
-      intro="Last updated September 19, 2026. FOLIO is built to keep share counts honest — and your data minimal."
+      intro="Last updated September 24, 2026. FOLIO is built to keep share counts honest — and your data minimal."
     >
       <article className="legal-doc">
         <h2>What we collect</h2>
