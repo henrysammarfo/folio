@@ -1,57 +1,74 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { DeskShell, Panel } from "@/components/desk-shell";
-import { StatusBadge } from "@/components/folio-brand";
-import { ModeBadge } from "@/components/mode-badge";
+import { DeskShell } from "@/components/desk-shell";
 import { getActivityBundle } from "@/lib/desk.functions";
+import { humanizeHonestyNote, humanizeWashNote } from "@/lib/humanize-copy";
+import { siteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/desk/activity")({
   head: () => ({
-    meta: [
-      { title: "Activity — FOLIO" },
-      { name: "description", content: "Live-derived desk events — not a fabricated ledger." },
-    ],
+    meta: siteMeta({
+      title: "Activity — FOLIO",
+      description: "Live desk events from market feeds.",
+      path: "/desk/activity",
+    }),
   }),
+  loader: async () => getActivityBundle(),
   component: Page,
 });
 
+function humanizeActivityDetail(title: string, detail: string): string {
+  if (/wash/i.test(title)) return humanizeWashNote(detail);
+  return humanizeHonestyNote(detail) || detail;
+}
+
 function Page() {
+  const initial = Route.useLoaderData();
   const fetchActivity = useServerFn(getActivityBundle);
-  const { data, isFetching } = useQuery({
+  const { data } = useQuery({
     queryKey: ["activity-bundle"],
     queryFn: () => fetchActivity(),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
 
   return (
-    <DeskShell eyebrow="Immutable context" title="Activity">
-      <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Live-derived</ModeBadge>
-        <ModeBadge mode="quote-only">No broadcast log</ModeBadge>
-      </div>
-      <Panel
-        title="Event stream"
-        meta={<StatusBadge tone="neutral">{isFetching ? "Refreshing…" : "UTC · live"}</StatusBadge>}
-      >
-        <p className="mb-3 text-sm opacity-80">{data?.note}</p>
-        <div className="event-list">
-          {(data?.events ?? []).map((e) => (
-            <div key={`${e.title}-${e.at}`}>
-              <time>{new Date(e.at).toISOString().slice(11, 19)}</time>
-              <span>
-                <b>{e.title}</b>
-                <small>{e.detail}</small>
-              </span>
-              <StatusBadge
-                tone={e.tone === "green" ? "green" : e.tone === "blue" ? "blue" : e.tone === "amber" ? "amber" : "neutral"}
-              >
-                {e.mode}
-              </StatusBadge>
-            </div>
-          ))}
+    <DeskShell title="Activity">
+      <section className="fx-page">
+        <header className="fx-hero" style={{ marginBottom: "1rem" }}>
+          <h1 className="fx-title">Activity</h1>
+          <p className="fx-sub">Live market checks for your desk.</p>
+        </header>
+
+        <div className="fx-card">
+          <ul className="fx-feed" aria-label="Activity">
+            {(data?.events ?? []).map((e) => (
+              <li key={`${e.title}-${e.at}`}>
+                <span className="fx-feed-dot" aria-hidden>
+                  {e.title.slice(0, 1)}
+                </span>
+                <div>
+                  <strong>{e.title}</strong>
+                  <p>{humanizeActivityDetail(e.title, e.detail)}</p>
+                </div>
+                <time dateTime={e.at}>
+                  {new Date(e.at).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </time>
+              </li>
+            ))}
+          </ul>
         </div>
-      </Panel>
+        {data?.note ? (
+          <p className="fx-sub" style={{ marginTop: "1rem" }}>
+            {humanizeHonestyNote(data.note)}
+          </p>
+        ) : null}
+      </section>
     </DeskShell>
   );
 }

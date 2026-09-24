@@ -20,6 +20,8 @@ export type XStockAsset = {
   decimals: number | null;
   isTradingHalted: boolean;
   openNow: boolean | null;
+  /** xStocks trading.currentPeriod when present (open/closed/…). */
+  tradingPeriod: string | null;
   logo: string | null;
 };
 
@@ -84,7 +86,7 @@ export async function fetchXStockAsset(
       underlyingSymbol?: string;
       isTradingHalted?: boolean;
       logo?: string | null;
-      trading?: { openNow?: boolean };
+      trading?: { openNow?: boolean; currentPeriod?: string };
       deployments?: Array<{
         network?: string;
         address?: string;
@@ -104,6 +106,7 @@ export async function fetchXStockAsset(
       decimals: typeof solana?.decimals === "number" ? solana.decimals : null,
       isTradingHalted: Boolean(json.isTradingHalted),
       openNow: json.trading?.openNow ?? null,
+      tradingPeriod: json.trading?.currentPeriod ?? null,
       logo: json.logo ?? null,
     });
   } catch (e) {

@@ -24,6 +24,8 @@ export const Route = createFileRoute("/network")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  /** Prefetch live matrix so NestUSD / wash / broadcast honesty is visible on first paint. */
+  loader: async () => getNetworkBundle(),
   component: Page,
 });
 
@@ -35,18 +37,23 @@ function toneFor(mode: IntegrationMode): "green" | "amber" | "blue" | "neutral" 
 }
 
 function Page() {
+  const initial = Route.useLoaderData();
   const fetchNetwork = useServerFn(getNetworkBundle);
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["network-matrix"],
     queryFn: () => fetchNetwork(),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     refetchInterval: 60_000,
+    staleTime: 30_000,
   });
 
   return (
     <PublicShell
+      tone="network"
       eyebrow="Network matrix"
       title="No blurred lines between demo and live."
-      intro="Stocklana + Colosseum World’s Fair path: mainnet READ for truth, Jupiter quote-only, local fork for CPI proofs. Custom mainnet program deploy is out of the ≤~$1 budget. Broadcast stays paused until funded and explicitly confirmed."
+      intro="Stocklana + Colosseum World’s Fair path: mainnet READ for truth, Jupiter quote-only, borrow CPI unavailable until funded (no fork harness on this budget). Custom mainnet program deploy is out of the ≤~$1 budget. Broadcast stays paused until funded and explicitly confirmed."
     >
       <div className="mb-4 flex flex-wrap gap-2">
         <ModeBadge mode="mainnet-read">Mainnet-primary truth</ModeBadge>
@@ -72,6 +79,14 @@ function Page() {
           </div>
         ))}
       </div>
+      <section className="mkt-aside-band" aria-label="How to read this matrix">
+        <h2>Read the mode, not the marketing</h2>
+        <p>
+          Mainnet-read means a live probe returned. Quote-only means Jupiter
+          routes without broadcast. Unavailable is intentional — not a broken
+          badge waiting for a screenshot.
+        </p>
+      </section>
     </PublicShell>
   );
 }

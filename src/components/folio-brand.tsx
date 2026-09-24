@@ -1,8 +1,21 @@
 import { Link } from "@tanstack/react-router";
 
-export function FolioMark({ className = "" }: { className?: string }) {
+export function FolioMark({
+  className = "",
+  title = "FOLIO",
+}: {
+  className?: string;
+  title?: string;
+}) {
   return (
-    <svg className={className} viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <svg
+      className={className}
+      viewBox="0 0 64 64"
+      fill="none"
+      role="img"
+      aria-label={title}
+    >
+      <title>{title}</title>
       <path d="M8 8h32v10H20v10h17v10H20v18H8V8Z" fill="currentColor" />
       <path d="M47 19l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z" fill="currentColor" />
       <path d="M41 43h15v13H41z" stroke="currentColor" strokeWidth="4" />
@@ -21,6 +34,18 @@ export function Wordmark({ to = "/", inverse = false }: { to?: string; inverse?:
 
 export type StatusTone = "green" | "amber" | "blue" | "neutral";
 
-export function StatusBadge({ children, tone = "neutral" }: { children: React.ReactNode; tone?: StatusTone }) {
-  return <span className={`status-badge status-${tone}`}>{children}</span>;
+export function StatusBadge({
+  children,
+  tone = "neutral",
+  title,
+}: {
+  children: React.ReactNode;
+  tone?: StatusTone;
+  title?: string;
+}) {
+  return (
+    <span className={`status-badge status-${tone}`} title={title}>
+      {children}
+    </span>
+  );
 }

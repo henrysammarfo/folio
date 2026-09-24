@@ -1,16 +1,89 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { fetchXStockAsset, fetchXStockMultiplier } from "./adapters/xstocks";
-import { divergeBps, fetchPythEquityPrice } from "./adapters/pyth";
-import { fetchJupiterQuote, fetchJupiterTokenPrice } from "./adapters/jupiter";
+import { divergeBps, pythBountyFeedSymbols, type PythPrice } from "./adapters/pyth";
+import {
+  fetchCoinGeckoXStockPrice,
+  fetchEquityReferencePrice,
+  type EquityRefPrice,
+  type XStockRefPrice,
+} from "./adapters/equity-ref";
+import { fetchJupiterQuote, fetchJupiterTokenPrice, fetchJupiterExecute } from "./adapters/jupiter";
 import { evaluateWashGate, washAllowsSize } from "./adapters/wash";
+import { buildAcquireGateMessages } from "./acquire-gates";
 import { buildNetworkMatrix, type MatrixRow } from "./adapters/network-matrix";
-import type { AdapterResult } from "./adapters/types";
+import { fetchKaminoXStocksMarket } from "./adapters/kamino";
+import { fetchJupiterLendEarn } from "./adapters/jupiter-lend";
+import { fetchNestUsdStatus } from "./adapters/nestusd";
+import { fetchNestCreditVaults } from "./adapters/nest-credit";
+import {
+  compareApiOnchainMultiplier,
+  fetchScaledUiOnchain,
+  type ScaledUiApiCompare,
+  type ScaledUiOnchain,
+} from "./adapters/scaled-ui";
+import { fetchRaydiumPoolsForMint } from "./adapters/pools";
+import { resolveSolanaRpcUrl } from "./adapters/solana-rpc";
+import { errResult, type AdapterResult } from "./adapters/types";
 import type { XStockAsset, XStockMultiplier } from "./adapters/xstocks";
-import type { PythPrice } from "./adapters/pyth";
 import type { JupiterQuote, JupiterTokenPrice } from "./adapters/jupiter";
 import type { WashVerdict } from "./adapters/wash";
+import type { PoolAwareness } from "./adapters/pools";
 import { paperRawFor } from "./market";
+import { isBroadcastPaused } from "./broadcast";
+import {
+  readApprovedLabShader,
+  readApprovedLabUi,
+  type LabShaderId,
+  type LabUiId,
+} from "./lab-pick";
+import {
+  FOLIO_SESSION_COOKIE,
+  loadDeskPreferences,
+  parseFolioSessionCookie,
+  resolveActiveTenantId,
+  verifyFolioSessionCookieValue,
+  type FolioSession,
+} from "./auth/session";
+import { executeBlockedReason } from "./auth/desk-access";
+import { readClientIp } from "./auth/client-ip";
+import {
+  rateLimitCheck,
+  rateLimitClientKey,
+} from "./auth/rate-limit";
+export { isBroadcastPaused } from "./broadcast";
+
+function readVerifiedSessionLocal(): AdapterResult<FolioSession> {
+  try {
+    const value = getCookie(FOLIO_SESSION_COOKIE);
+    return verifyFolioSessionCookieValue(value);
+  } catch {
+    const g = globalThis as { __FOLIO_COOKIE_HEADER__?: string };
+    return parseFolioSessionCookie(g.__FOLIO_COOKIE_HEADER__ ?? null);
+  }
+}
+
+/** Load strictFailClosed from active-tenant prefs when a session exists; else false. */
+async function loadStrictFailClosedPref(): Promise<{
+  strictFailClosed: boolean;
+  prefsFromSession: boolean;
+}> {
+  try {
+    const value = getCookie(FOLIO_SESSION_COOKIE);
+    const session = verifyFolioSessionCookieValue(value);
+    if (!session.ok) return { strictFailClosed: false, prefsFromSession: false };
+    const tenantId = resolveActiveTenantId(session.data);
+    const prefs = await loadDeskPreferences(tenantId, session.data.userId);
+    if (!prefs.ok) return { strictFailClosed: false, prefsFromSession: false };
+    return {
+      strictFailClosed: prefs.data.strictFailClosed,
+      prefsFromSession: true,
+    };
+  } catch {
+    return { strictFailClosed: false, prefsFromSession: false };
+  }
+}
 
 const SymbolInput = z.object({
   symbol: z.string().min(2).max(16).default("AAPLx"),
@@ -18,15 +91,52 @@ const SymbolInput = z.object({
 
 const QuoteInput = z.object({
   symbol: z.string().min(2).max(16).default("AAPLx"),
-  spendUsdc: z.number().positive().max(25), // quote inspection cap; broadcast still off (≤~$1 budget)
+  /** USDC spend when paySymbol is omitted / USDC. */
+  spendUsdc: z.number().positive().max(25).optional(),
+  /** Pay-side xStock for true stock↔stock Jupiter quotes. */
+  paySymbol: z.string().min(2).max(16).optional(),
+  /** Pay qty (USDC dollars or xStock units). Cap keeps inspection cheap. */
+  amount: z.number().positive().max(25).optional(),
+});
+
+const PrepareSwapInput = z.object({
+  symbol: z.string().min(2).max(16),
+  spendUsdc: z.number().positive().max(25).optional(),
+  paySymbol: z.string().min(2).max(16).optional(),
+  amount: z.number().positive().max(25).optional(),
+  /** Solana pubkey that will sign — required for Swap V2 assembled tx. */
+  taker: z.string().min(32).max(64),
+  slippageBps: z.number().int().min(1).max(500).optional(),
 });
 
 export type TruthBundle = {
   symbol: string;
   asset: AdapterResult<XStockAsset>;
   multiplier: AdapterResult<XStockMultiplier>;
+  /**
+   * Pyth Hermes — intentionally off ship path (Pro paywall).
+   * Diverge uses live free equityRef (Yahoo/Finnhub) instead.
+   */
   pyth: AdapterResult<PythPrice>;
+  /** Live free equity reference for diverge — Finnhub → Yahoo. Never invents prices. */
+  equityRef: AdapterResult<EquityRefPrice>;
+  /** Pyth Crypto.xStock — off ship path; see xStockRef. */
+  pythXStock: AdapterResult<PythPrice>;
+  /** Live CoinGecko xStock secondary. */
+  xStockRef: AdapterResult<XStockRefPrice>;
+  /** Pyth Ondo — off ship path. */
+  pythOndo: AdapterResult<PythPrice>;
+  /** Mapped bounty feed symbols (catalog only — prices not fetched on ship path). */
+  pythBountyFeeds: {
+    equityUs: string | null;
+    cryptoXStock: string | null;
+    cryptoOndo: string | null;
+  };
   jupiterPrice: AdapterResult<JupiterTokenPrice>;
+  /** On-chain Token-2022 Scaled UI — Solana mainnet-read when RPC works. */
+  scaledUi: AdapterResult<ScaledUiOnchain>;
+  /** API currentMultiplier ↔ on-chain effective — never invents a match. */
+  scaledUiCompare: ScaledUiApiCompare;
   diverge: {
     pass: boolean | null;
     divergeBps: number | null;
@@ -40,25 +150,46 @@ export type TruthBundle = {
 
 export type AcquireBundle = {
   symbol: string;
+  /** "USDC" or pay-side xStock symbol. */
+  paySymbol: string;
   spendUsdc: number;
+  payAmount: number;
+  mode: "usdc" | "stock-pair";
+  payAsset: AdapterResult<XStockAsset> | null;
   asset: AdapterResult<XStockAsset>;
   multiplier: AdapterResult<XStockMultiplier>;
   pyth: AdapterResult<PythPrice>;
+  equityRef: AdapterResult<EquityRefPrice>;
   jupiterPrice: AdapterResult<JupiterTokenPrice>;
   wash: AdapterResult<WashVerdict>;
   jupiter: AdapterResult<JupiterQuote>;
+  /** Raydium pool awareness — not a route guarantee. */
+  pools: AdapterResult<PoolAwareness>;
+  /** On-chain Token-2022 Scaled UI — Solana mainnet-read when RPC works. */
+  scaledUi: AdapterResult<ScaledUiOnchain>;
+  /** API currentMultiplier ↔ on-chain effective — never invents a match. */
+  scaledUiCompare: ScaledUiApiCompare;
+  /**
+   * From active-tenant desk prefs when a verified session exists.
+   * Without session: false (public demo stays honesty-labeled for missing Pyth).
+   */
+  strictFailClosed: boolean;
+  /** True when prefs were loaded from an authenticated active tenant. */
+  prefsFromSession: boolean;
   gates: {
     truthOk: boolean;
     washOk: boolean;
     quoteOk: boolean;
     divergeOk: boolean;
+    /** On-chain Scaled UI match when both sides live; else false (honesty-labeled). */
+    scaledUiOk: boolean;
     canReview: boolean;
     blockedReasons: string[];
+    /** Labeled gaps that do not alone block review (e.g. missing Pyth) unless strict. */
+    honestyNotes: string[];
   };
 };
 
-import { isBroadcastPaused } from "./broadcast";
-export { isBroadcastPaused } from "./broadcast";
 export type NetworkBundle = {
   rows: MatrixRow[];
   broadcastPaused: boolean;
@@ -74,6 +205,14 @@ function unavailablePrice(reason: string): AdapterResult<JupiterTokenPrice> {
   };
 }
 
+function pythOffShipPath(): AdapterResult<PythPrice> {
+  return errResult(
+    "hermes.pyth.network",
+    "pyth_not_on_ship_path",
+    "Ship diverge uses live Yahoo/Finnhub (+ CoinGecko xStock) — Pyth Pro not required.",
+  );
+}
+
 export const getTruthBundle = createServerFn({ method: "GET" })
   .validator(SymbolInput)
   .handler(async ({ data }): Promise<TruthBundle> => {
@@ -86,50 +225,66 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       (asset.ok ? asset.data.underlyingSymbol : symbol.replace(/x$/i, "").toUpperCase()) ||
       "AAPL";
     const mint = asset.ok ? asset.data.solanaMint : null;
-    const [pyth, jupiterPrice] = await Promise.all([
-      fetchPythEquityPrice(underlying),
+    const bountyFeeds = pythBountyFeedSymbols(symbol);
+    const pyth = pythOffShipPath();
+    const pythXStock = pythOffShipPath();
+    const pythOndo = pythOffShipPath();
+    const [equityRef, xStockRef, jupiterPrice, scaledUi] = await Promise.all([
+      fetchEquityReferencePrice(underlying),
+      fetchCoinGeckoXStockPrice(symbol),
       mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
+      mint
+        ? fetchScaledUiOnchain(mint)
+        : Promise.resolve(
+            errResult(
+              "solana-rpc.scaled-ui",
+              "xstock_mint_missing",
+              "No Solana mint — cannot read Scaled UI",
+            ),
+          ),
     ]);
 
     let diverge: TruthBundle["diverge"] = {
       pass: null,
       divergeBps: null,
       bandBps: 75,
-      note: "Need two live references to score diverge",
+      note: "Need live free equity ref (Yahoo/Finnhub) + Jupiter venue to score pass/fail",
     };
 
-    if (pyth.ok && jupiterPrice.ok) {
-      const d = divergeBps(pyth.data.price, jupiterPrice.data.usdPrice, 75);
+    const secondaryNotes = xStockRef.ok
+      ? `${xStockRef.data.feedSymbol} live (CoinGecko)`
+      : null;
+    const xStockNote = secondaryNotes ? ` · ${secondaryNotes}` : "";
+
+    // Pass/fail only on live free equity ref + Jupiter venue — no invented prices.
+    if (equityRef.ok && jupiterPrice.ok) {
+      const d = divergeBps(equityRef.data.price, jupiterPrice.data.usdPrice, 75);
       diverge = {
         pass: d.pass,
         divergeBps: d.divergeBps,
         bandBps: d.bandBps,
-        note: `Pyth ${underlying} vs Jupiter venue`,
+        note: `${equityRef.data.feedSymbol} (${equityRef.data.provider}) vs Jupiter venue${xStockNote}`,
       };
-    } else if (
-      jupiterPrice.ok &&
-      jupiterPrice.data.stockRefPrice != null &&
-      jupiterPrice.data.stockRefPrice > 0
-    ) {
-      const d = divergeBps(
-        jupiterPrice.data.stockRefPrice,
-        jupiterPrice.data.usdPrice,
-        75,
-      );
-      diverge = {
-        pass: d.pass,
-        divergeBps: d.divergeBps,
-        bandBps: d.bandBps,
-        note: "Jupiter stockData vs Jupiter venue (Pyth Hermes price updates unavailable on this egress)",
-      };
-    } else if (!pyth.ok) {
+    } else if (!equityRef.ok) {
       diverge = {
         pass: null,
         divergeBps: null,
         bandBps: 75,
-        note: `Pyth unavailable: ${pyth.reason}`,
+        note: `Equity ref unavailable: ${equityRef.reason}${equityRef.detail ? ` — ${equityRef.detail}` : ""}${xStockNote}`,
+      };
+    } else if (!jupiterPrice.ok) {
+      diverge = {
+        pass: null,
+        divergeBps: null,
+        bandBps: 75,
+        note: `Jupiter venue unavailable: ${jupiterPrice.reason}${xStockNote}`,
       };
     }
+
+    const scaledUiCompare = compareApiOnchainMultiplier(
+      multiplier.ok ? multiplier.data.currentMultiplier : null,
+      scaledUi.ok ? scaledUi.data.effectiveMultiplier : null,
+    );
 
     const paperRaw = paperRawFor(symbol);
     const economicShares = multiplier.ok
@@ -141,7 +296,14 @@ export const getTruthBundle = createServerFn({ method: "GET" })
       asset,
       multiplier,
       pyth,
+      equityRef,
+      pythXStock,
+      xStockRef,
+      pythOndo,
+      pythBountyFeeds: bountyFeeds,
       jupiterPrice,
+      scaledUi,
+      scaledUiCompare,
       diverge,
       paperRaw,
       economicShares,
@@ -151,79 +313,429 @@ export const getTruthBundle = createServerFn({ method: "GET" })
 export const getAcquireBundle = createServerFn({ method: "GET" })
   .validator(QuoteInput)
   .handler(async ({ data }): Promise<AcquireBundle> => {
-    const { symbol, spendUsdc } = data;
-    const [asset, multiplier] = await Promise.all([
+    const session = readVerifiedSessionLocal();
+    const rl = rateLimitCheck(
+      "quote",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      const denied = errResult("folio.rate-limit", "rate_limited", rl.detail);
+      return {
+        symbol: data.symbol,
+        paySymbol: "USDC",
+        spendUsdc: data.spendUsdc ?? 1,
+        payAmount: data.amount ?? data.spendUsdc ?? 1,
+        mode: "usdc",
+        payAsset: null,
+        asset: denied as AdapterResult<XStockAsset>,
+        multiplier: denied as AdapterResult<XStockMultiplier>,
+        pyth: denied as AdapterResult<PythPrice>,
+        equityRef: denied as AdapterResult<EquityRefPrice>,
+        jupiterPrice: denied as AdapterResult<JupiterTokenPrice>,
+        wash: denied as AdapterResult<WashVerdict>,
+        jupiter: denied as AdapterResult<JupiterQuote>,
+        pools: denied as AdapterResult<PoolAwareness>,
+        scaledUi: denied as AdapterResult<ScaledUiOnchain>,
+        scaledUiCompare: {
+          status: "unavailable",
+          apiMultiplier: null,
+          onchainEffective: null,
+          deltaBps: null,
+          note: rl.detail,
+        },
+        strictFailClosed: false,
+        prefsFromSession: false,
+        broadcastPaused: isBroadcastPaused(),
+        gates: {
+          truthOk: false,
+          washOk: false,
+          quoteOk: false,
+          divergeOk: false,
+          scaledUiOk: false,
+          canReview: false,
+          blockedReasons: [rl.detail],
+          honestyNotes: [],
+        },
+      };
+    }
+
+    const symbol = data.symbol;
+    const payRaw = data.paySymbol?.trim();
+    const isPair = Boolean(payRaw && payRaw.toUpperCase() !== "USDC");
+    const paySymbol = isPair ? payRaw! : "USDC";
+    const payAmount = data.amount ?? data.spendUsdc ?? (isPair ? 0.01 : 1);
+    const spendUsdc = payAmount;
+
+    const [asset, multiplier, payAssetRes] = await Promise.all([
       fetchXStockAsset(symbol),
       fetchXStockMultiplier(symbol),
+      isPair ? fetchXStockAsset(paySymbol) : Promise.resolve(null),
     ]);
+    const payAsset =
+      payAssetRes && typeof payAssetRes === "object" && "ok" in payAssetRes
+        ? payAssetRes
+        : null;
     const underlying = asset.ok
       ? asset.data.underlyingSymbol
       : symbol.replace(/x$/i, "").toUpperCase();
     const mint = asset.ok ? asset.data.solanaMint : null;
-    const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
+    const decimals =
+      asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
+    const payMint =
+      isPair && payAsset?.ok ? payAsset.data.solanaMint : null;
+    const payDecimals =
+      isPair && payAsset?.ok && payAsset.data.decimals != null
+        ? payAsset.data.decimals
+        : 8;
+    const notionalUsd = isPair
+      ? Math.min(25, Math.max(0.5, payAmount * 50))
+      : spendUsdc;
 
-    const [pyth, jupiterPrice, wash] = await Promise.all([
-      fetchPythEquityPrice(underlying),
-      mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
-      evaluateWashGate({ symbol, mint, notionalUsd: spendUsdc }),
+    const [equityRef, jupiterPrice, wash, pools, scaledUi] = await Promise.all([
+      fetchEquityReferencePrice(underlying),
+      mint
+        ? fetchJupiterTokenPrice(mint)
+        : Promise.resolve(unavailablePrice("xstock_mint_missing")),
+      evaluateWashGate({ symbol, mint, notionalUsd }),
+      mint
+        ? fetchRaydiumPoolsForMint(mint)
+        : Promise.resolve(errResult("api-v3.raydium.io", "xstock_mint_missing")),
+      mint
+        ? fetchScaledUiOnchain(mint)
+        : Promise.resolve(
+            errResult(
+              "solana-rpc.scaled-ui",
+              "xstock_mint_missing",
+              "No Solana mint — cannot read Scaled UI",
+            ),
+          ),
     ]);
+    const pyth = pythOffShipPath();
 
-    const jupiter: AdapterResult<JupiterQuote> = !mint
-      ? {
-          ok: false,
-          mode: "unavailable",
-          asOf: new Date().toISOString(),
-          source: "api.jup.ag/swap/v1/quote",
-          reason: "xstock_mint_missing",
-          detail: "Cannot quote without Solana mint from xStocks deployments",
-        }
-      : await fetchJupiterQuote({
-          outputMint: mint,
-          amountRaw: Math.round(spendUsdc * 1_000_000),
-          slippageBps: 50,
-          outputDecimals: decimals,
-        });
+    let jupiter: AdapterResult<JupiterQuote>;
+    if (!mint) {
+      jupiter = {
+        ok: false,
+        mode: "unavailable",
+        asOf: new Date().toISOString(),
+        source: "api.jup.ag/swap/v2/order",
+        reason: "xstock_mint_missing",
+        detail: "Cannot quote without Solana mint from xStocks deployments",
+      };
+    } else if (isPair && !payMint) {
+      jupiter = {
+        ok: false,
+        mode: "unavailable",
+        asOf: new Date().toISOString(),
+        source: "api.jup.ag/swap/v2/order",
+        reason: "pay_mint_missing",
+        detail: `Cannot stock-pair quote without pay mint for ${paySymbol}`,
+      };
+    } else if (isPair && payMint === mint) {
+      jupiter = {
+        ok: false,
+        mode: "unavailable",
+        asOf: new Date().toISOString(),
+        source: "api.jup.ag/swap/v2/order",
+        reason: "same_mint_pair",
+        detail: "Pay and receive must be different stocks",
+      };
+    } else {
+      jupiter = await fetchJupiterQuote({
+        inputMint: isPair && payMint ? payMint : undefined,
+        outputMint: mint,
+        amountRaw: Math.round(payAmount * 10 ** (isPair ? payDecimals : 6)),
+        slippageBps: 50,
+        outputDecimals: decimals,
+        inputDecimals: isPair ? payDecimals : 6,
+      });
+    }
 
-    const blockedReasons: string[] = [];
-    const truthOk = multiplier.ok && asset.ok;
+    const truthOk =
+      multiplier.ok && asset.ok && (!isPair || Boolean(payAsset?.ok));
     const washOk = washAllowsSize(wash);
-    if (!truthOk) blockedReasons.push("Corporate-action / asset truth unavailable");
-    if (asset.ok && asset.data.isTradingHalted) {
-      blockedReasons.push("Trading halted per xStocks API");
-    }
-    if (!washOk) {
-      blockedReasons.push(wash.ok ? "Wash pressure blocked" : `Wash gate: ${wash.reason}`);
-    }
-    if (!jupiter.ok) blockedReasons.push(`Jupiter quote: ${jupiter.reason}`);
+    const scaledUiCompare = compareApiOnchainMultiplier(
+      multiplier.ok ? multiplier.data.currentMultiplier : null,
+      scaledUi.ok ? scaledUi.data.effectiveMultiplier : null,
+    );
+    const scaledUiOk = scaledUiCompare.status === "match";
+    const scaledUiGate =
+      scaledUiCompare.status === "match"
+        ? ({ kind: "match", note: scaledUiCompare.note } as const)
+        : scaledUiCompare.status === "mismatch"
+          ? ({ kind: "mismatch", note: scaledUiCompare.note } as const)
+          : ({ kind: "unavailable", note: scaledUiCompare.note } as const);
 
-    let divergeOk = true;
-    if (pyth.ok && jupiterPrice.ok) {
-      const d = divergeBps(pyth.data.price, jupiterPrice.data.usdPrice, 75);
-      if (!d.pass) {
-        divergeOk = false;
-        blockedReasons.push("Pyth vs Jupiter venue diverge outside band");
-      }
+    let diverge:
+      | { kind: "ok" }
+      | { kind: "blocked" }
+      | { kind: "pyth_missing" }
+      | { kind: "unavailable" } = { kind: "unavailable" };
+    if (equityRef.ok && jupiterPrice.ok) {
+      const d = divergeBps(equityRef.data.price, jupiterPrice.data.usdPrice, 75);
+      diverge = d.pass ? { kind: "ok" } : { kind: "blocked" };
+    } else if (!equityRef.ok) {
+      diverge = { kind: "pyth_missing" };
     }
-    // Missing Pyth does not invent a pass — only live diverge failures block.
-    // Unavailable Pyth is labeled on the UI; quote path may still review when wash+truth+jupiter hold.
+
+    const poolsGate = !pools.ok
+      ? ({ kind: "unavailable", reason: pools.reason } as const)
+      : pools.data.raydium.length === 0
+        ? ({ kind: "empty" } as const)
+        : ({ kind: "ok", poolCount: pools.data.raydium.length } as const);
+
+    const prefs = await loadStrictFailClosedPref();
+    const gateMsgs = buildAcquireGateMessages({
+      truthOk,
+      tradingHalted: Boolean(asset.ok && asset.data.isTradingHalted),
+      washOk,
+      wash: wash.ok
+        ? { kind: "pressure" }
+        : { kind: "adapter", reason: wash.reason },
+      quoteOk: jupiter.ok,
+      quoteReason: jupiter.ok ? null : jupiter.reason,
+      diverge,
+      strictFailClosed: prefs.strictFailClosed,
+      pools: poolsGate,
+      scaledUi: scaledUiGate,
+    });
+
+    const honestyNotes = [
+      ...gateMsgs.honestyNotes,
+      isPair
+        ? `Stock ↔ stock · ${paySymbol} → ${symbol} · quote only until fills turn on`
+        : null,
+      jupiter.ok && jupiter.data.router
+        ? `Router ${jupiter.data.router}${jupiter.data.gasless ? " · gasless path" : ""}`
+        : null,
+      isBroadcastPaused()
+        ? "Fills paused — review only until FOLIO arms buys"
+        : "Fills armed — sign in wallet to execute",
+    ].filter(Boolean) as string[];
 
     return {
       symbol,
+      paySymbol,
       spendUsdc,
+      payAmount,
+      mode: isPair ? "stock-pair" : "usdc",
+      payAsset,
       asset,
       multiplier,
       pyth,
+      equityRef,
       jupiterPrice,
       wash,
       jupiter,
+      pools,
+      scaledUi,
+      scaledUiCompare,
+      strictFailClosed: prefs.strictFailClosed,
+      prefsFromSession: prefs.prefsFromSession,
+      broadcastPaused: isBroadcastPaused(),
       gates: {
         truthOk,
         washOk,
         quoteOk: jupiter.ok,
-        divergeOk,
-        canReview: truthOk && washOk && jupiter.ok && divergeOk,
-        blockedReasons,
+        divergeOk: gateMsgs.divergeOk,
+        scaledUiOk,
+        canReview: gateMsgs.canReview,
+        blockedReasons: gateMsgs.blockedReasons,
+        honestyNotes,
       },
+    };
+  });
+
+const ExecuteSwapInput = z.object({
+  signedTransaction: z.string().min(32).max(20_000),
+  requestId: z.string().min(8).max(200),
+});
+
+/**
+ * Assemble a signable Swap V2 order for the session wallet.
+ * Requires folio_session · fail-closed while fills paused · never broadcasts.
+ */
+export const prepareJupiterSwap = createServerFn({ method: "POST" })
+  .inputValidator(PrepareSwapInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSessionLocal();
+    const sessionBlock = executeBlockedReason(session);
+    if (sessionBlock) {
+      return {
+        ok: false as const,
+        reason: "execute_requires_session",
+        detail: sessionBlock,
+      };
+    }
+    const rl = rateLimitCheck(
+      "execute",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
+    if (isBroadcastPaused()) {
+      return {
+        ok: false as const,
+        reason: "broadcast_paused",
+        detail:
+          "Fills paused — set BROADCAST_PAUSED=false on preview, then prod.",
+      };
+    }
+
+    const payRaw = data.paySymbol?.trim();
+    const isPair = Boolean(payRaw && payRaw.toUpperCase() !== "USDC");
+    const paySymbol = isPair ? payRaw! : "USDC";
+    const payAmount = data.amount ?? data.spendUsdc ?? (isPair ? 0.01 : 1);
+    const slippageBps = data.slippageBps ?? 50;
+
+    const [asset, payAssetRes] = await Promise.all([
+      fetchXStockAsset(data.symbol),
+      isPair ? fetchXStockAsset(paySymbol) : Promise.resolve(null),
+    ]);
+    if (!asset.ok || !asset.data.solanaMint) {
+      return {
+        ok: false as const,
+        reason: "xstock_mint_missing",
+        detail: "Receive mint unavailable — cannot assemble order.",
+      };
+    }
+    const payAsset =
+      payAssetRes && typeof payAssetRes === "object" && "ok" in payAssetRes
+        ? payAssetRes
+        : null;
+    if (isPair && (!payAsset?.ok || !payAsset.data.solanaMint)) {
+      return {
+        ok: false as const,
+        reason: "pay_mint_missing",
+        detail: "Pay mint unavailable — cannot assemble stock↔stock order.",
+      };
+    }
+    if (isPair && payAsset?.ok && payAsset.data.solanaMint === asset.data.solanaMint) {
+      return {
+        ok: false as const,
+        reason: "same_mint_pair",
+        detail: "Pay and receive must be different stocks.",
+      };
+    }
+
+    const decimals =
+      asset.data.decimals != null ? asset.data.decimals : 8;
+    const payDecimals =
+      isPair && payAsset?.ok && payAsset.data.decimals != null
+        ? payAsset.data.decimals
+        : 6;
+    const amountRaw = Math.round(payAmount * 10 ** (isPair ? payDecimals : 6));
+
+    const order = await fetchJupiterQuote({
+      inputMint: isPair && payAsset?.ok ? payAsset.data.solanaMint! : undefined,
+      outputMint: asset.data.solanaMint,
+      amountRaw,
+      slippageBps,
+      outputDecimals: decimals,
+      inputDecimals: isPair ? payDecimals : 6,
+      taker: data.taker.trim(),
+    });
+    if (!order.ok) {
+      return {
+        ok: false as const,
+        reason: order.reason,
+        detail: order.detail ?? null,
+        source: order.source,
+      };
+    }
+    if (!order.data.transaction || !order.data.requestId) {
+      return {
+        ok: false as const,
+        reason: "order_missing_transaction",
+        detail:
+          "Jupiter returned quote without a signable tx — check wallet SOL/USDC or try ≥~$10 for gasless.",
+        source: order.source,
+      };
+    }
+    return {
+      ok: true as const,
+      source: order.source,
+      mode: order.mode,
+      data: {
+        requestId: order.data.requestId,
+        transaction: order.data.transaction,
+        outUiAmount: order.data.outUiAmount,
+        inUiAmount: order.data.inUiAmount,
+        gasless: order.data.gasless,
+        signatureFeePayer: order.data.signatureFeePayer,
+        router: order.data.router,
+        feeBps: order.data.feeBps,
+      },
+    };
+  });
+
+/**
+ * Land a user-signed Jupiter Swap V2 order.
+ * Requires verified folio_session · fail-closed while BROADCAST_PAUSED≠false.
+ * Does not sign — client must sign first.
+ */
+export const executeJupiterSwap = createServerFn({ method: "POST" })
+  .inputValidator(ExecuteSwapInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSessionLocal();
+    const sessionBlock = executeBlockedReason(session);
+    if (sessionBlock) {
+      return {
+        ok: false as const,
+        reason: "execute_requires_session",
+        detail: sessionBlock,
+      };
+    }
+    const rl = rateLimitCheck(
+      "execute",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
+    if (isBroadcastPaused()) {
+      return {
+        ok: false as const,
+        reason: "broadcast_paused",
+        detail:
+          "Fills paused — FOLIO arms buys on a preview first, then production.",
+      };
+    }
+    const res = await fetchJupiterExecute({
+      signedTransaction: data.signedTransaction,
+      requestId: data.requestId,
+    });
+    if (!res.ok) {
+      return {
+        ok: false as const,
+        reason: res.reason,
+        detail: res.detail ?? null,
+        source: res.source,
+      };
+    }
+    return {
+      ok: true as const,
+      source: res.source,
+      mode: res.mode,
+      data: res.data,
     };
   });
 
@@ -237,12 +749,33 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     const underlying = asset.ok ? asset.data.underlyingSymbol : "AAPL";
     const mint = asset.ok ? asset.data.solanaMint : null;
     const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
+    const rpc = resolveSolanaRpcUrl();
 
-    const [pyth, jupiterPrice, wash] = await Promise.all([
-      fetchPythEquityPrice(underlying),
-      mint ? fetchJupiterTokenPrice(mint) : Promise.resolve(unavailablePrice("xstock_mint_missing")),
-      evaluateWashGate({ symbol, mint, notionalUsd: 100 }),
-    ]);
+    const [equityRef, jupiterPrice, wash, kamino, jupiterLend, nestusd, nestCredit, scaledUi, pools] =
+      await Promise.all([
+        fetchEquityReferencePrice(underlying),
+        mint
+          ? fetchJupiterTokenPrice(mint)
+          : Promise.resolve(unavailablePrice("xstock_mint_missing")),
+        evaluateWashGate({ symbol, mint, notionalUsd: 100 }),
+        fetchKaminoXStocksMarket(),
+        fetchJupiterLendEarn(),
+        fetchNestUsdStatus(),
+        fetchNestCreditVaults(),
+        mint
+          ? fetchScaledUiOnchain(mint)
+          : Promise.resolve({
+              ok: false as const,
+              mode: "unavailable" as const,
+              asOf: new Date().toISOString(),
+              source: "solana-rpc.scaled-ui",
+              reason: "xstock_mint_missing",
+            }),
+        mint
+          ? fetchRaydiumPoolsForMint(mint)
+          : Promise.resolve(errResult("api-v3.raydium.io", "xstock_mint_missing")),
+      ]);
+    const pyth = pythOffShipPath();
 
     const jupiter = mint
       ? await fetchJupiterQuote({
@@ -254,38 +787,93 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
           ok: false,
           mode: "unavailable",
           asOf: new Date().toISOString(),
-          source: "api.jup.ag/swap/v1/quote",
+          source: "api.jup.ag/swap/v2/order",
           reason: "xstock_mint_missing",
         } as const);
+
+    const multiTenantKeysPresent = Boolean(
+      process.env["PRIVY_APP_ID"]?.trim() &&
+        process.env["PRIVY_APP_SECRET"]?.trim() &&
+        process.env["SUPABASE_URL"]?.trim() &&
+        process.env["SUPABASE_ANON_KEY"]?.trim() &&
+        process.env["SUPABASE_SERVICE_ROLE_KEY"]?.trim() &&
+        (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16,
+    );
+    const sessionSecretPresent =
+      (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
 
     return {
       rows: buildNetworkMatrix({
         multiplier,
         pyth,
+        equityRef,
         jupiter,
         jupiterPrice,
         wash,
-        bitqueryKeyPresent: Boolean(process.env["BITQUERY_API_KEY"]),
+        kamino,
+        jupiterLend,
+        nestusd,
+        nestCredit,
+        scaledUi,
+        pools,
+        bitqueryKeyPresent: Boolean(process.env["BITQUERY_API_KEY"]?.trim()),
+        multiTenantKeysPresent,
+        sessionSecretPresent,
+        solanaRpcPublicFallback: rpc.publicFallback,
+        /** FOLIO does not sponsor gas/treasury at ≤~$1 — user-signed only when unpaused. */
         broadcastFunded: false,
+        broadcastPaused: isBroadcastPaused(),
       }),
       broadcastPaused: isBroadcastPaused(),
     };
   },
 );
+
+/** Henry-approved production lab chrome (FOLIO_APPROVED_LAB_* env after chat reply). */
+export const getLabApprovals = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{
+    approvedUi: LabUiId | null;
+    approvedShader: LabShaderId | null;
+  }> => ({
+    approvedUi: readApprovedLabUi(),
+    approvedShader: readApprovedLabShader(),
+  }),
+);
+
 export {
   getPositionsBundle,
   getCreditBundle,
   getActivityBundle,
   getSessionBundle,
+  getEmpireReadiness,
+  getDeskAccess,
   runDeskAgent,
+  updateDeskPreferences,
+  setActiveTenant,
   createSessionFromPrivyToken,
   clearFolioSession,
+  attachDemoTenantMembership,
+  bootstrapDemoDeskSession,
+  bindWatchWallet,
+  clearWatchWallet,
+  joinBetaWaitlist,
 } from "./desk.empire";
+export { getPreipoBundle, getTesseraBundle } from "./desk.markets";
+export { getMarketsBoard, getScreenerBundle } from "./desk.screener";
 export type {
   PositionsBundle,
   CreditBundle,
   ActivityBundle,
   SessionBundle,
+  EmpireReadiness,
   PositionRow,
   ActivityEvent,
 } from "./desk.empire";
+export type { DeskAccess } from "./auth/desk-access";
+export type { PreipoBundle, TesseraBundle } from "./desk.markets";
+export type {
+  MarketsBoardBundle,
+  MarketsBoardRow,
+  ScreenerBundle,
+  ScreenerRow,
+} from "./desk.screener";

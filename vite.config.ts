@@ -18,6 +18,12 @@ export default defineConfig({
       server: { entry: "server" },
     }),
     viteReact(),
-    nitro({ preset: "node-server" }),
+    // Vercel sets VERCEL=1 and needs the vercel preset (.vercel/output).
+    // Local preview / Playwright use node-server (.output).
+    nitro(
+      process.env["VERCEL"]
+        ? { preset: "vercel" }
+        : { preset: "node-server" },
+    ),
   ],
 });

@@ -1,259 +1,388 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
-import { DeskShell, Panel } from "@/components/desk-shell";
-import { StatusBadge } from "@/components/folio-brand";
-import { ModeBadge } from "@/components/mode-badge";
+import { Bell, KeyRound, Radio, Shield, Wallet } from "lucide-react";
+import { lazy, Suspense, useState } from "react";
+import { z } from "zod";
+import { AccountCustodyPanel } from "@/components/account-custody-panel";
+import { DeskShell } from "@/components/desk-shell";
+import { usePrivyShellReady } from "@/components/privy-app-provider";
 import { Switch } from "@/components/ui/switch";
 import {
+  bindWatchWallet,
   clearFolioSession,
-  createSessionFromPrivyToken,
+  clearWatchWallet,
   getSessionBundle,
-  runDeskAgent,
+  setActiveTenant,
+  updateDeskPreferences,
+  type SessionBundle,
 } from "@/lib/desk.functions";
+import { canWriteDeskPrefs } from "@/lib/auth/role-gates";
+import { scrubOpsJargon } from "@/lib/humanize-copy";
+import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
+import { siteMeta } from "@/lib/site-meta";
+
+const PrivySessionMint = lazy(() =>
+  import("@/components/privy-session-mint").then((m) => ({
+    default: m.PrivySessionMint,
+  })),
+);
+
+const DeskOpsSettings = lazy(() =>
+  import("@/components/desk-ops-settings").then((m) => ({
+    default: m.DeskOpsSettings,
+  })),
+);
+
+const searchSchema = z.object({
+  wall: z.enum(["ops"]).optional().catch(undefined),
+});
 
 export const Route = createFileRoute("/desk/settings")({
   head: () => ({
-    meta: [
-      { title: "Settings — FOLIO" },
-      {
-        name: "description",
-        content: "Server session status and paper agent — no localStorage auth.",
-      },
-    ],
+    meta: siteMeta({
+      title: "Account — FOLIO",
+      description: "Connect your wallet and manage alerts.",
+      path: "/desk/settings",
+    }),
   }),
+  validateSearch: (s) => searchSchema.parse(s),
+  loader: async () => getSessionBundle(),
   component: Page,
 });
 
 function Page() {
+  const initial = Route.useLoaderData();
+  const { wall } = Route.useSearch();
+  const opsOk = Boolean(initial.readiness.opsWallEnabled);
+  if (wall === "ops" && opsOk) {
+    return (
+      <DeskShell title="Operator">
+        <Suspense fallback={<p className="fx-sub">Loading…</p>}>
+          <DeskOpsSettings initial={initial} />
+        </Suspense>
+      </DeskShell>
+    );
+  }
+  return <ConsumerSettings initial={initial} />;
+}
+
+function ConsumerSettings({ initial }: { initial: SessionBundle }) {
   const queryClient = useQueryClient();
   const fetchSession = useServerFn(getSessionBundle);
-  const runAgent = useServerFn(runDeskAgent);
-  const createSession = useServerFn(createSessionFromPrivyToken);
+  const bindWatch = useServerFn(bindWatchWallet);
+  const clearWatch = useServerFn(clearWatchWallet);
   const clearSession = useServerFn(clearFolioSession);
+  const savePrefs = useServerFn(updateDeskPreferences);
+  const switchTenant = useServerFn(setActiveTenant);
   const { data, refetch } = useQuery({
     queryKey: ["session-bundle"],
     queryFn: () => fetchSession(),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 30_000,
   });
-  const [prompt, setPrompt] = useState("truth AAPLx");
-  const [agentOut, setAgentOut] = useState<string>("");
+
+  const [wallet, setWallet] = useState("");
+  const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
-  const [privyToken, setPrivyToken] = useState("");
-  const [sessionMsg, setSessionMsg] = useState<string>("");
-  const [sessionBusy, setSessionBusy] = useState(false);
+  const [tenantBusy, setTenantBusy] = useState(false);
+  const shellReady = usePrivyShellReady();
+
   const tenants = data?.session.ok ? data.session.data.tenants : [];
+  const activeTenantId = data?.activeTenantId ?? null;
+  const prefsTenant =
+    tenants.find((t) => t.tenantId === activeTenantId) ?? tenants[0] ?? null;
+  const prefsEditable = Boolean(
+    data?.session.ok &&
+      prefsTenant &&
+      data?.auth.ok &&
+      canWriteDeskPrefs(prefsTenant.role),
+  );
+  const alertsOn = data?.preferences.ok
+    ? data.preferences.data.corporateActionAlerts
+    : false;
+  const signedIn = Boolean(data?.auth.ok && data.auth.data.sessionReady);
+  const appId = data?.readiness.privyAppId ?? "";
+  const watchBindReady = Boolean(data?.sessionSecretPresent);
+  const fillsPaused = data?.readiness.broadcastPaused !== false;
+  const shortWallet = data?.watchWallet
+    ? `${data.watchWallet.slice(0, 4)}…${data.watchWallet.slice(-4)}`
+    : null;
+
+  async function refresh() {
+    await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
+    await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
+    await queryClient.invalidateQueries({ queryKey: ["credit-bundle"] });
+    await refetch();
+  }
 
   return (
-    <DeskShell eyebrow="Server preferences" title="Settings">
-      <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Mainnet read</ModeBadge>
-        <ModeBadge mode="unavailable">Broadcast off</ModeBadge>
-        <ModeBadge mode="paper">Paper agent</ModeBadge>
-      </div>
-      <div className="desk-grid">
-        <Panel title="Network mode" meta={<StatusBadge tone="green">Safe default</StatusBadge>}>
-          <div className="setting-row">
-            <span>
-              <b>Mainnet read</b>
-              <small>Observe live market and ledger data</small>
-            </span>
-            <StatusBadge tone="green">Selected</StatusBadge>
+    <DeskShell title="Account">
+      <section className="fx-page fx-account">
+        <header className="fx-account-hero">
+          <div className="fx-account-avatar" aria-hidden>
+            {shortWallet ? shortWallet[0]!.toUpperCase() : "F"}
           </div>
-          <div className="setting-row">
-            <span>
-              <b>Broadcast</b>
-              <small>Requires funding and explicit enablement</small>
-            </span>
-            <StatusBadge tone="neutral">
-              {data?.networkPolicy.broadcast ? "Enabled" : "Unavailable"}
-            </StatusBadge>
-          </div>
-          <div className="setting-row">
-            <span>
-              <b>Auth providers</b>
-              <small>Privy + Supabase + FOLIO_SESSION_SECRET</small>
-            </span>
-            <StatusBadge tone={data?.auth.ok ? "green" : "amber"}>
-              {data?.auth.ok
-                ? "Keys present"
-                : data && !data.auth.ok
-                  ? data.auth.reason
-                  : "Keys missing"}
-            </StatusBadge>
-          </div>
-          <div className="setting-row">
-            <span>
-              <b>httpOnly session</b>
-              <small>
-                {data?.session.ok
-                  ? `user ${data.session.data.userId.slice(0, 12)}…`
-                  : data?.session && !data.session.ok
-                    ? data.session.reason
-                    : "No verified folio_session"}
-              </small>
-            </span>
-            <StatusBadge
-              tone={data?.auth.ok && data.auth.data.sessionReady ? "green" : "amber"}
-            >
-              {data?.auth.ok && data.auth.data.sessionReady ? "Ready" : "Not ready"}
-            </StatusBadge>
-          </div>
-        </Panel>
-        <Panel title="Policy preferences">
-          <label className="setting-row">
-            <span>
-              <b>Corporate-action alerts</b>
-              <small>
-                {data?.preferences.ok
-                  ? "Server-persisted"
-                  : data && !data.preferences.ok
-                    ? data.preferences.reason
-                    : "Server prefs unavailable — not using localStorage"}
-              </small>
-            </span>
-            <Switch
-              checked={
-                data?.preferences.ok ? data.preferences.data.corporateActionAlerts : true
-              }
-              disabled
-            />
-          </label>
-          <label className="setting-row">
-            <span>
-              <b>Strict fail-closed mode</b>
-              <small>Stop when any required signal is unresolved</small>
-            </span>
-            <Switch
-              checked={data?.preferences.ok ? data.preferences.data.strictFailClosed : true}
-              disabled
-            />
-          </label>
-        </Panel>
-      </div>
-
-      <Panel
-        title="Bind Privy → httpOnly session"
-        meta={<StatusBadge tone="amber">Fail-closed without keys</StatusBadge>}
-      >
-        <p className="mb-3 text-sm opacity-80">
-          Paste a Privy access token only after Privy + Supabase + FOLIO_SESSION_SECRET are set.
-          FOLIO mints an httpOnly <code>folio_session</code> cookie — never localStorage auth.
-        </p>
-        <div className="form-grid">
-          <label>
-            Privy access token
-            <input
-              value={privyToken}
-              onChange={(e) => setPrivyToken(e.target.value)}
-              placeholder="eyJ… (server-verified)"
-              autoComplete="off"
-            />
-          </label>
-          <button
-            type="button"
-            className="wallet-pill"
-            disabled={sessionBusy || !privyToken.trim()}
-            onClick={async () => {
-              setSessionBusy(true);
-              setSessionMsg("");
-              try {
-                const res = await createSession({
-                  data: { accessToken: privyToken.trim() },
-                });
-                if (res.ok) {
-                  setSessionMsg(
-                    `Session bound for ${res.data.session.userId.slice(0, 16)}… — httpOnly cookie set.`,
-                  );
-                  setPrivyToken("");
-                  await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
-                  await refetch();
-                } else {
-                  setSessionMsg(
-                    `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
-                  );
-                }
-              } finally {
-                setSessionBusy(false);
-              }
-            }}
-          >
-            {sessionBusy ? "Verifying…" : "Mint httpOnly session"}
-          </button>
-        </div>
-        {sessionMsg ? <p className="mt-3 text-sm">{sessionMsg}</p> : null}
-        <div className="mt-4">
-          <b className="text-sm">Tenant memberships</b>
-          {tenants.length === 0 ? (
-            <p className="mt-1 text-sm opacity-80">
-              None resolved — fail-closed empty until Supabase{" "}
-              <code>tenant_members</code> rows exist for this Privy subject.
+          <div>
+            <p className="fx-hero-kicker">Profile</p>
+            <h1 className="fx-title">Account</h1>
+            <p className="fx-sub">
+              {signedIn
+                ? "Signed in · wallet prefs save to your desk."
+                : "Open App to sign in with email or connect a wallet."}
             </p>
-          ) : (
-            <ul className="mt-2 space-y-1 text-sm">
-              {tenants.map((t) => (
-                <li key={`${t.tenantId}:${t.userId}`}>
-                  <code>{t.tenantId.slice(0, 8)}…</code> · {t.role}
-                </li>
-              ))}
-            </ul>
-          )}
-          <button
-            type="button"
-            className="wallet-pill mt-3"
-            disabled={sessionBusy || !(data?.session.ok)}
-            onClick={async () => {
-              setSessionBusy(true);
-              setSessionMsg("");
-              try {
-                const res = await clearSession();
-                setSessionMsg(
-                  res.ok
-                    ? res.data.note
-                    : "Failed to clear session",
-                );
-                await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
-                await refetch();
-              } finally {
-                setSessionBusy(false);
-              }
-            }}
-          >
-            Clear httpOnly session
-          </button>
-        </div>
-      </Panel>
+          </div>
+        </header>
 
-      <Panel title="Paper agent" meta={<StatusBadge tone="blue">Caps · no broadcast</StatusBadge>}>
-        <div className="form-grid">
-          <label>
-            Prompt
-            <input value={prompt} onChange={(e) => setPrompt(e.target.value)} />
-          </label>
-          <button
-            type="button"
-            className="wallet-pill"
-            disabled={busy}
-            onClick={async () => {
-              setBusy(true);
-              try {
-                const res = await runAgent({ data: { prompt } });
-                setAgentOut(
-                  res.ok
-                    ? `${res.data.reply} (metered ~$${res.data.meteredCostUsd.toFixed(6)})`
-                    : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
-                );
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            {busy ? "Running…" : "Run paper agent"}
-          </button>
+        <div className="fx-account-grid">
+          <article className="fx-card fx-account-card">
+            <header className="fx-account-card-head">
+              <Wallet size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Wallet</h2>
+                <p>{shortWallet ?? "No wallet connected"}</p>
+              </div>
+            </header>
+            <form
+              className="fx-inline-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const next = wallet.trim();
+                if (!isPlausibleSolanaAddress(next)) {
+                  setMsg("Enter a valid Solana address.");
+                  return;
+                }
+                setBusy(true);
+                setMsg("");
+                try {
+                  const res = await bindWatch({ data: { wallet: next } });
+                  setMsg(
+                    res.ok
+                      ? "Wallet saved."
+                      : scrubOpsJargon(res.reason || "Couldn’t save wallet."),
+                  );
+                  if (res.ok) {
+                    setWallet("");
+                    await refresh();
+                  }
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              <input
+                value={wallet}
+                onChange={(e) => setWallet(e.target.value)}
+                placeholder="Paste wallet address"
+                autoComplete="off"
+                spellCheck={false}
+                aria-label="Wallet address"
+              />
+              <button
+                type="submit"
+                className="fx-btn fx-btn-dark fx-btn-sm"
+                disabled={busy || !watchBindReady}
+              >
+                {busy ? "…" : "Save"}
+              </button>
+            </form>
+            {!watchBindReady ? (
+              <p className="fx-sub" style={{ marginTop: ".65rem" }}>
+                Wallet save isn’t available on this host yet — use Open App to
+                sign in instead.
+              </p>
+            ) : null}
+            {data?.watchWallet ? (
+              <button
+                type="button"
+                className="fx-text-btn"
+                style={{ marginTop: ".85rem" }}
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    await clearWatch();
+                    await refresh();
+                    setMsg("Wallet disconnected.");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                Disconnect wallet
+              </button>
+            ) : null}
+          </article>
+
+          <article className="fx-card fx-account-card">
+            <header className="fx-account-card-head">
+              <Shield size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Sign in</h2>
+                <p>
+                  {signedIn
+                    ? "Session active on this device"
+                    : "Optional · unlocks saved prefs"}
+                </p>
+              </div>
+            </header>
+            {shellReady && appId ? (
+              <Suspense fallback={null}>
+                <PrivySessionMint
+                  appId={appId}
+                  mintReady={Boolean(data?.auth.ok)}
+                  allowedOrigin={
+                    typeof window !== "undefined" ? window.location.origin : ""
+                  }
+                  onMinted={refresh}
+                  variant="consumer"
+                />
+              </Suspense>
+            ) : (
+              <p className="fx-sub">Sign-in opens when the desk is configured.</p>
+            )}
+            {signedIn ? (
+              <button
+                type="button"
+                className="fx-text-btn"
+                style={{ marginTop: ".85rem" }}
+                onClick={async () => {
+                  await clearSession();
+                  await refresh();
+                  setMsg("Signed out.");
+                }}
+              >
+                Sign out
+              </button>
+            ) : null}
+          </article>
+
+          <article className="fx-card fx-account-card">
+            <header className="fx-account-card-head">
+              <KeyRound size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Security &amp; custody</h2>
+                <p>Link a wallet or export your embedded key</p>
+              </div>
+            </header>
+            <AccountCustodyPanel />
+          </article>
+
+          <article className="fx-card fx-account-card">
+            <header className="fx-account-card-head">
+              <Radio size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Desk mode</h2>
+                <p>
+                  {fillsPaused
+                    ? "Live reads · buys paused"
+                    : "Live reads · fills armed"}
+                </p>
+              </div>
+            </header>
+            <p className="fx-sub">
+              Markets and share counts update live. Broadcast fills stay off
+              until FOLIO turns them on for your session.
+            </p>
+          </article>
+
+          <article className="fx-card fx-account-card fx-account-card-row">
+            <header className="fx-account-card-head">
+              <Bell size={18} strokeWidth={2} aria-hidden />
+              <div>
+                <h2>Corporate-action alerts</h2>
+                <p>Notify when a pending multiplier appears.</p>
+              </div>
+            </header>
+            <Switch
+              checked={Boolean(alertsOn)}
+              disabled={!prefsEditable}
+              onCheckedChange={async (v) => {
+                if (!prefsEditable) return;
+                await savePrefs({ data: { corporateActionAlerts: v } });
+                await refresh();
+              }}
+            />
+          </article>
+
+          {signedIn && tenants.length > 0 ? (
+            <article className="fx-card fx-account-card">
+              <header className="fx-account-card-head">
+                <Shield size={18} strokeWidth={2} aria-hidden />
+                <div>
+                  <h2>Workspace</h2>
+                  <p>
+                    {prefsTenant
+                      ? `${prefsTenant.role} · ${
+                          prefsTenant.slug ??
+                          prefsTenant.displayName ??
+                          prefsTenant.tenantId.slice(0, 8)
+                        }`
+                      : "No active tenant"}
+                    {tenants.length > 1 ? ` · ${tenants.length} memberships` : ""}
+                  </p>
+                </div>
+              </header>
+              {tenants.length > 1 ? (
+                <ul className="fx-tenant-list" aria-label="Switch workspace">
+                  {tenants.map((t) => {
+                    const on = t.tenantId === activeTenantId;
+                    const label =
+                      t.slug ?? t.displayName ?? `${t.tenantId.slice(0, 8)}…`;
+                    return (
+                      <li key={t.tenantId}>
+                        <button
+                          type="button"
+                          className={`fx-tenant-item${on ? " is-on" : ""}`}
+                          disabled={tenantBusy || on}
+                          onClick={async () => {
+                            setTenantBusy(true);
+                            setMsg("");
+                            try {
+                              const res = await switchTenant({
+                                data: { tenantId: t.tenantId },
+                              });
+                              setMsg(
+                                res.ok
+                                  ? res.data.note
+                                  : `${res.reason}${res.detail ? ` — ${res.detail}` : ""}`,
+                              );
+                              await refresh();
+                            } finally {
+                              setTenantBusy(false);
+                            }
+                          }}
+                        >
+                          <strong>{label}</strong>
+                          <small>{t.role}</small>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="fx-sub">
+                  Prefs and alerts save to this workspace. Multi-tenant switch
+                  appears when you join another desk.
+                </p>
+              )}
+            </article>
+          ) : null}
         </div>
-        {agentOut ? <p className="mt-3 text-sm">{agentOut}</p> : null}
-      </Panel>
+
+        {msg ? (
+          <p className="fx-sub" style={{ marginTop: ".85rem" }}>
+            {msg}
+          </p>
+        ) : null}
+
+        <p className="fx-legal">
+          <Link to="/privacy">Privacy</Link>
+          {" · "}
+          <Link to="/terms">Terms</Link>
+        </p>
+      </section>
     </DeskShell>
   );
 }

@@ -1,17 +1,23 @@
 import { describe, expect, it } from "vitest";
 import { evaluateWashGate, washAllowsSize } from "../adapters/wash";
 
-describe("wash gate", () => {
-  it("fail-closes without BITQUERY_API_KEY", async () => {
+/** Low-entropy mint fixture — not a secret (avoids GG high-entropy false positives). */
+const FIXTURE_XSTOCK = "AAPLxTestMint111111111111111111111111111111";
+
+describe("wash gate fail-closed", () => {
+  it("blocks size when mint has no tape on any feed", async () => {
     const prev = process.env["BITQUERY_API_KEY"];
     delete process.env["BITQUERY_API_KEY"];
     const wash = await evaluateWashGate({
       symbol: "AAPLx",
-      mint: "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+      mint: FIXTURE_XSTOCK,
       notionalUsd: 100,
     });
     expect(wash.ok).toBe(false);
     expect(washAllowsSize(wash)).toBe(false);
+    if (!wash.ok) {
+      expect(wash.detail).toMatch(/fail-closed|blocked|Gecko|tape/i);
+    }
     if (prev != null) process.env["BITQUERY_API_KEY"] = prev;
   });
 });

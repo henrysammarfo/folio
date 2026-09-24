@@ -3,8 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, CheckCircle2, Database, FileClock } from "lucide-react";
 import { PublicShell, Metric } from "@/components/public-page";
-import { StatusBadge } from "@/components/folio-brand";
-import { ModeBadge } from "@/components/mode-badge";
 import { getTruthBundle } from "@/lib/desk.functions";
 
 export const Route = createFileRoute("/truth")({
@@ -24,14 +22,19 @@ export const Route = createFileRoute("/truth")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  /** Prefetch live bundle on the server so first paint is not empty placeholders. */
+  loader: async () => getTruthBundle({ data: { symbol: "AAPLx" } }),
   component: Page,
 });
 
 function Page() {
+  const initial = Route.useLoaderData();
   const fetchTruth = useServerFn(getTruthBundle);
   const { data, isLoading, isError, error, dataUpdatedAt } = useQuery({
     queryKey: ["truth", "AAPLx"],
     queryFn: () => fetchTruth({ data: { symbol: "AAPLx" } }),
+    initialData: initial,
+    initialDataUpdatedAt: Date.now(),
     refetchInterval: 60_000,
     staleTime: 30_000,
   });
@@ -43,27 +46,56 @@ function Page() {
 
   return (
     <PublicShell
+      tone="truth"
       eyebrow="Corporate-action ledger"
       title="One balance. Every truth behind it."
-      intro="Token balances alone can lie after dividends and splits. FOLIO reads the live xStocks Scaled UI multiplier on Solana mainnet and shows raw vs economic ownership — no fixture 4.0× theater."
+      intro="Token balances alone can lie after dividends and splits. FOLIO reconciles the live xStocks Scaled UI multiplier (API ↔ on-chain Token-2022) — our share-truth / PoR-analogue. Not issuer proof-of-reserves; Backed holds that layer."
+      aside={
+        <div className="mkt-status-col" aria-label="Feed status">
+          <div className="mkt-status-line" data-ok={String(Boolean(mult?.ok))}>
+            <b>xStocks</b>
+            <span>{mult?.ok ? "Live multiplier" : "Unavailable"}</span>
+          </div>
+          <div
+            className="mkt-status-line"
+            data-ok={String(
+              Boolean(data?.scaledUi?.ok) && data?.scaledUiCompare?.status !== "mismatch",
+            )}
+          >
+            <b>Reconcile</b>
+            <span>
+              {data?.scaledUi?.ok
+                ? data.scaledUiCompare?.status === "mismatch"
+                  ? "Mismatch"
+                  : data.scaledUiCompare?.status === "match"
+                    ? "API ↔ chain OK"
+                    : "Live on-chain"
+                : "Off"}
+            </span>
+          </div>
+          <div className="mkt-status-line" data-ok={String(Boolean(data?.jupiterPrice.ok))}>
+            <b>Jupiter</b>
+            <span>
+              {!data?.jupiterPrice.ok
+                ? "Off"
+                : data.jupiterPrice.source.includes("stale")
+                  ? "Stale-aware"
+                  : "Live venue"}
+            </span>
+          </div>
+        </div>
+      }
     >
-      <div className="mb-4 flex flex-wrap gap-2">
-        <ModeBadge mode={mult?.ok ? mult.mode : "unavailable"}>
-          {mult?.ok ? "xStocks live" : "Multiplier unavailable"}
-        </ModeBadge>
-        <ModeBadge mode={data?.jupiterPrice.ok ? data.jupiterPrice.mode : "unavailable"}>
-          {data?.jupiterPrice.ok ? "Jupiter price live" : "Jupiter price unavailable"}
-        </ModeBadge>
-        <ModeBadge mode={data?.pyth.ok ? data.pyth.mode : "unavailable"}>
-          {data?.pyth.ok ? "Pyth live" : "Pyth unavailable"}
-        </ModeBadge>
-      </div>
-
       <div className="metrics-grid">
         <Metric
           label="Paper raw balance"
           value={raw != null ? raw.toFixed(4) : isLoading ? "…" : "—"}
-          detail="Illustrative paper qty — not wallet truth until Privy binding"
+          detail="Illustrative paper qty — not wallet truth until you connect"
+        />
+        <Metric
+          label="Economic shares"
+          value={economic != null ? economic.toFixed(4) : isLoading ? "…" : "—"}
+          detail="raw × live multiplier (desk recon)"
         />
         <Metric
           label="Live action multiplier"
@@ -79,16 +111,49 @@ function Page() {
           }
         />
         <Metric
-          label="Economic shares"
-          value={economic != null ? economic.toFixed(4) : isLoading ? "…" : "—"}
-          detail="raw × live multiplier"
+          label="On-chain Scaled UI"
+          value={
+            data?.scaledUi?.ok
+              ? `${data.scaledUi.data.effectiveMultiplier.toFixed(6)}×`
+              : isLoading
+                ? "…"
+                : "—"
+          }
+          detail={
+            data?.scaledUi?.ok
+              ? `${data.scaledUiCompare?.note ?? "Token-2022"} · ${data.scaledUi.source.includes("public") ? "public RPC" : "dedicated RPC"}`
+              : data?.scaledUi && !data.scaledUi.ok
+                ? data.scaledUi.reason
+                : "Awaiting mint + RPC"
+          }
+        />
+        <Metric
+          label="Pending corporate action"
+          value={
+            mult?.ok && mult.data.pendingMultiplier != null
+              ? `${mult.data.pendingMultiplier.toFixed(6)}×`
+              : mult?.ok
+                ? "None"
+                : isLoading
+                  ? "…"
+                  : "—"
+          }
+          detail={
+            mult?.ok && mult.data.pendingMultiplier != null
+              ? `xStocks pending · reason ${mult.data.reason ?? "n/a"}`
+              : mult?.ok
+                ? "No pending newMultiplier on live feed"
+                : "Awaiting live multiplier"
+          }
         />
       </div>
 
       {(isError || (data && !mult?.ok)) && (
         <section className="feature-band mt-6">
           <div>
-            <StatusBadge tone="amber">Fail closed</StatusBadge>
+            <p className="mkt-eyebrow-row">
+              Fail closed <em>truth feed</em>
+            </p>
             <h2>Truth feed issue</h2>
             <p>
               {isError
@@ -103,9 +168,9 @@ function Page() {
 
       <section className="feature-band">
         <div>
-          <StatusBadge tone={mult?.ok ? "green" : "amber"}>
-            {mult?.ok ? "Live" : "Blocked"}
-          </StatusBadge>
+          <p className="mkt-eyebrow-row">
+            {mult?.ok ? "Live" : "Blocked"} <em>ownership math</em>
+          </p>
           <h2>{asset?.ok ? asset.data.name : "AAPLx"} ownership math</h2>
           <p>
             {asset?.ok
@@ -140,18 +205,94 @@ function Page() {
             </span>
           </li>
           <li>
+            {data?.scaledUiCompare?.status === "mismatch" ? (
+              <AlertTriangle />
+            ) : data?.scaledUi?.ok ? (
+              <CheckCircle2 />
+            ) : (
+              <Database />
+            )}
+            <span>
+              <b>On-chain Scaled UI</b>
+              {data?.scaledUi?.ok
+                ? ` ${data.scaledUi.data.effectiveMultiplier.toFixed(6)}× Token-2022 · ${data.scaledUiCompare?.note ?? "read"}`
+                : data?.scaledUi && !data.scaledUi.ok
+                  ? ` ${data.scaledUi.reason} — no invented on-chain ×`
+                  : " pending mint + RPC"}
+            </span>
+          </li>
+          <li>
+            <FileClock />
+            <span>
+              <b>Corporate-action pending</b>
+              {mult?.ok && mult.data.pendingMultiplier != null
+                ? ` newMultiplier ${mult.data.pendingMultiplier.toFixed(6)}× · reason ${mult.data.reason ?? "n/a"}`
+                : mult?.ok
+                  ? " none on live feed (no invented calendar)"
+                  : " unavailable"}
+            </span>
+          </li>
+          <li>
+            <Database />
+            <span>
+              <b>Pyth</b> off ship path ({data?.pyth.reason ?? "pyth_not_on_ship_path"})
+              {data?.xStockRef?.ok
+                ? ` · ${data.xStockRef.data.feedSymbol} $${data.xStockRef.data.price.toFixed(2)} (CoinGecko)`
+                : " · CoinGecko xStock off"}
+            </span>
+          </li>
+          <li>
+            <Database />
+            <span>
+              <b>Diverge equity ref</b>
+              {data?.equityRef?.ok
+                ? ` ${data.equityRef.data.feedSymbol} $${data.equityRef.data.price.toFixed(2)} · ${data.equityRef.data.provider}`
+                : data?.equityRef && !data.equityRef.ok
+                  ? ` ${data.equityRef.reason}`
+                  : " unavailable"}
+            </span>
+          </li>
+          <li>
+            <Database />
+            <span>
+              <b>Pyth bounty feeds</b>{" "}
+              {[
+                data?.pythBountyFeeds?.equityUs,
+                data?.pythBountyFeeds?.cryptoXStock,
+                data?.pythBountyFeeds?.cryptoOndo,
+              ]
+                .filter(Boolean)
+                .join(" · ") || "unmapped for this symbol"}
+              {data?.pyth && !data.pyth.ok && data.pyth.reason === "pyth_api_key_missing"
+                ? " — mapped · prices fail-closed until PYTH_API_KEY"
+                : ""}
+            </span>
+          </li>
+          <li>
             <Database />
             <span>
               <b>Venue check</b>
               {data?.jupiterPrice.ok
-                ? " Jupiter Price v3 mainnet"
-                : " Jupiter price unavailable"}
+                ? ` Jupiter Price v3 · ${data.jupiterPrice.source.includes("cached") ? "cached/stale-aware" : "live"}`
+                : data?.jupiterPrice && !data.jupiterPrice.ok
+                  ? ` ${data.jupiterPrice.reason}`
+                  : " Jupiter price unavailable"}
             </span>
           </li>
-          <li>
-            {data?.diverge.pass === false ? <AlertTriangle /> : <CheckCircle2 />}
+          <li data-testid="truth-diverge-gate" data-diverge-pass={String(data?.diverge.pass ?? "null")}>
+            {data?.diverge.pass === false ? (
+              <AlertTriangle />
+            ) : data?.diverge.pass === true ? (
+              <CheckCircle2 />
+            ) : (
+              <FileClock />
+            )}
             <span>
-              <b>Diverge gate</b> {data?.diverge.note ?? "pending"}
+              <b>Diverge gate</b>{" "}
+              {data?.diverge.pass == null
+                ? data?.diverge.note ??
+                  "unavailable — no invent-a-pass (live Yahoo/Finnhub + Jupiter venue required)"
+                : (data.diverge.note ?? "pending")}
             </span>
           </li>
         </ol>

@@ -3,6 +3,9 @@ import { errResult, okResult, type AdapterResult } from "./types";
 /** Live mainnet xStocks market (api.kamino.finance /v2/kamino-market, 2026-09-15). */
 export const KAMINO_XSTOCKS_MARKET = "5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua";
 
+/** Official Kamino borrow UI for the xStocks market (app.kamino → kamino.com). */
+export const KAMINO_XSTOCKS_BORROW_URL = `https://kamino.com/borrow/${KAMINO_XSTOCKS_MARKET}`;
+
 export type KaminoReserve = {
   symbol: string;
   mint: string;
@@ -19,13 +22,16 @@ export type KaminoMarketSnapshot = {
   market: string;
   marketName: string;
   reserves: KaminoReserve[];
+  borrowUrl: string;
 };
 
 /**
  * Mainnet-read Kamino xStocks market reserves (LTV / APY / TVL).
- * Borrow CPI remains local-fork / unavailable until funded — this is READ only.
+ * Execute path = deep-link to Kamino borrow UI (no FOLIO program / CPI).
  */
-export async function fetchKaminoXStocksMarket(): Promise<AdapterResult<KaminoMarketSnapshot>> {
+export async function fetchKaminoXStocksMarket(): Promise<
+  AdapterResult<KaminoMarketSnapshot>
+> {
   const source = "api.kamino.finance/kamino-market/reserves/metrics";
   try {
     const url = `https://api.kamino.finance/kamino-market/${KAMINO_XSTOCKS_MARKET}/reserves/metrics`;
@@ -83,6 +89,7 @@ export async function fetchKaminoXStocksMarket(): Promise<AdapterResult<KaminoMa
       market: KAMINO_XSTOCKS_MARKET,
       marketName: "xStocks Market",
       reserves,
+      borrowUrl: KAMINO_XSTOCKS_BORROW_URL,
     });
   } catch (e) {
     return errResult(source, "kamino_fetch_failed", String(e));

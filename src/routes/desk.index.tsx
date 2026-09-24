@@ -1,121 +1,169 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { DeskShell, Panel } from "@/components/desk-shell";
-import { StatusBadge } from "@/components/folio-brand";
-import { ModeBadge } from "@/components/mode-badge";
-import { getCreditBundle, getPositionsBundle } from "@/lib/desk.functions";
+import { z } from "zod";
+import { AllocationChart, paletteFor } from "@/components/allocation-chart";
+import { AssetLogo } from "@/components/asset-logo";
+import { DeskShell } from "@/components/desk-shell";
+import { TradingViewChart } from "@/components/tradingview-chart";
+import {
+  getCreditBundle,
+  getPositionsBundle,
+} from "@/lib/desk.functions";
+import { siteMeta } from "@/lib/site-meta";
+
+const deskSearchSchema = z.object({
+  inspect: z.string().max(64).optional().catch(undefined),
+});
 
 export const Route = createFileRoute("/desk/")({
   head: () => ({
-    meta: [
-      { title: "Prime Desk — FOLIO" },
-      { name: "description", content: "Live-labeled xStock desk overview." },
-    ],
+    meta: siteMeta({
+      title: "Desk — FOLIO",
+      description: "Buy, hold, and borrow tokenized stocks on Solana.",
+      path: "/desk",
+    }),
   }),
+  validateSearch: (search) => deskSearchSchema.parse(search),
+  loaderDeps: ({ search }) => ({ inspect: search.inspect }),
+  loader: async ({ deps }) => {
+    const [positions, credit] = await Promise.all([
+      getPositionsBundle({ data: { inspectWallet: deps.inspect } }),
+      getCreditBundle({ data: { inspectWallet: deps.inspect } }),
+    ]);
+    return { positions, credit };
+  },
   component: Page,
 });
 
+function money(n: number) {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}
+
 function Page() {
+  const initial = Route.useLoaderData();
+  const { inspect } = Route.useSearch();
   const fetchPositions = useServerFn(getPositionsBundle);
   const fetchCredit = useServerFn(getCreditBundle);
   const positions = useQuery({
-    queryKey: ["positions-bundle"],
-    queryFn: () => fetchPositions(),
+    queryKey: ["positions-bundle", inspect ?? ""],
+    queryFn: () => fetchPositions({ data: { inspectWallet: inspect } }),
+    initialData: initial.positions,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 15_000,
   });
   const credit = useQuery({
-    queryKey: ["credit-bundle"],
-    queryFn: () => fetchCredit(),
+    queryKey: ["credit-bundle", inspect ?? ""],
+    queryFn: () => fetchCredit({ data: { inspectWallet: inspect } }),
+    initialData: initial.credit,
+    initialDataUpdatedAt: Date.now(),
     staleTime: 20_000,
   });
 
   const rows = positions.data?.rows ?? [];
-  const verified = rows.filter((r) => r.health === "Verified").length;
-  const paperValue = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
+  const total = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
+  const borrow = credit.data?.paper.illustrativeBorrowUsd;
+  const featured = rows[0]?.symbol ?? "AAPLx";
+  const parts = rows
+    .filter((r) => (r.paperValueUsd ?? 0) > 0)
+    .map((r, i) => ({
+      label: r.symbol,
+      value: r.paperValueUsd ?? 0,
+      color: paletteFor(i),
+    }));
 
   return (
-    <DeskShell eyebrow="Portfolio command" title="Prime desk">
-      <div className="mb-3 flex flex-wrap gap-2">
-        <ModeBadge mode="mainnet-read">Live marks</ModeBadge>
-        <ModeBadge mode="paper">Paper qty</ModeBadge>
-        <ModeBadge mode="quote-only">Broadcast off</ModeBadge>
-      </div>
-      <div className="desk-metrics">
-        <div>
-          <span>Paper economic value</span>
-          <b>
-            {paperValue > 0
-              ? paperValue.toLocaleString("en-US", { style: "currency", currency: "USD" })
-              : "—"}
-          </b>
-          <small>Mainnet marks · paper qty</small>
+    <DeskShell title="Home">
+      <section className="fx-page fx-home">
+        <header className="fx-hero">
+          <p className="fx-hero-kicker">Your portfolio</p>
+          <h1 className="fx-hero-value">{total > 0 ? money(total) : "—"}</h1>
+          <p className="fx-hero-sub">
+            {borrow != null
+              ? `Borrowing power up to ${money(borrow)}`
+              : "Borrowing opens soon"}
+          </p>
+        </header>
+
+        <div className="fx-actions">
+          <Link to="/desk/acquire" className="fx-btn fx-btn-primary">
+            Buy
+          </Link>
+          <Link to="/desk/credit" className="fx-btn fx-btn-ghost">
+            Borrow
+          </Link>
+          <Link to="/desk/positions" className="fx-btn fx-btn-ghost">
+            Holdings
+          </Link>
         </div>
-        <div>
-          <span>Verified rows</span>
-          <b>
-            {verified} / {rows.length || "—"}
-          </b>
-          <small>Fail-closed when signals missing</small>
-        </div>
-        <div>
-          <span>Illustrative credit</span>
-          <b>
-            {credit.data?.paper.illustrativeBorrowUsd != null
-              ? credit.data.paper.illustrativeBorrowUsd.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 0,
-                })
-              : "—"}
-          </b>
-          <small>Paper × live Kamino LTV</small>
-        </div>
-      </div>
-      <div className="desk-grid">
-        <Panel title="Economic positions" meta={<StatusBadge tone="green">{verified} verified</StatusBadge>}>
-          <div className="position-list">
-            {rows.map((p) => (
-              <Link key={p.symbol} to="/desk/positions/$symbol" params={{ symbol: p.symbol }}>
-                <span className="asset-icon">{p.symbol[0]}</span>
-                <p>
-                  <b>{p.symbol}</b>
-                  <small>{p.name}</small>
-                </p>
-                <p>
-                  <b>{p.economicShares != null ? p.economicShares.toFixed(4) : "—"}</b>
-                  <small>economic shares</small>
-                </p>
-                <strong>
-                  {p.paperValueUsd != null
-                    ? p.paperValueUsd.toLocaleString("en-US", { style: "currency", currency: "USD" })
-                    : "—"}
-                </strong>
+
+        <div className="fx-home-grid">
+          <div className="fx-card fx-home-chart">
+            <div className="fx-home-chart-head">
+              <div>
+                <p className="fx-hero-kicker">{featured}</p>
+                <h2 className="fx-home-chart-title">Live chart</h2>
+              </div>
+              <Link
+                to="/desk/positions/$symbol"
+                params={{ symbol: featured }}
+                search={inspect ? { inspect } : {}}
+                className="fx-text-btn"
+              >
+                Open
               </Link>
-            ))}
+            </div>
+            <TradingViewChart
+              symbol={featured}
+              height={360}
+              interval="60"
+              theme="light"
+            />
           </div>
-        </Panel>
-        <Panel title="Policy state" meta={<StatusBadge tone="green">Fail closed</StatusBadge>}>
-          <div className="policy-list">
-            <p>
-              <span>Corporate actions</span>
-              <b>{verified > 0 ? "Live API" : "Pending"}</b>
-            </p>
-            <p>
-              <span>Kamino market</span>
-              <b>{credit.data?.kamino.ok ? "Mainnet read" : "Unavailable"}</b>
-            </p>
-            <p>
-              <span>Wash pressure</span>
-              <b>Fail-closed until Bitquery</b>
-            </p>
-            <p>
-              <span>Broadcast</span>
-              <b>Disabled</b>
-            </p>
+
+          <div className="fx-home-side">
+            {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
+
+            <h2 className="fx-section-title">Holdings</h2>
+            <div className="fx-card">
+              <ul className="fx-list">
+                {rows.slice(0, 5).map((p) => (
+                  <li key={p.symbol}>
+                    <Link
+                      to="/desk/positions/$symbol"
+                      params={{ symbol: p.symbol }}
+                      search={inspect ? { inspect } : {}}
+                      className="fx-asset"
+                    >
+                      <AssetLogo symbol={p.symbol} logo={p.logo} size={40} />
+                      <span className="fx-asset-main">
+                        <strong>{p.symbol}</strong>
+                        <small>{p.name}</small>
+                      </span>
+                      <span className="fx-asset-right">
+                        <strong>
+                          {p.paperValueUsd != null
+                            ? money(p.paperValueUsd)
+                            : "—"}
+                        </strong>
+                        <small>
+                          {p.usdPrice != null
+                            ? `$${p.usdPrice.toFixed(2)}`
+                            : "Live"}
+                        </small>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </Panel>
-      </div>
+        </div>
+      </section>
     </DeskShell>
   );
 }

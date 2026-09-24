@@ -28,12 +28,20 @@ create table if not exists public.desk_preferences (
   primary key (tenant_id, user_id)
 );
 
+create index if not exists tenant_members_user_id_idx
+  on public.tenant_members (user_id);
+
+create index if not exists desk_preferences_user_id_idx
+  on public.desk_preferences (user_id);
+
 alter table public.tenants enable row level security;
 alter table public.tenant_members enable row level security;
 alter table public.desk_preferences enable row level security;
 
--- Placeholder policies: replace auth.uid()/JWT claim mapping once Privy→Supabase is wired.
--- Until then, service-role server only — anon client must not read memberships.
+-- RLS: auth.jwt() ->> 'sub' must equal Privy DID (user_id).
+-- FOLIO mints short-lived HS256 user JWTs when SUPABASE_JWT_SECRET is set
+-- (see src/lib/auth/supabase-user-jwt.ts). Without the JWT secret, server uses
+-- labeled service-role fallback — anon client still must not bypass these policies.
 create policy tenants_member_select on public.tenants
   for select using (
     exists (
@@ -46,6 +54,59 @@ create policy tenants_member_select on public.tenants
 create policy tenant_members_self_select on public.tenant_members
   for select using (user_id = coalesce(auth.jwt() ->> 'sub', ''));
 
-create policy desk_prefs_self_all on public.desk_preferences
-  for all using (user_id = coalesce(auth.jwt() ->> 'sub', ''))
-  with check (user_id = coalesce(auth.jwt() ->> 'sub', ''));
+-- Desk prefs: any member may read their own row; only owner/trader may write.
+-- Mirrors src/lib/auth/role-gates.ts — viewers fail-closed at RLS + app.
+drop policy if exists desk_prefs_self_all on public.desk_preferences;
+
+create policy desk_prefs_self_select on public.desk_preferences
+  for select using (user_id = coalesce(auth.jwt() ->> 'sub', ''));
+
+create policy desk_prefs_writer_insert on public.desk_preferences
+  for insert with check (
+    user_id = coalesce(auth.jwt() ->> 'sub', '')
+    and exists (
+      select 1 from public.tenant_members m
+      where m.tenant_id = desk_preferences.tenant_id
+        and m.user_id = coalesce(auth.jwt() ->> 'sub', '')
+        and m.role in ('owner', 'trader')
+    )
+  );
+
+create policy desk_prefs_writer_update on public.desk_preferences
+  for update using (
+    user_id = coalesce(auth.jwt() ->> 'sub', '')
+    and exists (
+      select 1 from public.tenant_members m
+      where m.tenant_id = desk_preferences.tenant_id
+        and m.user_id = coalesce(auth.jwt() ->> 'sub', '')
+        and m.role in ('owner', 'trader')
+    )
+  )
+  with check (
+    user_id = coalesce(auth.jwt() ->> 'sub', '')
+    and exists (
+      select 1 from public.tenant_members m
+      where m.tenant_id = desk_preferences.tenant_id
+        and m.user_id = coalesce(auth.jwt() ->> 'sub', '')
+        and m.role in ('owner', 'trader')
+    )
+  );
+
+create policy desk_prefs_writer_delete on public.desk_preferences
+  for delete using (
+    user_id = coalesce(auth.jwt() ->> 'sub', '')
+    and exists (
+      select 1 from public.tenant_members m
+      where m.tenant_id = desk_preferences.tenant_id
+        and m.user_id = coalesce(auth.jwt() ->> 'sub', '')
+        and m.role in ('owner', 'trader')
+    )
+  );
+
+-- PostgREST roles need explicit table privileges (otherwise service_role → 42501).
+grant select, insert, update, delete on public.tenants to service_role;
+grant select, insert, update, delete on public.tenant_members to service_role;
+grant select, insert, update, delete on public.desk_preferences to service_role;
+grant select on public.tenants to anon, authenticated;
+grant select on public.tenant_members to anon, authenticated;
+grant select, insert, update, delete on public.desk_preferences to anon, authenticated;
