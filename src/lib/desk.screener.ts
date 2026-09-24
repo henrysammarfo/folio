@@ -1,7 +1,7 @@
 /**
  * Live markets board — multi-venue (Jupiter · free tape · Raydium · Solami when keyed).
  * Primary mark prefers Jupiter → Solami → free tape. Never invents prices.
- * Price fetches are staggered (not Promise.all of all symbols) to avoid 429 storms.
+ * Bounded concurrency (not full serial) so Vercel loaders stay under timeout.
  */
 
 import { createServerFn } from "@tanstack/react-start";
@@ -30,7 +30,6 @@ export type MarketsBoardRow = {
   stockRefPrice: number | null;
   liquidity: number | null;
   priceNote: string;
-  /** Multi-venue honesty strip */
   venues: VenueQuote[];
   openNow: boolean | null;
   tradingPeriod: string | null;
@@ -42,7 +41,6 @@ export type MarketsBoardBundle = {
   note: string;
 };
 
-/** @deprecated alias while exports settle */
 export type ScreenerRow = MarketsBoardRow;
 export type ScreenerBundle = MarketsBoardBundle;
 
@@ -55,89 +53,90 @@ function catalogSlice(lane: "all" | XStockLane): readonly XStockCatalogItem[] {
   return XSTOCK_CATALOG.filter((s) => s.lane === lane);
 }
 
-const PRICE_STAGGER_MS = 90;
+/** Cap parallel mint probes — avoids Jupiter 429 storms and Vercel timeouts. */
+const MINT_CONCURRENCY = 3;
 
-function sleep(ms: number) {
-  return new Promise<void>((r) => setTimeout(r, ms));
+async function mapPool<T, R>(
+  items: readonly T[],
+  concurrency: number,
+  fn: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  const out = new Array<R>(items.length);
+  let next = 0;
+  async function worker() {
+    while (true) {
+      const i = next++;
+      if (i >= items.length) return;
+      out[i] = await fn(items[i]!, i);
+    }
+  }
+  const n = Math.min(concurrency, Math.max(1, items.length));
+  await Promise.all(Array.from({ length: n }, () => worker()));
+  return out;
 }
 
-async function mapStaggered<T, R>(
-  items: readonly T[],
-  fn: (item: T, index: number) => Promise<R>,
-  gapMs: number,
-): Promise<R[]> {
-  const out: R[] = [];
-  for (let i = 0; i < items.length; i++) {
-    if (i > 0 && gapMs > 0) await sleep(gapMs);
-    out.push(await fn(items[i]!, i));
+async function buildRow(item: XStockCatalogItem): Promise<MarketsBoardRow> {
+  const asset = await fetchXStockAsset(item.symbol);
+  const mint = asset.ok ? asset.data.solanaMint : null;
+  const logo = asset.ok ? asset.data.logo : null;
+  const openNow = asset.ok ? asset.data.openNow : null;
+  const tradingPeriod = asset.ok ? asset.data.tradingPeriod : null;
+
+  const base = {
+    symbol: item.symbol,
+    name: item.name,
+    underlying: item.underlying,
+    lane: item.lane,
+    buyable: item.buyable,
+    logo,
+    mint,
+    openNow,
+    tradingPeriod,
+    ...(item.blurb ? { blurb: item.blurb } : {}),
+  };
+
+  if (!mint || !item.buyable) {
+    return {
+      ...base,
+      usdPrice: null,
+      stockRefPrice: null,
+      liquidity: null,
+      priceNote: !item.buyable
+        ? "Watchlist"
+        : asset.ok
+          ? "Mint missing"
+          : asset.reason,
+      venues: [],
+    };
   }
-  return out;
+
+  const multi = await resolveMultiVenuePrice(mint);
+  if (!multi.primary) {
+    return {
+      ...base,
+      usdPrice: null,
+      stockRefPrice: null,
+      liquidity: null,
+      priceNote: "Venues cooling — refresh soon",
+      venues: multi.venues,
+    };
+  }
+
+  return {
+    ...base,
+    usdPrice: multi.primary.usdPrice,
+    stockRefPrice: multi.primary.stockRefPrice,
+    liquidity: multi.primary.liquidity,
+    priceNote: multi.primary.priceNote,
+    venues: multi.venues,
+  };
 }
 
 export const getMarketsBoard = createServerFn({ method: "GET" })
   .validator(BoardInput)
   .handler(async ({ data }): Promise<MarketsBoardBundle> => {
     const slice = catalogSlice(data.lane);
-    const rows: MarketsBoardRow[] = await mapStaggered(
-      slice,
-      async (item) => {
-        const asset = await fetchXStockAsset(item.symbol);
-        const mint = asset.ok ? asset.data.solanaMint : null;
-        const logo = asset.ok ? asset.data.logo : null;
-        const openNow = asset.ok ? asset.data.openNow : null;
-        const tradingPeriod = asset.ok ? asset.data.tradingPeriod : null;
-
-        const base = {
-          symbol: item.symbol,
-          name: item.name,
-          underlying: item.underlying,
-          lane: item.lane,
-          buyable: item.buyable,
-          logo,
-          mint,
-          openNow,
-          tradingPeriod,
-          ...(item.blurb ? { blurb: item.blurb } : {}),
-        };
-
-        if (!mint || !item.buyable) {
-          return {
-            ...base,
-            usdPrice: null,
-            stockRefPrice: null,
-            liquidity: null,
-            priceNote: !item.buyable
-              ? "Watchlist"
-              : asset.ok
-                ? "Mint missing"
-                : asset.reason,
-            venues: [],
-          };
-        }
-
-        const multi = await resolveMultiVenuePrice(mint);
-        if (!multi.primary) {
-          return {
-            ...base,
-            usdPrice: null,
-            stockRefPrice: null,
-            liquidity: null,
-            priceNote: "Venues cooling — refresh soon",
-            venues: multi.venues,
-          };
-        }
-
-        return {
-          ...base,
-          usdPrice: multi.primary.usdPrice,
-          stockRefPrice: multi.primary.stockRefPrice,
-          liquidity: multi.primary.liquidity,
-          priceNote: multi.primary.priceNote,
-          venues: multi.venues,
-        };
-      },
-      PRICE_STAGGER_MS,
-    );
+    const rows = await mapPool(slice, MINT_CONCURRENCY, (item) => buildRow(item));
 
     const priced = rows.filter((r) => r.usdPrice != null).length;
     const liveVenues = rows.reduce(
@@ -173,5 +172,4 @@ export const getMarketsBoard = createServerFn({ method: "GET" })
     };
   });
 
-/** Keep old export name for any mid-WIP imports. */
 export const getScreenerBundle = getMarketsBoard;
