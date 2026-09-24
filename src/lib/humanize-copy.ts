@@ -123,6 +123,10 @@ export function humanizeVenueNote(raw: string | null | undefined): string {
     return "Cooling — refresh soon";
   }
   if (/Venue cooling/i.test(t)) return "Cooling — refresh soon";
+  if (/xstocks_asset_http_error|xstocks_asset_fetch_failed|xstocks_asset_malformed/i.test(t)) {
+    return "Catalog cooling — refresh soon";
+  }
+  if (/Mint missing/i.test(t)) return "Mint missing";
   if (/free.?tape|gecko/i.test(t)) return "live · free tape";
   if (/^live$/i.test(t)) return "live · Jupiter";
   if (/^live ·/i.test(t)) return t;
