@@ -462,7 +462,9 @@ export function NetroDensityCanvas({
                       <b>
                         {/live|clear|pass/i.test(gates.wash)
                           ? "Clean"
-                          : gates.wash || "…"}
+                          : /fail|closed|block|pause|unavail/i.test(gates.wash)
+                            ? "Paused"
+                            : gates.wash || "…"}
                       </b>
                     </li>
                     <li>
