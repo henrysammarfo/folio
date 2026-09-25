@@ -312,7 +312,7 @@ async function buildBoard(
   lane: z.infer<typeof BoardInput>["lane"],
   q?: string,
 ): Promise<MarketsBoardBundle> {
-  const cacheKey = `markets-board:v2:${lane}:${(q ?? "").trim().toLowerCase()}`;
+  const cacheKey = `markets-board:v3:${lane}:${(q ?? "").trim().toLowerCase()}`;
   const hit = cacheGet<MarketsBoardBundle>(cacheKey);
   if (hit) return hit.value;
 
@@ -393,12 +393,6 @@ async function buildBoard(
         ? `${universeCount.toLocaleString()} Solana xStocks live`
         : null,
       `${pricedCount} priced`,
-      partners.counts.preipo
-        ? `${partners.counts.preipo} PreStocks`
-        : null,
-      partners.counts.tessera
-        ? `${partners.counts.tessera} Tessera`
-        : null,
       liveVenues > 0 ? `${liveVenues} venue reads` : null,
     ]
       .filter(Boolean)

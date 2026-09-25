@@ -25,7 +25,7 @@ export const LANE_META: readonly LaneMeta[] = [
     id: "all",
     label: "All",
     title: "Full desk catalog",
-    body: "Mega names, recent IPO-era listings, meme stocks, plus PreStocks and Tessera partner lanes — each labeled.",
+    body: "Mega names, recent IPO-era listings, and meme stocks on the desk board. Private Pre-IPO lives on PreStocks / Tessera desks.",
   },
   {
     id: "mega",
