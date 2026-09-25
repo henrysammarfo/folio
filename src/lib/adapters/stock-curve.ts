@@ -1,7 +1,8 @@
 /**
  * FOLIO stock-curve for Meteora DBC.
  * Production path: locked config + live program-executable RPC probe (no heavy SDK in SSR).
- * SDK math (`buildCurveWithMarketCap`) is exercised in unit tests + optional FOLIO_DBC_SDK=1.
+ * SDK math lives in `stock-curve-sdk.ts` and is imported only from unit tests —
+ * never from desk.functions (Anchor CJS crashes Vercel ESM /__server → Privy mint dies).
  *
  * Pool address: `FOLIO_DBC_POOL` (preferred) or legacy `FOLIO_DBC_DEVNET_POOL`.
  * Network label: `FOLIO_DBC_NETWORK=mainnet|devnet` (default mainnet when FOLIO_DBC_POOL set).
@@ -138,88 +139,16 @@ async function probeProgramExecutableStrict(): Promise<boolean | null> {
 }
 
 /**
- * Optional heavy SDK build — only when FOLIO_DBC_SDK=1 (or vitest).
- * Avoids pulling @coral-xyz/anchor into every Vercel SSR request (CJS/ESM crash).
+ * @deprecated Prefer importing from `./stock-curve-sdk` in tests only.
+ * Kept as a thin re-export so older test imports keep working without
+ * pulling the SDK into the desk SSR graph via desk.functions → stock-curve.
  */
 export async function buildFolioStockCurveWithSdk(): Promise<{
   sqrt: string;
   curvePoints: number;
 }> {
-  const sdk = await import("@meteora-ag/dynamic-bonding-curve-sdk");
-  const {
-    ActivationType,
-    BaseFeeMode,
-    CollectFeeMode,
-    MigrationFeeOption,
-    MigrationOption,
-    TokenAuthorityOption,
-    TokenDecimal,
-    TokenType,
-    buildCurveWithMarketCap,
-    getSqrtPriceFromPrice,
-  } = sdk;
-
-  const sqrt = getSqrtPriceFromPrice("100", 6, 6);
-  const built = buildCurveWithMarketCap({
-    initialMarketCap: 100_000,
-    migrationMarketCap: 750_000,
-    activationType: ActivationType.Timestamp,
-    token: {
-      tokenType: TokenType.SPLToken,
-      tokenBaseDecimal: TokenDecimal.SIX,
-      tokenQuoteDecimal: 6,
-      tokenAuthorityOption: TokenAuthorityOption.Immutable,
-      totalTokenSupply: 1_000_000_000,
-      leftover: 0,
-    },
-    fee: {
-      baseFeeParams: {
-        baseFeeMode: BaseFeeMode.FeeSchedulerLinear,
-        feeSchedulerParam: {
-          startingFeeBps: 100,
-          endingFeeBps: 100,
-          numberOfPeriod: 0,
-          totalDuration: 0,
-        },
-      },
-      dynamicFeeEnabled: false,
-      collectFeeMode: CollectFeeMode.QuoteToken,
-      creatorTradingFeePercentage: 0,
-      poolCreationFee: 0,
-      enableFirstSwapWithMinFee: false,
-    },
-    migration: {
-      migrationOption: MigrationOption.MET_DAMM_V2,
-      migrationFeeOption: MigrationFeeOption.FixedBps100,
-      migrationFee: { feePercentage: 0, creatorFeePercentage: 0 },
-    },
-    liquidityDistribution: {
-      partnerPermanentLockedLiquidityPercentage: 0,
-      partnerLiquidityPercentage: 0,
-      creatorPermanentLockedLiquidityPercentage: 100,
-      creatorLiquidityPercentage: 0,
-    },
-    lockedVesting: {
-      totalLockedVestingAmount: 0,
-      numberOfVestingPeriod: 0,
-      cliffUnlockAmount: 0,
-      totalVestingDuration: 0,
-      cliffDurationFromMigrationTime: 0,
-    },
-  });
-
-  const curvePoints = Array.isArray(built.curve) ? built.curve.length : 0;
-  return {
-    sqrt: typeof sqrt?.toString === "function" ? sqrt.toString(10) : String(sqrt),
-    curvePoints,
-  };
-}
-
-function sdkEnabled(): boolean {
-  return (
-    process.env["FOLIO_DBC_SDK"] === "1" ||
-    process.env["VITEST"] === "true" ||
-    process.env["NODE_ENV"] === "test"
+  throw new Error(
+    "buildFolioStockCurveWithSdk moved to stock-curve-sdk.ts — import that module from tests only (never from desk SSR).",
   );
 }
 
@@ -233,24 +162,11 @@ export async function folioStockCurveStatus(): Promise<
       pool ? rpcGetAccountExists(pool) : Promise.resolve(null),
     ]);
 
-    let sdkSqrt: string | null = null;
-    let sdkPoints: number | null = null;
-    if (sdkEnabled()) {
-      try {
-        const built = await buildFolioStockCurveWithSdk();
-        sdkSqrt = built.sqrt;
-        sdkPoints = built.curvePoints;
-      } catch {
-        sdkSqrt = null;
-        sdkPoints = null;
-      }
-    }
-
     const config: FolioStockCurveConfig = {
       ...FOLIO_STOCK_CURVE,
       poolNetwork: network,
-      sdkSqrtPriceExample: sdkSqrt,
-      sdkCurvePoints: sdkPoints,
+      sdkSqrtPriceExample: null,
+      sdkCurvePoints: null,
     };
 
     const prog =
@@ -269,26 +185,18 @@ export async function folioStockCurveStatus(): Promise<
             ? "address set · account missing on RPC"
             : "account probe pending";
       note = `Stock curve locked · DBC ${prog} · ${network} pool ${pool.slice(0, 8)}… (${exists}) · no fake volume`;
-    } else if (sdkPoints != null) {
-      note = `SDK stock curve live (${sdkPoints} segments · fixed 100bps) · DBC program ${prog} · ${network} pool pending (needs funded create) · no fake volume`;
     } else {
       note = `Stock curve config live (USDC · gentle · fixed 100bps · cash-close start) · DBC program ${prog} · ${network} pool pending · SDK math in tests · no fake volume`;
     }
 
-    return okResult(
-      "mainnet-read",
-      sdkPoints != null
-        ? "@meteora-ag/dynamic-bonding-curve-sdk"
-        : "folio.stock-curve+rpc",
-      {
-        config,
-        pool,
-        poolNetwork: network,
-        poolAccountExists,
-        programExecutable,
-        note,
-      },
-    );
+    return okResult("mainnet-read", "folio.stock-curve+rpc", {
+      config,
+      pool,
+      poolNetwork: network,
+      poolAccountExists,
+      programExecutable,
+      note,
+    });
   } catch (e) {
     return errResult("folio.stock-curve", "stock_curve_failed", String(e));
   }
