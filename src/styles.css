@@ -1746,12 +1746,12 @@ button.fx-swap-mid:disabled{opacity:.4;cursor:default}
 }
 /* Catalog / T-tokens cards — padding + head gap so borders never clip titles */
 .fx-preipo-grid > .fx-card{
-  padding:1rem 1.05rem 1.05rem;
-  display:flex;flex-direction:column;gap:.75rem;
+  padding:1.15rem 1.1rem 1.1rem;
+  display:flex;flex-direction:column;gap:1rem;
 }
 .fx-preipo-grid > .fx-card > h2{
   margin:0;padding:0;flex-shrink:0;
-  font-size:.95rem;font-weight:750;letter-spacing:-.01em;line-height:1.2;
+  font-size:.95rem;font-weight:750;letter-spacing:-.01em;line-height:1.25;
   color:var(--fx-ink);position:relative;z-index:1;
 }
 .fx-preipo-list{
