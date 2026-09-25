@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
+import { VenueLogo } from "@/components/venue-logo";
 import { getMarketsBoard } from "@/lib/desk.functions";
 import { humanizeVenueNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
@@ -221,15 +222,7 @@ function Page() {
                               className={`fx-venue-pill is-${v.status}`}
                               title={v.note}
                             >
-                              <span className="fx-venue-mark" aria-hidden>
-                                {v.id === "jupiter"
-                                  ? "J"
-                                  : v.id === "free-tape"
-                                    ? "G"
-                                    : v.id === "raydium"
-                                      ? "R"
-                                      : "S"}
-                              </span>
+                              <VenueLogo id={v.id} size={14} />
                               {v.label}
                               {v.usdPrice != null
                                 ? ` ${money(v.usdPrice)}`

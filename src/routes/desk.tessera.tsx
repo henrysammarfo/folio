@@ -194,13 +194,19 @@ function Page() {
               <b>{isFetching ? "…" : out ? `${out} ${selected?.symbol}` : "—"}</b>
             </p>
             <p className="fx-checks">
-              Wash:{" "}
-              {data?.washOk
-                ? "clear"
-                : humanizeWashNote(data?.washNote)}
-              {" · "}
-              {humanizeHonestyNote(data?.note)}
+              {data?.jupiter.ok
+                ? `Live quote · $${spendUsdc} USDC`
+                : "Quote cooling — refresh soon"}
             </p>
+            {!data?.washOk ? (
+              <div className="fx-wash-banner" role="status">
+                <strong>Size paused — thin Tessera tape</strong>
+                {humanizeWashNote(data?.washNote)}. Quote stays live; we won’t
+                invent a clear wash.
+              </div>
+            ) : (
+              <p className="fx-checks">Wash clear</p>
+            )}
             {err ? <p className="fx-checks" role="alert">{err}</p> : null}
             {lastSig ? (
               <p className="fx-checks">
@@ -224,7 +230,11 @@ function Page() {
               slippageBps={100}
               outputMint={selected?.mint}
               outputDecimals={data?.assumedDecimals ?? 9}
-              pausedLabel="Quote ready — fills paused"
+              pausedLabel={
+                !data?.washOk
+                  ? "Paused — thin Tessera tape"
+                  : "Quote ready — fills paused"
+              }
               confirmLabel={`Buy ${selected?.symbol ?? "T-token"}`}
               onError={setErr}
               onSuccess={(sig) => {

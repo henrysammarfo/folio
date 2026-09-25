@@ -9,6 +9,7 @@ import { DeskShell } from "@/components/desk-shell";
 import { TokenSelectButton } from "@/components/token-select-button";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { trackFolioEvent } from "@/lib/analytics";
+import { isStablePaySymbol } from "@/lib/adapters/jupiter";
 import { getAcquireBundle } from "@/lib/desk.functions";
 import {
   humanizeGateReason,
@@ -74,7 +75,8 @@ function Page() {
     return () => window.removeEventListener("keydown", onKey);
   }, [settingsOpen]);
 
-  const isPair = pay !== "USDC";
+  const isPair = !isStablePaySymbol(pay);
+  const payStable = isStablePaySymbol(pay) ? pay.toUpperCase() : "USDC";
   const payAmount = Number(amount);
   const ready =
     Number.isFinite(payAmount) && payAmount > 0 && payAmount <= 25;
@@ -119,7 +121,7 @@ function Page() {
       }),
     enabled: ready && Boolean(selected?.buyable !== false || isPair),
     initialData:
-      receive === "AAPLx" && pay === "USDC" && payAmount === 1
+      receive === "AAPLx" && isStablePaySymbol(pay) && payAmount === 1
         ? initial
         : undefined,
     initialDataUpdatedAt: Date.now(),
@@ -198,8 +200,8 @@ function Page() {
   }
 
   function onPayToken(sym: string) {
-    if (sym.toUpperCase() === "USDC") {
-      setPay("USDC");
+    if (isStablePaySymbol(sym)) {
+      setPay(sym.toUpperCase());
       setAmount((a) => (Number(a) <= 0.25 ? "1" : a));
       if (tab === "pairs") setTab("all");
     } else {
@@ -218,7 +220,7 @@ function Page() {
   }
 
   function onReceiveToken(sym: string) {
-    if (sym.toUpperCase() === "USDC") return;
+    if (isStablePaySymbol(sym)) return;
     pickReceive(sym);
     if (pay === sym) setPay("USDC");
   }
@@ -274,12 +276,12 @@ function Page() {
                   className={`fx-lane${tab === id ? " is-on" : ""}`}
                   onClick={() => {
                     setTab(id);
-                    if (id === "pairs" && pay === "USDC") {
+                    if (id === "pairs" && isStablePaySymbol(pay)) {
                       setPay("AAPLx");
                       setReceive("MSFTx");
                       setAmount("0.01");
                     }
-                    if (id !== "pairs" && pay !== "USDC") {
+                    if (id !== "pairs" && !isStablePaySymbol(pay)) {
                       setPay("USDC");
                       setAmount("1");
                     }
@@ -431,7 +433,7 @@ function Page() {
           <div className="fx-mode-row" role="group" aria-label="Pay with">
             <button
               type="button"
-              className={`fx-mode${pay === "USDC" ? " is-on" : ""}`}
+              className={`fx-mode${!isPair ? " is-on" : ""}`}
               onClick={() => {
                 setPay("USDC");
                 setAmount("1");
@@ -439,7 +441,7 @@ function Page() {
                 setReviewed(false);
               }}
             >
-              Pay USDC
+              Pay stable
             </button>
             <button
               type="button"
@@ -461,7 +463,7 @@ function Page() {
               <span>You pay</span>
               <div className="fx-swap-row">
                 <TokenSelectButton
-                  value={isPair ? pay : "USDC"}
+                  value={isPair ? pay : payStable}
                   allowUsdc
                   exclude={[receive]}
                   aria-label="Pay token"
@@ -683,7 +685,7 @@ function Page() {
                   )
                 }
                 symbol={receive}
-                paySymbol={isPair ? pay : "USDC"}
+                paySymbol={isPair ? pay : payStable}
                 amount={payAmount}
                 slippageBps={slippageBps}
                 onError={(msg) => setErr(msg || null)}

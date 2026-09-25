@@ -130,13 +130,38 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
             <p className="fx-sub">
               {signedIn
                 ? "Signed in · wallet prefs save to your desk."
-                : "Open App to sign in with email or connect a wallet."}
+                : "New here? Create an account. Already have a wallet? Connect it."}
             </p>
           </div>
         </header>
 
+        {!signedIn ? (
+          <div className="fx-account-paths" data-testid="account-dual-paths">
+            <article className="fx-account-path">
+              <strong>Create account</strong>
+              <p>
+                Fresh to crypto? Open App with email or social — FOLIO mints a
+                wallet you can fund later.
+              </p>
+              <Link to="/desk/settings" className="fx-btn fx-btn-primary fx-btn-sm">
+                Open App →
+              </Link>
+            </article>
+            <article className="fx-account-path">
+              <strong>Connect wallet</strong>
+              <p>
+                Already on Solana? Paste or connect your wallet to verify
+                holdings and sign buys in-desk.
+              </p>
+              <a href="#wallet-bind" className="fx-btn fx-btn-dark fx-btn-sm">
+                Connect below →
+              </a>
+            </article>
+          </div>
+        ) : null}
+
         <div className="fx-account-grid">
-          <article className="fx-card fx-account-card">
+          <article className="fx-card fx-account-card" id="wallet-bind">
             <header className="fx-account-card-head">
               <Wallet size={18} strokeWidth={2} aria-hidden />
               <div>

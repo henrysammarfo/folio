@@ -81,11 +81,10 @@ function Page() {
     <DeskShell title="Pre-IPO">
       <section className="fx-page fx-preipo">
         <header className="fx-preipo-hero">
-          <p className="fx-hero-kicker">PreStocks only</p>
-          <h1>Private companies. Live Solana quotes.</h1>
+          <p className="fx-hero-kicker">PreStocks</p>
+          <h1>Private companies. Live quotes.</h1>
           <p className="fx-sub">
-            Stocklana PreStocks bounty — SPV-backed economic exposure, not
-            Tessera T-tokens. Search the catalog, size in USDC, confirm in FOLIO.{" "}
+            Search the catalog, size in USDC, confirm in FOLIO.{" "}
             <Link to="/desk/tessera">Tessera desk →</Link>
           </p>
         </header>
@@ -215,13 +214,21 @@ function Page() {
               <b>{isFetching ? "…" : out ? `${out} ${selected?.symbol}` : "—"}</b>
             </p>
             <p className="fx-checks">
-              Wash:{" "}
-              {data?.washOk
-                ? "clear"
-                : humanizeWashNote(data?.washNote)}
+              {data?.jupiter.ok
+                ? `Live quote · $${spendUsdc} USDC`
+                : "Quote cooling — refresh soon"}
               {" · "}
-              Decimals assumed {data?.assumedDecimals ?? 9} (labeled)
+              Decimals labeled {data?.assumedDecimals ?? 9}
             </p>
+            {!data?.washOk ? (
+              <div className="fx-wash-banner" role="status">
+                <strong>Size paused — thin PreStock tape</strong>
+                {humanizeWashNote(data?.washNote)}. Quote stays live; we won’t
+                invent a clear wash. Refresh after more trades land.
+              </div>
+            ) : (
+              <p className="fx-checks">Wash clear</p>
+            )}
             {err ? <p className="fx-checks" role="alert">{err}</p> : null}
             {lastSig ? (
               <p className="fx-checks">
@@ -245,7 +252,11 @@ function Page() {
               slippageBps={100}
               outputMint={selected?.mint}
               outputDecimals={data?.assumedDecimals ?? 9}
-              pausedLabel="Quote ready — fills paused"
+              pausedLabel={
+                !data?.washOk
+                  ? "Paused — thin PreStock tape"
+                  : "Quote ready — fills paused"
+              }
               confirmLabel={`Buy ${selected?.symbol ?? "PreStock"}`}
               onError={setErr}
               onSuccess={(sig) => {

@@ -112,6 +112,28 @@ function Page() {
           </div>
         ) : null}
 
+        <div className="fx-holdings-netro" data-testid="holdings-netro-strip">
+          <div className="fx-holdings-netro-card">
+            <span>Portfolio</span>
+            <b>{total > 0 ? money(total) : "—"}</b>
+            <small>{walletRead ? "Wallet verified" : "Paper estimate"}</small>
+          </div>
+          <div className="fx-holdings-netro-card">
+            <span>Positions</span>
+            <b>{rows.length}</b>
+            <small>{rows.filter((r) => r.qtySource === "wallet-read").length} live</small>
+          </div>
+          <div className="fx-holdings-netro-card is-dark">
+            <span>Next</span>
+            <b>{walletRead ? "Borrow" : "Connect"}</b>
+            <small>
+              <Link to={walletRead ? "/desk/credit" : "/desk/settings"}>
+                {walletRead ? "Open credit →" : "Open account →"}
+              </Link>
+            </small>
+          </div>
+        </div>
+
         {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
 
         <h2 className="fx-section-title">Your stocks</h2>

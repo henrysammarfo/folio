@@ -1,4 +1,8 @@
 import { errResult, okResult, type AdapterResult } from "./types";
+import { cacheGet, cacheGetStale, cacheSet } from "./ttl-cache";
+
+const WASH_TTL_MS = 45_000;
+const WASH_STALE_MS = 180_000;
 
 export type WashVerdict = {
   symbol: string;
@@ -399,6 +403,10 @@ export async function evaluateWashGate(params: {
     );
   }
 
+  const cacheKey = `wash:${params.mint}:${Math.round(params.notionalUsd)}`;
+  const hit = cacheGet<AdapterResult<WashVerdict>>(cacheKey);
+  if (hit) return hit.value;
+
   const apiKey = process.env["BITQUERY_API_KEY"]?.trim();
   if (apiKey) {
     const bitquery = await fetchBitqueryWash({
@@ -407,7 +415,10 @@ export async function evaluateWashGate(params: {
       notionalUsd: params.notionalUsd,
       apiKey,
     });
-    if (bitquery.ok) return bitquery;
+    if (bitquery.ok) {
+      cacheSet(cacheKey, bitquery, WASH_TTL_MS);
+      return bitquery;
+    }
     // Quota / HTTP / schema miss → free fallback (still fail-closed if gecko fails)
   }
 
@@ -416,7 +427,22 @@ export async function evaluateWashGate(params: {
     mint: params.mint,
     notionalUsd: params.notionalUsd,
   });
-  if (gecko.ok) return gecko;
+  if (gecko.ok) {
+    cacheSet(cacheKey, gecko, WASH_TTL_MS);
+    return gecko;
+  }
+
+  const stale = cacheGetStale<AdapterResult<WashVerdict>>(
+    cacheKey,
+    WASH_STALE_MS,
+  );
+  if (stale?.value.ok) {
+    return {
+      ...stale.value,
+      mode: "cached",
+      source: `${stale.value.source} · stale-wash`,
+    };
+  }
 
   if (!apiKey) {
     return errResult(
