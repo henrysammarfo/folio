@@ -36,6 +36,19 @@ Before shipping any desk/markets/credit/buy/partner change:
 | Overview agent rail | Present but quieter than Netro yellow intelligence column |
 | NetroBNB full overview | Missing FOLIO analogues: signal-health grid, risk gauge, 3D/hero art depth, floating swap mascot energy (FOLIO-branded, not fox clone) |
 
+## Gap close pass (2026-09-25)
+
+| Gap | Status |
+|---|---|
+| Buy token sheet depth | Popular chips + deeper pop |
+| Credit LTV hierarchy | Max LTV conic ring |
+| NestUSD rate rail | Dual borrow/liq bars |
+| Markets venue identity | Letter-mark pills J/G/R/S |
+| Holdings paper-demo | Banner + Connect → |
+| Partner Pre-IPO logos | API `image` + 40px faces |
+| Overview AI rail quiet | Yellow sheen + live gate chips |
+| DBC “how much SOL” | Documented — **0.05–0.08 SOL** comfortable create |
+
 ## Bible path audit (2026-09-24)
 
 Bible **World’s Fair side tracks** added 2026-09-24:
