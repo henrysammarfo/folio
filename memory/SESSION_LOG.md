@@ -8,7 +8,7 @@
 - Local `.env`: Privy/Supabase/Jupiter empty → local Open App fail-closed (expected).
 - Root cause of connect/sign dying on prod: `@coral-xyz/anchor` ESM crash (`exports is not defined`) pulled via Meteora DBC SDK into desk SSR — not missing Privy keys.
 - Fix: move SDK to `stock-curve-sdk.ts` (tests only); production `stock-curve.ts` is RPC-only.
-- PR #46 · merged to `main` (`9b1d5fc`) · production redeploy in flight so Privy mint/sign can work again.
+- PR #46 merged · production READY on `9b1d5fc` (`dpl_8sX5nCKr…`) · zero Anchor crash logs on that deploy · Privy keys still green.
 
 ## 2026-09-25 — Pitch + Technical video pack + live pitch deck
 

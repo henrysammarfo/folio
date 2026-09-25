@@ -8,6 +8,7 @@
 | Desk SSR Anchor `exports is not defined` blocked Privy mint/sign (not missing keys) | Verified runtime logs on prod main pre-fix |
 | Fix preview (`cursor/folio-dbc-ssr-sign-fix-f1ec`) has zero Anchor crash logs | Verified |
 | Fix merged to `main` (`9b1d5fc`) · PR #46 | Verified git push |
+| Production deploy `dpl_8sX5nCKr…` READY · no Anchor crash on that deploy | Verified runtime logs + SSR probe |
 
 ## 2026-09-25 — Pitch deck + dual video scripts
 

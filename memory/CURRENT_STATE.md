@@ -31,7 +31,7 @@ See `memory/FLAWS_AND_WORKAROUNDS.md` — Jupiter 429s, Raydium no mid, Solami D
 
 **URL:** https://folio-tawny-one.vercel.app
 
-**Keys (2026-09-25):** Vercel Privy+Supabase+session+Jupiter+Bitquery+Finnhub+Pyth+RPC present · `privyConfigured` true on SSR · `broadcastPaused:false`. Connect/sign break was Anchor ESM crash from Meteora DBC SDK in desk SSR — fixed on `main` (`9b1d5fc`, PR #46); production redeploy after merge.
+**Keys (2026-09-25):** Vercel Privy+Supabase+session+Jupiter+Bitquery+Finnhub+Pyth+RPC present · `privyConfigured` true on SSR · `broadcastPaused:false`. Connect/sign break was Anchor ESM crash from Meteora DBC SDK in desk SSR — fixed and live on prod (`9b1d5fc` / PR #46).
 
 | Surface | Status |
 |---|---|
