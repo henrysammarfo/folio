@@ -2,11 +2,12 @@
 
 | Claim | Status |
 |---|---|
-| Production Vercel has PRIVY_APP_ID/SECRET + Supabase + FOLIO_SESSION_SECRET + Jupiter | Verified via SSR readiness payload |
+| Production Vercel has PRIVY_APP_ID/SECRET + Supabase + FOLIO_SESSION_SECRET + Jupiter + Bitquery + Finnhub + Pyth + SOLANA_RPC | Verified via `filter_project_envs` (names) + SSR readiness |
 | Production `broadcastPaused:false` (fills armed) | Verified SSR `broadcastPaused:!1` |
 | Local `.env` Privy/Supabase empty | Verified smoke:keys FAIL-CLOSED |
-| `/__server` Anchor `exports is not defined` blocks serverFns (session mint / prepare) | Verified runtime errors · 122 hits |
-| Fix: DBC SDK isolated from desk SSR graph | Implemented on branch |
+| Desk SSR Anchor `exports is not defined` blocked Privy mint/sign (not missing keys) | Verified runtime logs on prod main pre-fix |
+| Fix preview (`cursor/folio-dbc-ssr-sign-fix-f1ec`) has zero Anchor crash logs | Verified |
+| Fix merged to `main` (`9b1d5fc`) · PR #46 | Verified git push |
 
 ## 2026-09-25 — Pitch deck + dual video scripts
 
