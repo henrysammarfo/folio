@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Stocklana paste pack + NetroBNB style README + video scripts
+
+- Root README rewritten NetroBNB style (badges, stack table, flow, honest limits). Soft pitch. No hyphen heavy prose.
+- `docs/VIDEO_SCRIPTS.md` added: master 90s tour plus nine surface clips with shot lists.
+- `docs/STOCKLANA_SUBMISSION.md` Full Description Markdown paste ready (~2k chars).
+- Demo and submit checklists pointed at video scripts.
+
 ## 2026-09-25 — NetroBNB home fidelity + markets/partner UX repair
 
 - Home Netro canvas: **exact NetroBNB tokens** (#F4D014 yellow · #E5E7EB canvas) · `i1.png` gear · "Asset Intelligence Dashboard" / "Today's Market Flow" / "Make Analysis Easy" · always-on (no approve-gate).
