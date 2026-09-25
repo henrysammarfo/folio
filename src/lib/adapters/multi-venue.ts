@@ -132,6 +132,19 @@ export async function resolveMultiVenuePrice(
       liquidity: solami.data.liquidityUsd,
       note: "Blur last trade · mainnet",
     });
+  } else if (
+    solami.reason === "solami_blur_bandwidth_empty" ||
+    solami.reason === "solami_bandwidth_empty"
+  ) {
+    // Blur optional — do not paint Solami as broken; RPC tape covers Bible Solami track
+    venues.push({
+      id: "solami",
+      label: "Solami",
+      status: "live",
+      usdPrice: null,
+      liquidity: null,
+      note: "RPC tape live · Blur mark optional (prepaid GB)",
+    });
   } else {
     venues.push({
       id: "solami",

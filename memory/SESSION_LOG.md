@@ -1,6 +1,14 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Solami docs correction (no $25 Blur tax)
+
+- Re-read Solami docs: Blur meters prepaid streaming bandwidth; Free/Pro include **RPC**.
+- Live probe: `remaining_bytes: 0` · Blur 402 · **same key** `rpc.solami.dev` getSlot + getSignaturesForAddress OK.
+- Adapter: prefer Solami RPC tape; Blur last-trade optional only when bandwidth > 0. Never require $25 top-up for demo.
+- Multi-venue: Solami stays `live` on RPC path when Blur empty.
+- Stocklana Pro trial (`st-earn-sep-26`) = RPC/gRPC perk, not free Blur GB.
+
 ## 2026-09-24 — Multi-venue + SDK depth (Henry follow-up)
 
 - Markets: `resolveMultiVenuePrice` — Jupiter · Gecko free-tape · Raydium liq awareness · Solami Blur REST (`api.solami.dev`) when keyed; venue pills on board (not faint dots).

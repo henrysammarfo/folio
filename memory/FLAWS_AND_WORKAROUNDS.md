@@ -10,17 +10,20 @@
 | Single-venue UI hid free-tape / Raydium / Solami | High (Henry shot) | `resolveMultiVenuePrice` returns all four · board venue pills |
 | Raydium API has TVL/volume but not always a mid price | Med | Show Raydium as **liq awareness** only — no invented mid |
 | GeckoTerminal rate / empty pools for thin mints | Med | Label `off` · do not paint Ready |
-| Solami Blur requires `DataApi` key (`SOLAMI_API_KEY`) | Med | Key landed on `.env` + Vercel · **402 prepaid bandwidth** until top-up · labeled `solami_bandwidth_empty` · RPC tape until Blur meters |
+| Solami Blur requires `DataApi` key (`SOLAMI_API_KEY`) | Med | Key landed · Blur GB optional · **Solami RPC tape is the free live path** |
 
 ## Solami Blur (Bible tape)
 
 | Finding | Severity | Workaround / fix |
 |---|---|---|
+| Solami Blur requires prepaid streaming bandwidth | Med | **Do not buy $25 Blur GB for demo** · Free/Pro **RPC** satisfies Bible Solami track · Blur mark optional when `remaining_bytes>0` |
 | REST host is `https://api.solami.dev` (not `.fast` / invent hosts) | — | Documented from official `/docs/api/get_data-token-price` |
 | Fractional fields are **decimal strings** | Bug if ignored | `Number(price_usd)` before math |
 | Response is bare array · mint may be omitted if no USD-able trade | Med | Match on `mint` · never invent |
-| Auth: Bearer + DataApi permission | Key landed | Still needs prepaid Blur bandwidth (402) |
-| HTTP 402 no prepaid bandwidth | Blocker for Blur marks | Top up https://solami.dev/dashboard · keep RPC tape labeled |
+| Auth: Bearer + DataApi permission | Key landed | Blur still 402 with 0 bandwidth |
+| HTTP 402 / `remaining_bytes: 0` | Expected without prepaid GB | Use `rpc.solami.dev` tape · label Blur optional |
+| Docs “which product” | Binding | **read state with RPC** · streams optional · Beam only if sending tx |
+| Stocklana signup `st-earn-sep-26` | Optional | 7-day Pro free (RPC/gRPC) · auto-revert Free · no card — still not free Blur GB |
 
 ## Meteora DBC (Bible primary)
 
@@ -60,4 +63,4 @@
 
 ## Keys
 
-Research keys only in gitignored `.env`. Rotate after any chat paste. `SOLAMI_API_KEY` on Vercel — still needs Blur bandwidth top-up.
+Research keys only in gitignored `.env`. Rotate after any chat paste. `SOLAMI_API_KEY` on Vercel — use **Solami RPC** for live tape; Blur prepaid GB is optional (not a $25 demo tax).

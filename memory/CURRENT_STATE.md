@@ -19,7 +19,7 @@ See `memory/HENRY_DESK_CREATIVE.md` — factorize every feature against Bible + 
 | Soft pitch + pitch order | Live in copy |
 | **Cash session weekend refuse** | **Wired** — `session-gate.ts` → acquire gates + `/network` + overview week strip |
 | **Meteora DBC stock-curve** | **Live config + RPC** — program executable · `FOLIO_DBC_POOL` mainnet slot ready · pool create needs funded payer (no invent) |
-| **Solami Blur tape** | **Key landed** · Blur **402 bandwidth** until top-up · RPC tape until then |
+| **Solami Blur tape** | **Key landed** · live via **Solami RPC** (Free/Pro) · Blur marks optional (prepaid GB — skip $25) |
 | **Multi-venue markets** | **Live** — Jupiter + free tape + Raydium awareness + Solami · board venue pills |
 | Panta | Out (correct) |
 

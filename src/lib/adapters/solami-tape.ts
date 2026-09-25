@@ -1,13 +1,25 @@
 /**
- * Solami Blur tape — Bible World’s Fair “the tape.”
- * Live REST: GET https://api.solami.dev/data/token/price (DataApi key).
- * Without SOLAMI_API_KEY → labeled RPC recent-sig probe (never invents prices).
- * Docs: https://solami.dev/docs/api/get_data-token-price · https://solami.dev/docs/blur
+ * Solami tape — Bible World’s Fair “the tape.”
+ *
+ * Docs (2026-09-25):
+ * - which-product: “read state with RPC, react to change with a stream”
+ * - Free plan includes RPC (5 rps). Blur REST meters prepaid streaming bandwidth.
+ * - Stocklana signup trial: 7 days Pro (RPC/gRPC) — not free Blur GB.
+ * - Blur $ prepaid bandwidth is OPTIONAL — never required for “live Solami” honesty.
+ *
+ * Path:
+ * 1) Solami RPC recent sigs when SOLAMI_API_KEY set (free / plan included)
+ * 2) Blur last-trade USD only when bandwidth > 0 (optional)
+ * 3) Else public/configured SOLANA_RPC_URL labeled (not Solami-branded)
+ *
+ * Never invent prices. Never tell operators to burn $25 Blur bandwidth for the demo.
  */
 import { errResult, okResult, type AdapterResult } from "./types";
 import { resolveSolanaRpcUrl } from "./solana-rpc";
 
 const SOLAMI_PRICE = "https://api.solami.dev/data/token/price";
+const SOLAMI_BANDWIDTH = "https://api.solami.dev/bandwidth";
+const SOLAMI_RPC = "https://rpc.solami.dev/sol";
 
 export type SolamiTokenPrice = {
   mint: string;
@@ -19,7 +31,7 @@ export type SolamiTokenPrice = {
 };
 
 export type SolamiTape = {
-  kind: "solami_blur" | "rpc_recent_sigs" | "unavailable";
+  kind: "solami_blur" | "solami_rpc" | "rpc_recent_sigs" | "unavailable";
   label: string;
   recentSigs?: number;
   mint?: string;
@@ -27,10 +39,12 @@ export type SolamiTape = {
   liquidityUsd?: number | null;
 };
 
-function solamiHeaders(): HeadersInit | null {
+function solamiKey(): string | null {
   const key = process.env["SOLAMI_API_KEY"]?.trim();
-  if (!key) return null;
-  // Solami accepts Bearer; some dashboards also issue raw keys — send both styles safely.
+  return key || null;
+}
+
+function solamiHeaders(key: string): HeadersInit {
   return {
     Accept: "application/json",
     Authorization: `Bearer ${key}`,
@@ -38,19 +52,28 @@ function solamiHeaders(): HeadersInit | null {
   };
 }
 
+/** Solami JSON-RPC URL when keyed — Free/Pro included path (docs). */
+export function resolveSolamiRpcUrl(): { url: string; keyed: boolean } {
+  const key = solamiKey();
+  if (!key) return { url: "", keyed: false };
+  return {
+    url: `${SOLAMI_RPC}?api_key=${encodeURIComponent(key)}`,
+    keyed: true,
+  };
+}
+
 /**
- * Live Blur last-trade USD price for a mint.
- * Fail-closed without DataApi key or when mint has no USD-priceable trade.
+ * Optional Blur last-trade USD. Fail-closed on 402 bandwidth — do not treat as hard requirement.
  */
 export async function fetchSolamiTokenPrice(
   mint: string,
 ): Promise<AdapterResult<SolamiTokenPrice>> {
-  const headers = solamiHeaders();
-  if (!headers) {
+  const key = solamiKey();
+  if (!key) {
     return errResult(
       "api.solami.dev",
       "solami_api_key_missing",
-      "Set SOLAMI_API_KEY with DataApi permission — https://solami.dev/dashboard/keys",
+      "Set SOLAMI_API_KEY — https://solami.dev/dashboard/keys",
     );
   }
   try {
@@ -60,7 +83,7 @@ export async function fetchSolamiTokenPrice(
       liquidity: "true",
     });
     const res = await fetch(`${SOLAMI_PRICE}?${qs}`, {
-      headers,
+      headers: solamiHeaders(key),
       signal: AbortSignal.timeout(12_000),
     });
     if (res.status === 401 || res.status === 403) {
@@ -71,15 +94,11 @@ export async function fetchSolamiTokenPrice(
       );
     }
     if (res.status === 402) {
-      let detail =
-        "Blur needs prepaid bandwidth — top up at https://solami.dev/dashboard";
-      try {
-        const body = (await res.json()) as { message?: string };
-        if (body?.message) detail = body.message;
-      } catch {
-        /* keep default */
-      }
-      return errResult("api.solami.dev", "solami_bandwidth_empty", detail);
+      return errResult(
+        "api.solami.dev",
+        "solami_blur_bandwidth_empty",
+        "Blur REST optional · prepaid streaming bandwidth empty · Solami RPC tape still live (Free/Pro)",
+      );
     }
     if (!res.ok) {
       return errResult(
@@ -125,9 +144,34 @@ export async function fetchSolamiTokenPrice(
   }
 }
 
+/** Bandwidth remaining (0 = Blur off; RPC still ok). */
+export async function fetchSolamiBandwidth(): Promise<
+  AdapterResult<{ remainingBytes: number }>
+> {
+  const key = solamiKey();
+  if (!key) {
+    return errResult("api.solami.dev", "solami_api_key_missing", "no key");
+  }
+  try {
+    const res = await fetch(SOLAMI_BANDWIDTH, {
+      headers: solamiHeaders(key),
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!res.ok) {
+      return errResult("api.solami.dev", "solami_bandwidth_http", `HTTP ${res.status}`);
+    }
+    const json = (await res.json()) as { remaining_bytes?: number };
+    const remainingBytes =
+      typeof json.remaining_bytes === "number" ? json.remaining_bytes : 0;
+    return okResult("mainnet-read", "api.solami.dev/bandwidth", { remainingBytes });
+  } catch (e) {
+    return errResult("api.solami.dev", "solami_bandwidth_failed", String(e));
+  }
+}
+
 /**
  * Network-matrix / desk tape probe.
- * Prefer live Blur price when keyed; else RPC recent signatures (labeled).
+ * Prefer Solami RPC (included). Blur price is optional when bandwidth exists.
  */
 export async function fetchSolamiTape(input: {
   mint: string | null;
@@ -136,35 +180,53 @@ export async function fetchSolamiTape(input: {
     return errResult("folio.solami-tape", "mint_missing", "Need xStock mint for tape probe");
   }
 
-  const blur = await fetchSolamiTokenPrice(input.mint);
-  if (blur.ok) {
-    return okResult("mainnet-read", blur.source, {
-      kind: "solami_blur",
-      label: `Solami Blur · $${blur.data.usdPrice.toPrecision(4)} · last trade`,
-      mint: input.mint,
-      usdPrice: blur.data.usdPrice,
-      liquidityUsd: blur.data.liquidityUsd,
-    });
+  const key = solamiKey();
+  if (key) {
+    // Optional Blur mark — never block tape on 402
+    const blur = await fetchSolamiTokenPrice(input.mint);
+    if (blur.ok) {
+      return okResult("mainnet-read", blur.source, {
+        kind: "solami_blur",
+        label: `Solami Blur · $${blur.data.usdPrice.toPrecision(4)} · last trade`,
+        mint: input.mint,
+        usdPrice: blur.data.usdPrice,
+        liquidityUsd: blur.data.liquidityUsd,
+      });
+    }
+
+    const solamiRpc = await fetchRecentSigsViaUrl(
+      resolveSolamiRpcUrl().url,
+      input.mint,
+      "rpc.solami.dev",
+      blur.reason === "solami_blur_bandwidth_empty"
+        ? "Solami RPC · mainnet tape (Blur bandwidth optional / empty)"
+        : `Solami RPC · mainnet tape (Blur: ${blur.reason})`,
+    );
+    if (solamiRpc.ok) return solamiRpc;
   }
 
-  // Key missing or Blur miss → labeled RPC tape (not fake Blur)
-  if (blur.reason === "solami_api_key_missing") {
-    return fetchRpcRecentSigTape(input.mint, blur.reason);
-  }
-
-  // Keyed but no price — still try RPC for activity honesty
-  const rpc = await fetchRpcRecentSigTape(input.mint, blur.reason);
-  if (rpc.ok) return rpc;
-  return errResult("api.solami.dev", blur.reason, blur.detail);
+  // No Solami key → labeled generic RPC
+  return fetchRecentSigsViaUrl(
+    resolveSolanaRpcUrl().url,
+    input.mint,
+    "solana-rpc.getSignaturesForAddress",
+    key
+      ? "Mainnet tape · generic RPC"
+      : "Mainnet tape · generic RPC (set SOLAMI_API_KEY for Solami RPC path)",
+  );
 }
 
-async function fetchRpcRecentSigTape(
+async function fetchRecentSigsViaUrl(
+  url: string,
   mint: string,
-  priorReason: string,
+  source: string,
+  labelPrefix: string,
 ): Promise<AdapterResult<SolamiTape>> {
-  const rpc = resolveSolanaRpcUrl();
+  if (!url) {
+    return errResult(source, "rpc_url_missing", "No RPC URL");
+  }
   try {
-    const res = await fetch(rpc.url, {
+    const res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -176,34 +238,27 @@ async function fetchRpcRecentSigTape(
       signal: AbortSignal.timeout(8_000),
     });
     if (!res.ok) {
-      return errResult(
-        "solana-rpc.tape",
-        "rpc_http_error",
-        `HTTP ${res.status} · prior ${priorReason}`,
-      );
+      return errResult(source, "rpc_http_error", `HTTP ${res.status}`);
     }
     const json = (await res.json()) as {
       result?: Array<{ signature?: string }>;
       error?: { message?: string };
     };
     if (json.error) {
-      return errResult("solana-rpc.tape", "rpc_error", json.error.message ?? "unknown");
+      return errResult(source, "rpc_error", json.error.message ?? "unknown");
     }
     const n = Array.isArray(json.result) ? json.result.length : 0;
-    return okResult("mainnet-read", "solana-rpc.getSignaturesForAddress", {
-      kind: "rpc_recent_sigs",
+    const kind = source.includes("solami") ? "solami_rpc" : "rpc_recent_sigs";
+    return okResult("mainnet-read", source, {
+      kind,
       label:
-        priorReason === "solami_api_key_missing"
-          ? n > 0
-            ? `Mainnet tape · ${n} recent sigs (RPC · Solami Blur needs DataApi key)`
-            : "Mainnet tape quiet · RPC (Solami Blur needs DataApi key)"
-          : n > 0
-            ? `Mainnet tape · ${n} recent sigs (RPC · Blur: ${priorReason})`
-            : `Mainnet tape quiet · RPC · Blur: ${priorReason}`,
+        n > 0
+          ? `${labelPrefix} · ${n} recent sigs`
+          : `${labelPrefix} · quiet`,
       recentSigs: n,
       mint,
     });
   } catch (e) {
-    return errResult("solana-rpc.tape", "rpc_fetch_failed", String(e));
+    return errResult(source, "rpc_fetch_failed", String(e));
   }
 }
