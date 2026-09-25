@@ -1,6 +1,16 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — DBC create cost + shot-page depth
+
+- **DBC mainnet create cost (honest):** comfortable **0.05–0.08 SOL (~$6–10)**; bare reuse-config **~0.025–0.035 SOL (~$3–4)**; typical pool rent **~0.022 SOL**. Graduation **750 USDC** ≠ create cost. ≤~$1 cannot sponsor. Documented in `FLAWS_AND_WORKAROUNDS.md`.
+- Overview: AI rail yellow sheen + live gate chips; larger signal gauge; partner rows 40px + PreStocks `image` logos.
+- Credit: LTV hero ring · NestUSD dual rate bars (borrow/liq).
+- Buy: token picker popular chips + deeper sheet.
+- Markets: letter-mark venue pills (J/G/R/S).
+- Holdings: paper-estimate banner + Connect CTA.
+- Branch: `cursor/folio-dbc-cost-shot-depth-f1ec`.
+
 ## 2026-09-25 — Solami docs correction (no $25 Blur tax)
 
 - Re-read Solami docs: Blur meters prepaid streaming bandwidth; Free/Pro include **RPC**.
@@ -27,6 +37,7 @@
 - Branch: `cursor/folio-netro-depth-bible-f1ec`.
 
 ## 2026-09-24 — Copy refresh (README · marketing · docs)
+
 
 - Soft plain-English pass across README, home/about/markets/credit/preipo/beta, truth/pairs/network/execution/whitepaper.
 - Whitepaper v1.1 + DEMO_SCRIPT + STOCKLANA_SUBMIT/SUBMISSION pointed at production `https://folio-tawny-one.vercel.app`.

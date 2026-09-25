@@ -1,6 +1,6 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-24 · Stocklana deadline **re-check live** (hero has shown **SEP 25, 2026**)
+> Updated: 2026-09-25 · Stocklana deadline **re-check live**
 > Doctrine: honest security only — **never claim unhackable**. Soft pitch only in user-facing copy.
 > Bible: `docs/FOLIO_BIBLE.md` · Demo: `docs/DEMO_SCRIPT.md` · Submit: `docs/STOCKLANA_SUBMIT.md`
 
@@ -12,20 +12,20 @@ FOLIO buys the US stocks you want on Solana — keeps share counts honest, won�
 
 See `memory/HENRY_DESK_CREATIVE.md` — factorize every feature against Bible + Henry screenshots + NetroBNB depth. No bare `Loading…`. Logos on every partner row. Take 4K time. Research via Tavily/Firecrawl/TinyFish (keys in `.env` only).
 
-## Bible spine (World’s Fair · 2026-09-24)
+## Bible spine (World’s Fair · 2026-09-25)
 
 | Piece | Status |
 |---|---|
 | Soft pitch + pitch order | Live in copy |
 | **Cash session weekend refuse** | **Wired** — `session-gate.ts` → acquire gates + `/network` + overview week strip |
-| **Meteora DBC stock-curve** | **Live config + RPC** — program executable · `FOLIO_DBC_POOL` mainnet slot ready · pool create needs funded payer (no invent) |
+| **Meteora DBC stock-curve** | **Live config + RPC** — program executable · pool create needs **~0.05–0.08 SOL (~$6–10)** funded wallet (see `FLAWS_AND_WORKAROUNDS.md`) · paste `FOLIO_DBC_POOL` after create |
 | **Solami Blur tape** | **Key landed** · live via **Solami RPC** (Free/Pro) · Blur marks optional (prepaid GB — skip $25) |
-| **Multi-venue markets** | **Live** — Jupiter + free tape + Raydium awareness + Solami · board venue pills |
+| **Multi-venue markets** | **Live** — Jupiter + free tape + Raydium awareness + Solami · letter-mark venue pills |
 | Panta | Out (correct) |
 
 ## Flaws ledger
 
-See `memory/FLAWS_AND_WORKAROUNDS.md` — Jupiter 429s, Raydium no mid, Solami DataApi key, NestUSD metrics-only, DBC demo pool pending.
+See `memory/FLAWS_AND_WORKAROUNDS.md` — Jupiter 429s, Raydium no mid, Solami DataApi key, NestUSD metrics-only, **DBC create cost table**, DBC demo pool pending.
 
 ## Live product (production)
 
@@ -33,10 +33,11 @@ See `memory/FLAWS_AND_WORKAROUNDS.md` — Jupiter 429s, Raydium no mid, Solami D
 
 | Surface | Status |
 |---|---|
-| Buy | USDC→stock / stock↔stock · searchable pickers · flip · user-signed fills when armed |
+| Buy | USDC→stock / stock↔stock · searchable pickers + popular chips · flip · user-signed fills when armed |
 | Markets | Multi-venue board · Jupiter + free-tape + Raydium awareness + Solami (when keyed) |
-| Borrow | Kamino deposit/borrow in-desk (you sign) · NestUSD metrics-only |
-| Pre-IPO | PreStocks + Tessera desks · buys stay inside FOLIO |
+| Borrow | Kamino deposit/borrow in-desk (you sign) · NestUSD metrics + rate bars |
+| Pre-IPO | PreStocks + Tessera desks · buys stay inside FOLIO · API logos on PreStocks |
+| Overview | Netro density · signal gauge · yellow/teal AI rail · partner faces |
 | Activity | Lucide + AssetLogo (no letter tiles) |
 | Agent | 5 messages / account / day |
 | Truth / Network | Live share multiplier · labeled capability matrix |

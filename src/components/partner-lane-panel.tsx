@@ -178,7 +178,12 @@ function PreipoLanePanel() {
             return (
               <li key={row.mint}>
                 <Link to="/desk/preipo" className="netro-partner-row">
-                  <AssetLogo symbol={row.symbol} size={32} />
+                  <AssetLogo
+                    symbol={row.symbol}
+                    logo={row.image}
+                    underlying={row.symbol}
+                    size={40}
+                  />
                   <span className="netro-partner-copy">
                     <strong>{row.symbol}</strong>
                     <small>{row.name}</small>
@@ -280,7 +285,7 @@ function TesseraLanePanel() {
           {rows.map((row) => (
             <li key={row.mint}>
               <Link to="/desk/tessera" className="netro-partner-row">
-                <AssetLogo symbol={row.symbol} size={32} />
+                <AssetLogo symbol={row.symbol} size={40} />
                 <span className="netro-partner-copy">
                   <strong>{row.symbol}</strong>
                   <small>{row.sector ?? row.name}</small>

@@ -97,6 +97,21 @@ function Page() {
           </Link>
         </div>
 
+        {!walletRead ? (
+          <div className="fx-holdings-banner" data-testid="holdings-paper-banner">
+            <div>
+              <strong>Estimates until you connect</strong>
+              <p>
+                Paper rows are sizing guides — not owned shares. Connect a wallet
+                to verify live balances and share counts.
+              </p>
+            </div>
+            <Link to="/desk/settings" className="fx-btn fx-btn-dark">
+              Connect →
+            </Link>
+          </div>
+        ) : null}
+
         {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
 
         <h2 className="fx-section-title">Your stocks</h2>

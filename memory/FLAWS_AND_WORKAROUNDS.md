@@ -31,11 +31,32 @@
 |---|---|---|
 | Official SDK `@meteora-ag/dynamic-bonding-curve-sdk` pulls `@coral-xyz/anchor` — CJS `exports` in ESM breaks Vercel SSR when statically imported | **Critical (500 all desk)** | Production path: config + RPC `getAccountInfo` only · SDK via `FOLIO_DBC_SDK=1` / vitest · never static-import SDK into desk.functions |
 | `buildCurveWithMarketCap` with fixed 100bps start=end ≈ stock fee (not meme exponential) | — | FOLIO preset locks linear scheduler equal bps (unit-tested) |
-| Mainnet DBC **pool create** needs funded payer (rent ≫ ≤~$1) | Expected | After you create on Meteora: `FOLIO_DBC_POOL` + `FOLIO_DBC_NETWORK=mainnet` — never invent address · Bible allows devnet demo; prices stay mainnet-read |
+| Mainnet DBC **pool create** needs funded payer (rent ≫ ≤~$1) | Expected | See **DBC create cost** below · After you create: `FOLIO_DBC_POOL` + `FOLIO_DBC_NETWORK=mainnet` — never invent address · Bible allows devnet demo; prices stay mainnet-read |
 | Mainnet DBC program `dbcij3…` is executable on public RPC | Verified 2026-09-24 | `programExecutable: true` via JSON-RPC (no web3.js required on SSR) |
 | Curve does not know NYSE hours | Bible | FOLIO `session-gate` refuses weekend size |
 | Multi-venue × full catalog can timeout Vercel | High | Bounded concurrency (3) · parallel venues per mint |
 | Pyth Hermes free trial only | Low | Keep off ship path · Finnhub/Yahoo + CoinGecko remain diverge |
+
+### DBC create cost (mainnet, verified math 2026-09-25)
+
+Not inventable. FOLIO cannot sponsor this on the ≤~$1 Bible budget.
+
+| Line item | SOL (approx) | USD @ ~$121/SOL | Source |
+|---|---:|---:|---|
+| Pool + vaults rent (typical create) | **~0.022** | **~$2.70** | Community/docs estimate · Solana rent on multi-KB accounts |
+| Base mint rent | ~0.0011 | ~$0.13 | `getMinimumBalanceForRentExemption(82)` |
+| Quote + base vault ATAs (×2) | ~0.0030 | ~$0.36 | rent on 165-byte token accounts |
+| Config account (if you create a new config) | ~0.01–0.02 | ~$1.20–2.40 | rent on ~2–4 KB |
+| Optional `poolCreationFee` | **0** or **0.001–100** | $0+ | SDK: `MIN_POOL_CREATION_FEE=1e6` lamports · Meteora 10% / partner 90% |
+| Priority fee + buffer | ~0.005–0.015 | ~$0.60–1.80 | congestion-dependent |
+
+**Comfortable funded wallet to create config + pool:** **0.05–0.08 SOL (~$6–10)**.
+
+**Bare minimum (reuse existing config, fee=0):** ~**0.025–0.035 SOL (~$3–4)** — still above ≤~$1.
+
+**Not create cost:** Bible graduation **750 USDC** market cap is the *migration* threshold (curve → DAMM), not the SOL you need to open the pool. Seed liquidity / first buys are separate and optional for a demo mark.
+
+**Wire after create:** paste pool address → `FOLIO_DBC_POOL` + `FOLIO_DBC_NETWORK=mainnet`.
 
 ## Overview / Netro depth
 

@@ -773,9 +773,24 @@ export function NetroDensityCanvas({
           >
             <div className="netro-density-rail-head">
               <span className="netro-density-rail-avatar">F</span>
-              <div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <p className="netro-density-rail-title">FOLIO agent</p>
-                <p className="netro-density-rail-sub">Asset intelligence</p>
+                <p className="netro-density-rail-sub">Live desk intelligence</p>
+                <div className="netro-density-rail-live" aria-label="Live gates">
+                  <span
+                    className={`netro-density-rail-chip${/live|match/i.test(multiplierLabel) ? " is-on" : ""}`}
+                  >
+                    × {multiplierLabel.replace(/\s*live$/i, "") || "…"}
+                  </span>
+                  <span
+                    className={`netro-density-rail-chip${/live|clear|pass/i.test(gates.wash) ? " is-on" : ""}`}
+                  >
+                    {/live|clear|pass/i.test(gates.wash) ? "Wash clear" : "Wash…"}
+                  </span>
+                  <span className="netro-density-rail-chip is-on">
+                    {flowSymbol}
+                  </span>
+                </div>
               </div>
               {enablePaperAgent ? (
                 <button

@@ -1,3 +1,18 @@
+## 2026-09-25 — DBC create cost + shot depth
+
+| Claim | Status |
+|---|---|
+| Mainnet DBC pool create ≈ 0.022 SOL rent; comfortable wallet 0.05–0.08 SOL (~$6–10 @ ~$121) | Verified — Solana rent RPC + Meteora SDK fee bounds + docs |
+| Graduation 750 USDC is migration cap, not create SOL | Correct — Bible / Meteora USDC quote config |
+| ≤~$1 cannot FOLIO-sponsor mainnet pool | Holds |
+| Overview AI rail yellow energy + gate chips | Implemented |
+| NestUSD dual rate bars · Credit LTV ring | Implemented |
+| Token picker popular chips | Implemented |
+| Markets letter-mark venue pills | Implemented |
+| Holdings paper banner | Implemented |
+| PreStocks partner rows use API `image` | Implemented |
+| No invented pool / fake volume | Holds |
+
 ## 2026-09-24 — Multi-venue + SDK depth
 
 | Claim | Status |

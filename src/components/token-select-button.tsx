@@ -29,6 +29,8 @@ type Props = {
   className?: string;
 };
 
+const POPULAR = ["USDC", "AAPLx", "TSLAx", "NVDAx", "GOOGLx"] as const;
+
 function usdcOption(): TokenOption {
   return { symbol: "USDC", name: "USD Coin", kind: "usdc" };
 }
@@ -74,6 +76,17 @@ export function TokenSelectButton({
         (o.underlying?.toLowerCase().includes(needle) ?? false),
     );
   }, [allowUsdc, exclude, q]);
+
+  const popular = useMemo(() => {
+    const ex = new Set(exclude.map((s) => s.toUpperCase()));
+    return POPULAR.filter((sym) => {
+      if (ex.has(sym.toUpperCase())) return false;
+      if (sym === "USDC") return allowUsdc;
+      return XSTOCK_CATALOG.some(
+        (i) => i.buyable && i.symbol.toUpperCase() === sym.toUpperCase(),
+      );
+    });
+  }, [allowUsdc, exclude]);
 
   const selected =
     value.toUpperCase() === "USDC"
@@ -135,6 +148,48 @@ export function TokenSelectButton({
 
       {open ? (
         <div className="fx-token-pop" role="listbox" id={listId}>
+          {popular.length > 0 && !q.trim() ? (
+            <div className="fx-token-popular" aria-label="Popular">
+              {popular.map((sym) => {
+                const on = sym.toUpperCase() === value.toUpperCase();
+                const und =
+                  sym === "USDC"
+                    ? undefined
+                    : XSTOCK_CATALOG.find(
+                        (i) => i.symbol.toUpperCase() === sym.toUpperCase(),
+                      )?.underlying;
+                return (
+                  <button
+                    key={sym}
+                    type="button"
+                    className={on ? "is-on" : undefined}
+                    onClick={() => {
+                      onChange(sym);
+                      setOpen(false);
+                      setQ("");
+                    }}
+                  >
+                    {sym === "USDC" ? (
+                      <span
+                        className="fx-logo fx-logo-fallback fx-logo-usdc"
+                        aria-hidden
+                        style={{ width: 18, height: 18, fontSize: 9 }}
+                      >
+                        $
+                      </span>
+                    ) : (
+                      <AssetLogo
+                        symbol={sym}
+                        {...(und ? { underlying: und } : {})}
+                        size={18}
+                      />
+                    )}
+                    {sym === "USDC" ? "USDC" : sym.replace(/x$/i, "")}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
           <label className="fx-token-search">
             <Search size={14} strokeWidth={2.2} aria-hidden />
             <input
@@ -173,7 +228,7 @@ export function TokenSelectButton({
                       <AssetLogo
                         symbol={o.symbol}
                         underlying={o.underlying}
-                        size={28}
+                        size={32}
                       />
                     )}
                     <span>

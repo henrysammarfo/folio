@@ -221,12 +221,25 @@ function Page() {
                               className={`fx-venue-pill is-${v.status}`}
                               title={v.note}
                             >
+                              <span className="fx-venue-mark" aria-hidden>
+                                {v.id === "jupiter"
+                                  ? "J"
+                                  : v.id === "free-tape"
+                                    ? "G"
+                                    : v.id === "raydium"
+                                      ? "R"
+                                      : "S"}
+                              </span>
                               {v.label}
                               {v.usdPrice != null
                                 ? ` ${money(v.usdPrice)}`
                                 : v.liquidity != null
                                   ? ` ${shortLiq(v.liquidity)}`
-                                  : ""}
+                                  : v.status === "cooling"
+                                    ? " · cool"
+                                    : v.status === "off"
+                                      ? " · off"
+                                      : ""}
                             </em>
                           ))}
                         </span>
