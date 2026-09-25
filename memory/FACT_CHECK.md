@@ -1,3 +1,12 @@
+## 2026-09-25 — Azure home + partner flip (catalog kept)
+
+| Claim | Status |
+|---|---|
+| Netro accents FOLIO azure `#0EA5C9` (not NetroBNB yellow `#F4D014`) | Implemented |
+| Soft home titles: Your market desk / Today's flow / Easy market view | Implemented |
+| PreStocks + Tessera keep catalog list + TokenSelect flip USDC/USDT ↔ partner | Implemented — no cross-issuer |
+| Prepare swap supports partner sell (mint → stable) | Implemented |
+
 ## 2026-09-25 — Netro home + markets universe + Tessera Buy
 
 | Claim | Status |

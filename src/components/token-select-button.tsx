@@ -246,7 +246,11 @@ export function TokenSelectButton({
               ref={inputRef}
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search USDC, USDT, or stock…"
+              placeholder={
+                allowXstocks
+                  ? "Search USDC, USDT, or stock…"
+                  : "Search USDC, USDT, or token…"
+              }
               aria-label="Search tokens"
               autoComplete="off"
             />

@@ -55,15 +55,15 @@ function Page() {
         </p>
       </MktSection>
 
-      <MktSection n="03" title="Private pre-IPO">
+      <MktSection n="03" title="Private desks">
         <p>
           <b>PreStocks</b> and <b>Tessera</b> each get their own desk so private
-          names never blur into public IPO-era listings.
+          names never blur into public IPO era listings.
         </p>
         <p className="mkt-links">
-          <Link to="/preipo">Pre-IPO explainer →</Link>
-          <Link to="/desk/preipo">PreStocks desk →</Link>
-          <Link to="/desk/tessera">Tessera desk →</Link>
+          <Link to="/preipo">PreStocks explainer</Link>
+          <Link to="/desk/preipo">PreStocks desk</Link>
+          <Link to="/desk/tessera">Tessera desk</Link>
         </p>
       </MktSection>
     </PublicShell>

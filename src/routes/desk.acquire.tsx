@@ -39,9 +39,9 @@ type GasPref = "best" | "usdc" | "sol";
 export const Route = createFileRoute("/desk/acquire")({
   head: () => ({
     meta: siteMeta({
-      title: "Buy — FOLIO",
+      title: "Buy · FOLIO",
       description:
-        "Buy xStocks with USDC or swap stock↔stock on Solana — mega, IPO, meme lanes.",
+        "Buy xStocks with USDC or swap stock to stock on Solana. Mega, IPO, meme lanes.",
       path: "/desk/acquire",
     }),
   }),
@@ -293,9 +293,9 @@ function Page() {
               <Link
                 to="/desk/preipo"
                 className="fx-lane fx-lane-link"
-                title="PreStocks Pre-IPO desk"
+                title="PreStocks desk"
               >
-                Pre-IPO
+                PreStocks
               </Link>
               <Link
                 to="/desk/tessera"
@@ -310,7 +310,7 @@ function Page() {
               <strong>{meta.title}</strong>
               <p>{meta.body}</p>
               <p className="fx-lane-links">
-                Private pre-IPO?{" "}
+                Private names?{" "}
                 <Link to="/desk/preipo">PreStocks</Link>
                 {" · "}
                 <Link to="/desk/tessera">Tessera</Link>
@@ -658,7 +658,7 @@ function Page() {
                   <b>
                     {data?.gates.washOk
                       ? "Clear"
-                      : "Paused — tape check"}
+                      : "Paused. Flow check."}
                   </b>
                 </li>
                 <li>
@@ -710,7 +710,7 @@ function Page() {
           <p className="fx-ticket-sub">
             Prefer credit? <Link to="/desk/credit">Borrow</Link>
             {" · "}
-            <Link to="/desk/preipo">Pre-IPO</Link>
+            <Link to="/desk/preipo">PreStocks</Link>
           </p>
         </aside>
       </section>

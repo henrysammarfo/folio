@@ -29,7 +29,7 @@ function Home() {
           <Link to="/markets">Markets</Link>
           <Link to="/truth">Truth</Link>
           <Link to="/credit">Credit</Link>
-          <Link to="/preipo">Pre-IPO</Link>
+          <Link to="/preipo">PreStocks</Link>
           <Link to="/about">About</Link>
         </nav>
         <Link to="/desk" className="nx-top-cta">

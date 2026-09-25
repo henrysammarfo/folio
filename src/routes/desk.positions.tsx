@@ -78,8 +78,8 @@ function Page() {
           <p className="fx-hero-value">{total > 0 ? money(total) : "—"}</p>
           <p className="fx-hero-sub">
             {walletRead
-              ? "Live balances from your wallet — verified when on-chain share count matches"
-              : "Paper estimates until you connect — not owned shares yet"}
+              ? "Live balances from your wallet, verified when on-chain share count matches"
+              : "Paper estimates until you connect. Not owned shares yet"}
           </p>
         </header>
 
@@ -105,7 +105,7 @@ function Page() {
             <div>
               <strong>Estimates until you connect</strong>
               <p>
-                Paper rows are sizing guides — not owned shares. Connect a wallet
+                Paper rows are sizing guides, not owned shares. Connect a wallet
                 to verify live balances and share counts.
               </p>
             </div>

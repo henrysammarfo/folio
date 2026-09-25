@@ -348,13 +348,13 @@
 .lab-aionis-stage{position:relative;height:min(52vh,28rem);margin:.75rem 0 1rem;border-radius:calc(var(--radius) - 2px);overflow:hidden;background:#000}
 .lab-aionis-stage-tall{height:min(62vh,36rem)}
 .lab-aionis-stage .folio-stencil{position:absolute;inset:0}
-/* NetroBNB density tokens — yellow #F4D014 · grey canvas #E5E7EB · ink #1C1C1C */
+/* Netro density tokens — FOLIO azure #0EA5C9 · grey canvas #E5E7EB · ink #1C1C1C */
 .netro-density{
-  --netro-yellow:#F4D014;
-  --netro-yellow-soft:#FAF0AD;
-  --netro-yellow-wash:#FAF6CE;
+  --netro-yellow:#0EA5C9;
+  --netro-yellow-soft:#B8E8F3;
+  --netro-yellow-wash:#E8F7FB;
   --netro-yellow-ink:#1C1C1C;
-  --netro-on-accent:#1C1C1C;
+  --netro-on-accent:#FFFFFF;
   --netro-gap:0.875rem;
   margin:0;padding:1.25rem 1.25rem 1.5rem;border-radius:0;background:#E5E7EB;color:var(--netro-yellow-ink);
   overflow-x:hidden;overflow-y:visible;min-height:min(88vh,56rem);isolation:isolate;font-family:var(--font-sans,ui-sans-serif,system-ui,sans-serif)
@@ -377,7 +377,7 @@
 .netro-density-inspect strong{display:block;font-size:.9rem;font-weight:650}
 .netro-density-inspect span{display:block;font-size:.68rem;color:#6b7280;margin-top:.1rem}
 .netro-density-inspect input{border:1px solid #e5e7eb;border-radius:10px;padding:.65rem .75rem;font-size:.85rem;min-width:0;width:100%;box-sizing:border-box}
-.netro-density-inspect button{border:0;border-radius:10px;background:var(--netro-yellow,#F4D014);color:var(--netro-on-accent,#1C1C1C);font-weight:600;font-size:.8rem;padding:.65rem .9rem;cursor:pointer;white-space:nowrap}
+.netro-density-inspect button{border:0;border-radius:10px;background:var(--netro-yellow,#0EA5C9);color:var(--netro-on-accent,#FFFFFF);font-weight:600;font-size:.8rem;padding:.65rem .9rem;cursor:pointer;white-space:nowrap}
 .netro-density-inspect button:disabled{opacity:.45;cursor:not-allowed}
 .netro-density-inspect-clear{background:#fff!important;border:1px solid #e5e7eb!important;color:#1c1c1c!important}
 .netro-density-inspect-bind{font-size:.72rem;color:#1c1c1c;font-weight:600;text-decoration:underline;white-space:nowrap}
@@ -454,7 +454,7 @@
 .netro-density-top{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--netro-gap,1.1rem);align-items:stretch}
 @media(min-width:1024px){.netro-density-top{grid-template-columns:repeat(9,minmax(0,1fr))}}
 @media(min-width:1024px){.netro-density-profile{grid-column:span 3}.netro-density-stack{grid-column:span 6}}
-.netro-density-profile{background:linear-gradient(180deg,#FAF0AD,#FAF6CE 40%,#fff);border:1px solid #e5e7eb;border-radius:12px;padding:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.45rem;min-height:100%;min-width:0;justify-content:space-between}
+.netro-density-profile{background:linear-gradient(180deg,#B8E8F3,#E8F7FB 40%,#fff);border:1px solid #e5e7eb;border-radius:12px;padding:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.45rem;min-height:100%;min-width:0;justify-content:space-between}
 .netro-density-hi{margin:0;font-size:1.375rem;font-weight:600;line-height:1.2;color:#1C1C1C}
 .netro-density-profile-art{position:relative;display:flex;align-items:center;justify-content:center;min-height:10rem;flex:1;margin:.35rem 0;overflow:hidden}
 .netro-density-profile-art img{
@@ -470,13 +470,13 @@
 .netro-density-clock em{font-style:normal;opacity:.55;padding-bottom:.15rem;animation:netro-pulse 1.2s ease-in-out infinite}
 @keyframes netro-pulse{0%,100%{opacity:.35}50%{opacity:.85}}
 @media(prefers-reduced-motion:reduce){.netro-density-clock em{animation:none;opacity:.55}}
-.netro-density-cta{display:block;text-align:center;text-decoration:none;width:100%;margin-top:auto;border:0;border-radius:10px;background:var(--netro-yellow,#F4D014);color:var(--netro-on-accent,#1C1C1C);font-weight:600;font-size:1.05rem;padding:.7rem;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.netro-density-cta{display:block;text-align:center;text-decoration:none;width:100%;margin-top:auto;border:0;border-radius:10px;background:var(--netro-yellow,#0EA5C9);color:var(--netro-on-accent,#FFFFFF);font-weight:600;font-size:1.05rem;padding:.7rem;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .netro-density-stack{display:flex;flex-direction:column;gap:var(--netro-gap,0.875rem);min-width:0}
 .netro-density-flow{background:#fff;border:1px solid #e5e7eb;border-radius:0;box-shadow:0 1px 5px rgba(0,0,0,.05);overflow:hidden;min-width:0}
 .netro-density-flow-head{background:#1C1C1C;color:#fff;padding:.85rem 1rem;display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;flex-wrap:wrap}
 .netro-density-flow-head strong{display:block;font-size:1.25rem;font-weight:600}
 .netro-density-flow-head p{margin:.2rem 0 0;font-size:.84rem;color:#d1d5db}
-.netro-density-flow-pill{background:var(--netro-yellow,#F4D014);color:#1C1C1C;font-weight:700;font-size:.84rem;padding:.35rem .65rem;border-radius:6px;white-space:nowrap}
+.netro-density-flow-pill{background:var(--netro-yellow,#0EA5C9);color:#fff;font-weight:700;font-size:.84rem;padding:.35rem .65rem;border-radius:6px;white-space:nowrap}
 .netro-density-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem .5rem;padding:.7rem .95rem .85rem}
 @media(min-width:640px){.netro-density-metrics{grid-template-columns:repeat(5,minmax(0,1fr))}}
 .netro-density-metrics>div{padding:.45rem .55rem;border-right:1px solid #e5e7eb;min-width:0;overflow-wrap:anywhere}
@@ -562,7 +562,7 @@
 .netro-density-card-dark small{color:#a3a3a3}
 .netro-density-pills{display:flex;flex-wrap:wrap;gap:.35rem;margin:.1rem 0}
 .netro-pill{font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;border:1px solid #d1d5db;border-radius:99px;padding:.2rem .55rem;color:#6b7280}
-.netro-pill-on{background:var(--netro-yellow,#0EA5C9);border-color:var(--netro-yellow,#0EA5C9);color:var(--netro-yellow-ink,#1c1c1c);font-weight:550}
+.netro-pill-on{background:var(--netro-yellow,#0EA5C9);border-color:var(--netro-yellow,#0EA5C9);color:#fff;font-weight:550}
 .netro-density-card b{font-size:1.05rem;font-weight:500;font-variant-numeric:tabular-nums}
 .netro-density-card small{font-size:.72rem;color:#6b7280}
 .netro-density-market{background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:0;box-shadow:0 1px 5px rgba(0,0,0,.06);color:#1c1c1c;overflow:hidden}
@@ -740,14 +740,14 @@
 .netro-density-quote-sheet-body dt{font-size:.68rem;color:#8d8a95}
 .netro-density-quote-sheet-body dd{margin:0;font-size:.72rem;font-weight:650;text-align:right}
 .netro-density-quote-sheet-body p{margin:.25rem 0 0;font-size:.65rem;line-height:1.4;color:#8d8a95}
-.netro-density-quote-cta{display:block;box-sizing:border-box;text-align:center;text-decoration:none;width:100%;border:0;border-radius:12px;background:var(--netro-yellow,#F4D014);color:var(--netro-on-accent,#1C1C1C);font-weight:700;font-size:.95rem;padding:.85rem;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.netro-density-quote-cta{display:block;box-sizing:border-box;text-align:center;text-decoration:none;width:100%;border:0;border-radius:12px;background:var(--netro-yellow,#0EA5C9);color:var(--netro-on-accent,#FFFFFF);font-weight:700;font-size:.95rem;padding:.85rem;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.1)}
 .netro-density-quote-foot{margin:0;font-size:.68rem;color:#77747e;border-top:1px solid rgba(255,255,255,.04);padding-top:.55rem}
 .netro-density-quote-foot a{color:var(--netro-yellow,#0EA5C9);font-weight:650;text-decoration:none}
 .netro-density-rail{
   position:relative;
   background:
-    radial-gradient(120% 80% at 100% 0%,rgba(244,208,20,.55),transparent 55%),
-    linear-gradient(165deg,#F4D014 0%,#FAF0AD 42%,#FFF8D6 100%);
+    radial-gradient(120% 80% at 100% 0%,rgba(14,165,201,.45),transparent 55%),
+    linear-gradient(165deg,#0EA5C9 0%,#7DD3E8 42%,#E8F7FB 100%);
   border-radius:16px;padding:1.1rem;display:flex;flex-direction:column;gap:.85rem;
   min-height:24rem;flex:1;box-shadow:0 12px 36px rgba(0,0,0,.12);
   border:1px solid rgba(28,28,28,.12);overflow:hidden;color:#1C1C1C;
@@ -763,9 +763,9 @@
 }
 .netro-density-rail-head{display:flex;align-items:center;gap:.65rem;flex-shrink:0;position:relative;z-index:1}
 .netro-density-rail-avatar{
-  width:2.35rem;height:2.35rem;border-radius:10px;background:#1c1c1c;color:#FACC15;
+  width:2.35rem;height:2.35rem;border-radius:10px;background:#1c1c1c;color:#7DD3E8;
   display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:.95rem;
-  box-shadow:0 0 0 3px rgba(250,204,21,.35);
+  box-shadow:0 0 0 3px rgba(14,165,201,.35);
 }
 .netro-density-rail-title{margin:0;font-weight:700;font-size:1.08rem;line-height:1.1}
 .netro-density-rail-sub{margin:.15rem 0 0;font-size:.68rem;opacity:.75;font-weight:600}
@@ -776,7 +776,7 @@
   font-size:.58rem;font-weight:750;letter-spacing:.04em;text-transform:uppercase;
   padding:.18rem .45rem;border-radius:6px;background:rgba(28,28,28,.08);color:#0b3a45;
 }
-.netro-density-rail-chip.is-on{background:#1c1c1c;color:#FACC15}
+.netro-density-rail-chip.is-on{background:#1c1c1c;color:#7DD3E8}
 .netro-density-rail-welcome,.netro-density-rail-actions,.netro-density-rail-form{position:relative;z-index:1}
 .netro-density-rail-welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:0;padding:.35rem;gap:.45rem;overflow:auto}
 .netro-density-rail-mark{

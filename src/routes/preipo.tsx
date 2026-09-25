@@ -7,11 +7,11 @@ import { getPreipoBundle } from "@/lib/desk.functions";
 export const Route = createFileRoute("/preipo")({
   head: () => ({
     meta: [
-      { title: "Pre-IPO — FOLIO" },
+      { title: "PreStocks · FOLIO" },
       {
         name: "description",
         content:
-          "Private-company tokens on Solana — PreStocks and Tessera, each on its own FOLIO desk.",
+          "Private company tokens on Solana. PreStocks and Tessera, each on its own FOLIO desk.",
       },
     ],
   }),
@@ -37,9 +37,9 @@ function Page() {
   return (
     <PublicShell
       tone="credit"
-      eyebrow="Pre-IPO desks"
+      eyebrow="Private desks"
       title="Private names. Separate rooms."
-      intro="PreStocks for SPV-backed private exposure. Tessera for loan-participation T-tokens. Each stays on its own desk so the story stays clean — and the buy stays inside FOLIO."
+      intro="PreStocks for SPV backed private exposure. Tessera for loan participation T-tokens. Each stays on its own desk so the story stays clean, and the buy stays inside FOLIO."
       aside={
         <div className="metrics-grid metrics-grid-aside">
           <Metric
@@ -68,19 +68,19 @@ function Page() {
         </div>
       }
     >
-      <MktSection n="01" title="Public IPO ≠ private pre-IPO">
+      <MktSection n="01" title="Public IPO is not private PreStocks">
         <p>
           Buy → <b>IPO</b> is for public recent listings (Arm, Reddit xStocks).
-          Private companies live on PreStocks and Tessera — never mixed into the
+          Private companies live on PreStocks and Tessera, never mixed into the
           public board by accident.
         </p>
       </MktSection>
 
       <MktSection n="02" title="Open the desks">
         <p className="mkt-links">
-          <Link to="/desk/preipo">PreStocks desk →</Link>
-          <Link to="/desk/tessera">Tessera desk →</Link>
-          <Link to="/markets">Full market map →</Link>
+          <Link to="/desk/preipo">PreStocks desk</Link>
+          <Link to="/desk/tessera">Tessera desk</Link>
+          <Link to="/markets">Full market map</Link>
         </p>
       </MktSection>
     </PublicShell>

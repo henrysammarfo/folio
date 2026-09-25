@@ -107,7 +107,7 @@ function Page() {
               </p>
               <p className="fx-credit-hero-sub">
                 {data?.paper.note ??
-                  "Keep the shares. Unlock USDC inside FOLIO — you sign every step."}
+                  "Keep the shares. Unlock USDC inside FOLIO. You sign every step."}
               </p>
             </div>
             {ltv != null ? (

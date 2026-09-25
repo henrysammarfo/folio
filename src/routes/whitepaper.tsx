@@ -54,7 +54,7 @@ function Page() {
               <b>Credit</b> — borrow often means sell the position.
             </li>
             <li>
-              <b>Pre-IPO</b> — PreStocks and Tessera are different products;
+              <b>PreStocks</b>. PreStocks and Tessera are different products;
               mixing them confuses everyone.
             </li>
           </ul>

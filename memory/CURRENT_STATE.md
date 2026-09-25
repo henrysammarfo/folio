@@ -37,7 +37,7 @@ See `memory/FLAWS_AND_WORKAROUNDS.md` — Jupiter 429s, Raydium no mid, Solami D
 | Markets | Multi-venue board · Jupiter + free-tape + Raydium awareness + Solami (when keyed) |
 | Borrow | Kamino deposit/borrow in-desk (you sign) · NestUSD metrics + rate bars |
 | Pre-IPO | PreStocks + Tessera desks · buys stay inside FOLIO · API logos on PreStocks |
-| Overview | Netro density · signal gauge · yellow/teal AI rail · partner faces |
+| Overview | Netro density · signal gauge · FOLIO azure AI rail · partner faces |
 | Activity | Lucide + AssetLogo (no letter tiles) |
 | Agent | 5 messages / account / day |
 | Truth / Network | Live share multiplier · labeled capability matrix |
@@ -54,11 +54,11 @@ README, marketing routes, whitepaper, demo/submit docs, and public intros rewrit
 
 ## Desk UI (product)
 
-- Home: **NetroBNB density always-on** (FOLIO tokens) — live clock, markets strip, AI rail, partner lanes.
+- Home: **Netro density always-on** (FOLIO azure `#0EA5C9` · grey canvas) — live clock, markets strip, AI rail, partner lanes. Soft titles: Your market desk / Today's flow / Easy market view.
 - Buy: Mega / IPO / Meme / **Pairs** · TokenSelect + flip · Netro-depth details.
-- Markets: multi-venue curated board + **Universe tab** (~1k+ Solana xStocks, Jupiter batch marks, search) · Pre-IPO + Tessera lanes.
+- Markets: multi-venue curated board + **Universe search** (~1k+ Solana xStocks, Jupiter batch marks) · PreStocks + Tessera on own desks.
 - Credit: AssetLogo rates · Kamino ktx in-desk · NestUSD metrics-only · collateral from **full wallet xStock scan** when bound.
-- PreStocks / Tessera: in-desk BuyExecute · **both** Buy-style TokenSelect + flip (stables ↔ partner; no cross-issuer).
+- PreStocks / Tessera: catalog list kept · Buy-style TokenSelect + flip (USDC/USDT ↔ partner; no cross-issuer).
 - Holdings: **full ATA wallet-scan** → mint index (paper 3-symbol only when unbound) · shared query keys + invalidate after Privy/session mint.
 - Agent: `agent_daily` = 5 / account / 24h.
 - Logo chain: API → Backed CDN → favicon → initials (SpaceX / Tessera paths fixed).

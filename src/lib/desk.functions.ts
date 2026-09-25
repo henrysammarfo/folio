@@ -116,10 +116,12 @@ const PrepareSwapInput = z.object({
   slippageBps: z.number().int().min(1).max(500).optional(),
   /**
    * Partner mint path (PreStocks / Tessera) — skip xStocks catalog lookup.
-   * When set, FOLIO quotes USDC → this mint in-desk (no external redirect).
+   * When set, FOLIO quotes stable ↔ this mint in-desk (no external redirect).
    */
   outputMint: z.string().min(32).max(64).optional(),
   outputDecimals: z.number().int().min(0).max(18).optional(),
+  /** buy = stable → partner · sell = partner → stable. Never cross issuers. */
+  side: z.enum(["buy", "sell"]).optional().default("buy"),
 });
 
 export type TruthBundle = {
@@ -641,17 +643,29 @@ export const prepareJupiterSwap = createServerFn({ method: "POST" })
         return {
           ok: false as const,
           reason: "partner_pair_unsupported",
-          detail: "Partner tokens buy USDC→mint only — no stock↔stock pair.",
+          detail: "Partner tokens stay on stable rails only. No stock pairs.",
         };
       }
-      const amountRaw = Math.round(payAmount * 1_000_000);
+      const side = data.side ?? "buy";
+      const stable = stableMintForSymbol(paySymbol);
+      if (!stable) {
+        return {
+          ok: false as const,
+          reason: "stable_pay_unknown",
+          detail: "Pay rail must be USDC or USDT.",
+        };
+      }
+      const amountRaw =
+        side === "sell"
+          ? Math.round(payAmount * 10 ** partnerDecimals)
+          : Math.round(payAmount * 1_000_000);
       const order = await fetchJupiterQuote({
-        inputMint: stableMintForSymbol(paySymbol) ?? undefined,
-        outputMint: partnerMint,
+        inputMint: side === "sell" ? partnerMint : stable,
+        outputMint: side === "sell" ? stable : partnerMint,
         amountRaw,
         slippageBps,
-        outputDecimals: partnerDecimals,
-        inputDecimals: 6,
+        outputDecimals: side === "sell" ? 6 : partnerDecimals,
+        inputDecimals: side === "sell" ? partnerDecimals : 6,
         taker: data.taker.trim(),
       });
       if (!order.ok) {

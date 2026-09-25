@@ -28,6 +28,8 @@ type Props = {
   /** Partner path — PreStocks / Tessera mint (skip xStocks catalog). */
   outputMint?: string | null;
   outputDecimals?: number;
+  /** Partner only: buy = stable → mint · sell = mint → stable. */
+  side?: "buy" | "sell";
   pausedLabel?: string;
   confirmLabel?: string;
   onError: (msg: string) => void;
@@ -45,7 +47,7 @@ export function BuyExecuteButton(props: Props) {
         disabled
         data-testid="acquire-execute"
       >
-        {props.pausedLabel ?? "Paused — check wash or quote"}
+        {props.pausedLabel ?? "Paused. Check wash or quote."}
       </button>
     );
   }
@@ -59,7 +61,7 @@ export function BuyExecuteButton(props: Props) {
         data-testid="acquire-execute"
       >
         {props.pausedLabel ??
-          (props.isPair ? "Swap stocks — fills paused" : "Swap — fills paused")}
+          (props.isPair ? "Swap stocks. Fills paused." : "Swap. Fills paused.")}
       </button>
     );
   }
@@ -126,12 +128,18 @@ function BuyExecuteArmed(props: Props) {
           ...(props.outputMint
             ? {
                 spendUsdc: props.amount,
+                amount: props.amount,
+                paySymbol: props.paySymbol,
                 outputMint: props.outputMint,
                 outputDecimals: props.outputDecimals ?? 9,
+                side: props.side ?? "buy",
               }
             : props.isPair
               ? { paySymbol: props.paySymbol, amount: props.amount }
-              : { spendUsdc: props.amount }),
+              : {
+                  spendUsdc: props.amount,
+                  paySymbol: props.paySymbol,
+                }),
         },
       });
       if (!prepared.ok) {

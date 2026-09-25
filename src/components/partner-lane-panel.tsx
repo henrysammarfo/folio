@@ -15,7 +15,7 @@ export type PartnerLaneId = "stocks" | "preipo" | "tessera";
 
 const LANES: { id: PartnerLaneId; label: string }[] = [
   { id: "stocks", label: "Stocks" },
-  { id: "preipo", label: "Pre-IPO" },
+  { id: "preipo", label: "PreStocks" },
   { id: "tessera", label: "Tessera" },
 ];
 
@@ -105,15 +105,15 @@ function PreipoLanePanel() {
     <section
       className="netro-partner-panel"
       data-testid="partner-lane-preipo"
-      aria-label="Pre-IPO PreStocks"
+      aria-label="PreStocks"
     >
       <header className="netro-partner-head">
         <div>
-          <strong>Pre-IPO · PreStocks</strong>
-          <p>Private-company exposure — not public share equity. Live quotes.</p>
+          <strong>PreStocks</strong>
+          <p>Private company names. Live quotes, not public share equity.</p>
         </div>
         <Link to="/desk/preipo" className="fx-btn fx-btn-dark fx-btn-sm">
-          Open Pre-IPO desk
+          Open PreStocks
         </Link>
       </header>
 
@@ -229,11 +229,11 @@ function TesseraLanePanel() {
     >
       <header className="netro-partner-head">
         <div>
-          <strong>Tessera · T-tokens</strong>
-          <p>Loan participation — SpaceX, OpenAI, Kalshi. Buys stay in FOLIO.</p>
+          <strong>Tessera T-tokens</strong>
+          <p>Loan participation for SpaceX, OpenAI, Kalshi. Buys stay in FOLIO.</p>
         </div>
         <Link to="/desk/tessera" className="fx-btn fx-btn-dark fx-btn-sm">
-          Open Tessera desk
+          Open Tessera
         </Link>
       </header>
 

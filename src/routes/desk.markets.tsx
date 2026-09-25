@@ -153,7 +153,7 @@ function Page() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search symbol — expands full Solana universe…"
+            placeholder="Search symbol. Expands full Solana universe…"
             autoComplete="off"
           />
         </label>
@@ -163,7 +163,7 @@ function Page() {
           {data?.universeCount != null
             ? ` · ${data.universeCount.toLocaleString()} Solana xStocks live.`
             : ""}{" "}
-          Private pre-IPO stays on{" "}
+          Private names stay on{" "}
           <Link to="/desk/preipo">PreStocks</Link> /{" "}
           <Link to="/desk/tessera">Tessera</Link>.
         </p>
@@ -280,14 +280,14 @@ function Page() {
 
         <div className="fx-markets-extra">
           <article className="fx-markets-aside">
-            <h2>Stock ↔ stock</h2>
-            <p>Rotate without cashing to USDC first — pairs on Buy.</p>
-            <Link to="/desk/acquire">Open pairs →</Link>
+            <h2>Stock to stock</h2>
+            <p>Rotate without cashing to USDC first. Pairs live on Buy.</p>
+            <Link to="/desk/acquire">Open pairs</Link>
           </article>
           <article className="fx-markets-aside">
-            <h2>Pre-IPO</h2>
-            <p>PreStocks private names · Tessera T-tokens on their own desks.</p>
-            <Link to="/desk/preipo">PreStocks →</Link>
+            <h2>PreStocks</h2>
+            <p>Private names and Tessera T-tokens on their own desks.</p>
+            <Link to="/desk/preipo">Open PreStocks</Link>
           </article>
         </div>
       </section>

@@ -233,8 +233,8 @@ export function NetroDensityCanvas({
     <div className="netro-density" data-testid="netro-density-surface">
       <header className="netro-density-title netro-density-item" style={delay(0)}>
         <div>
-          <h3>Asset Intelligence Dashboard</h3>
-          <span>Buy · hold · borrow — live Solana markets</span>
+          <h3>Your market desk</h3>
+          <span>Buy, hold, and borrow on Solana</span>
         </div>
         <div className="netro-density-chrome-actions">
           <Link to="/desk/acquire" className="netro-density-connect">
@@ -365,14 +365,14 @@ export function NetroDensityCanvas({
               className="netro-density-profile netro-density-item"
               style={delay(3)}
             >
-              <p className="netro-density-hi">Hi — FOLIO desk</p>
+              <p className="netro-density-hi">Hi from FOLIO</p>
               <div className="netro-density-profile-art" aria-hidden>
                 <img src="/netro/i1.png" alt="" width={260} height={260} />
               </div>
               <h4>
-                Make
+                Easy
                 <br />
-                Analysis Easy
+                market view
               </h4>
               <div className="netro-density-clock">
                 <span>{clock.h}</span>
@@ -382,7 +382,7 @@ export function NetroDensityCanvas({
                 <span>{clock.s}</span>
               </div>
               <Link to="/desk/acquire" className="netro-density-cta">
-                Start Analysis
+                Open Buy
               </Link>
             </div>
 
@@ -394,8 +394,8 @@ export function NetroDensityCanvas({
               >
                 <div className="netro-density-flow-head">
                   <div>
-                    <strong>Today&apos;s Market Flow</strong>
-                    <p>Live share counts · wash · Jupiter quote</p>
+                    <strong>Today&apos;s flow</strong>
+                    <p>Live share counts, wash check, Jupiter quote</p>
                   </div>
                   <span className="netro-density-flow-pill">
                     {flowUnderlying} | USDC
@@ -455,7 +455,7 @@ export function NetroDensityCanvas({
                   </div>
                   <ul>
                     <li>
-                      <span>Tape</span>
+                      <span>Flow</span>
                       <b>
                         {/live|clear|pass/i.test(gates.wash)
                           ? "Clean"
@@ -465,7 +465,7 @@ export function NetroDensityCanvas({
                       </b>
                     </li>
                     <li>
-                      <span>Share ×</span>
+                      <span>Shares</span>
                       <b>{multiplierLabel.replace(/\s*live$/i, "")}</b>
                     </li>
                     <li>
@@ -481,9 +481,9 @@ export function NetroDensityCanvas({
                 <div
                   className="netro-density-week"
                   data-testid="netro-session-week"
-                  aria-label="Cash session week"
+                  aria-label="Trading week"
                 >
-                  <strong>Cash session</strong>
+                  <strong>Trading days</strong>
                   <div className="netro-density-week-grid">
                     {(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const).map(
                       (d, i) => {
@@ -494,8 +494,8 @@ export function NetroDensityCanvas({
                             className={`netro-density-week-cell${weekend ? " is-closed" : " is-open"}`}
                             title={
                               weekend
-                                ? "Weekend — FOLIO refuses size"
-                                : "Weekday — cash session when NYSE open"
+                                ? "Weekend: FOLIO blocks size"
+                                : "Weekday: open when NYSE is open"
                             }
                           >
                             {d}
@@ -505,7 +505,7 @@ export function NetroDensityCanvas({
                     )}
                   </div>
                   <small>
-                    Weekend buys stay blocked in FOLIO — the curve cannot see the
+                    Weekend buys stay blocked in FOLIO. The curve cannot see the
                     bell.
                   </small>
                 </div>
@@ -774,7 +774,7 @@ export function NetroDensityCanvas({
               <span className="netro-density-rail-avatar">F</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p className="netro-density-rail-title">FOLIO agent</p>
-                <p className="netro-density-rail-sub">Live desk intelligence</p>
+                <p className="netro-density-rail-sub">Live desk help</p>
                 <div className="netro-density-rail-live" aria-label="Live gates">
                   <span
                     className={`netro-density-rail-chip${/live|match/i.test(multiplierLabel) ? " is-on" : ""}`}

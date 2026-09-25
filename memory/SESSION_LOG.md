@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Azure accents + soft copy + partner Buy flip (catalog kept)
+
+- Home Netro: yellow `#F4D014` → FOLIO azure `#0EA5C9` (soft/wash + agent rail). Soft titles: Your market desk / Today's flow / Easy market view / Trading days. No em-dash footer.
+- PreStocks + Tessera: **catalog list kept** + Buy-style TokenSelect + flip (USDC/USDT ↔ partner). Docs keep PreStocks ≠ Tessera.
+- Desk/public wordings softened (PreStocks label, no hyphen heavy prose).
+- Branch: `cursor/folio-netro-home-depth-f1ec`
+
 ## 2026-09-25 — Stocklana paste pack + NetroBNB style README + video scripts
 
 - Root README rewritten NetroBNB style (badges, stack table, flow, honest limits). Soft pitch. No hyphen heavy prose.
