@@ -22,12 +22,12 @@ const WASH_HUMAN: Record<string, string> = {
 
 /** Soften long free-path wash notes that still leak adapter names. */
 const WASH_PHRASE: Array<[RegExp, string]> = [
-  [/No recent GeckoTerminal trades for mint[^.…]*/gi, "No recent tape for this mint — paused for safety"],
+  [/No recent GeckoTerminal trades for mint[^.…]*/gi, "No recent tape for this mint. Paused for safety."],
   [/GeckoTerminal free tape/gi, "Free market tape"],
   [/Free path via GeckoTerminal/gi, "Free path"],
   [/GeckoTerminal/gi, "free tape"],
   [/signer concentration \+ thin-tape \(not market tape buy\/sell pairs\)\.?/gi, "Signer concentration check"],
-  [/Wash \/ concentration pressure blocked size \(free-path heuristic\)\.?/gi, "Concentration pressure — size blocked"],
+  [/Wash \/ concentration pressure blocked size \(free-path heuristic\)\.?/gi, "Concentration pressure. Size blocked."],
   [/Top signer in \d+% of \d+ trades \(\d+ unique\)\.?/gi, "Top signer concentration elevated"],
 ];
 
