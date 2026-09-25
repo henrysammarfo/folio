@@ -70,6 +70,17 @@ export async function fetchSolamiTokenPrice(
         `HTTP ${res.status} · need DataApi permission`,
       );
     }
+    if (res.status === 402) {
+      let detail =
+        "Blur needs prepaid bandwidth — top up at https://solami.dev/dashboard";
+      try {
+        const body = (await res.json()) as { message?: string };
+        if (body?.message) detail = body.message;
+      } catch {
+        /* keep default */
+      }
+      return errResult("api.solami.dev", "solami_bandwidth_empty", detail);
+    }
     if (!res.ok) {
       return errResult(
         "api.solami.dev",

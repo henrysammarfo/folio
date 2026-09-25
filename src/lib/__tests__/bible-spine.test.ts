@@ -41,13 +41,16 @@ describe("FOLIO stock curve (Meteora DBC SDK)", () => {
 
   it("builds live SDK curve when FOLIO_DBC_SDK/test env + probes DBC program", async () => {
     const prev = process.env["FOLIO_DBC_DEVNET_POOL"];
+    const prevPool = process.env["FOLIO_DBC_POOL"];
     const prevSdk = process.env["FOLIO_DBC_SDK"];
     delete process.env["FOLIO_DBC_DEVNET_POOL"];
+    delete process.env["FOLIO_DBC_POOL"];
     process.env["FOLIO_DBC_SDK"] = "1";
     const st = await folioStockCurveStatus();
     expect(st.ok).toBe(true);
     if (!st.ok) return;
-    expect(st.data.demoPool).toBeNull();
+    expect(st.data.pool).toBeNull();
+    expect(st.data.poolNetwork).toBe("mainnet");
     // With SDK flag: either live segments or soft-fail still returns config
     expect(st.data.note).toMatch(/stock curve|SDK/i);
     if (st.data.config.sdkCurvePoints != null) {
@@ -58,6 +61,8 @@ describe("FOLIO stock curve (Meteora DBC SDK)", () => {
     }
     if (prev !== undefined) process.env["FOLIO_DBC_DEVNET_POOL"] = prev;
     else delete process.env["FOLIO_DBC_DEVNET_POOL"];
+    if (prevPool !== undefined) process.env["FOLIO_DBC_POOL"] = prevPool;
+    else delete process.env["FOLIO_DBC_POOL"];
     if (prevSdk !== undefined) process.env["FOLIO_DBC_SDK"] = prevSdk;
     else delete process.env["FOLIO_DBC_SDK"];
   }, 30_000);

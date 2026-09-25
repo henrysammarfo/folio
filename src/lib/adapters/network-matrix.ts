@@ -88,7 +88,7 @@ export function buildNetworkMatrix(input: {
       detail: input.stockCurve
         ? detailOf(
             input.stockCurve,
-            "USDC · gentle · fixed/short linear · start=cash close · demo pool labeled",
+            "USDC · gentle · fixed/short linear · start=cash close · mainnet pool when FOLIO_DBC_POOL set",
           )
         : "Config unwired · World’s Fair primary track",
     },

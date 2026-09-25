@@ -18,8 +18,8 @@ See `memory/HENRY_DESK_CREATIVE.md` — factorize every feature against Bible + 
 |---|---|
 | Soft pitch + pitch order | Live in copy |
 | **Cash session weekend refuse** | **Wired** — `session-gate.ts` → acquire gates + `/network` + overview week strip |
-| **Meteora DBC stock-curve** | **Live SDK** — `@meteora-ag/dynamic-bonding-curve-sdk` `buildCurveWithMarketCap` + program executable on RPC · demo pool pending · no fake volume |
-| **Solami Blur tape** | **Live REST when `SOLAMI_API_KEY`** — `api.solami.dev/data/token/price` · else labeled RPC sigs |
+| **Meteora DBC stock-curve** | **Live config + RPC** — program executable · `FOLIO_DBC_POOL` mainnet slot ready · pool create needs funded payer (no invent) |
+| **Solami Blur tape** | **Key landed** · Blur **402 bandwidth** until top-up · RPC tape until then |
 | **Multi-venue markets** | **Live** — Jupiter + free tape + Raydium awareness + Solami · board venue pills |
 | Panta | Out (correct) |
 
