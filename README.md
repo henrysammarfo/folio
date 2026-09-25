@@ -1,5 +1,11 @@
 <p align="center">
-  <img src="./public/og.png" alt="FOLIO desk" width="100%" />
+  <a href="https://folio-tawny-one.vercel.app">
+    <img src="./public/folio-readme-banner.png" alt="FOLIO · Honest stock desk on Solana" width="920" />
+  </a>
+</p>
+
+<p align="center">
+  <img src="./public/folio-mark.svg" alt="FOLIO mark" width="56" height="56" />
 </p>
 
 <p align="center">
@@ -47,30 +53,82 @@ We never invent fills. We never invent mints. We never claim the desk is unhacka
 | Partners | PreStocks API, Tessera API | Separate desks. Buys stay inside FOLIO |
 | Honesty | Wash gate, rate limits, TTL caches, network matrix | Shared boards for concurrent desks without invented greens |
 
+```mermaid
+flowchart LR
+  subgraph Client
+    Desk[Desk UI]
+    Privy[Privy wallet]
+  end
+  subgraph FOLIO["FOLIO server"]
+    Spine[Truth · Wash · Quote]
+    Buy[Buy prepare]
+    Credit[Credit ticket]
+    Partners[PreStocks · Tessera]
+  end
+  subgraph Solana
+    Jup[Jupiter]
+    XS[xStocks / Scaled UI]
+    Kam[Kamino]
+  end
+  Desk --> Spine
+  Desk --> Buy
+  Desk --> Credit
+  Desk --> Partners
+  Privy --> Buy
+  Privy --> Credit
+  Spine --> XS
+  Spine --> Jup
+  Buy --> Jup
+  Credit --> Kam
+  Partners --> Jup
+```
+
 ---
 
 ## How the desk flows
 
-```
-  Landing  →  Open desk  →  Home density
-                               │
-           ┌───────────────────┼───────────────────┐
-           ▼                   ▼                   ▼
-        Truth ×            Wash gate            Buy ticket
-     live multiplier      refuse dirty         Jupiter quote
-           │                   │              user signs fill
-           └───────────────────┼───────────────────┘
-                               ▼
-                    Markets board · PreStocks · Tessera
-                               │
-                               ▼
-                    Borrow on Kamino · NestUSD metrics
-                               │
-                               ▼
-                    Guarded agent · five messages a day
+Pitch order we demo out loud: Truth, then Wash, then Buy, then Borrow, then Agent.
+
+```mermaid
+flowchart TD
+  L[Landing] --> O[Open desk]
+  O --> H[Home density]
+  H --> T[Truth × live multiplier]
+  H --> W[Wash gate]
+  H --> B[Buy ticket]
+  T --> G{Tape clean?}
+  W --> G
+  G -->|No| P[Size paused · labeled]
+  G -->|Yes| Q[Jupiter quote]
+  Q --> S[User signs fill]
+  H --> M[Markets board]
+  M --> Pre[PreStocks desk]
+  M --> Tes[Tessera desk]
+  H --> C[Borrow on Kamino]
+  C --> N[NestUSD metrics]
+  H --> A[Guarded agent · 5 / day]
 ```
 
-Pitch order we demo out loud: Truth, then Wash, then Buy, then Borrow, then Agent.
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant D as FOLIO desk
+  participant X as xStocks / ledger
+  participant W as Wash feeds
+  participant J as Jupiter
+  U->>D: Open Buy · pick stock
+  D->>X: Live share multiplier
+  D->>W: Wash check
+  alt Tape dirty or missing
+    D-->>U: Size paused · why labeled
+  else Tape clear
+    D->>J: Quote USDC → stock
+    J-->>D: Live quote
+    D-->>U: Review buy
+    U->>D: Confirm · wallet signs
+    D->>J: Execute signed order
+  end
+```
 
 ---
 
@@ -100,6 +158,25 @@ Keep the shares. Unlock USDC on live Kamino LTV inside the desk. Deposit and bor
 
 PreStocks private SPV names and Tessera T tokens each get their own catalog and ticket. Cross issuer mixing is refused on purpose so bounty lanes stay clean.
 
+```mermaid
+flowchart LR
+  subgraph Public["Public equity"]
+    Mega[Mega]
+    IPO[IPO]
+    Meme[Meme]
+  end
+  subgraph Private["Private rooms"]
+    PS[PreStocks catalog]
+    TT[Tessera T-tokens]
+  end
+  Buy[Buy ticket] --> Mega
+  Buy --> IPO
+  Buy --> Meme
+  PS --> BuyPS[PreStocks Buy · USDC/USDT flip]
+  TT --> BuyTT[Tessera Buy · USDC/USDT flip]
+  BuyPS -.->|no cross issuer| BuyTT
+```
+
 ### 7. Guarded agent
 
 Short answers about truth, wash, quotes, and credit. Five messages per account per day. The agent never pretends a fill happened.
@@ -128,10 +205,10 @@ folio/
 │   │   ├── adapters/           # Jupiter, xStocks, wash, Kamino, wallets
 │   │   ├── auth/               # Privy session, tenants, rate limits
 │   │   └── desk.*.ts           # Server functions for each desk surface
-│   └── styles.css              # FOLIO tokens plus NetroBNB density chrome
+│   └── styles.css              # FOLIO tokens plus Netro density chrome
 ├── docs/                       # Bible, demo scripts, submit pack, video scripts
 ├── memory/                     # Current state, session log, fact check, threats
-├── public/                     # OG image, mark, NetroBNB gear assets
+├── public/                     # OG banner, FOLIO mark, Netro gear assets
 └── scripts/                    # Smoke, keys, replay helpers
 ```
 

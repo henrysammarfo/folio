@@ -1,6 +1,12 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — README real logo + Mermaid diagrams
+
+- Replaced flat black/azure `og.png` with FOLIO mark + wordmark banner (`public/folio-readme-banner.png`, also writes `og.png`).
+- README uses logo lockup + three Mermaid diagrams (stack, desk flow + sequence, partner rooms).
+- Branch: `cursor/folio-readme-logo-mermaid-f1ec`
+
 ## 2026-09-25 — Azure accents + soft copy + partner Buy flip (catalog kept)
 
 - Home Netro: yellow `#F4D014` → FOLIO azure `#0EA5C9` (soft/wash + agent rail). Soft titles: Your market desk / Today's flow / Easy market view / Trading days. No em-dash footer.
@@ -284,6 +290,12 @@
 - Build + 147 unit tests green.
 
 # FOLIO — SESSION LOG
+
+## 2026-09-25 — README real logo + Mermaid diagrams
+
+- Replaced flat black/azure `og.png` with FOLIO mark + wordmark banner (`public/folio-readme-banner.png`, also writes `og.png`).
+- README uses logo lockup + three Mermaid diagrams (stack, desk flow + sequence, partner rooms).
+- Branch: `cursor/folio-readme-logo-mermaid-f1ec`
 
 ## 2026-09-20 — Light TradingView (Netro match)
 
