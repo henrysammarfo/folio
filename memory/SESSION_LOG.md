@@ -1,6 +1,17 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Shot-fix pass (Henry screens)
+
+- Credit: Available/Max LTV hero + meta strip · NestUSD panel head cleaned
+- Markets: real venue SVG logos (Jupiter/Raydium/Solami/Gecko) not letter marks
+- Buy: token dropdown z-index fix (AAPLx bleed) · USDC+USDT stables-first · Pay stable mode
+- PreStocks/Tessera: soft heroes · wash banner (honest thin-tape, no invent clear) · softer CTA
+- Wash gate: 45s TTL + 3m stale cache to cut Gecko/Bitquery RPM
+- Holdings: Netro summary strip · Account: create-account vs connect-wallet dual paths
+- Meteora: full-pay config+pool (no public-config reuse) documented
+- Branch: `cursor/folio-shot-fix-pass-f1ec`
+
 ## 2026-09-25 — DBC create cost + shot-page depth
 
 - **DBC mainnet create cost (honest):** comfortable **0.05–0.08 SOL (~$6–10)**; bare reuse-config **~0.025–0.035 SOL (~$3–4)**; typical pool rent **~0.022 SOL**. Graduation **750 USDC** ≠ create cost. ≤~$1 cannot sponsor. Documented in `FLAWS_AND_WORKAROUNDS.md`.

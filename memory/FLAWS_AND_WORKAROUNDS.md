@@ -37,26 +37,18 @@
 | Multi-venue × full catalog can timeout Vercel | High | Bounded concurrency (3) · parallel venues per mint |
 | Pyth Hermes free trial only | Low | Keep off ship path · Finnhub/Yahoo + CoinGecko remain diverge |
 
-### DBC create cost (mainnet, verified math 2026-09-25)
+## Comfortable funded wallet: **createConfig + createPool** (Henry: no reuse)
 
-Not inventable. FOLIO cannot sponsor this on the ≤~$1 Bible budget.
+**Do not reuse a public partner config** for FOLIO demo — pay for your own config so fee claimer + curve rules (USDC · gentle · ~100bps · 750 USDC graduation) stay FOLIO-owned.
 
-| Line item | SOL (approx) | USD @ ~$121/SOL | Source |
-|---|---:|---:|---|
-| Pool + vaults rent (typical create) | **~0.022** | **~$2.70** | Community/docs estimate · Solana rent on multi-KB accounts |
-| Base mint rent | ~0.0011 | ~$0.13 | `getMinimumBalanceForRentExemption(82)` |
-| Quote + base vault ATAs (×2) | ~0.0030 | ~$0.36 | rent on 165-byte token accounts |
-| Config account (if you create a new config) | ~0.01–0.02 | ~$1.20–2.40 | rent on ~2–4 KB |
-| Optional `poolCreationFee` | **0** or **0.001–100** | $0+ | SDK: `MIN_POOL_CREATION_FEE=1e6` lamports · Meteora 10% / partner 90% |
-| Priority fee + buffer | ~0.005–0.015 | ~$0.60–1.80 | congestion-dependent |
+**Comfortable funded wallet:** **0.05–0.08 SOL (~$6–10)**.
 
-**Comfortable funded wallet to create config + pool:** **0.05–0.08 SOL (~$6–10)**.
-
-**Bare minimum (reuse existing config, fee=0):** ~**0.025–0.035 SOL (~$3–4)** — still above ≤~$1.
-
-**Not create cost:** Bible graduation **750 USDC** market cap is the *migration* threshold (curve → DAMM), not the SOL you need to open the pool. Seed liquidity / first buys are separate and optional for a demo mark.
+**Bare minimum was never the FOLIO path.** Graduation **750 USDC** is migration market cap, not create SOL.
 
 **Wire after create:** paste pool address → `FOLIO_DBC_POOL` + `FOLIO_DBC_NETWORK=mainnet`.
+
+### DBC create cost (mainnet, verified math 2026-09-25) — detail
+
 
 ## Overview / Netro depth
 
