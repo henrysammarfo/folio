@@ -12,7 +12,7 @@ export const Route = createFileRoute("/beta")({
     meta: siteMeta({
       title: "Closed beta — FOLIO",
       description:
-        "Join FOLIO closed beta — honest Solana stock desk. Quote-only until fills unlock.",
+        "Join FOLIO closed beta — honest Solana stock desk. Live quotes. Buys in FOLIO.",
       path: "/beta",
     }),
   }),
@@ -65,8 +65,8 @@ function Page() {
       tone="about"
       compactIntro
       eyebrow="Closed beta"
-      title="Mainnet-close desk. Quote-only until fills unlock."
-      intro="Join the waitlist for FOLIO closed beta — live share truth, wash refuse, Jupiter quotes. Broadcast stays paused on purpose until we’re funded."
+      title="Get early access to the honest stock desk."
+      intro="Join the waitlist for FOLIO closed beta — live share truth, safe routes, buys and borrows inside FOLIO. We invite in waves."
     >
       <div className="fx-beta">
         {!done ? (
@@ -117,8 +117,8 @@ function Page() {
               {busy ? "Joining…" : "Join waitlist"}
             </button>
             <p className="fx-ticket-sub">
-              Saved on FOLIO servers (rate-limited). Follow {primaryXHandle()}{" "}
-              for invite waves.
+              Saved securely (rate-limited). Follow {primaryXHandle()} for invite
+              waves.
             </p>
           </form>
         ) : (
@@ -145,13 +145,11 @@ function Page() {
         <aside className="fx-beta-aside">
           <h2>What beta includes</h2>
           <ul>
-            <li>Live Markets board + Buy lanes (mega / IPO / meme / pairs)</li>
-            <li>PreStocks + Tessera desks (kept separate on purpose)</li>
-            <li>Scaled UI share truth · wash refuse · Jupiter quotes</li>
-            <li>
-              Fills arm when BROADCAST_PAUSED=false · borrows still
-              unavailable-until-funded
-            </li>
+            <li>Live Markets board + Buy (mega / IPO / meme / pairs)</li>
+            <li>PreStocks + Tessera desks — buys stay in FOLIO</li>
+            <li>Honest share counts · wash refuse · live quotes</li>
+            <li>In-desk borrow on Kamino · NestUSD metrics labeled</li>
+            <li>Agent chat capped at 5 messages / day per account</li>
           </ul>
           <p>
             <a href={SOCIALS.stocklana} target="_blank" rel="noreferrer">

@@ -1,15 +1,16 @@
 /**
- * Live markets board — Jupiter venue prices + free-tape fallback when Jupiter cools.
- * Not a Finviz clone; desk-native board for the catalog we actually trade.
- *
- * Price fetches are staggered (not Promise.all) to avoid Jupiter 429 storms.
+ * Live markets board — multi-venue (Jupiter · free tape · Raydium · Solami when keyed).
+ * Primary mark prefers Jupiter → Solami → free tape. Never invents prices.
+ * Bounded concurrency (not full serial) so Vercel loaders stay under timeout.
  */
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { fetchGeckoTerminalTokenPrice } from "./adapters/gecko-price";
 import { fetchXStockAsset } from "./adapters/xstocks";
-import { fetchJupiterTokenPrice } from "./adapters/jupiter";
+import {
+  resolveMultiVenuePrice,
+  type VenueQuote,
+} from "./adapters/multi-venue";
 import {
   XSTOCK_CATALOG,
   type XStockCatalogItem,
@@ -29,7 +30,7 @@ export type MarketsBoardRow = {
   stockRefPrice: number | null;
   liquidity: number | null;
   priceNote: string;
-  /** From xStocks trading.openNow when asset loads. */
+  venues: VenueQuote[];
   openNow: boolean | null;
   tradingPeriod: string | null;
 };
@@ -40,7 +41,6 @@ export type MarketsBoardBundle = {
   note: string;
 };
 
-/** @deprecated alias while exports settle */
 export type ScreenerRow = MarketsBoardRow;
 export type ScreenerBundle = MarketsBoardBundle;
 
@@ -53,136 +53,123 @@ function catalogSlice(lane: "all" | XStockLane): readonly XStockCatalogItem[] {
   return XSTOCK_CATALOG.filter((s) => s.lane === lane);
 }
 
-const PRICE_STAGGER_MS = 70;
+/** Cap parallel mint probes — avoids Jupiter 429 storms and Vercel timeouts. */
+const MINT_CONCURRENCY = 3;
 
-function sleep(ms: number) {
-  return new Promise<void>((r) => setTimeout(r, ms));
-}
-
-async function mapStaggered<T, R>(
+async function mapPool<T, R>(
   items: readonly T[],
+  concurrency: number,
   fn: (item: T, index: number) => Promise<R>,
-  gapMs: number,
 ): Promise<R[]> {
-  const out: R[] = [];
-  for (let i = 0; i < items.length; i++) {
-    if (i > 0 && gapMs > 0) await sleep(gapMs);
-    out.push(await fn(items[i]!, i));
+  const out = new Array<R>(items.length);
+  let next = 0;
+  async function worker() {
+    while (true) {
+      const i = next++;
+      if (i >= items.length) return;
+      out[i] = await fn(items[i]!, i);
+    }
   }
+  const n = Math.min(concurrency, Math.max(1, items.length));
+  await Promise.all(Array.from({ length: n }, () => worker()));
   return out;
 }
 
-async function resolveVenuePrice(mint: string): Promise<{
-  usdPrice: number;
-  stockRefPrice: number | null;
-  liquidity: number | null;
-  priceNote: string;
-} | null> {
-  const jup = await fetchJupiterTokenPrice(mint);
-  if (jup.ok) {
+async function buildRow(item: XStockCatalogItem): Promise<MarketsBoardRow> {
+  const asset = await fetchXStockAsset(item.symbol);
+  const mint = asset.ok ? asset.data.solanaMint : null;
+  const logo = asset.ok ? asset.data.logo : null;
+  const openNow = asset.ok ? asset.data.openNow : null;
+  const tradingPeriod = asset.ok ? asset.data.tradingPeriod : null;
+
+  const base = {
+    symbol: item.symbol,
+    name: item.name,
+    underlying: item.underlying,
+    lane: item.lane,
+    buyable: item.buyable,
+    logo,
+    mint,
+    openNow,
+    tradingPeriod,
+    ...(item.blurb ? { blurb: item.blurb } : {}),
+  };
+
+  if (!mint || !item.buyable) {
     return {
-      usdPrice: jup.data.usdPrice,
-      stockRefPrice: jup.data.stockRefPrice,
-      liquidity: jup.data.liquidity,
-      priceNote: jup.source.includes("stale")
-        ? "stale · Jupiter"
-        : jup.source.includes("cached")
-          ? "cached · Jupiter"
-          : "live · Jupiter",
-    };
-  }
-  // Free-tape fallback when Jupiter cools / misses — labeled, never invented
-  const gecko = await fetchGeckoTerminalTokenPrice(mint);
-  if (gecko.ok) {
-    return {
-      usdPrice: gecko.data.usdPrice,
+      ...base,
+      usdPrice: null,
       stockRefPrice: null,
-      liquidity: gecko.data.liquidity,
-      priceNote: "live · free tape",
+      liquidity: null,
+      priceNote: !item.buyable
+        ? "Watchlist"
+        : asset.ok
+          ? "Mint missing"
+          : asset.reason,
+      venues: [],
     };
   }
-  return null;
+
+  const multi = await resolveMultiVenuePrice(mint);
+  if (!multi.primary) {
+    return {
+      ...base,
+      usdPrice: null,
+      stockRefPrice: null,
+      liquidity: null,
+      priceNote: "Venues cooling — refresh soon",
+      venues: multi.venues,
+    };
+  }
+
+  return {
+    ...base,
+    usdPrice: multi.primary.usdPrice,
+    stockRefPrice: multi.primary.stockRefPrice,
+    liquidity: multi.primary.liquidity,
+    priceNote: multi.primary.priceNote,
+    venues: multi.venues,
+  };
 }
 
 export const getMarketsBoard = createServerFn({ method: "GET" })
   .validator(BoardInput)
   .handler(async ({ data }): Promise<MarketsBoardBundle> => {
     const slice = catalogSlice(data.lane);
-    const rows: MarketsBoardRow[] = await mapStaggered(
-      slice,
-      async (item) => {
-        const asset = await fetchXStockAsset(item.symbol);
-        const mint = asset.ok ? asset.data.solanaMint : null;
-        const logo = asset.ok ? asset.data.logo : null;
-        const openNow = asset.ok ? asset.data.openNow : null;
-        const tradingPeriod = asset.ok ? asset.data.tradingPeriod : null;
-
-        const base = {
-          symbol: item.symbol,
-          name: item.name,
-          underlying: item.underlying,
-          lane: item.lane,
-          buyable: item.buyable,
-          logo,
-          mint,
-          openNow,
-          tradingPeriod,
-          ...(item.blurb ? { blurb: item.blurb } : {}),
-        };
-
-        if (!mint || !item.buyable) {
-          return {
-            ...base,
-            usdPrice: null,
-            stockRefPrice: null,
-            liquidity: null,
-            priceNote: !item.buyable
-              ? "Watchlist"
-              : asset.ok
-                ? "Mint missing"
-                : asset.reason,
-          };
-        }
-
-        const venue = await resolveVenuePrice(mint);
-        if (!venue) {
-          return {
-            ...base,
-            usdPrice: null,
-            stockRefPrice: null,
-            liquidity: null,
-            priceNote: "Venue cooling — refresh soon",
-          };
-        }
-
-        return {
-          ...base,
-          usdPrice: venue.usdPrice,
-          stockRefPrice: venue.stockRefPrice,
-          liquidity: venue.liquidity,
-          priceNote: venue.priceNote,
-        };
-      },
-      PRICE_STAGGER_MS,
-    );
+    const rows = await mapPool(slice, MINT_CONCURRENCY, (item) => buildRow(item));
 
     const priced = rows.filter((r) => r.usdPrice != null).length;
-    const freeTape = rows.filter((r) => /free tape/i.test(r.priceNote)).length;
+    const liveVenues = rows.reduce(
+      (n, r) =>
+        n +
+        r.venues.filter((v) => v.status === "live" || v.status === "cached")
+          .length,
+      0,
+    );
+    const freeTape = rows.filter((r) =>
+      r.venues.some((v) => v.id === "free-tape" && v.usdPrice != null),
+    ).length;
+    const solami = rows.filter((r) =>
+      r.venues.some((v) => v.id === "solami" && v.usdPrice != null),
+    ).length;
     const anyOpen = rows.some((r) => r.openNow === true);
-    const paceNote =
-      freeTape > 0
-        ? ` · ${freeTape} via free tape (Jupiter cool)`
-        : priced < rows.filter((r) => r.buyable).length
-          ? " · some venues still loading"
-          : "";
+    const paceNote = [
+      freeTape > 0 ? `${freeTape} free-tape` : null,
+      solami > 0 ? `${solami} Solami` : null,
+      priced < rows.filter((r) => r.buyable).length
+        ? "some marks still loading"
+        : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+
     return {
       rows,
       asOf: new Date().toISOString(),
       note: anyOpen
-        ? `Session open · Jupiter + free-tape venues (24/7 on Solana)${paceNote}`
-        : `Session closed · Solana venues still quote 24/7${paceNote}`,
+        ? `Session open · multi-venue marks (${liveVenues} live reads)${paceNote ? ` · ${paceNote}` : ""}`
+        : `Session closed · Solana venues still quote 24/7 (${liveVenues} live reads)${paceNote ? ` · ${paceNote}` : ""}`,
     };
   });
 
-/** Keep old export name for any mid-WIP imports. */
 export const getScreenerBundle = getMarketsBoard;

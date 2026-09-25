@@ -1,6 +1,50 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — DBC create cost + shot-page depth
+
+- **DBC mainnet create cost (honest):** comfortable **0.05–0.08 SOL (~$6–10)**; bare reuse-config **~0.025–0.035 SOL (~$3–4)**; typical pool rent **~0.022 SOL**. Graduation **750 USDC** ≠ create cost. ≤~$1 cannot sponsor. Documented in `FLAWS_AND_WORKAROUNDS.md`.
+- Overview: AI rail yellow sheen + live gate chips; larger signal gauge; partner rows 40px + PreStocks `image` logos.
+- Credit: LTV hero ring · NestUSD dual rate bars (borrow/liq).
+- Buy: token picker popular chips + deeper sheet.
+- Markets: letter-mark venue pills (J/G/R/S).
+- Holdings: paper-estimate banner + Connect CTA.
+- Branch: `cursor/folio-dbc-cost-shot-depth-f1ec`.
+
+## 2026-09-25 — Solami docs correction (no $25 Blur tax)
+
+- Re-read Solami docs: Blur meters prepaid streaming bandwidth; Free/Pro include **RPC**.
+- Live probe: `remaining_bytes: 0` · Blur 402 · **same key** `rpc.solami.dev` getSlot + getSignaturesForAddress OK.
+- Adapter: prefer Solami RPC tape; Blur last-trade optional only when bandwidth > 0. Never require $25 top-up for demo.
+- Multi-venue: Solami stays `live` on RPC path when Blur empty.
+- Stocklana Pro trial (`st-earn-sep-26`) = RPC/gRPC perk, not free Blur GB.
+
+## 2026-09-24 — Multi-venue + SDK depth (Henry follow-up)
+
+- Markets: `resolveMultiVenuePrice` — Jupiter · Gecko free-tape · Raydium liq awareness · Solami Blur REST (`api.solami.dev`) when keyed; venue pills on board (not faint dots).
+- Solami: real Blur `/data/token/price` · fractional strings parsed · fail-closed without DataApi key · RPC tape labeled otherwise.
+- Meteora: official `@meteora-ag/dynamic-bonding-curve-sdk` buildCurveWithMarketCap (fixed 100bps stock fee) + mainnet program executable probe.
+- Overview: holdings logos + connect CTA · quote AssetLogos · cash-session week strip · stronger AI rail · soft Tape/Borrow labels.
+- Credit/Holdings soft CTAs · `memory/FLAWS_AND_WORKAROUNDS.md` documents bugs/workarounds.
+- Tests: 199+ multi-venue · build green · preview routes 200.
+- Branch: `cursor/folio-netro-depth-bible-f1ec`.
+
+## 2026-09-24 — Netro depth + Bible spine (Henry screenshots)
+
+- Doctrine: `memory/HENRY_DESK_CREATIVE.md` — factorize every feature · no rush · screenshot-verify · research keys in `.env` only (rotated after chat paste).
+- Honest Bible gap: DBC/Solami/cash-close were docs-only → now adapters + `/network` rows + acquire weekend refuse.
+- Desk polish from Henry shots: partner Pre-IPO/Tessera **AssetLogo rows** · skeleton loaders (no bare Loading…) · shorter Tessera hero · Netro signal gauge · stronger venue labels.
+- Branch: `cursor/folio-netro-depth-bible-f1ec`.
+
+## 2026-09-24 — Copy refresh (README · marketing · docs)
+
+
+- Soft plain-English pass across README, home/about/markets/credit/preipo/beta, truth/pairs/network/execution/whitepaper.
+- Whitepaper v1.1 + DEMO_SCRIPT + STOCKLANA_SUBMIT/SUBMISSION pointed at production `https://folio-tawny-one.vercel.app`.
+- Stripped ops jargon from user-facing intros (no CPI / fail-closed / BROADCAST / ≤$1 theater language in marketing).
+- Memory sync: CURRENT_STATE · FACT_CHECK · this log.
+- Branch: `cursor/folio-copy-refresh-f1ec`.
+
 ## 2026-09-24 — Desk UX pass (token select + markets venues)
 
 - Buy: searchable TokenSelect on pay/receive · flip arrow always works.

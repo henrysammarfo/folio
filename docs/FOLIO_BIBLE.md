@@ -11,14 +11,14 @@
 
 ## Soft (plain — anyone)
 
-FOLIO buys the US stocks you want on Solana — keeps your share count honest, won’t buy in shady pools, and lets you borrow cash without selling.
+FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
 
 ## Unique job (not “another buy UI”)
 
-**Honest stock desk on Solana** (truth · safe route · credit).  
+**Honest stock desk on Solana.**  
 Brokers buy. FOLIO keeps share counts true after dividends, refuses wash fills, opens credit without selling.
 
-> Depth jargon only (never lead pitch): corporate-action truth = raw vs economic shares after splits/dividends.
+> Depth note only (never lead pitch): share truth = raw wallet tokens vs economic shares after splits/dividends.
 
 ## 8-second
 

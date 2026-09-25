@@ -1,6 +1,6 @@
 # FOLIO — Henry key steps (one at a time)
 
-Demo (hard-refresh): https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app
+Demo (hard-refresh): https://folio-tawny-one.vercel.app
 
 ---
 
@@ -44,9 +44,9 @@ App ID + secret on Vercel. Rotate after chat paste.
 
 **Or browser login:**
 1. Privy Dashboard → **Configuration → App settings → Domains** → Allowed origins → paste exactly:  
-   `https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app`  
+   `https://folio-tawny-one.vercel.app`  
    (Privy rejects `*.vercel.app` wildcards; `https://*.teamtitanlink.vercel.app` OK if you own that suffix.)
-2. Open [Settings](https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk/settings#settings-session)
+2. Open [Settings](https://folio-tawny-one.vercel.app/desk/settings#settings-session)
 3. Click **Log in with Privy (auto-mints)** — session cookie sets after login
 4. If memberships empty → **Join folio-demo as owner**
 5. Confirm Active tenant shows `folio-demo`

@@ -40,6 +40,12 @@ export type AcquireGateInputs = {
     | { kind: "match"; note: string }
     | { kind: "mismatch"; note: string }
     | { kind: "unavailable"; note: string };
+  /**
+   * Cash session (NYSE hours) — weekend / closed refuses size (Bible spine).
+   */
+  cashSession?:
+    | { kind: "open"; label: string }
+    | { kind: "closed"; label: string };
 };
 
 export type AcquireGateMessages = {
@@ -56,7 +62,7 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
   const honestyNotes: string[] = [];
 
   if (!input.truthOk) {
-    blockedReasons.push("Corporate-action / asset truth unavailable");
+    blockedReasons.push("Share truth unavailable");
   }
   if (input.tradingHalted) {
     blockedReasons.push("Trading halted per xStocks API");
@@ -135,11 +141,20 @@ export function buildAcquireGateMessages(input: AcquireGateInputs): AcquireGateM
     }
   }
 
+  if (input.cashSession?.kind === "closed") {
+    blockedReasons.push(
+      `Cash session closed — ${input.cashSession.label}`,
+    );
+  } else if (input.cashSession?.kind === "open") {
+    honestyNotes.push(input.cashSession.label);
+  }
+
   const canReview =
     input.truthOk &&
     input.washOk &&
     input.quoteOk &&
     divergeOk &&
+    input.cashSession?.kind !== "closed" &&
     !(
       input.strictFailClosed &&
       input.scaledUi != null &&

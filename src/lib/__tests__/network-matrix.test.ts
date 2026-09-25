@@ -78,6 +78,11 @@ describe("buildNetworkMatrix honesty", () => {
     expect(byCap["Raydium pool awareness"]?.detail).toMatch(
       /awareness only|not a route guarantee/i,
     );
+
+    // Bible spine — labeled when unwired (no silent omission)
+    expect(byCap["Cash session (weekend refuse)"]?.mode).toBe("unavailable");
+    expect(byCap["Meteora DBC stock curve"]?.mode).toBe("unavailable");
+    expect(byCap["Solami / mainnet tape"]?.mode).toBe("unavailable");
   });
 
   it("labels user-signed fills armed when broadcastPaused=false without FOLIO treasury", () => {

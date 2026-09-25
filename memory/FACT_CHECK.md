@@ -1,3 +1,57 @@
+## 2026-09-25 — DBC create cost + shot depth
+
+| Claim | Status |
+|---|---|
+| Mainnet DBC pool create ≈ 0.022 SOL rent; comfortable wallet 0.05–0.08 SOL (~$6–10 @ ~$121) | Verified — Solana rent RPC + Meteora SDK fee bounds + docs |
+| Graduation 750 USDC is migration cap, not create SOL | Correct — Bible / Meteora USDC quote config |
+| ≤~$1 cannot FOLIO-sponsor mainnet pool | Holds |
+| Overview AI rail yellow energy + gate chips | Implemented |
+| NestUSD dual rate bars · Credit LTV ring | Implemented |
+| Token picker popular chips | Implemented |
+| Markets letter-mark venue pills | Implemented |
+| Holdings paper banner | Implemented |
+| PreStocks partner rows use API `image` | Implemented |
+| No invented pool / fake volume | Holds |
+
+## 2026-09-24 — Multi-venue + SDK depth
+
+| Claim | Status |
+|---|---|
+| Markets multi-venue (Jupiter + free tape + Raydium + Solami) | Implemented — `multi-venue.ts` + board pills |
+| Solami Blur REST live when SOLAMI_API_KEY | Implemented — `api.solami.dev/data/token/price` |
+| Meteora DBC SDK builds FOLIO stock curve | Implemented — `buildCurveWithMarketCap` · program executable verified |
+| Overview Netro depth beyond thin gauge | Holdings logos · week strip · quote logos · stronger AI rail |
+| Flaws/workarounds documented | `memory/FLAWS_AND_WORKAROUNDS.md` |
+| No invented prices / fake DBC volume / Nest fills | Holds — fail-closed + labeled |
+| Unit tests + production build | Green |
+
+## 2026-09-24 — Netro depth + Bible spine
+
+| Claim | Status |
+|---|---|
+| Henry creative doctrine in memory | `memory/HENRY_DESK_CREATIVE.md` |
+| Bible DBC/Solami was docs-only before this pass | Corrected — adapters + network rows |
+| Cash session weekend refuse on Buy | Implemented — `session-gate.ts` + acquire gates |
+| FOLIO stock-curve config (USDC · gentle · cash-close start) | Implemented — `stock-curve.ts` · demo pool pending |
+| Solami Blur live stream | Fail-closed until client shipped · RPC recent-sig probe labeled |
+| Partner Pre-IPO/Tessera rows show AssetLogo | Implemented — `partner-lane-panel.tsx` |
+| Skeleton loaders replace bare “Loading…” | Implemented — Tessera/PreStocks + partner lanes |
+| Netro signal gauge on overview | Implemented — live wash/×/LTV |
+| Research keys only in gitignored `.env` | Verified — never committed |
+| Never claim unhackable | Still holds |
+
+## 2026-09-24 — Copy refresh
+
+| Claim | Status |
+|---|---|
+| README soft pitch + live product table + prod URL | Updated — `README.md` |
+| Marketing routes soft intros (home/about/markets/credit/preipo/beta) | Updated |
+| Truth / pairs / network / execution / whitepaper soft copy | Updated |
+| Whitepaper MD v1.1 matches live desk (Buy/Borrow/Agent 5/day) | Updated — `docs/FOLIO_WHITEPAPER.md` |
+| DEMO_SCRIPT + STOCKLANA_SUBMIT use production URL | Updated — no stale preview URL |
+| No “unhackable” / fake fill claims in marketing | Verified in this pass |
+| NestUSD still metrics-only in copy | Honest residual |
+
 ## 2026-09-24 — Desk UX pass
 
 | Claim | Status |

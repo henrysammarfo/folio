@@ -12,13 +12,13 @@ export const Route = createFileRoute("/truth")({
       {
         name: "description",
         content:
-          "Live share counts for tokenized stocks — wallet raw vs economic shares after dividends and splits.",
+          "See the real share count after dividends and splits — wallet raw vs economic shares.",
       },
       { property: "og:title", content: "Share Truth — FOLIO" },
       {
         property: "og:description",
         content:
-          "Live share counts for tokenized stocks — wallet raw vs economic shares after dividends and splits.",
+          "See the real share count after dividends and splits — wallet raw vs economic shares.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -49,9 +49,9 @@ function Page() {
   return (
     <PublicShell
       tone="truth"
-      eyebrow="Corporate-action ledger"
-      title="One balance. Every truth behind it."
-      intro="Token balances alone can lie after dividends and splits. FOLIO reconciles the live xStocks Scaled UI multiplier (API ↔ on-chain Token-2022) — our share-truth / PoR-analogue. Not issuer proof-of-reserves; Backed holds that layer."
+      eyebrow="Share truth"
+      title="One balance. The real share count behind it."
+      intro="Wallet balances alone can lie after dividends and splits. FOLIO shows the live share multiplier — API and on-chain, side by side — so you see economic shares, not just raw tokens. Issuer reserves stay with Backed."
       aside={
         <div className="mkt-status-col" aria-label="Feed status">
           <div className="mkt-status-line" data-ok={String(Boolean(mult?.ok))}>
@@ -266,7 +266,7 @@ function Page() {
                 .filter(Boolean)
                 .join(" · ") || "unmapped for this symbol"}
               {data?.pyth && !data.pyth.ok && data.pyth.reason === "pyth_api_key_missing"
-                ? " — mapped · prices fail-closed until PYTH_API_KEY"
+                ? " — mapped · prices pause until PYTH_API_KEY"
                 : ""}
             </span>
           </li>

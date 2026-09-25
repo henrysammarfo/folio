@@ -2,48 +2,47 @@
 
 Re-check live counts on https://hackathons.solana.com/hackathons/stocklana before final submit.
 
-**Deadline (re-check live):** hero **SEP 25, 2026** · timeline may still list 18 Sep — confirm on the form.  
-**Demo (production — MERGED):** https://folio-tawny-one.vercel.app  
-PR #15 merged to `main` · production deploy READY · `/desk/markets` · `/desk/preipo` · `/desk/tessera` · `/whitepaper` · `/beta` all **HTTP 200**.
+**Deadline:** re-check the live hero + form (hero has shown **SEP 25, 2026**).  
+**Demo:** https://folio-tawny-one.vercel.app
 
 ## Form fields (paste)
 
 **Project name:** FOLIO
 
-**One-liner:** Honest stock desk on Solana — live share truth, wash fail-closed, Jupiter quote-only, stock↔stock pairs, PreStocks + Tessera desks, credit reads without fake fills.
+**One-liner:** Buy US stocks on Solana with share counts you can trust — refuse dirty routes, buy and rotate in one desk, borrow cash without selling.
 
 **Demo URL:** https://folio-tawny-one.vercel.app
 
 **Repo:** https://github.com/henrysammarfo/folio (`main`)
 
 **Pitch (short paragraph):**
-FOLIO is the honest stock desk for tokenized equities on Solana. We read live xStocks Scaled UI multipliers so share counts stay true after corporate actions; if wash tape is missing or dirty, acquire stays fail-closed. Jupiter quotes are mainnet quote-only (broadcast paused on a ≤~$1 budget). Buy organizes Mega / IPO / Meme plus true stock↔stock pairs. Live Markets board shows venue price, liquidity, and session. PreStocks and Tessera each get their own desk so Stocklana bounty tracks stay eligible. Credit surfaces Kamino LTV honestly; NestUSD stays unavailable until verified. Whitepaper + closed beta at `/whitepaper` and `/beta`. We do not claim unhackable security.
+FOLIO is the honest stock desk for tokenized equities on Solana. We show the live share multiplier after dividends and splits, pause size when the tape looks dirty, and let you buy USDC→stock or stock↔stock with searchable pickers inside FOLIO. Borrow keeps your shares and unlocks USDC on Kamino rails — you sign every step. PreStocks and Tessera each get their own desk; NestUSD shows live risk metrics while Nest execute stays on their app. Guarded agent, five messages a day. We never invent fills and never claim unhackable security.
 
 **Links judges can open:**
 1. Desk: https://folio-tawny-one.vercel.app/desk
-2. Markets board: https://folio-tawny-one.vercel.app/desk/markets
-3. Buy + pairs: https://folio-tawny-one.vercel.app/desk/acquire
-4. PreStocks: https://folio-tawny-one.vercel.app/desk/preipo
-5. Tessera: https://folio-tawny-one.vercel.app/desk/tessera
-6. Truth (AAPLx): https://folio-tawny-one.vercel.app/truth?symbol=AAPLx
-7. Network honesty: https://folio-tawny-one.vercel.app/network
-8. Whitepaper: https://folio-tawny-one.vercel.app/whitepaper
-9. Closed beta: https://folio-tawny-one.vercel.app/beta
-10. Docs: `docs/FOLIO_WHITEPAPER.md` · `docs/DEMO_SCRIPT.md` · `docs/FOUNDER_OPERATING_PLAN.md`
+2. Buy: https://folio-tawny-one.vercel.app/desk/acquire
+3. Markets: https://folio-tawny-one.vercel.app/desk/markets
+4. Borrow: https://folio-tawny-one.vercel.app/desk/credit
+5. PreStocks: https://folio-tawny-one.vercel.app/desk/preipo
+6. Tessera: https://folio-tawny-one.vercel.app/desk/tessera
+7. Truth (AAPLx): https://folio-tawny-one.vercel.app/truth?symbol=AAPLx
+8. Network honesty: https://folio-tawny-one.vercel.app/network
+9. Whitepaper: https://folio-tawny-one.vercel.app/whitepaper
+10. Closed beta: https://folio-tawny-one.vercel.app/beta
 
-**Track fit:** Investing / credit & yield / infrastructure · PreStocks bounty · Tessera bounty · Pyth if keyed.
+**Track fit:** Investing / credit & yield · PreStocks · Tessera · Pyth when keyed.
 
 ## Henry before submit
 
-- [x] PR #15 merged · production routes live
 - [ ] Record ≤90s demo · add link on submit form
 - [ ] Claim Folio X handle · set `src/lib/socials.ts` `xFolio`
+- [ ] Re-check Stocklana counts + deadline on the official page
 - [ ] Submit form · invite teammates · edit until close
 - [ ] Rotate any chat-pasted secrets after hackathon
 
 ## After submit
 
-1. Post launch thread (LAUNCH_AND_SOCIALS.md)
+1. Post launch thread (`docs/LAUNCH_AND_SOCIALS.md`)
 2. Reach Colosseum / World’s Fair judges for feedback
-3. Invite `/beta` waitlist in batches of 25
-4. Log traction → Colosseum submission with Stocklana credibility
+3. Invite `/beta` waitlist in waves
+4. Log traction → Colosseum with Stocklana credibility

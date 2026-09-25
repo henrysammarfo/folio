@@ -3,14 +3,14 @@
 Use this **after** Henry replies with a lab candidate id (or in parallel if he asks).  
 Do **one key family at a time**. Paste into Vercel (Preview + Production) and local `.env`. Never commit values. Rotate anything pasted in chat.
 
-Demo Settings: https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app/desk/settings#empire-readiness  
+Demo Settings: https://folio-tawny-one.vercel.app/desk/settings#empire-readiness  
 Vercel env UI: https://vercel.com/teamtitanlink/folio/settings/environment-variables
 
-Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED=true` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density` · `BITQUERY_API_KEY` · `PYTH_API_KEY` · `PRIVY_*` · `SUPABASE_URL` · `SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_JWT_SECRET` · `JUPITER_API_KEY`
+Already on Vercel: `FOLIO_SESSION_SECRET` · `BROADCAST_PAUSED` · `SOLANA_RPC_URL` · `API_KEY_21ST` · `SHADERS_API_KEY` · `AGENTROUTER_*` · `TAVILY_API_KEY` · `TINYFISH_API_KEY` · `FOLIO_APPROVED_LAB_UI=netro-density` · `BITQUERY_API_KEY` · `PYTH_API_KEY` · `PRIVY_*` · `SUPABASE_URL` · `SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_JWT_SECRET` · `JUPITER_API_KEY`
 
 SQL ✅ · JWT ✅ · **live free diverge** (Finnhub→Yahoo + CoinGecko; Pyth off ship path) ✅. Still need Henry: **Privy login mint + Join folio-demo**. **Rotate all chat-pasted secrets.**
 
-Stocklana live 2026-09-16 (jina): **605** registered · **84** submissions · **$121k** · SEP 25.
+Stocklana: re-check registered / submission counts + deadline on the official page before claims.
 
 Lab MCP live-verified on branch preview `/lab/ui` (2026-09-16): **21st MCP connected**.
 

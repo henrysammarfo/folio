@@ -51,7 +51,8 @@ describe("humanizeVenueNote", () => {
   it("softens rate-limit blanks on markets board", async () => {
     const { humanizeVenueNote } = await import("../humanize-copy");
     expect(humanizeVenueNote("jupiter_rate_limited")).toMatch(/cooling/i);
-    expect(humanizeVenueNote("live")).toBe("live");
+    expect(humanizeVenueNote("live")).toBe("live · Jupiter");
+    expect(humanizeVenueNote("xstocks_asset_http_error")).toMatch(/Catalog cooling/i);
   });
 });
 

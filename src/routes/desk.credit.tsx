@@ -105,17 +105,18 @@ function Page() {
               <h1>{borrow != null ? money(borrow) : "—"}</h1>
               <p className="fx-sub">
                 {data?.paper.note ??
-                  "Deposit xStock collateral and borrow USDC in FOLIO — Kamino rails, your wallet signs."}
+                  "Keep the shares. Unlock USDC inside FOLIO — you sign every step."}
               </p>
             </div>
             {ltv != null ? (
-              <div className="fx-markets-stats" style={{ flexDirection: "column", alignItems: "flex-end" }}>
+              <div
+                className="fx-credit-hero-ring"
+                style={{ ["--ltv" as string]: Math.round(ltv * 100) }}
+                aria-label={`Max LTV ${(ltv * 100).toFixed(0)} percent`}
+              >
                 <span>
-                  Max LTV <b>{(ltv * 100).toFixed(0)}%</b>
-                </span>
-                <span>
-                  Collateral{" "}
-                  <b>{collateral != null ? money(collateral) : "—"}</b>
+                  Max LTV
+                  <b>{(ltv * 100).toFixed(0)}%</b>
                 </span>
               </div>
             ) : null}
@@ -219,17 +220,21 @@ function Page() {
               <h2 className="fx-section-title">
                 NestUSD collateral {nestLive ? "(live)" : "(risk)"}
               </h2>
-              <div className="fx-card">
-                <ul className="fx-list" data-testid="credit-nestusd-rows">
-                  {nestRows.map((r) => {
-                    const und =
-                      catalogUnderlying(r.symbol) ?? underlyingKey(r.symbol);
-                    return (
-                      <li
-                        key={r.symbol}
-                        className="fx-asset"
-                        style={{ cursor: "default" }}
-                      >
+              <p className="fx-sub" style={{ margin: "0 0 .55rem" }}>
+                Metrics only — Nest execute stays on Nest.
+              </p>
+              <div className="fx-card" data-testid="credit-nestusd-rows">
+                {nestRows.map((r) => {
+                  const und =
+                    catalogUnderlying(r.symbol) ?? underlyingKey(r.symbol);
+                  const borrowPct = Math.min(100, Math.round(r.borrowLtv * 100));
+                  const liqPct = Math.min(
+                    100,
+                    Math.round(r.liquidationThreshold * 100),
+                  );
+                  return (
+                    <div key={r.symbol} className="fx-nest-rate">
+                      <div className="fx-nest-rate-top">
                         <AssetLogo
                           symbol={r.symbol}
                           underlying={und}
@@ -238,20 +243,34 @@ function Page() {
                         <span className="fx-asset-main">
                           <strong>{r.symbol}</strong>
                           <small>
-                            {(r.borrowLtv * 100).toFixed(0)}% borrow LTV
+                            {borrowPct}% borrow · {liqPct}% liq
                             {r.borrowsPaused ? " · paused" : ""}
                           </small>
                         </span>
                         <span className="fx-asset-right">
-                          <strong>
-                            {(r.liquidationThreshold * 100).toFixed(0)}%
-                          </strong>
-                          <small>liq</small>
+                          <strong>{borrowPct}%</strong>
+                          <small>borrow</small>
                         </span>
-                      </li>
-                    );
-                  })}
-                </ul>
+                      </div>
+                      <div className="fx-nest-rate-bars" aria-hidden>
+                        <div className="fx-nest-bar">
+                          <span>Borrow</span>
+                          <i>
+                            <b style={{ width: `${borrowPct}%` }} />
+                          </i>
+                          <em>{borrowPct}%</em>
+                        </div>
+                        <div className="fx-nest-bar is-liq">
+                          <span>Liq</span>
+                          <i>
+                            <b style={{ width: `${liqPct}%` }} />
+                          </i>
+                          <em>{liqPct}%</em>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </>
           ) : null}

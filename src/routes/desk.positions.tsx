@@ -75,19 +75,42 @@ function Page() {
           <p className="fx-hero-value">{total > 0 ? money(total) : "—"}</p>
           <p className="fx-hero-sub">
             {walletRead
-              ? "Live balances from your wallet — Verified only when on-chain share count matches"
-              : "Paper quantities for demo — not owned shares until you connect a wallet"}
+              ? "Live balances from your wallet — verified when on-chain share count matches"
+              : "Paper estimates until you connect — not owned shares yet"}
           </p>
         </header>
 
         <div className="fx-actions">
-          <Link to="/desk/acquire" className="fx-btn fx-btn-primary">
+          {!walletRead ? (
+            <Link to="/desk/settings" className="fx-btn fx-btn-primary">
+              Connect wallet
+            </Link>
+          ) : null}
+          <Link
+            to="/desk/acquire"
+            className={`fx-btn ${walletRead ? "fx-btn-primary" : "fx-btn-ghost"}`}
+          >
             Buy stocks
           </Link>
           <Link to="/desk/credit" className="fx-btn fx-btn-ghost">
             Borrow
           </Link>
         </div>
+
+        {!walletRead ? (
+          <div className="fx-holdings-banner" data-testid="holdings-paper-banner">
+            <div>
+              <strong>Estimates until you connect</strong>
+              <p>
+                Paper rows are sizing guides — not owned shares. Connect a wallet
+                to verify live balances and share counts.
+              </p>
+            </div>
+            <Link to="/desk/settings" className="fx-btn fx-btn-dark">
+              Connect →
+            </Link>
+          </div>
+        ) : null}
 
         {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
 

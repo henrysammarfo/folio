@@ -1,71 +1,39 @@
 # FOLIO — Stocklana submit checklist
 
-Deadline conflict — **re-check live at submit**:
-- Hero / stats strip: **SEP 25, 2026**
-- Timeline copy: **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)**
-Budget: ≤~$1 · Broadcast: paused
+**Demo (production):** https://folio-tawny-one.vercel.app  
+**Deadline:** re-check the live Stocklana hero + form before submit (hero has shown **SEP 25, 2026**).  
+**Counts:** never invent — refresh https://hackathons.solana.com/hackathons/stocklana
 
-## Live counts (2026-09-16, official page scrape)
+## Soft one-liner
 
-Source: https://hackathons.solana.com/hackathons/stocklana
-
-- Registered: **605**
-- Submissions: **84**
-- Prize pool hero: **$121,000** (Foundation main track $100k + bounty tracks)
-- Deadline conflict: hero **SEP 25, 2026** vs timeline **Fri 18 Sep 2026, 16:00 ET (20:00 UTC)** — confirm which the form uses at submit
-- Bounty note: Pyth market-data track — FOLIO diverge uses Equity.US.* vs Jupiter; Crypto.xStock/USD + Crypto.AAPLON/USD (Ondo) secondary on `/truth`
-
-Do not invent newer counts — refresh the page before the submission form.
-Paste pack: `docs/STOCKLANA_SUBMISSION.md`
+FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
 
 ## Before submit
 
-- [x] Demo URL reachable (Block 0 spine) — https://folio-git-cursor-folio-netro-desk-approve-f1ec-teamtitanlink.vercel.app (SSO off). Set `FOLIO_SESSION_SECRET` (+ optional `SOLANA_RPC_URL`) in Vercel env for watch-wallet; public RPC fallback covers Scaled UI reads when RPC unset. `BROADCAST_PAUSED=true` recommended in Vercel.
-- [x] Ephemeral `?inspect=` wallet-read on positions + credit (no Vercel secret required; labeled not-auth)
-- [x] Vercel env: `FOLIO_SESSION_SECRET` (≥16) + `BROADCAST_PAUSED=true` (live settings: secret set · bind ready)
+- [x] Demo URL reachable — https://folio-tawny-one.vercel.app
+- [x] Pitch order locked — truth → wash → buy → borrow → agent (`docs/DEMO_SCRIPT.md`)
+- [x] Buy: searchable tokens · flip · in-FOLIO confirm
+- [x] Markets: live board · free-tape when Jupiter cools
+- [x] Borrow: Kamino deposit/borrow in-desk (you sign)
+- [x] PreStocks + Tessera desks · buys stay inside FOLIO
+- [x] Agent: 5 messages / account / day
+- [x] NestUSD: live risk metrics only (execute still Nest’s app)
+- [x] No “unhackable” claims · no fake fills
+- [x] Paste pack ready — `docs/STOCKLANA_SUBMISSION.md`
+- [ ] Record ≤90s demo · add link on the form
+- [ ] Re-check registered / submission counts on the official page
+- [ ] Submit form · invite teammates · edit until close
+- [ ] Rotate any chat-pasted secrets after the hackathon
 
-- [x] Replay green locally (unit + e2e + empire smoke + build) — re-run before final submit:
+## Replay before final submit
 
 ```bash
 npm run replay
-# = npm test && npm run test:e2e && npx tsx scripts/smoke-empire.mts && npm run build
 ```
-
-- [x] Pitch order locked (truth → wash → buy → credit → agent) — see `docs/DEMO_SCRIPT.md`
-- [x] Mode badges visible on `/truth`, `/desk/acquire`, `/network`, `/desk/credit` (verified on Vercel preview SSR)
-- [x] `/network` shows NestUSD unavailable, wash fail-closed without Bitquery, broadcast paused (verified live preview)
-- [x] Wash fail-closed without Bitquery (Continue disabled) — e2e + live preview
-- [x] No “unhackable” / nation-state claims in product UI (e2e asserts + README/threat model forbid)
-- [x] No claim of mainnet fill / mint / borrow unless actually funded + confirmed (broadcast hard-false; smoke gates)
-- [x] `.env` keys never committed; rotate any chat-pasted secrets after hackathon
-- [x] Submission paste pack ready — `docs/STOCKLANA_SUBMISSION.md`
-
-## Keys to land (Henry)
-
-See full runbook: `docs/KEYS_LANDING.md` · `npm run keys` prints local readiness (no values) · `npm run smoke:keys` live-probes when keys present.
-
-| Key | Unlocks |
-|---|---|
-| `BITQUERY_API_KEY` | Live wash tape (fail-closed until set) |
-| `PYTH_API_KEY` | Hermes equity diverge (fail-closed until set; Aug 2026 auth) |
-| `PRIVY_APP_ID` + `PRIVY_APP_SECRET` | Wallet identity |
-| `SUPABASE_URL` + `SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` + migration | Tenant memberships / prefs |
-| `SUPABASE_JWT_SECRET` (≥16) | User-JWT RLS path (`sub` = Privy DID); without it service-role is labeled fallback |
-| `FOLIO_SESSION_SECRET` (≥16) — **set on Vercel** | httpOnly `folio_session` + watch-wallet cookie |
-| Optional `AGENTROUTER_API_KEY` | Paper agent NL (WAF → spine-only; live spine always) |
-| Optional `JUPITER_API_KEY` | If quote/price becomes gated |
-| `SOLANA_RPC_URL` — **set on Vercel** (public mainnet) | Scaled UI + wallet reads (fallback still labeled) |
-
-## UI approve gate ✅ DONE
-
-`FOLIO_APPROVED_LAB_UI=netro-density` is live on Vercel. Production `/desk` mounts Netro 12-col; home **Aionis hero stays preserved**. Lab `/lab/ui` · `/lab/shaders` remain for optional shader pick / local preview.
-
-Step-by-step Empire keys: `docs/HENRY_STEPS.md` · Vision: `docs/COLOSSEUM_VISION.md`
-
-Shaders (optional): `ink-ledger` · `ledger-mist` · `aurora-grid`  
-UI ids: `netro-density` (production) · `aionis-brand-plane` · `cinematic-landing-21st` · `trade-journal-21st`
 
 ## After Stocklana
 
-- Colosseum World’s Fair uses the **same** mainnet-read + quote-only honesty posture
-- Still no custom mainnet program deploy on ≤~$1
+- Claim Folio X · closed beta invites (`/beta`)
+- Same honesty for Colosseum / World’s Fair — working live desk beats fake mainnet theater
+
+Keys runbook: `docs/KEYS_LANDING.md` · Henry steps: `docs/HENRY_STEPS.md`
