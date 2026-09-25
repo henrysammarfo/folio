@@ -177,8 +177,7 @@ export function DeskShell({
   const liveShader = previewShaderVariant(effectiveShader, effectiveUi);
   const isDeskOverview = path === "/desk" || path === "/desk/";
   /** Henry: NetroBNB whole dashboard IS the FOLIO desk home — always on. */
-  const showNetroCanvas =
-    isDeskOverview && (effectiveUi == null || effectiveUi === "netro-density");
+  const showNetroCanvas = isDeskOverview;
   const showJournal = effectiveUi === "trade-journal-21st" && isDeskOverview;
   const productionChrome = !previewing && (approvedUi != null || approvedShader != null);
 

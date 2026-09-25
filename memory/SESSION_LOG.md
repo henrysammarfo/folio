@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — NetroBNB home fidelity + markets/partner UX repair
+
+- Home Netro canvas: **exact NetroBNB tokens** (#F4D014 yellow · #E5E7EB canvas) · `i1.png` gear · "Asset Intelligence Dashboard" / "Today's Market Flow" / "Make Analysis Easy" · always-on (no approve-gate).
+- Markets: restored clean All/Mega/IPO/Meme tabs (removed jammed Pre-IPO/Tessera/Universe tabs) · search expands universe · partners stay on their desks.
+- PreStocks / Tessera: restored catalog list + ticket UX (prior layout).
+- Branch: `cursor/folio-netro-home-depth-f1ec`
+
 ## 2026-09-25 — Honest leftovers: PreStocks Buy · universe prices · wallet-scan qty
 
 - PreStocks desk: Tessera-parity Buy ticket (TokenSelect + flip, USDC/USDT ↔ PreStock).

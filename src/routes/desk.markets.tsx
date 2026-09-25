@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { VenueLogo } from "@/components/venue-logo";
@@ -9,23 +9,16 @@ import { getMarketsBoard } from "@/lib/desk.functions";
 import { DESK_SYNC, marketsQueryKey } from "@/lib/desk-query-keys";
 import { humanizeVenueNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
-import { LANE_META } from "@/lib/xstock-catalog";
+import { LANE_META, type XStockLane } from "@/lib/xstock-catalog";
 
-type LaneFilter =
-  | "all"
-  | "mega"
-  | "ipo"
-  | "meme"
-  | "preipo"
-  | "tessera"
-  | "universe";
+type LaneFilter = "all" | XStockLane;
 
 export const Route = createFileRoute("/desk/markets")({
   head: () => ({
     meta: siteMeta({
       title: "Markets — FOLIO",
       description:
-        "Live Jupiter marks for the full Solana xStocks universe plus PreStocks and Tessera.",
+        "Live Jupiter venue prices for mega, IPO, and meme xStocks on Solana.",
       path: "/desk/markets",
     }),
   }),
@@ -72,7 +65,10 @@ function Page() {
   });
 
   const rows = data?.rows ?? [];
-  const priced = data?.pricedCount ?? rows.filter((r) => r.usdPrice != null).length;
+  const priced = useMemo(
+    () => data?.pricedCount ?? rows.filter((r) => r.usdPrice != null).length,
+    [data?.pricedCount, rows],
+  );
 
   return (
     <DeskShell title="Markets">
@@ -96,7 +92,7 @@ function Page() {
             </span>
             {data?.universeCount != null ? (
               <span>
-                <b>{data.universeCount.toLocaleString()}</b> universe
+                <b>{data.universeCount.toLocaleString()}</b> on Solana
               </span>
             ) : null}
           </div>
@@ -109,7 +105,7 @@ function Page() {
         >
           {rows.slice(0, 10).map((row) => (
             <Link
-              key={row.symbol}
+              key={`${row.lane}-${row.symbol}`}
               to="/desk/acquire"
               className="fx-markets-flow-chip"
               aria-label={`Buy ${row.symbol}`}
@@ -134,17 +130,7 @@ function Page() {
         </div>
 
         <div className="fx-lane-row fx-markets-tabs" role="tablist">
-          {(
-            [
-              "all",
-              "mega",
-              "ipo",
-              "meme",
-              "universe",
-              "preipo",
-              "tessera",
-            ] as const
-          ).map((id) => {
+          {(["all", "mega", "ipo", "meme"] as const).map((id) => {
             const meta = LANE_META.find((l) => l.id === id);
             return (
               <button
@@ -167,7 +153,7 @@ function Page() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search symbol, name, or underlying…"
+            placeholder="Search symbol — expands full Solana universe…"
             autoComplete="off"
           />
         </label>
@@ -175,10 +161,9 @@ function Page() {
         <p className="fx-markets-explain">
           {LANE_META.find((l) => l.id === lane)?.body}
           {data?.universeCount != null
-            ? ` · ${data.universeCount.toLocaleString()} Solana xStocks on-chain.`
-            : ""}
-          {" "}
-          Partner buys stay on{" "}
+            ? ` · ${data.universeCount.toLocaleString()} Solana xStocks live.`
+            : ""}{" "}
+          Private pre-IPO stays on{" "}
           <Link to="/desk/preipo">PreStocks</Link> /{" "}
           <Link to="/desk/tessera">Tessera</Link>.
         </p>
@@ -200,16 +185,16 @@ function Page() {
                   ? ((row.usdPrice - row.stockRefPrice) / row.stockRefPrice) *
                     100
                   : null;
+              const deskTo =
+                row.deskPath === "/desk/preipo"
+                  ? "/desk/preipo"
+                  : row.deskPath === "/desk/tessera"
+                    ? "/desk/tessera"
+                    : "/desk/acquire";
               return (
                 <li key={`${row.lane}-${row.symbol}`}>
                   <Link
-                    to={
-                      row.deskPath === "/desk/preipo"
-                        ? "/desk/preipo"
-                        : row.deskPath === "/desk/tessera"
-                          ? "/desk/tessera"
-                          : "/desk/acquire"
-                    }
+                    to={deskTo}
                     className="fx-board-row"
                     aria-label={`Trade ${row.symbol}`}
                   >
@@ -263,10 +248,7 @@ function Page() {
                         <small>{humanizeVenueNote(row.priceNote)}</small>
                       )}
                       {row.venues.length > 0 ? (
-                        <span
-                          className="fx-venue-strip"
-                          aria-label="Venues"
-                        >
+                        <span className="fx-venue-strip" aria-label="Venues">
                           {row.venues.map((v) => (
                             <em
                               key={v.id}

@@ -233,8 +233,8 @@ export function NetroDensityCanvas({
     <div className="netro-density" data-testid="netro-density-surface">
       <header className="netro-density-title netro-density-item" style={delay(0)}>
         <div>
-          <h3>Your desk</h3>
-          <span>Buy · hold · borrow — live markets</span>
+          <h3>Asset Intelligence Dashboard</h3>
+          <span>Buy · hold · borrow — live Solana markets</span>
         </div>
         <div className="netro-density-chrome-actions">
           <Link to="/desk/acquire" className="netro-density-connect">
@@ -365,15 +365,14 @@ export function NetroDensityCanvas({
               className="netro-density-profile netro-density-item"
               style={delay(3)}
             >
-              <p className="netro-density-hi">Welcome</p>
+              <p className="netro-density-hi">Hi — FOLIO desk</p>
               <div className="netro-density-profile-art" aria-hidden>
-                <span className="netro-density-gear" />
-                <span className="netro-density-gear netro-density-gear-inner" />
+                <img src="/netro/i1.png" alt="" width={260} height={260} />
               </div>
               <h4>
-                Trade
+                Make
                 <br />
-                {flowSymbol}
+                Analysis Easy
               </h4>
               <div className="netro-density-clock">
                 <span>{clock.h}</span>
@@ -382,12 +381,8 @@ export function NetroDensityCanvas({
                 <em>:</em>
                 <span>{clock.s}</span>
               </div>
-              <Link
-                to="/desk/positions/$symbol"
-                params={{ symbol: flowSymbol }}
-                className="netro-density-cta"
-              >
-                Open {flowSymbol}
+              <Link to="/desk/acquire" className="netro-density-cta">
+                Start Analysis
               </Link>
             </div>
 
@@ -399,10 +394,12 @@ export function NetroDensityCanvas({
               >
                 <div className="netro-density-flow-head">
                   <div>
-                    <strong>{flowUnderlying}</strong>
-                    <p>{flowSymbol}</p>
+                    <strong>Today&apos;s Market Flow</strong>
+                    <p>Live share counts · wash · Jupiter quote</p>
                   </div>
-                  <span className="netro-density-flow-pill">Live</span>
+                  <span className="netro-density-flow-pill">
+                    {flowUnderlying} | USDC
+                  </span>
                 </div>
                 <div
                   className="netro-density-metrics"

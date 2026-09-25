@@ -350,10 +350,10 @@ async function buildBoard(
       );
       rows = [...curated];
 
-      if (lane === "all") {
-        // Full Solana universe marks (batch) excluding curated duplicates.
+      if (lane === "all" && q?.trim()) {
+        // Search expands into full Solana universe — idle All stays curated desk.
         const u = await buildUniverseRows({
-          ...(q ? { q } : {}),
+          q,
           excludeCurated: true,
         });
         universeCount = u.universeCount;
@@ -366,6 +366,7 @@ async function buildBoard(
 
     const partners = await partnersP;
     const partnerRows =
+      lane === "all" ||
       lane === "mega" ||
       lane === "ipo" ||
       lane === "meme" ||
@@ -373,7 +374,7 @@ async function buildBoard(
         ? []
         : partners.rows.filter(
             (r) =>
-              (lane === "all" ? true : r.lane === lane) &&
+              r.lane === lane &&
               matchesQuery(r, q),
           );
 
