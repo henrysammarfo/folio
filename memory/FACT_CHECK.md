@@ -1,3 +1,12 @@
+## 2026-09-25 — Three Stocklana bounty tracks (Competing In)
+
+| Claim | Status |
+|---|---|
+| Best Use of Meteora DBC ($5,000) | Documented · DBC read + weekend refuse + create cost honesty |
+| Best Use of Tessera, Pre-IPO stocks ($6,000) | Documented · `/desk/tessera` catalog + flip |
+| Best Use of PreStocks ($10,000) | Documented · `/desk/preipo` catalog + flip |
+| Tracks corrected on branch `cursor/folio-three-bounty-tracks-f1ec` (not force-merged) | Holds |
+
 ## 2026-09-25 — Pitch deck + dual video scripts
 
 | Claim | Status |

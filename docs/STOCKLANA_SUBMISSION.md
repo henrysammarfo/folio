@@ -37,7 +37,7 @@ Token balances can lie after dividends and splits. Dirty pools can smile until y
 3. **Buy** — USDC to stock or stock to stock. Searchable pickers. Flip. Live Jupiter quote. Your wallet signs when fills are armed.
 4. **Markets** — Live board for Mega IPO and Meme. Search expands the Solana xStocks universe. Marks are never invented.
 5. **Borrow** — Keep the shares. Unlock USDC on Kamino rails inside the desk. NestUSD shows live risk metrics. Nest execute stays on Nest.
-6. **Partners** — PreStocks and Tessera each get their own desk so private rooms stay separate.
+6. **Bounty rooms** — Meteora DBC weekend refuse + labeled curve honesty. Tessera Pre-IPO desk. PreStocks desk. Issuers never mixed.
 7. **Agent** — Short answers. Five messages per account per day. Never pretends a fill happened.
 
 ## Honest limits
@@ -67,7 +67,7 @@ Mainnet read and quote first. Fills stay paused until policy arms them. We never
 | Technical Video | Paste Loom / YouTube after recording from `docs/VIDEO_SCRIPTS.md` · Technical Video section |
 | Pitch deck | https://folio-tawny-one.vercel.app/pitch |
 
-**Track fit (three tracks):** Investing and credit · PreStocks · Tessera. See README Mermaid and Technical Video script.
+**Track fit (Competing In):** Best Use of Meteora DBC ($5k) · Best Use of Tessera, Pre-IPO stocks ($6k) · Best Use of PreStocks ($10k). See README Mermaid and Technical Video script.
 
 ### Extra deep links (optional in description)
 
@@ -82,7 +82,7 @@ Mainnet read and quote first. Fills stay paused until policy arms them. We never
 9. https://folio-tawny-one.vercel.app/whitepaper  
 10. https://folio-tawny-one.vercel.app/beta  
 
-**Track fit:** Investing and credit · PreStocks · Tessera. Pyth when keyed. Meteora DBC / Solami documented as World’s Fair side tracks in the Bible.
+**Track fit:** Best Use of Meteora DBC ($5,000) · Best Use of Tessera, Pre-IPO stocks ($6,000) · Best Use of PreStocks ($10,000).
 
 ---
 
