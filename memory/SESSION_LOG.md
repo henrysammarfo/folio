@@ -1,6 +1,12 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — PreStocks / Tessera header overlap
+
+- Bug: Catalog / T-tokens `h2` sat flush on first-row borders (Tailwind zeros heading margins; bare `.fx-card` had no padding).
+- Fix: `.fx-preipo-grid > .fx-card` padding + flex gap; tighten list/item spacing.
+- Branch: `cursor/folio-preipo-header-overlap-f1ec`
+
 ## 2026-09-25 — Shot-fix pass (Henry screens)
 
 - Credit: Available/Max LTV hero + meta strip · NestUSD panel head cleaned

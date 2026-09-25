@@ -57,7 +57,7 @@ README, marketing routes, whitepaper, demo/submit docs, and public intros rewrit
 - Buy: Mega / IPO / Meme / **Pairs** · TokenSelect + flip · Netro-depth details.
 - Markets: staggered Jupiter + Gecko free-tape · humanized venue notes.
 - Credit: AssetLogo rates · Kamino ktx in-desk · NestUSD metrics-only (no Nest execute theater).
-- PreStocks / Tessera: in-desk BuyExecute via partner `outputMint` (no external app CTAs).
+- PreStocks / Tessera: in-desk BuyExecute via partner `outputMint` (no external app CTAs). Catalog / T-tokens cards padded so titles never clip first-row borders.
 - Agent: `agent_daily` = 5 / account / 24h.
 - Logo chain: API → Backed CDN → favicon → initials (SpaceX / Tessera paths fixed).
 - Fills arm when `BROADCAST_PAUSED=false` (user-signed Jupiter + Kamino + partner buys).
