@@ -31,7 +31,7 @@
 |---|---|---|
 | Official SDK `@meteora-ag/dynamic-bonding-curve-sdk` pulls `@coral-xyz/anchor` — CJS `exports` in ESM breaks Vercel SSR when statically imported | **Critical (500 all desk)** | Production path: config + RPC `getAccountInfo` only · SDK via `FOLIO_DBC_SDK=1` / vitest · never static-import SDK into desk.functions |
 | `buildCurveWithMarketCap` with fixed 100bps start=end ≈ stock fee (not meme exponential) | — | FOLIO preset locks linear scheduler equal bps (unit-tested) |
-| Mainnet DBC **pool create** needs funded payer (rent ≫ ≤~$1) | Expected | See **DBC create cost** below · After you create: `FOLIO_DBC_POOL` + `FOLIO_DBC_NETWORK=mainnet` — never invent address · Bible allows devnet demo; prices stay mainnet-read |
+| Mainnet DBC **pool create** needs funded payer | Expected | **Full-pay path (Henry 2026-09-25):** create **config + pool** — do **not** reuse a public config. Comfortable **0.05–0.08 SOL (~$6–10)**. After create: `FOLIO_DBC_POOL` + `FOLIO_DBC_NETWORK=mainnet`. Never invent address. |
 | Mainnet DBC program `dbcij3…` is executable on public RPC | Verified 2026-09-24 | `programExecutable: true` via JSON-RPC (no web3.js required on SSR) |
 | Curve does not know NYSE hours | Bible | FOLIO `session-gate` refuses weekend size |
 | Multi-venue × full catalog can timeout Vercel | High | Bounded concurrency (3) · parallel venues per mint |

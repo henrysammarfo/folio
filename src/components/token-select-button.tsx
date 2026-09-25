@@ -1,6 +1,6 @@
 /**
  * Clickable pay/receive token control — search dropdown (Uniswap-style).
- * Keeps selection inside FOLIO; no external redirects.
+ * Stables-first (USDC / USDT). Keeps selection inside FOLIO.
  */
 import { ChevronDown, Search } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
@@ -15,12 +15,12 @@ export type TokenOption = {
   name: string;
   underlying?: string;
   logo?: string | null;
-  kind: "usdc" | "xstock";
+  kind: "stable" | "xstock";
 };
 
 type Props = {
   value: string;
-  /** USDC allowed in this leg */
+  /** Stables (USDC / USDT) allowed in this leg */
   allowUsdc?: boolean;
   /** Exclude these symbols from the list (e.g. the other leg) */
   exclude?: string[];
@@ -29,11 +29,15 @@ type Props = {
   className?: string;
 };
 
-const POPULAR = ["USDC", "AAPLx", "TSLAx", "NVDAx", "GOOGLx"] as const;
+/** Solana mainnet stables — FOLIO pay rails prefer these over volatile alts. */
+export const STABLE_OPTIONS: TokenOption[] = [
+  { symbol: "USDC", name: "USD Coin", kind: "stable" },
+  { symbol: "USDT", name: "Tether USD", kind: "stable" },
+];
 
-function usdcOption(): TokenOption {
-  return { symbol: "USDC", name: "USD Coin", kind: "usdc" };
-}
+export const USDT_MINT = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB";
+
+const POPULAR_STOCKS = ["AAPLx", "TSLAx", "NVDAx", "GOOGLx"] as const;
 
 function toOption(item: XStockCatalogItem): TokenOption {
   return {
@@ -42,6 +46,10 @@ function toOption(item: XStockCatalogItem): TokenOption {
     underlying: item.underlying,
     kind: "xstock",
   };
+}
+
+function isStable(sym: string) {
+  return /^(USDC|USDT)$/i.test(sym);
 }
 
 export function TokenSelectButton({
@@ -61,7 +69,11 @@ export function TokenSelectButton({
   const options = useMemo(() => {
     const ex = new Set(exclude.map((s) => s.toUpperCase()));
     const out: TokenOption[] = [];
-    if (allowUsdc && !ex.has("USDC")) out.push(usdcOption());
+    if (allowUsdc) {
+      for (const s of STABLE_OPTIONS) {
+        if (!ex.has(s.symbol.toUpperCase())) out.push(s);
+      }
+    }
     for (const item of XSTOCK_CATALOG) {
       if (!item.buyable) continue;
       if (ex.has(item.symbol.toUpperCase())) continue;
@@ -79,29 +91,42 @@ export function TokenSelectButton({
 
   const popular = useMemo(() => {
     const ex = new Set(exclude.map((s) => s.toUpperCase()));
-    return POPULAR.filter((sym) => {
-      if (ex.has(sym.toUpperCase())) return false;
-      if (sym === "USDC") return allowUsdc;
-      return XSTOCK_CATALOG.some(
+    const chips: TokenOption[] = [];
+    if (allowUsdc) {
+      for (const s of STABLE_OPTIONS) {
+        if (!ex.has(s.symbol.toUpperCase())) chips.push(s);
+      }
+    }
+    for (const sym of POPULAR_STOCKS) {
+      if (ex.has(sym.toUpperCase())) continue;
+      const item = XSTOCK_CATALOG.find(
         (i) => i.buyable && i.symbol.toUpperCase() === sym.toUpperCase(),
       );
-    });
+      if (item) chips.push(toOption(item));
+    }
+    return chips;
   }, [allowUsdc, exclude]);
 
-  const selected =
-    value.toUpperCase() === "USDC"
-      ? usdcOption()
-      : toOption(
-          XSTOCK_CATALOG.find(
-            (i) => i.symbol.toLowerCase() === value.toLowerCase(),
-          ) ?? {
-            symbol: value,
-            name: value,
-            underlying: value.replace(/x$/i, ""),
-            lane: "mega",
-            buyable: true,
-          },
-        );
+  const selected: TokenOption = (() => {
+    if (isStable(value)) {
+      return (
+        STABLE_OPTIONS.find(
+          (s) => s.symbol.toUpperCase() === value.toUpperCase(),
+        ) ?? STABLE_OPTIONS[0]!
+      );
+    }
+    return toOption(
+      XSTOCK_CATALOG.find(
+        (i) => i.symbol.toLowerCase() === value.toLowerCase(),
+      ) ?? {
+        symbol: value,
+        name: value,
+        underlying: value.replace(/x$/i, ""),
+        lane: "mega",
+        buyable: true,
+      },
+    );
+  })();
 
   useEffect(() => {
     if (!open) return;
@@ -121,7 +146,10 @@ export function TokenSelectButton({
   }, [open]);
 
   return (
-    <div className={`fx-token-select ${className}`.trim()} ref={rootRef}>
+    <div
+      className={`fx-token-select${open ? " is-open" : ""} ${className}`.trim()}
+      ref={rootRef}
+    >
       <button
         type="button"
         className="fx-token-trigger"
@@ -131,8 +159,11 @@ export function TokenSelectButton({
         aria-controls={listId}
         onClick={() => setOpen((v) => !v)}
       >
-        {selected.kind === "usdc" ? (
-          <span className="fx-logo fx-logo-fallback fx-logo-usdc" aria-hidden>
+        {selected.kind === "stable" ? (
+          <span
+            className={`fx-logo fx-logo-fallback ${selected.symbol === "USDT" ? "fx-logo-usdt" : "fx-logo-usdc"}`}
+            aria-hidden
+          >
             $
           </span>
         ) : (
@@ -149,46 +180,47 @@ export function TokenSelectButton({
       {open ? (
         <div className="fx-token-pop" role="listbox" id={listId}>
           {popular.length > 0 && !q.trim() ? (
-            <div className="fx-token-popular" aria-label="Popular">
-              {popular.map((sym) => {
-                const on = sym.toUpperCase() === value.toUpperCase();
-                const und =
-                  sym === "USDC"
-                    ? undefined
-                    : XSTOCK_CATALOG.find(
-                        (i) => i.symbol.toUpperCase() === sym.toUpperCase(),
-                      )?.underlying;
-                return (
-                  <button
-                    key={sym}
-                    type="button"
-                    className={on ? "is-on" : undefined}
-                    onClick={() => {
-                      onChange(sym);
-                      setOpen(false);
-                      setQ("");
-                    }}
-                  >
-                    {sym === "USDC" ? (
-                      <span
-                        className="fx-logo fx-logo-fallback fx-logo-usdc"
-                        aria-hidden
-                        style={{ width: 18, height: 18, fontSize: 9 }}
-                      >
-                        $
-                      </span>
-                    ) : (
-                      <AssetLogo
-                        symbol={sym}
-                        {...(und ? { underlying: und } : {})}
-                        size={18}
-                      />
-                    )}
-                    {sym === "USDC" ? "USDC" : sym.replace(/x$/i, "")}
-                  </button>
-                );
-              })}
-            </div>
+            <>
+              <p className="fx-token-stables">Stables & popular</p>
+              <div className="fx-token-popular" aria-label="Popular">
+                {popular.map((o) => {
+                  const on = o.symbol.toUpperCase() === value.toUpperCase();
+                  return (
+                    <button
+                      key={o.symbol}
+                      type="button"
+                      className={on ? "is-on" : undefined}
+                      onClick={() => {
+                        onChange(o.symbol);
+                        setOpen(false);
+                        setQ("");
+                      }}
+                    >
+                      {o.kind === "stable" ? (
+                        <span
+                          className={`fx-logo fx-logo-fallback ${o.symbol === "USDT" ? "fx-logo-usdt" : "fx-logo-usdc"}`}
+                          aria-hidden
+                          style={{ width: 18, height: 18, fontSize: 9 }}
+                        >
+                          $
+                        </span>
+                      ) : (
+                        <AssetLogo
+                          symbol={o.symbol}
+                          {...(o.underlying
+                            ? { underlying: o.underlying }
+                            : {})}
+                          size={18}
+                        />
+                      )}
+                      {o.kind === "stable"
+                        ? o.symbol
+                        : o.symbol.replace(/x$/i, "")}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
           ) : null}
           <label className="fx-token-search">
             <Search size={14} strokeWidth={2.2} aria-hidden />
@@ -196,7 +228,7 @@ export function TokenSelectButton({
               ref={inputRef}
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search USDC or stock…"
+              placeholder="Search USDC, USDT, or stock…"
               aria-label="Search tokens"
               autoComplete="off"
             />
@@ -217,9 +249,9 @@ export function TokenSelectButton({
                       setQ("");
                     }}
                   >
-                    {o.kind === "usdc" ? (
+                    {o.kind === "stable" ? (
                       <span
-                        className="fx-logo fx-logo-fallback fx-logo-usdc"
+                        className={`fx-logo fx-logo-fallback ${o.symbol === "USDT" ? "fx-logo-usdt" : "fx-logo-usdc"}`}
                         aria-hidden
                       >
                         $

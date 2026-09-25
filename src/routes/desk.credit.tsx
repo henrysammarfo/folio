@@ -99,11 +99,13 @@ function Page() {
     <DeskShell title="Borrow">
       <section className="fx-page fx-buy">
         <div className="fx-buy-stack">
-          <header className="fx-markets-hero">
-            <div>
-              <p className="fx-hero-kicker">Available to borrow</p>
-              <h1>{borrow != null ? money(borrow) : "—"}</h1>
-              <p className="fx-sub">
+          <header className="fx-credit-hero">
+            <div className="fx-credit-hero-copy">
+              <p className="fx-credit-hero-kicker">Available to borrow</p>
+              <p className="fx-credit-hero-value">
+                {borrow != null ? money(borrow) : "—"}
+              </p>
+              <p className="fx-credit-hero-sub">
                 {data?.paper.note ??
                   "Keep the shares. Unlock USDC inside FOLIO — you sign every step."}
               </p>
@@ -120,6 +122,24 @@ function Page() {
                 </span>
               </div>
             ) : null}
+            <div className="fx-credit-hero-meta" aria-label="Borrow summary">
+              <div>
+                <span>Collateral</span>
+                <b>{collateral != null ? money(collateral) : "—"}</b>
+              </div>
+              <div>
+                <span>Max LTV</span>
+                <b>{ltv != null ? `${(ltv * 100).toFixed(0)}%` : "—"}</b>
+              </div>
+              <div>
+                <span>Available</span>
+                <b>{borrow != null ? money(borrow) : "—"}</b>
+              </div>
+              <div>
+                <span>Rails</span>
+                <b>Kamino</b>
+              </div>
+            </div>
           </header>
 
           {ltv != null ? (
@@ -216,13 +236,13 @@ function Page() {
           )}
 
           {nestRows.length > 0 ? (
-            <>
-              <h2 className="fx-section-title">
-                NestUSD collateral {nestLive ? "(live)" : "(risk)"}
-              </h2>
-              <p className="fx-sub" style={{ margin: "0 0 .55rem" }}>
-                Metrics only — Nest execute stays on Nest.
-              </p>
+            <div className="fx-nest-panel">
+              <div className="fx-nest-panel-head">
+                <h2 className="fx-section-title" style={{ margin: 0 }}>
+                  NestUSD collateral {nestLive ? "· live" : "· risk"}
+                </h2>
+                <p>Metrics only — Nest execute stays on Nest.</p>
+              </div>
               <div className="fx-card" data-testid="credit-nestusd-rows">
                 {nestRows.map((r) => {
                   const und =
@@ -249,7 +269,7 @@ function Page() {
                         </span>
                         <span className="fx-asset-right">
                           <strong>{borrowPct}%</strong>
-                          <small>borrow</small>
+                          <small>max</small>
                         </span>
                       </div>
                       <div className="fx-nest-rate-bars" aria-hidden>
@@ -272,7 +292,7 @@ function Page() {
                   );
                 })}
               </div>
-            </>
+            </div>
           ) : null}
         </div>
 

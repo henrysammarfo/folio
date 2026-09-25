@@ -45,7 +45,7 @@ export function BuyExecuteButton(props: Props) {
         disabled
         data-testid="acquire-execute"
       >
-        Blocked for safety
+        {props.pausedLabel ?? "Paused — check wash or quote"}
       </button>
     );
   }

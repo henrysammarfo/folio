@@ -9,7 +9,7 @@ import {
   type EquityRefPrice,
   type XStockRefPrice,
 } from "./adapters/equity-ref";
-import { fetchJupiterQuote, fetchJupiterTokenPrice, fetchJupiterExecute } from "./adapters/jupiter";
+import { fetchJupiterQuote, fetchJupiterTokenPrice, fetchJupiterExecute, isStablePaySymbol, stableMintForSymbol } from "./adapters/jupiter";
 import {
   fetchKaminoBorrowTx,
   fetchKaminoDepositTx,
@@ -377,8 +377,13 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
 
     const symbol = data.symbol;
     const payRaw = data.paySymbol?.trim();
-    const isPair = Boolean(payRaw && payRaw.toUpperCase() !== "USDC");
-    const paySymbol = isPair ? payRaw! : "USDC";
+    const payStable = payRaw ? isStablePaySymbol(payRaw) : true;
+    const isPair = Boolean(payRaw && !payStable);
+    const paySymbol = isPair
+      ? payRaw!
+      : payRaw && isStablePaySymbol(payRaw)
+        ? payRaw.toUpperCase()
+        : "USDC";
     const payAmount = data.amount ?? data.spendUsdc ?? (isPair ? 0.01 : 1);
     const spendUsdc = payAmount;
 
@@ -458,7 +463,10 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       };
     } else {
       jupiter = await fetchJupiterQuote({
-        inputMint: isPair && payMint ? payMint : undefined,
+        inputMint:
+          isPair && payMint
+            ? payMint
+            : (stableMintForSymbol(paySymbol) ?? undefined),
         outputMint: mint,
         amountRaw: Math.round(payAmount * 10 ** (isPair ? payDecimals : 6)),
         slippageBps: 50,
@@ -613,8 +621,13 @@ export const prepareJupiterSwap = createServerFn({ method: "POST" })
     }
 
     const payRaw = data.paySymbol?.trim();
-    const isPair = Boolean(payRaw && payRaw.toUpperCase() !== "USDC");
-    const paySymbol = isPair ? payRaw! : "USDC";
+    const payStable = payRaw ? isStablePaySymbol(payRaw) : true;
+    const isPair = Boolean(payRaw && !payStable);
+    const paySymbol = isPair
+      ? payRaw!
+      : payRaw && isStablePaySymbol(payRaw)
+        ? payRaw.toUpperCase()
+        : "USDC";
     const payAmount = data.amount ?? data.spendUsdc ?? (isPair ? 0.01 : 1);
     const slippageBps = data.slippageBps ?? 50;
     const partnerMint = data.outputMint?.trim() || null;
@@ -633,6 +646,7 @@ export const prepareJupiterSwap = createServerFn({ method: "POST" })
       }
       const amountRaw = Math.round(payAmount * 1_000_000);
       const order = await fetchJupiterQuote({
+        inputMint: stableMintForSymbol(paySymbol) ?? undefined,
         outputMint: partnerMint,
         amountRaw,
         slippageBps,
@@ -713,7 +727,10 @@ export const prepareJupiterSwap = createServerFn({ method: "POST" })
     const amountRaw = Math.round(payAmount * 10 ** (isPair ? payDecimals : 6));
 
     const order = await fetchJupiterQuote({
-      inputMint: isPair && payAsset?.ok ? payAsset.data.solanaMint! : undefined,
+      inputMint:
+        isPair && payAsset?.ok
+          ? payAsset.data.solanaMint!
+          : (stableMintForSymbol(paySymbol) ?? undefined),
       outputMint: asset.data.solanaMint,
       amountRaw,
       slippageBps,

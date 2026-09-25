@@ -2,6 +2,19 @@ import { errResult, okResult, type AdapterResult } from "./types";
 import { cacheGet, cacheGetStale, cacheSet } from "./ttl-cache";
 
 export const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+/** Tether USD on Solana mainnet — FOLIO stable pay rail alongside USDC. */
+export const USDT_MINT = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB";
+
+export function isStablePaySymbol(symbol: string): boolean {
+  return /^(USDC|USDT)$/i.test(symbol.trim());
+}
+
+export function stableMintForSymbol(symbol: string): string | null {
+  const s = symbol.trim().toUpperCase();
+  if (s === "USDC") return USDC_MINT;
+  if (s === "USDT") return USDT_MINT;
+  return null;
+}
 
 const QUOTE_TTL_MS = 20_000;
 const PRICE_TTL_MS = 30_000;
