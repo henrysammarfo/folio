@@ -10,6 +10,18 @@
 | Fix merged to `main` (`9b1d5fc`) · PR #46 | Verified git push |
 | Production deploy `dpl_8sX5nCKr…` READY · no Anchor crash on that deploy | Verified runtime logs + SSR probe |
 
+## 2026-09-25 — Prod feature smoke (post SSR fix)
+
+| Claim | Status |
+|---|---|
+| Desk routes /desk* + /network + /pitch HTTP 200 SSR success | Verified curl |
+| Buy Jupiter quote + wash + diverge live; cash session overnight refuse | Verified SSR + UI shot |
+| Markets multi-venue board populated (~55 symbols) | Verified SSR + UI |
+| Borrow Kamino + NestUSD live · armed | Verified SSR + UI |
+| PreStocks catalog live (8) · Tessera T-tokens live (3) | Verified SSR catalog |
+| Network matrix 22 capabilities labeled honestly | Verified SSR |
+| No Anchor ESM crash on current production deploy | Verified runtime logs |
+
 ## 2026-09-25 — Pitch deck + dual video scripts
 
 | Claim | Status |

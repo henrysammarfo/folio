@@ -1,6 +1,17 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Prod feature smoke after SSR Privy fix
+
+- All desk routes HTTP 200 · SSR success · no Anchor `exports is not defined` on current prod.
+- Buy: live Jupiter quote + wash pass + truth/diverge/scaled-ui OK · Review blocked only by overnight cash session (expected).
+- Markets: ~55 xStock symbols · Jupiter/Free tape/Raydium/Solami venue pills.
+- Borrow: Kamino rates + NestUSD live · fills armed label.
+- PreStocks catalog 8 names (ANDURIL…SPACEX) · Tessera 3 T-tokens · both mainnet-read.
+- Network matrix 22 caps · only Pyth optional + custom deploy unavailable (doctrine).
+- Account: Open App / Connect CTAs render · privyConfigured.
+- Playwright shots under `/opt/cursor/artifacts/screenshots/prod-*.png`.
+
 ## 2026-09-25 — Keys check + DBC SSR crash blocking Privy sign
 
 - Prod SSR readiness: Privy+Supabase+session configured · `broadcastPaused:false` (fills armed).

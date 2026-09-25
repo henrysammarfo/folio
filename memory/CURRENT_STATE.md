@@ -33,6 +33,8 @@ See `memory/FLAWS_AND_WORKAROUNDS.md` — Jupiter 429s, Raydium no mid, Solami D
 
 **Keys (2026-09-25):** Vercel Privy+Supabase+session+Jupiter+Bitquery+Finnhub+Pyth+RPC present · `privyConfigured` true on SSR · `broadcastPaused:false`. Connect/sign break was Anchor ESM crash from Meteora DBC SDK in desk SSR — fixed and live on prod (`9b1d5fc` / PR #46).
 
+**Feature smoke (2026-09-25):** Buy/Markets/Borrow/PreStocks/Tessera/Network/Account all live on prod after SSR fix · overnight cash-session refuse expected · Pyth optional unavailable by design.
+
 | Surface | Status |
 |---|---|
 | Buy | USDC→stock / stock↔stock · searchable pickers + popular chips · flip · user-signed fills when armed |
