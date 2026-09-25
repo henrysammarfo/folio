@@ -8,6 +8,7 @@ import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { getPositionsBundle } from "@/lib/desk.functions";
+import { DESK_SYNC, positionsQueryKey } from "@/lib/desk-query-keys";
 import { scaledUiHealthLabel, positionStatusLabel } from "@/lib/position-health";
 import { siteMeta } from "@/lib/site-meta";
 
@@ -47,11 +48,13 @@ function Page() {
   const [inspectInput, setInspectInput] = useState(inspect ?? "");
   const [err, setErr] = useState<string | null>(null);
   const { data } = useQuery({
-    queryKey: ["positions-bundle", inspect ?? ""],
+    queryKey: positionsQueryKey(inspect),
     queryFn: () => fetchPositions({ data: { inspectWallet: inspect } }),
     initialData: initial,
     initialDataUpdatedAt: Date.now(),
-    staleTime: 15_000,
+    staleTime: DESK_SYNC.positionsStaleMs,
+    refetchInterval: DESK_SYNC.positionsRefetchMs,
+    refetchOnMount: "always",
   });
 
   const rows = data?.rows ?? [];

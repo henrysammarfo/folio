@@ -1,10 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { ArrowDownUp } from "lucide-react";
+import { useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { BuyExecuteButton } from "@/components/buy-execute-button";
 import { DeskShell } from "@/components/desk-shell";
+import {
+  TokenSelectButton,
+  type TokenOption,
+} from "@/components/token-select-button";
 import { getTesseraBundle } from "@/lib/desk.functions";
 import { humanizeHonestyNote, humanizeWashNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
@@ -18,7 +23,8 @@ export const Route = createFileRoute("/desk/tessera")({
       path: "/desk/tessera",
     }),
   }),
-  loader: async () => getTesseraBundle({ data: { spendUsdc: 1 } }),
+  loader: async () =>
+    getTesseraBundle({ data: { spendUsdc: 1, paySymbol: "USDC", side: "buy" } }),
   component: Page,
 });
 
@@ -41,6 +47,8 @@ function Page() {
   const initial = Route.useLoaderData();
   const fetchTessera = useServerFn(getTesseraBundle);
   const [symbol, setSymbol] = useState(initial.selected?.symbol ?? "T-OpenAI");
+  const [pay, setPay] = useState<"USDC" | "USDT">("USDC");
+  const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("1");
   const [err, setErr] = useState<string | null>(null);
   const [lastSig, setLastSig] = useState<string | null>(null);
@@ -48,11 +56,17 @@ function Page() {
   const ready = Number.isFinite(spendUsdc) && spendUsdc > 0 && spendUsdc <= 25;
 
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ["tessera", symbol, spendUsdc],
-    queryFn: () => fetchTessera({ data: { symbol, spendUsdc } }),
+    queryKey: ["tessera", symbol, spendUsdc, pay, side],
+    queryFn: () =>
+      fetchTessera({
+        data: { symbol, spendUsdc, paySymbol: pay, side },
+      }),
     enabled: ready,
     initialData:
-      symbol === (initial.selected?.symbol ?? "T-OpenAI") && spendUsdc === 1
+      symbol === (initial.selected?.symbol ?? "T-OpenAI") &&
+      spendUsdc === 1 &&
+      pay === "USDC" &&
+      side === "buy"
         ? initial
         : undefined,
     initialDataUpdatedAt: Date.now(),
@@ -60,6 +74,20 @@ function Page() {
   });
 
   const rows = data?.catalog.ok ? data.catalog.data.rows : [];
+  const partnerOptions: TokenOption[] = useMemo(
+    () =>
+      rows.map((r) => {
+        const opt: TokenOption = {
+          symbol: r.symbol,
+          name: r.name,
+          kind: "partner",
+        };
+        if (r.sector) opt.underlying = r.sector;
+        else if (r.code) opt.underlying = r.code;
+        return opt;
+      }),
+    [rows],
+  );
   const selected = data?.selected;
   const out = data?.jupiter.ok
     ? data.jupiter.data.outUiAmount.toFixed(6)
@@ -69,6 +97,14 @@ function Page() {
     ready && data?.jupiter.ok && data.washOk && selected?.mint,
   );
 
+  const payLeg = side === "buy" ? pay : symbol;
+  const receiveLeg = side === "buy" ? symbol : pay;
+
+  function flip() {
+    setSide((s) => (s === "buy" ? "sell" : "buy"));
+    setErr(null);
+  }
+
   return (
     <DeskShell title="Tessera">
       <section className="fx-page fx-preipo">
@@ -76,182 +112,202 @@ function Page() {
           <p className="fx-hero-kicker">Tessera T-tokens</p>
           <h1>SpaceX. OpenAI. Kalshi.</h1>
           <p className="fx-sub">
-            Loan-participation quotes. Confirm the buy inside FOLIO — no app hop.{" "}
+            Loan-participation quotes. Search, flip, confirm inside FOLIO — same
+            ticket shape as Buy. PreStocks stay on their own desk.{" "}
             <Link to="/desk/preipo">PreStocks desk →</Link>
           </p>
         </header>
 
         <div className="fx-preipo-grid">
-          <div className="fx-card">
-            <h2>T-tokens</h2>
-            {!data?.catalog.ok && isFetching ? (
-              <ul className="fx-preipo-list" aria-busy="true" aria-label="Loading T-tokens">
-                {Array.from({ length: 3 }, (_, i) => (
-                  <li key={i} className="fx-skel-row">
-                    <span className="netro-skel-face" />
-                    <span className="netro-skel-lines">
-                      <i />
-                      <i />
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : !data?.catalog.ok ? (
-              <p className="fx-checks">
-                {data?.catalog && !data.catalog.ok
-                  ? humanizeHonestyNote(data.catalog.reason)
-                  : "Catalog unavailable"}
-              </p>
-            ) : (
-              <ul className="fx-preipo-list">
-                {rows.map((row) => {
-                  const on = row.symbol === selected?.symbol;
-                  return (
-                    <li key={row.mint}>
-                      <button
-                        type="button"
-                        className={`fx-preipo-item${on ? " is-on" : ""}`}
-                        onClick={() => {
-                          setSymbol(row.symbol);
-                          setErr(null);
-                          setLastSig(null);
-                        }}
-                      >
-                        <AssetLogo symbol={row.symbol} size={36} />
-                        <span>
-                          <strong>{row.symbol}</strong>
-                          <small>
-                            {row.sector ?? "—"}
-                            {row.markPrice != null
-                              ? ` · ${money(row.markPrice)}`
-                              : ""}
-                          </small>
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-
-          <aside className="fx-card fx-ticket">
-            <div className="fx-ticket-brand">
-              <AssetLogo symbol={selected?.symbol ?? "T-"} size={44} />
-              <div>
-                <p className="fx-hero-kicker">Buy in FOLIO</p>
-                <h2>USDC → {selected?.symbol ?? "—"}</h2>
+          <div className="fx-card fx-partner-ticket">
+            <h2>Ticket</h2>
+            <div className="fx-swap-leg">
+              <span>{side === "buy" ? "You pay" : "You sell"}</span>
+              <div className="fx-swap-row">
+                <input
+                  className="fx-swap-amt"
+                  inputMode="decimal"
+                  value={amount}
+                  onChange={(e) => {
+                    setAmount(e.target.value);
+                    setErr(null);
+                  }}
+                  aria-label="Amount"
+                />
+                {side === "buy" ? (
+                  <TokenSelectButton
+                    value={pay}
+                    allowUsdc
+                    allowXstocks={false}
+                    onChange={(s) => {
+                      if (s === "USDC" || s === "USDT") setPay(s);
+                    }}
+                    aria-label="Pay stable"
+                  />
+                ) : (
+                  <TokenSelectButton
+                    value={symbol}
+                    allowUsdc={false}
+                    allowXstocks={false}
+                    extraOptions={partnerOptions}
+                    onChange={setSymbol}
+                    aria-label="Sell T-token"
+                  />
+                )}
               </div>
             </div>
-            <p className="fx-ticket-sub">
-              {selected?.name ?? "Select a T-token"}
-              {selected?.holders != null
-                ? ` · ${selected.holders.toLocaleString()} holders`
-                : ""}
-            </p>
-            {selected ? (
-              <dl className="fx-preipo-marks">
-                <div>
-                  <dt>Mark</dt>
-                  <dd>
-                    {selected.markPrice != null
-                      ? money(selected.markPrice)
-                      : "—"}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Mark val</dt>
-                  <dd>
-                    {selected.markValuation != null
-                      ? shortVal(selected.markValuation)
-                      : "—"}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Sector</dt>
-                  <dd>{selected.sector ?? "—"}</dd>
-                </div>
-                <div>
-                  <dt>Holders</dt>
-                  <dd>
-                    {selected.holders != null
-                      ? selected.holders.toLocaleString()
-                      : "—"}
-                  </dd>
-                </div>
-              </dl>
-            ) : null}
-            <label className="fx-field">
-              Amount (USDC)
-              <input
-                value={amount}
-                inputMode="decimal"
-                onChange={(e) => setAmount(e.target.value)}
-              />
-            </label>
-            <p className="fx-swap-out-line">
-              You receive{" "}
-              <b>{isFetching ? "…" : out ? `${out} ${selected?.symbol}` : "—"}</b>
+
+            <button
+              type="button"
+              className="fx-swap-mid"
+              onClick={flip}
+              aria-label="Flip pay and receive"
+            >
+              <ArrowDownUp size={18} strokeWidth={2} />
+            </button>
+
+            <div className="fx-swap-leg">
+              <span>You receive</span>
+              <div className="fx-swap-row">
+                <p className="fx-swap-out-line" style={{ margin: 0, flex: 1 }}>
+                  {out ? (
+                    <>
+                      <b>{out}</b> {receiveLeg}
+                    </>
+                  ) : (
+                    <span className="fx-muted">Quote pending</span>
+                  )}
+                </p>
+                {side === "buy" ? (
+                  <TokenSelectButton
+                    value={symbol}
+                    allowUsdc={false}
+                    allowXstocks={false}
+                    extraOptions={partnerOptions}
+                    onChange={setSymbol}
+                    aria-label="Receive T-token"
+                  />
+                ) : (
+                  <TokenSelectButton
+                    value={pay}
+                    allowUsdc
+                    allowXstocks={false}
+                    onChange={(s) => {
+                      if (s === "USDC" || s === "USDT") setPay(s);
+                    }}
+                    aria-label="Receive stable"
+                  />
+                )}
+              </div>
+            </div>
+
+            <p className="fx-checks">
+              {isFetching ? "Refreshing…" : data?.note ?? "—"}
             </p>
             <p className="fx-checks">
-              {data?.jupiter.ok
-                ? `Live quote · $${spendUsdc} USDC`
-                : "Quote cooling — refresh soon"}
+              {data?.washOk
+                ? "Wash clear"
+                : humanizeWashNote(data?.washNote ?? "Wash pending")}
             </p>
-            {!data?.washOk ? (
-              <div className="fx-wash-banner" role="status">
-                <strong>Size paused — thin Tessera tape</strong>
-                {humanizeWashNote(data?.washNote)}. Quote stays live; we won’t
-                invent a clear wash.
-              </div>
-            ) : (
-              <p className="fx-checks">Wash clear</p>
-            )}
-            {err ? <p className="fx-checks" role="alert">{err}</p> : null}
+            {err ? <p className="fx-checks fx-err">{err}</p> : null}
             {lastSig ? (
               <p className="fx-checks">
-                Landed ·{" "}
+                Last sig{" "}
                 <a
                   href={`https://solscan.io/tx/${lastSig}`}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  view on Solscan
+                  {lastSig.slice(0, 8)}…
                 </a>
               </p>
             ) : null}
+
             <BuyExecuteButton
               canBuy={canBuy}
               isPair={false}
               broadcastPaused={broadcastPaused}
-              symbol={selected?.symbol ?? "T-"}
-              paySymbol="USDC"
+              symbol={selected?.symbol ?? "T-OpenAI"}
+              paySymbol={side === "buy" ? pay : selected?.symbol ?? symbol}
               amount={spendUsdc}
               slippageBps={100}
-              outputMint={selected?.mint}
-              outputDecimals={data?.assumedDecimals ?? 9}
+              {...(side === "buy" && selected?.mint
+                ? {
+                    outputMint: selected.mint,
+                    outputDecimals: data?.assumedDecimals ?? 9,
+                  }
+                : { outputDecimals: data?.assumedDecimals ?? 9 })}
               pausedLabel={
                 !data?.washOk
-                  ? "Paused — thin Tessera tape"
+                  ? "Paused — wash or thin tape"
                   : "Quote ready — fills paused"
               }
-              confirmLabel={`Buy ${selected?.symbol ?? "T-token"}`}
+              confirmLabel={
+                side === "buy" ? `Buy ${symbol}` : `Sell ${symbol}`
+              }
               onError={setErr}
-              onSuccess={(sig) => {
-                setLastSig(sig);
-                setErr(null);
-                void refetch();
-              }}
+              onSuccess={(sig) => setLastSig(sig)}
             />
             <button
               type="button"
               className="fx-btn fx-btn-ghost fx-btn-block"
               style={{ marginTop: "0.5rem" }}
-              disabled={!ready}
               onClick={() => void refetch()}
             >
               Refresh quote
             </button>
+          </div>
+
+          <aside className="fx-card fx-ticket">
+            <div className="fx-ticket-brand">
+              <AssetLogo symbol={symbol} size={44} />
+              <div>
+                <p className="fx-hero-kicker">
+                  {side === "buy" ? "Buy in FOLIO" : "Sell in FOLIO"}
+                </p>
+                <h2>
+                  {payLeg} → {receiveLeg}
+                </h2>
+              </div>
+            </div>
+            {selected ? (
+              <>
+                <p className="fx-ticket-sub">
+                  {selected.symbol}
+                  {selected.holders != null
+                    ? ` · ${selected.holders.toLocaleString()} holders`
+                    : ""}
+                </p>
+                <dl className="fx-preipo-marks">
+                  <div>
+                    <dt>Mark</dt>
+                    <dd>
+                      {selected.markPrice != null
+                        ? money(selected.markPrice)
+                        : "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Mark val</dt>
+                    <dd>
+                      {selected.markValuation != null
+                        ? shortVal(selected.markValuation)
+                        : "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Sector</dt>
+                    <dd>{selected.sector ?? "—"}</dd>
+                  </div>
+                </dl>
+              </>
+            ) : (
+              <p className="fx-checks">
+                {data?.catalog && !data.catalog.ok
+                  ? humanizeHonestyNote(data.catalog.reason)
+                  : "Select a T-token"}
+              </p>
+            )}
           </aside>
         </div>
       </section>

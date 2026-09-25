@@ -1,3 +1,16 @@
+## 2026-09-25 — Netro home + markets universe + Tessera Buy
+
+| Claim | Status |
+|---|---|
+| Live Solana xStocks universe ≈ 1124 via paginated `api.xstocks.fi/api/v2/public/assets` | Verified live (12 pages) |
+| Desk curated catalog > 40 buyable names | Implemented |
+| Markets lanes include Pre-IPO (8) + Tessera (3) | Implemented — partner marks, not fake Jupiter venues |
+| Tessera Buy-style TokenSelect + flip USDC/USDT ↔ T-token | Implemented — no PreStock↔Tessera cross |
+| Wash singleflight + TTL 60s / stale 240s | Implemented |
+| Holdings query keys identical across Home / Holdings / Netro | Implemented — `positionsQueryKey` |
+| Netro density always-on for `/desk` home | Implemented |
+| No invented fills / prices | Holds |
+
 ## 2026-09-25 — DBC create cost + shot depth
 
 | Claim | Status |

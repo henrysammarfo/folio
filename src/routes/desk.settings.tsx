@@ -114,6 +114,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
     await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
     await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
     await queryClient.invalidateQueries({ queryKey: ["credit-bundle"] });
+    await queryClient.invalidateQueries({ queryKey: ["credit-bundle"] });
     await refetch();
   }
 

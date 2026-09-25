@@ -1,8 +1,14 @@
 import { errResult, okResult, type AdapterResult } from "./types";
-import { cacheGet, cacheGetStale, cacheSet } from "./ttl-cache";
+import {
+  cacheGet,
+  cacheGetStale,
+  cacheSet,
+  cacheSingleflight,
+} from "./ttl-cache";
+import { DESK_SYNC } from "../desk-query-keys";
 
-const WASH_TTL_MS = 45_000;
-const WASH_STALE_MS = 180_000;
+const WASH_TTL_MS = DESK_SYNC.washTtlMs;
+const WASH_STALE_MS = DESK_SYNC.washStaleMs;
 
 export type WashVerdict = {
   symbol: string;
@@ -407,56 +413,61 @@ export async function evaluateWashGate(params: {
   const hit = cacheGet<AdapterResult<WashVerdict>>(cacheKey);
   if (hit) return hit.value;
 
-  const apiKey = process.env["BITQUERY_API_KEY"]?.trim();
-  if (apiKey) {
-    const bitquery = await fetchBitqueryWash({
-      symbol: params.symbol,
-      mint: params.mint,
-      notionalUsd: params.notionalUsd,
-      apiKey,
-    });
-    if (bitquery.ok) {
-      cacheSet(cacheKey, bitquery, WASH_TTL_MS);
-      return bitquery;
+  return cacheSingleflight(cacheKey, async () => {
+    const again = cacheGet<AdapterResult<WashVerdict>>(cacheKey);
+    if (again) return again.value;
+
+    const apiKey = process.env["BITQUERY_API_KEY"]?.trim();
+    if (apiKey) {
+      const bitquery = await fetchBitqueryWash({
+        symbol: params.symbol,
+        mint: params.mint!,
+        notionalUsd: params.notionalUsd,
+        apiKey,
+      });
+      if (bitquery.ok) {
+        cacheSet(cacheKey, bitquery, WASH_TTL_MS);
+        return bitquery;
+      }
+      // Quota / HTTP / schema miss → free fallback (still fail-closed if gecko fails)
     }
-    // Quota / HTTP / schema miss → free fallback (still fail-closed if gecko fails)
-  }
 
-  const gecko = await fetchGeckoWash({
-    symbol: params.symbol,
-    mint: params.mint,
-    notionalUsd: params.notionalUsd,
-  });
-  if (gecko.ok) {
-    cacheSet(cacheKey, gecko, WASH_TTL_MS);
-    return gecko;
-  }
+    const gecko = await fetchGeckoWash({
+      symbol: params.symbol,
+      mint: params.mint!,
+      notionalUsd: params.notionalUsd,
+    });
+    if (gecko.ok) {
+      cacheSet(cacheKey, gecko, WASH_TTL_MS);
+      return gecko;
+    }
 
-  const stale = cacheGetStale<AdapterResult<WashVerdict>>(
-    cacheKey,
-    WASH_STALE_MS,
-  );
-  if (stale?.value.ok) {
-    return {
-      ...stale.value,
-      mode: "cached",
-      source: `${stale.value.source} · stale-wash`,
-    };
-  }
+    const stale = cacheGetStale<AdapterResult<WashVerdict>>(
+      cacheKey,
+      WASH_STALE_MS,
+    );
+    if (stale?.value.ok) {
+      return {
+        ...stale.value,
+        mode: "mainnet-read",
+        source: `${stale.value.source} · stale-wash`,
+      };
+    }
 
-  if (!apiKey) {
+    if (!apiKey) {
+      return errResult(
+        "wash-gate",
+        "wash_feeds_unavailable",
+        "Bitquery unset and GeckoTerminal free tape failed — size blocked (fail-closed). Heuristics: self-trade / fee-payer-self / signer concentration / thin-tape.",
+      );
+    }
+
     return errResult(
       "wash-gate",
       "wash_feeds_unavailable",
-      "Bitquery unset and GeckoTerminal free tape failed — size blocked (fail-closed). Heuristics: self-trade / fee-payer-self / signer concentration / thin-tape.",
+      `Bitquery failed and GeckoTerminal fallback failed — size blocked. ${!gecko.ok ? gecko.detail : ""}`.trim(),
     );
-  }
-
-  return errResult(
-    "wash-gate",
-    "wash_feeds_unavailable",
-    `Bitquery failed and GeckoTerminal fallback failed — size blocked. ${!gecko.ok ? gecko.detail : ""}`.trim(),
-  );
+  });
 }
 
 export function washAllowsSize(wash: AdapterResult<WashVerdict>): boolean {

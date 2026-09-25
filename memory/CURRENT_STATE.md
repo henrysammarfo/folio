@@ -54,10 +54,12 @@ README, marketing routes, whitepaper, demo/submit docs, and public intros rewrit
 
 ## Desk UI (product)
 
+- Home: **NetroBNB density always-on** (FOLIO tokens) — live clock, markets strip, AI rail, partner lanes.
 - Buy: Mega / IPO / Meme / **Pairs** · TokenSelect + flip · Netro-depth details.
-- Markets: staggered Jupiter + Gecko free-tape · humanized venue notes.
+- Markets: multi-venue board · Pre-IPO + Tessera lanes · live universe count (~1k+ Solana xStocks) · curated 50+ priced desk.
 - Credit: AssetLogo rates · Kamino ktx in-desk · NestUSD metrics-only (no Nest execute theater).
-- PreStocks / Tessera: in-desk BuyExecute via partner `outputMint` (no external app CTAs).
+- PreStocks / Tessera: in-desk BuyExecute · Tessera Buy-style search + flip (stables ↔ T-token; no cross-issuer).
+- Holdings: shared query keys + refetch cadence so balances match across Home / Holdings / detail after email or wallet auth.
 - Agent: `agent_daily` = 5 / account / 24h.
 - Logo chain: API → Backed CDN → favicon → initials (SpaceX / Tessera paths fixed).
 - Fills arm when `BROADCAST_PAUSED=false` (user-signed Jupiter + Kamino + partner buys).

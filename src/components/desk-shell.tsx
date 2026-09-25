@@ -32,6 +32,11 @@ import {
   getTruthBundle,
 } from "@/lib/desk.functions";
 import {
+  creditQueryKey,
+  DESK_SYNC,
+  positionsQueryKey,
+} from "@/lib/desk-query-keys";
+import {
   isLabPreviewActive,
   readLabShaderPick,
   readLabUiPick,
@@ -171,7 +176,9 @@ export function DeskShell({
   const effectiveShader = previewing ? labShader : approvedShader;
   const liveShader = previewShaderVariant(effectiveShader, effectiveUi);
   const isDeskOverview = path === "/desk" || path === "/desk/";
-  const showNetroCanvas = effectiveUi === "netro-density" && isDeskOverview;
+  /** Henry: NetroBNB whole dashboard IS the FOLIO desk home — always on. */
+  const showNetroCanvas =
+    isDeskOverview && (effectiveUi == null || effectiveUi === "netro-density");
   const showJournal = effectiveUi === "trade-journal-21st" && isDeskOverview;
   const productionChrome = !previewing && (approvedUi != null || approvedShader != null);
 
@@ -193,22 +200,24 @@ export function DeskShell({
     refetchInterval: 60_000,
   });
   const credit = useQuery({
-    queryKey: ["credit-bundle", "netro-surface", inspectSearch ?? ""],
+    queryKey: creditQueryKey(inspectSearch),
     queryFn: () => fetchCredit({ data: { inspectWallet: inspectSearch } }),
     enabled: showNetroCanvas,
     initialData: showNetroCanvas && !inspectSearch ? creditSeed : undefined,
     initialDataUpdatedAt: Date.now(),
-    staleTime: 20_000,
+    staleTime: DESK_SYNC.creditStaleMs,
     refetchOnMount: "always",
+    refetchInterval: DESK_SYNC.positionsRefetchMs,
   });
   const positions = useQuery({
-    queryKey: ["positions-bundle", "netro-surface", inspectSearch ?? ""],
+    queryKey: positionsQueryKey(inspectSearch),
     queryFn: () => fetchPositions({ data: { inspectWallet: inspectSearch } }),
     enabled: showNetroCanvas,
     initialData: showNetroCanvas && !inspectSearch ? positionsSeed : undefined,
     initialDataUpdatedAt: Date.now(),
-    staleTime: 15_000,
+    staleTime: DESK_SYNC.positionsStaleMs,
     refetchOnMount: "always",
+    refetchInterval: DESK_SYNC.positionsRefetchMs,
   });
   useQuery({
     queryKey: ["empire-readiness", "netro-keys"],

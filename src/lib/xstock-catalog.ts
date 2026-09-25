@@ -13,7 +13,7 @@ export type XStockCatalogItem = {
 };
 
 export type LaneMeta = {
-  id: XStockLane | "all" | "pairs";
+  id: XStockLane | "all" | "pairs" | "preipo" | "tessera";
   label: string;
   title: string;
   body: string;
@@ -25,7 +25,7 @@ export const LANE_META: readonly LaneMeta[] = [
     id: "all",
     label: "All",
     title: "Full desk catalog",
-    body: "Mega names, recent IPO-era listings, and high-beta meme stocks — each with a buyable or watchlist label.",
+    body: "Mega names, recent IPO-era listings, meme stocks, plus PreStocks and Tessera partner lanes — each labeled.",
   },
   {
     id: "mega",
@@ -37,13 +37,25 @@ export const LANE_META: readonly LaneMeta[] = [
     id: "ipo",
     label: "IPO",
     title: "IPO & recent listings",
-    body: "Newer public names (Arm, Reddit…). Not private pre-IPO — those live on Pre-IPO (PreStocks) and Tessera desks. Verify mint before size.",
+    body: "Newer public names (Arm, Reddit, Uber…). Not private pre-IPO — those live on Pre-IPO (PreStocks) and Tessera desks. Verify mint before size.",
   },
   {
     id: "meme",
     label: "Meme",
     title: "Meme & high-beta",
     body: "Retail-driven names (GME, DJT…). Same wash + Scaled UI gates as mega — never a soft-sold fill. Watchlist rows stay non-buyable until mint is confirmed.",
+  },
+  {
+    id: "preipo",
+    label: "Pre-IPO",
+    title: "PreStocks private names",
+    body: "SPV-backed private exposure on the PreStocks desk — not Scaled UI public equity. Buy stays inside FOLIO.",
+  },
+  {
+    id: "tessera",
+    label: "Tessera",
+    title: "Tessera T-tokens",
+    body: "Loan-participation T-tokens (OpenAI, SpaceX, Kalshi). Separate from PreStocks and from public xStocks.",
   },
   {
     id: "pairs",
@@ -125,6 +137,50 @@ export const XSTOCK_CATALOG: readonly XStockCatalogItem[] = [
     name: "Costco xStock",
     underlying: "COST",
     lane: "mega",
+    buyable: true,
+  },
+  { symbol: "INTCx", name: "Intel xStock", underlying: "INTC", lane: "mega", buyable: true },
+  { symbol: "ORCLx", name: "Oracle xStock", underlying: "ORCL", lane: "mega", buyable: true },
+  { symbol: "IBMx", name: "IBM xStock", underlying: "IBM", lane: "mega", buyable: true },
+  { symbol: "BACx", name: "Bank of America xStock", underlying: "BAC", lane: "mega", buyable: true },
+  { symbol: "JPMx", name: "JPMorgan xStock", underlying: "JPM", lane: "mega", buyable: true },
+  { symbol: "WMTx", name: "Walmart xStock", underlying: "WMT", lane: "mega", buyable: true },
+  { symbol: "PEPx", name: "PepsiCo xStock", underlying: "PEP", lane: "mega", buyable: true },
+  { symbol: "DISx", name: "Disney xStock", underlying: "DIS", lane: "mega", buyable: true },
+  { symbol: "NKEx", name: "Nike xStock", underlying: "NKE", lane: "mega", buyable: true },
+  { symbol: "PFEx", name: "Pfizer xStock", underlying: "PFE", lane: "mega", buyable: true },
+  { symbol: "ABBVx", name: "AbbVie xStock", underlying: "ABBV", lane: "mega", buyable: true },
+  { symbol: "LLYx", name: "Eli Lilly xStock", underlying: "LLY", lane: "mega", buyable: true },
+  { symbol: "UNHx", name: "UnitedHealth xStock", underlying: "UNH", lane: "mega", buyable: true },
+  { symbol: "CVXx", name: "Chevron xStock", underlying: "CVX", lane: "mega", buyable: true },
+  { symbol: "XOMx", name: "Exxon Mobil xStock", underlying: "XOM", lane: "mega", buyable: true },
+  { symbol: "VOOx", name: "Vanguard S&P 500 xStock", underlying: "VOO", lane: "mega", buyable: true },
+  { symbol: "IWMx", name: "iShares Russell 2000 xStock", underlying: "IWM", lane: "mega", buyable: true },
+  { symbol: "CRMx", name: "Salesforce xStock", underlying: "CRM", lane: "mega", buyable: true },
+  { symbol: "ADBEx", name: "Adobe xStock", underlying: "ADBE", lane: "mega", buyable: true },
+  { symbol: "QCOMx", name: "Qualcomm xStock", underlying: "QCOM", lane: "mega", buyable: true },
+  { symbol: "AMATx", name: "Applied Materials xStock", underlying: "AMAT", lane: "mega", buyable: true },
+  { symbol: "PANWx", name: "Palo Alto Networks xStock", underlying: "PANW", lane: "mega", buyable: true },
+  { symbol: "SNOWx", name: "Snowflake xStock", underlying: "SNOW", lane: "ipo", buyable: true },
+  { symbol: "UBERx", name: "Uber xStock", underlying: "UBER", lane: "ipo", buyable: true },
+  { symbol: "SOFIx", name: "SoFi xStock", underlying: "SOFI", lane: "ipo", buyable: true },
+  { symbol: "NOWx", name: "ServiceNow xStock", underlying: "NOW", lane: "ipo", buyable: true },
+  { symbol: "NETx", name: "Cloudflare xStock", underlying: "NET", lane: "ipo", buyable: true },
+  { symbol: "TTDx", name: "The Trade Desk xStock", underlying: "TTD", lane: "ipo", buyable: true },
+  { symbol: "MUx", name: "Micron xStock", underlying: "MU", lane: "mega", buyable: true },
+  {
+    symbol: "QUBTx",
+    name: "Quantum Computing xStock",
+    underlying: "QUBT",
+    lane: "meme",
+    buyable: true,
+    blurb: "High-beta quantum · wash gate still applies",
+  },
+  {
+    symbol: "Sx",
+    name: "SentinelOne xStock",
+    underlying: "S",
+    lane: "meme",
     buyable: true,
   },
 ] as const;

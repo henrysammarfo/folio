@@ -1,6 +1,15 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Netro home + markets depth + Tessera Buy + sync
+
+- Desk home: NetroBNB density canvas always mounts on `/desk` (no approve-gate required).
+- Markets: curated board expanded 23→50+; lanes Pre-IPO + Tessera; live universe count (~1124 Solana xStocks) via cached paginated API; board TTL + singleflight.
+- Tessera: Buy-style searchable TokenSelect + flip (USDC/USDT ↔ T-token). PreStocks≠Tessera still enforced.
+- Wash: singleflight + longer TTL/stale for concurrent users.
+- Holdings: shared `positionsQueryKey` / `creditQueryKey` + sync cadences across Home / Holdings / Netro / detail.
+- Branch: `cursor/folio-netro-home-depth-f1ec`
+
 ## 2026-09-25 — Shot-fix pass (Henry screens)
 
 - Credit: Available/Max LTV hero + meta strip · NestUSD panel head cleaned

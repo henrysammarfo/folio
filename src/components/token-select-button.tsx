@@ -15,13 +15,17 @@ export type TokenOption = {
   name: string;
   underlying?: string;
   logo?: string | null;
-  kind: "stable" | "xstock";
+  kind: "stable" | "xstock" | "partner";
 };
 
 type Props = {
   value: string;
   /** Stables (USDC / USDT) allowed in this leg */
   allowUsdc?: boolean;
+  /** When false, hide xStock catalog — partner desks pass extraOptions only. */
+  allowXstocks?: boolean;
+  /** Extra partner / custom tokens (Tessera, PreStocks). */
+  extraOptions?: TokenOption[];
   /** Exclude these symbols from the list (e.g. the other leg) */
   exclude?: string[];
   onChange: (symbol: string) => void;
@@ -55,6 +59,8 @@ function isStable(sym: string) {
 export function TokenSelectButton({
   value,
   allowUsdc = true,
+  allowXstocks = true,
+  extraOptions = [],
   exclude = [],
   onChange,
   "aria-label": ariaLabel = "Select token",
@@ -74,10 +80,16 @@ export function TokenSelectButton({
         if (!ex.has(s.symbol.toUpperCase())) out.push(s);
       }
     }
-    for (const item of XSTOCK_CATALOG) {
-      if (!item.buyable) continue;
+    for (const item of extraOptions) {
       if (ex.has(item.symbol.toUpperCase())) continue;
-      out.push(toOption(item));
+      out.push(item);
+    }
+    if (allowXstocks) {
+      for (const item of XSTOCK_CATALOG) {
+        if (!item.buyable) continue;
+        if (ex.has(item.symbol.toUpperCase())) continue;
+        out.push(toOption(item));
+      }
     }
     const needle = q.trim().toLowerCase();
     if (!needle) return out;
@@ -87,7 +99,7 @@ export function TokenSelectButton({
         o.name.toLowerCase().includes(needle) ||
         (o.underlying?.toLowerCase().includes(needle) ?? false),
     );
-  }, [allowUsdc, exclude, q]);
+  }, [allowUsdc, allowXstocks, exclude, extraOptions, q]);
 
   const popular = useMemo(() => {
     const ex = new Set(exclude.map((s) => s.toUpperCase()));
@@ -115,6 +127,10 @@ export function TokenSelectButton({
         ) ?? STABLE_OPTIONS[0]!
       );
     }
+    const partner = extraOptions.find(
+      (o) => o.symbol.toLowerCase() === value.toLowerCase(),
+    );
+    if (partner) return partner;
     return toOption(
       XSTOCK_CATALOG.find(
         (i) => i.symbol.toLowerCase() === value.toLowerCase(),
@@ -169,7 +185,9 @@ export function TokenSelectButton({
         ) : (
           <AssetLogo
             symbol={selected.symbol}
-            underlying={selected.underlying}
+            {...(selected.underlying
+              ? { underlying: selected.underlying }
+              : {})}
             size={28}
           />
         )}
@@ -259,7 +277,7 @@ export function TokenSelectButton({
                     ) : (
                       <AssetLogo
                         symbol={o.symbol}
-                        underlying={o.underlying}
+                        {...(o.underlying ? { underlying: o.underlying } : {})}
                         size={32}
                       />
                     )}
