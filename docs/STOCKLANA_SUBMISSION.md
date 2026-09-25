@@ -63,7 +63,11 @@ Mainnet read and quote first. Fills stay paused until policy arms them. We never
 | :--- | :--- |
 | GitHub | https://github.com/henrysammarfo/folio |
 | Live demo | https://folio-tawny-one.vercel.app |
-| Video | Paste your Loom or YouTube master tour after you record it (`docs/VIDEO_SCRIPTS.md`) |
+| Pitch Video | Paste Loom / YouTube after recording from `docs/VIDEO_SCRIPTS.md` · Pitch Video section |
+| Technical Video | Paste Loom / YouTube after recording from `docs/VIDEO_SCRIPTS.md` · Technical Video section |
+| Pitch deck | https://folio-tawny-one.vercel.app/pitch |
+
+**Track fit (three tracks):** Investing and credit · PreStocks · Tessera. See README Mermaid and Technical Video script.
 
 ### Extra deep links (optional in description)
 
@@ -78,14 +82,16 @@ Mainnet read and quote first. Fills stay paused until policy arms them. We never
 9. https://folio-tawny-one.vercel.app/whitepaper  
 10. https://folio-tawny-one.vercel.app/beta  
 
-**Track fit:** Investing / credit and yield. PreStocks. Tessera. Pyth when keyed.
+**Track fit:** Investing and credit · PreStocks · Tessera. Pyth when keyed. Meteora DBC / Solami documented as World’s Fair side tracks in the Bible.
 
 ---
 
 ## Henry before submit
 
-- [ ] Record the master tour from `docs/VIDEO_SCRIPTS.md` (about 90 seconds)
-- [ ] Paste video URL on the form
+- [ ] Record **Pitch Video** from `docs/VIDEO_SCRIPTS.md` (about 2 min 15 sec)
+- [ ] Record **Technical Video** from `docs/VIDEO_SCRIPTS.md` (about 3 min 30 sec)
+- [ ] Paste both video URLs on the Stocklana Links form
+- [ ] Open pitch deck https://folio-tawny-one.vercel.app/pitch while recording if useful
 - [ ] Claim Folio X handle and set `src/lib/socials.ts`
 - [ ] Re check Stocklana counts and deadline on the official page
 - [ ] Submit. Invite teammates. Edit until close

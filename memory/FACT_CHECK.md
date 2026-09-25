@@ -1,3 +1,12 @@
+## 2026-09-25 — Pitch deck + dual video scripts
+
+| Claim | Status |
+|---|---|
+| Pitch Video + Technical Video scripts with shot lists | Implemented in `docs/VIDEO_SCRIPTS.md` |
+| Live `/pitch` deck · 13 slides · soft pitch · three tracks | Implemented |
+| README documents Investing+credit · PreStocks · Tessera + flaws | Implemented |
+| Stocklana form Links paste pack updated for both video fields | Implemented |
+
 ## 2026-09-25 — Azure home + partner flip (catalog kept)
 
 | Claim | Status |

@@ -49,8 +49,10 @@ README, marketing routes, whitepaper, demo/submit docs, and public intros rewrit
 ## Marketing / landing
 
 - Landing: **Nexeus cinematic** — brand-first hero · Open desk CTA.
-- Nav: Markets / Truth / Credit / Pre-IPO / About.
-- Public pages soft copy: `/`, `/about`, `/markets`, `/credit`, `/preipo`, `/beta`, `/truth`, `/pairs`, `/network`, `/execution`, `/whitepaper`.
+- Nav: Markets / Truth / Credit / PreStocks / Pitch / About.
+- Pitch deck: `/pitch` · 13 slides · soft pitch · three tracks · ten year vision.
+- Video scripts: Pitch + Technical in `docs/VIDEO_SCRIPTS.md` for Stocklana Links form.
+- Public pages soft copy: `/`, `/about`, `/markets`, `/credit`, `/preipo`, `/beta`, `/truth`, `/pairs`, `/network`, `/execution`, `/whitepaper`, `/pitch`.
 
 ## Desk UI (product)
 

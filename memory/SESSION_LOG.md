@@ -1,6 +1,14 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Pitch + Technical video pack + live pitch deck
+
+- `docs/VIDEO_SCRIPTS.md`: full human Pitch Video (~2m15) + Technical Video (~3m30) with shot lists, end cards, Loom blurbs.
+- Live deck `/pitch`: 13 startup grade slides · FOLIO mark · partner logos · ten year vision · keyboard nav.
+- README: three Stocklana tracks table + Mermaid · partner integration steps · flaws table · video form fields.
+- `docs/STOCKLANA_SUBMISSION.md`: Pitch + Technical URL slots + deck link.
+- Branch: `cursor/folio-pitch-tech-pack-f1ec`
+
 ## 2026-09-25 — README real logo + Mermaid diagrams
 
 - Replaced flat black/azure `og.png` with FOLIO mark + wordmark banner (`public/folio-readme-banner.png`, also writes `og.png`).

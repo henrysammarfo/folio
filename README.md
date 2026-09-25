@@ -37,7 +37,72 @@ You open the desk. You see the live share multiplier. You see whether the tape i
 
 We never invent fills. We never invent mints. We never claim the desk is unhackable. Missing feeds fail closed and stay labeled.
 
-**Live product:** https://folio-tawny-one.vercel.app
+**Live product:** https://folio-tawny-one.vercel.app  
+**Pitch deck:** https://folio-tawny-one.vercel.app/pitch  
+**Video scripts:** [`docs/VIDEO_SCRIPTS.md`](docs/VIDEO_SCRIPTS.md) · Pitch Video + Technical Video
+
+---
+
+## Stocklana · three tracks we ship
+
+FOLIO is built so judges can score three clean tracks without one soup.
+
+| Track | What is live | Where to click |
+| :--- | :--- | :--- |
+| **1. Investing and credit** | Truth ×, wash refuse, Jupiter Buy, Markets multi venue, Kamino borrow, weekend cash session refuse | `/desk` · `/desk/acquire` · `/desk/markets` · `/desk/credit` · `/network` |
+| **2. PreStocks** | Live PreStocks catalog, logos, catalog list kept, TokenSelect + USDC/USDT flip, wash gated size, buys in FOLIO | `/desk/preipo` |
+| **3. Tessera** | Live Tessera T tokens, separate desk, catalog kept, USDC/USDT flip, labeled loan participation, no PreStocks mix | `/desk/tessera` |
+
+Doctrine on every track: fail closed adapters, no mocks, no silent greens, no fake fills, no cross issuer mixing.
+
+```mermaid
+flowchart TB
+  subgraph T1["Track 1 · Investing and credit"]
+    Truth[Truth ×]
+    Wash[Wash gate]
+    Buy[Jupiter Buy]
+    Credit[Kamino borrow]
+  end
+  subgraph T2["Track 2 · PreStocks"]
+    PCat[PreStocks catalog]
+    PBuy[USDC/USDT flip ticket]
+  end
+  subgraph T3["Track 3 · Tessera"]
+    TCat[Tessera catalog]
+    TBuy[USDC/USDT flip ticket]
+  end
+  Desk[FOLIO desk] --> T1
+  Desk --> T2
+  Desk --> T3
+  PBuy -.->|never mix| TBuy
+```
+
+### How partner tracks were integrated
+
+1. **Public spine first.** xStocks multiplier, wash, Jupiter quote, Kamino LTV, session gate. Network matrix labels every capability.
+2. **PreStocks desk.** Adapter `fetchPreStocksCatalog` · server bundle quotes stable ↔ mint · UI keeps **catalog list + Buy style ticket** · TokenSelect allowXstocks false · extraOptions from catalog only · side buy/sell · no Tessera mints on this path.
+3. **Tessera desk.** Adapter `fetchTesseraCatalog` · same hybrid UX · T tokens only · docs and code keep PreStocks ≠ Tessera.
+4. **Overview lanes.** Partner lane tabs on home link into the same desks. Logos and skeletons. Never bare Loading.
+5. **Honesty under load.** Jupiter 429s and thin wash feed pause size with labels. We do not invent clear wash or invent marks.
+
+---
+
+## Flaws we found · and how we lived with them
+
+Full ledger: [`memory/FLAWS_AND_WORKAROUNDS.md`](memory/FLAWS_AND_WORKAROUNDS.md). Technical video walks these live.
+
+| Flaw | What broke | What we did |
+| :--- | :--- | :--- |
+| Jupiter Price v3 429s under parallel catalog fetch | Empty board risk | Stagger probes · TTL cache · leave cells labeled · never invent marks |
+| Raydium TVL without mid | Fake price temptation | Show as liquidity awareness only |
+| Meteora DBC SDK + Anchor in SSR | Whole desk HTTP 500 | Production path config + RPC reads · SDK behind flag for tests |
+| Mainnet DBC pool create cost | Cannot sponsor on ≤~$1 budget | Document comfortable 0.05–0.08 SOL · never invent pool address |
+| Solami Blur prepaid GB | Demo tax pressure | Solami RPC tape for live path · Blur optional labeled |
+| NestUSD execute | Partner boundary | Metrics only in FOLIO · never fake Nest CPI |
+| Partner catalog rewrite | Tickets without lists | Restored catalog + flip hybrid · PreStocks and Tessera separate |
+| Pyth Hermes free trial | Paywall | Off ship path · free equity refs for diverge |
+
+We document residual risk in [`memory/THREAT_MODEL.md`](memory/THREAT_MODEL.md). We will not say unhackable.
 
 ---
 
@@ -248,21 +313,16 @@ npm run smoke:keys      # labeled key readiness
 
 ## Demo videos
 
-Full spoken scripts and shot lists live in [`docs/VIDEO_SCRIPTS.md`](docs/VIDEO_SCRIPTS.md).
+Stocklana Links form wants two URLs. Scripts are human and shot listed in [`docs/VIDEO_SCRIPTS.md`](docs/VIDEO_SCRIPTS.md).
 
-| Clip | Length | What judges should see |
+| Form field | Length | Script |
 | :--- | :--- | :--- |
-| Master desk tour | about 90 seconds | Truth → wash → buy → borrow → agent |
-| Truth close up | about 45 seconds | Live multiplier and on chain compare |
-| Wash refuse | about 40 seconds | Dirty or missing tape pauses size |
-| Buy ticket | about 60 seconds | Search, flip, quote, confirm path |
-| Markets board | about 45 seconds | Live marks and search into universe |
-| Borrow | about 50 seconds | Kamino LTV and in desk sign path |
-| PreStocks | about 40 seconds | Catalog list and in FOLIO buy |
-| Tessera | about 40 seconds | T token desk kept separate |
-| Network matrix | about 35 seconds | Every capability labeled honestly |
+| **Pitch Video** | about 2 min 15 sec | Wow · impress · intrigue · ten year vision · three tracks · soft pitch |
+| **Technical Video** | about 3 min 30 sec | Partner integration · PreStocks · Tessera · flaws · fail closed spine |
 
-Record with Loom or YouTube. Paste the master link on the Stocklana form. Keep voice soft. Never say you filled unless the wallet actually signed.
+Pitch deck to follow while recording: https://folio-tawny-one.vercel.app/pitch
+
+Record with Loom or YouTube. Paste both links on the Stocklana form. Keep voice soft. Never say you filled unless the wallet actually signed.
 
 ---
 
@@ -272,11 +332,13 @@ Record with Loom or YouTube. Paste the master link on the Stocklana form. Keep v
 | :--- | :--- |
 | [`docs/FOLIO_BIBLE.md`](docs/FOLIO_BIBLE.md) | Product doctrine |
 | [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) | Short spoken pitch |
-| [`docs/VIDEO_SCRIPTS.md`](docs/VIDEO_SCRIPTS.md) | Full video shot lists |
+| [`docs/VIDEO_SCRIPTS.md`](docs/VIDEO_SCRIPTS.md) | Pitch + Technical video scripts |
 | [`docs/STOCKLANA_SUBMISSION.md`](docs/STOCKLANA_SUBMISSION.md) | Form paste pack |
 | [`docs/FOLIO_WHITEPAPER.md`](docs/FOLIO_WHITEPAPER.md) | Long form writeup |
 | [`memory/CURRENT_STATE.md`](memory/CURRENT_STATE.md) | Live product state |
+| [`memory/FLAWS_AND_WORKAROUNDS.md`](memory/FLAWS_AND_WORKAROUNDS.md) | Flaws ledger |
 | [`memory/THREAT_MODEL.md`](memory/THREAT_MODEL.md) | Residual risk |
+| Live pitch deck | https://folio-tawny-one.vercel.app/pitch |
 
 ---
 
