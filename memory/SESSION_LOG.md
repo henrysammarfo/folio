@@ -1,6 +1,12 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Correct three bounty tracks (branch only)
+
+- Competing In: **Best Use of Meteora DBC** ($5k) · **Best Use of Tessera, Pre-IPO stocks** ($6k) · **Best Use of PreStocks** ($10k).
+- Updated README, pitch deck, VIDEO_SCRIPTS, STOCKLANA_SUBMISSION. No merge to main.
+- Branch: `cursor/folio-three-bounty-tracks-f1ec`
+
 ## 2026-09-25 — Pitch + Technical video pack + live pitch deck
 
 - `docs/VIDEO_SCRIPTS.md`: full human Pitch Video (~2m15) + Technical Video (~3m30) with shot lists, end cards, Loom blurbs.

@@ -67,7 +67,7 @@ Mainnet read and quote first. Fills stay paused until policy arms them. We never
 | Technical Video | Paste Loom / YouTube after recording from `docs/VIDEO_SCRIPTS.md` · Technical Video section |
 | Pitch deck | https://folio-tawny-one.vercel.app/pitch |
 
-**Track fit (three tracks):** Investing and credit · PreStocks · Tessera. See README Mermaid and Technical Video script.
+**Track fit (Competing In):** Best Use of Meteora DBC ($5k) · Best Use of Tessera, Pre-IPO stocks ($6k) · Best Use of PreStocks ($10k). See README Mermaid and Technical Video script.
 
 ### Extra deep links (optional in description)
 
@@ -82,7 +82,7 @@ Mainnet read and quote first. Fills stay paused until policy arms them. We never
 9. https://folio-tawny-one.vercel.app/whitepaper  
 10. https://folio-tawny-one.vercel.app/beta  
 
-**Track fit:** Investing and credit · PreStocks · Tessera. Pyth when keyed. Meteora DBC / Solami documented as World’s Fair side tracks in the Bible.
+**Track fit:** Best Use of Meteora DBC ($5,000) · Best Use of Tessera, Pre-IPO stocks ($6,000) · Best Use of PreStocks ($10,000).
 
 ---
 

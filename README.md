@@ -43,47 +43,46 @@ We never invent fills. We never invent mints. We never claim the desk is unhacka
 
 ---
 
-## Stocklana · three tracks we ship
+## Stocklana · three bounty tracks we compete in
 
-FOLIO is built so judges can score three clean tracks without one soup.
+FOLIO is built so judges can score these three sponsored tracks without one soup.
 
-| Track | What is live | Where to click |
-| :--- | :--- | :--- |
-| **1. Investing and credit** | Truth ×, wash refuse, Jupiter Buy, Markets multi venue, Kamino borrow, weekend cash session refuse | `/desk` · `/desk/acquire` · `/desk/markets` · `/desk/credit` · `/network` |
-| **2. PreStocks** | Live PreStocks catalog, logos, catalog list kept, TokenSelect + USDC/USDT flip, wash gated size, buys in FOLIO | `/desk/preipo` |
-| **3. Tessera** | Live Tessera T tokens, separate desk, catalog kept, USDC/USDT flip, labeled loan participation, no PreStocks mix | `/desk/tessera` |
+| Track | Prize | What is live on FOLIO | Where to click |
+| :--- | :--- | :--- | :--- |
+| **Best Use of Meteora DBC** | $5,000 | Stock curve doctrine · DBC program mainnet-read · weekend cash session refuse (curve cannot see the bell) · network matrix labels · pool create cost honesty · no invented pool address | `/desk` week strip · `/network` · Bible DBC notes |
+| **Best Use of Tessera, Pre-IPO stocks** | $6,000 | Live Tessera catalog · T tokens · catalog list kept · TokenSelect + USDC/USDT flip · wash gated size · buys in FOLIO · never mixed with PreStocks | `/desk/tessera` |
+| **Best Use of PreStocks** | $10,000 | Live PreStocks catalog · logos · catalog list kept · TokenSelect + USDC/USDT flip · wash gated size · buys in FOLIO · never mixed with Tessera | `/desk/preipo` |
 
 Doctrine on every track: fail closed adapters, no mocks, no silent greens, no fake fills, no cross issuer mixing.
 
 ```mermaid
 flowchart TB
-  subgraph T1["Track 1 · Investing and credit"]
-    Truth[Truth ×]
-    Wash[Wash gate]
-    Buy[Jupiter Buy]
-    Credit[Kamino borrow]
+  subgraph T1["Best Use of Meteora DBC · $5k"]
+    DBC[DBC stock curve config]
+    Sess[Weekend cash session refuse]
+    Net[Network matrix labels]
   end
-  subgraph T2["Track 2 · PreStocks"]
-    PCat[PreStocks catalog]
-    PBuy[USDC/USDT flip ticket]
-  end
-  subgraph T3["Track 3 · Tessera"]
+  subgraph T2["Best Use of Tessera Pre-IPO · $6k"]
     TCat[Tessera catalog]
     TBuy[USDC/USDT flip ticket]
+  end
+  subgraph T3["Best Use of PreStocks · $10k"]
+    PCat[PreStocks catalog]
+    PBuy[USDC/USDT flip ticket]
   end
   Desk[FOLIO desk] --> T1
   Desk --> T2
   Desk --> T3
-  PBuy -.->|never mix| TBuy
+  PBuy -.->|never mix issuers| TBuy
 ```
 
-### How partner tracks were integrated
+### How these three tracks were integrated
 
-1. **Public spine first.** xStocks multiplier, wash, Jupiter quote, Kamino LTV, session gate. Network matrix labels every capability.
-2. **PreStocks desk.** Adapter `fetchPreStocksCatalog` · server bundle quotes stable ↔ mint · UI keeps **catalog list + Buy style ticket** · TokenSelect allowXstocks false · extraOptions from catalog only · side buy/sell · no Tessera mints on this path.
-3. **Tessera desk.** Adapter `fetchTesseraCatalog` · same hybrid UX · T tokens only · docs and code keep PreStocks ≠ Tessera.
-4. **Overview lanes.** Partner lane tabs on home link into the same desks. Logos and skeletons. Never bare Loading.
-5. **Honesty under load.** Jupiter 429s and thin wash feed pause size with labels. We do not invent clear wash or invent marks.
+1. **Meteora DBC.** Bible primary stock curve. Production path is config + RPC `getAccountInfo` for program executable. Official SDK stays behind a flag because static import with Anchor broke Vercel SSR (whole desk 500). Curve does not know NYSE hours, so FOLIO `session-gate` refuses weekend size and the home week strip shows it. Mainnet pool create needs a funded wallet (comfortable ~0.05–0.08 SOL). We never invent a `FOLIO_DBC_POOL` address. Graduation 750 USDC is migration cap, not create SOL.
+2. **Tessera (Pre-IPO stocks bounty).** Adapter `fetchTesseraCatalog` · server bundle quotes stable ↔ T mint · UI keeps **catalog list + Buy style ticket** · TokenSelect with partner options only · side buy/sell · no PreStocks mints on this path · loan participation labeled.
+3. **PreStocks.** Adapter `fetchPreStocksCatalog` · same hybrid UX · PreStock symbols only · logos from API · wash still gates size · buys confirm inside FOLIO · docs and code keep PreStocks ≠ Tessera on purpose for bounty clarity.
+4. **Overview lanes.** Partner lane tabs on home link into Tessera and PreStocks desks. Logos and skeletons. Never bare Loading.
+5. **Honesty under load.** Jupiter 429s and thin wash feed pause size with labels. We do not invent clear wash, invent marks, or invent a DBC pool.
 
 ---
 
@@ -317,8 +316,8 @@ Stocklana Links form wants two URLs. Scripts are human and shot listed in [`docs
 
 | Form field | Length | Script |
 | :--- | :--- | :--- |
-| **Pitch Video** | about 2 min 15 sec | Wow · impress · intrigue · ten year vision · three tracks · soft pitch |
-| **Technical Video** | about 3 min 30 sec | Partner integration · PreStocks · Tessera · flaws · fail closed spine |
+| **Pitch Video** | about 2 min 15 sec | Wow · impress · intrigue · ten year vision · three bounty tracks · soft pitch |
+| **Technical Video** | about 3 min 30 sec | Meteora DBC · Tessera · PreStocks integration · flaws · fail closed spine |
 
 Pitch deck to follow while recording: https://folio-tawny-one.vercel.app/pitch
 

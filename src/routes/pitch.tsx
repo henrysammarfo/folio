@@ -101,14 +101,15 @@ const SLIDES: Slide[] = [
   {
     id: "tracks",
     tone: "light",
-    kicker: "Stocklana tracks",
+    kicker: "Stocklana bounty tracks",
     title: "Three tracks. One doctrine.",
+    logos: ["Meteora DBC", "Tessera", "PreStocks"],
     bullets: [
-      "Investing and credit · public xStocks desk, wash, buy, Kamino borrow",
-      "PreStocks · live private catalog, buys in FOLIO, no Tessera mix",
-      "Tessera · loan participation T tokens, separate desk, USDC or USDT flip",
+      "Best Use of Meteora DBC · $5k · stock curve · weekend refuse · labeled network matrix",
+      "Best Use of Tessera, Pre-IPO stocks · $6k · live T tokens · catalog + flip · buys in FOLIO",
+      "Best Use of PreStocks · $10k · live private catalog · catalog + flip · no Tessera mix",
     ],
-    footer: "Fail closed on every lane. Catalogs kept. Issuers never cross.",
+    footer: "Fail closed on every lane. Catalogs kept. Issuers never cross. No invented DBC pool.",
   },
   {
     id: "partners",
@@ -184,7 +185,7 @@ const SLIDES: Slide[] = [
     bullets: [
       "Open the live desk · folio-tawny-one.vercel.app",
       "Watch Pitch and Technical videos · scripts in docs/VIDEO_SCRIPTS.md",
-      "Read the README Mermaid · three tracks · flaws · partner integration",
+      "Read the README Mermaid · Meteora DBC · Tessera · PreStocks · flaws",
       "Invite teammates · edit until close · then Colosseum",
     ],
   },
