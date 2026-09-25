@@ -4,10 +4,11 @@
 ## 2026-09-25 — Keys check + DBC SSR crash blocking Privy sign
 
 - Prod SSR readiness: Privy+Supabase+session configured · `broadcastPaused:false` (fills armed).
+- Vercel env (names only): PRIVY_APP_ID/SECRET, SUPABASE_*, FOLIO_SESSION_SECRET, JUPITER, BITQUERY, FINNHUB, PYTH, SOLANA_RPC, AGENTROUTER, TAVILY, SOLAMI all present on production+preview.
 - Local `.env`: Privy/Supabase/Jupiter empty → local Open App fail-closed (expected).
-- Root cause of connect/sign dying on prod serverFns: `@coral-xyz/anchor` ESM crash still pulled via dynamic Meteora DBC import into `/__server` (122 errors).
+- Root cause of connect/sign dying on prod: `@coral-xyz/anchor` ESM crash (`exports is not defined`) pulled via Meteora DBC SDK into desk SSR — not missing Privy keys.
 - Fix: move SDK to `stock-curve-sdk.ts` (tests only); production `stock-curve.ts` is RPC-only.
-- Branch: `cursor/folio-dbc-ssr-sign-fix-f1ec` (needs merge to heal prod)
+- PR #46 · merged to `main` (`9b1d5fc`) · production redeploy in flight so Privy mint/sign can work again.
 
 ## 2026-09-25 — Pitch + Technical video pack + live pitch deck
 
