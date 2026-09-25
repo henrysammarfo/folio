@@ -83,7 +83,7 @@ export async function fetchPreStocksCatalog(): Promise<
     return okResult("mainnet-read", source, {
       rows,
       source,
-      note: "PreStocks-only catalog · Stocklana bounty — no Tessera / other pre-IPO issuers mixed here.",
+      note: "PreStocks only catalog. No Tessera or other issuers mixed here.",
     });
   } catch (e) {
     return errResult(source, "prestocks_fetch_failed", String(e));
