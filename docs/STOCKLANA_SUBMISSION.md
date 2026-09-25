@@ -37,7 +37,7 @@ Token balances can lie after dividends and splits. Dirty pools can smile until y
 3. **Buy** — USDC to stock or stock to stock. Searchable pickers. Flip. Live Jupiter quote. Your wallet signs when fills are armed.
 4. **Markets** — Live board for Mega IPO and Meme. Search expands the Solana xStocks universe. Marks are never invented.
 5. **Borrow** — Keep the shares. Unlock USDC on Kamino rails inside the desk. NestUSD shows live risk metrics. Nest execute stays on Nest.
-6. **Partners** — PreStocks and Tessera each get their own desk so private rooms stay separate.
+6. **Bounty rooms** — Meteora DBC weekend refuse + labeled curve honesty. Tessera Pre-IPO desk. PreStocks desk. Issuers never mixed.
 7. **Agent** — Short answers. Five messages per account per day. Never pretends a fill happened.
 
 ## Honest limits

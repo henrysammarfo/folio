@@ -26,7 +26,7 @@ Record 1080p. Captions on. Dismiss cookie banner before line one. Hide full wall
 | 0:48–1:10 | **CUT** `/desk/acquire` | Search AAPLx. Show quote. Flip once. Pause label if fills paused. |
 | 1:10–1:25 | **CUT** `/desk/credit` | Kamino LTV. NestUSD metrics labeled. |
 | 1:25–1:45 | **CUT** `/desk/preipo` then `/desk/tessera` | Catalog kept. Separate rooms. One beat each. |
-| 1:45–2:05 | `/pitch` vision + tracks | Ten year line. Three tracks named. |
+| 1:45–2:05 | `/pitch` vision + tracks | Ten year line. Name DBC · Tessera · PreStocks bounties. |
 | 2:05–2:15 | End card | URL + soft pitch. Silence one beat. |
 
 ### Spoken script (read like a founder, not a bot)
