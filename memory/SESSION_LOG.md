@@ -1,6 +1,14 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Keys check + DBC SSR crash blocking Privy sign
+
+- Prod SSR readiness: Privy+Supabase+session configured · `broadcastPaused:false` (fills armed).
+- Local `.env`: Privy/Supabase/Jupiter empty → local Open App fail-closed (expected).
+- Root cause of connect/sign dying on prod serverFns: `@coral-xyz/anchor` ESM crash still pulled via dynamic Meteora DBC import into `/__server` (122 errors).
+- Fix: move SDK to `stock-curve-sdk.ts` (tests only); production `stock-curve.ts` is RPC-only.
+- Branch: `cursor/folio-dbc-ssr-sign-fix-f1ec` (needs merge to heal prod)
+
 ## 2026-09-25 — Pitch + Technical video pack + live pitch deck
 
 - `docs/VIDEO_SCRIPTS.md`: full human Pitch Video (~2m15) + Technical Video (~3m30) with shot lists, end cards, Loom blurbs.

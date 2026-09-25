@@ -1,3 +1,13 @@
+## 2026-09-25 — API keys + Privy sign diagnosis
+
+| Claim | Status |
+|---|---|
+| Production Vercel has PRIVY_APP_ID/SECRET + Supabase + FOLIO_SESSION_SECRET + Jupiter | Verified via SSR readiness payload |
+| Production `broadcastPaused:false` (fills armed) | Verified SSR `broadcastPaused:!1` |
+| Local `.env` Privy/Supabase empty | Verified smoke:keys FAIL-CLOSED |
+| `/__server` Anchor `exports is not defined` blocks serverFns (session mint / prepare) | Verified runtime errors · 122 hits |
+| Fix: DBC SDK isolated from desk SSR graph | Implemented on branch |
+
 ## 2026-09-25 — Pitch deck + dual video scripts
 
 | Claim | Status |
