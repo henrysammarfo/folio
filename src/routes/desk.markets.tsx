@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { VenueLogo } from "@/components/venue-logo";
@@ -11,14 +11,21 @@ import { humanizeVenueNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 import { LANE_META } from "@/lib/xstock-catalog";
 
-type LaneFilter = "all" | "mega" | "ipo" | "meme" | "preipo" | "tessera";
+type LaneFilter =
+  | "all"
+  | "mega"
+  | "ipo"
+  | "meme"
+  | "preipo"
+  | "tessera"
+  | "universe";
 
 export const Route = createFileRoute("/desk/markets")({
   head: () => ({
     meta: siteMeta({
       title: "Markets — FOLIO",
       description:
-        "Live Jupiter venue prices for mega, IPO, meme xStocks plus PreStocks and Tessera on Solana.",
+        "Live Jupiter marks for the full Solana xStocks universe plus PreStocks and Tessera.",
       path: "/desk/markets",
     }),
   }),
@@ -43,21 +50,29 @@ function shortLiq(n: number) {
 function Page() {
   const initial = Route.useLoaderData();
   const [lane, setLane] = useState<LaneFilter>("all");
+  const [q, setQ] = useState("");
+  const [qDebounced, setQDebounced] = useState("");
   const fetchBoard = useServerFn(getMarketsBoard);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setQDebounced(q.trim()), 280);
+    return () => window.clearTimeout(t);
+  }, [q]);
+
   const { data, isFetching } = useQuery({
-    queryKey: marketsQueryKey(lane),
-    queryFn: () => fetchBoard({ data: { lane } }),
-    initialData: lane === "all" ? initial : undefined,
+    queryKey: [...marketsQueryKey(lane), qDebounced],
+    queryFn: () =>
+      fetchBoard({
+        data: { lane, ...(qDebounced ? { q: qDebounced } : {}) },
+      }),
+    initialData: lane === "all" && !qDebounced ? initial : undefined,
     initialDataUpdatedAt: Date.now(),
     staleTime: DESK_SYNC.marketsStaleMs,
     refetchInterval: DESK_SYNC.marketsRefetchMs,
   });
 
   const rows = data?.rows ?? [];
-  const priced = useMemo(
-    () => rows.filter((r) => r.usdPrice != null).length,
-    [rows],
-  );
+  const priced = data?.pricedCount ?? rows.filter((r) => r.usdPrice != null).length;
 
   return (
     <DeskShell title="Markets">
@@ -120,7 +135,15 @@ function Page() {
 
         <div className="fx-lane-row fx-markets-tabs" role="tablist">
           {(
-            ["all", "mega", "ipo", "meme", "preipo", "tessera"] as const
+            [
+              "all",
+              "mega",
+              "ipo",
+              "meme",
+              "universe",
+              "preipo",
+              "tessera",
+            ] as const
           ).map((id) => {
             const meta = LANE_META.find((l) => l.id === id);
             return (
@@ -137,6 +160,17 @@ function Page() {
             );
           })}
         </div>
+
+        <label className="fx-markets-search">
+          <span className="fx-sr-only">Search markets</span>
+          <input
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search symbol, name, or underlying…"
+            autoComplete="off"
+          />
+        </label>
 
         <p className="fx-markets-explain">
           {LANE_META.find((l) => l.id === lane)?.body}

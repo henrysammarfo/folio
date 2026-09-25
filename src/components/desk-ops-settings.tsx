@@ -114,6 +114,7 @@ export function DeskOpsSettings({ initial }: { initial: SessionBundle }) {
       queryClient.invalidateQueries({ queryKey: ["credit-bundle"] }),
       queryClient.invalidateQueries({ queryKey: ["activity-bundle"] }),
       queryClient.invalidateQueries({ queryKey: ["empire-readiness"] }),
+      queryClient.invalidateQueries({ queryKey: ["markets-board"] }),
     ]);
   }
 

@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-25 — Honest leftovers: PreStocks Buy · universe prices · wallet-scan qty
+
+- PreStocks desk: Tessera-parity Buy ticket (TokenSelect + flip, USDC/USDT ↔ PreStock).
+- Markets: Universe tab + search; Jupiter Price v3 batch (50/chunk · 3 workers · 30s/120s cache tiers · stock-ref when no venue usdPrice); board TTL 60s + singleflight.
+- Holdings/Credit: full wallet ATA scan → mint→symbol via live universe index; paper 3-symbol watchlist only when unbound. Session mint invalidates positions/credit/markets.
+- Branch: `cursor/folio-netro-home-depth-f1ec`
+
 ## 2026-09-25 — Netro home + markets depth + Tessera Buy + sync
 
 - Desk home: NetroBNB density canvas always mounts on `/desk` (no approve-gate required).

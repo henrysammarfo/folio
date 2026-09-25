@@ -111,10 +111,12 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
     : null;
 
   async function refresh() {
-    await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
-    await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
-    await queryClient.invalidateQueries({ queryKey: ["credit-bundle"] });
-    await queryClient.invalidateQueries({ queryKey: ["credit-bundle"] });
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["session-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["positions-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["credit-bundle"] }),
+      queryClient.invalidateQueries({ queryKey: ["markets-board"] }),
+    ]);
     await refetch();
   }
 

@@ -150,7 +150,7 @@ export const getPreipoBundle = createServerFn({ method: "GET" })
     }
     const want = data.symbol?.trim().toUpperCase();
     const selected =
-      catalog.data.rows.find((r) => r.symbol === want) ??
+      catalog.data.rows.find((r) => r.symbol.toUpperCase() === want) ??
       catalog.data.rows[0] ??
       null;
     if (!selected) {

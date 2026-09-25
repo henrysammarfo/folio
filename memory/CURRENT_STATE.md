@@ -56,10 +56,10 @@ README, marketing routes, whitepaper, demo/submit docs, and public intros rewrit
 
 - Home: **NetroBNB density always-on** (FOLIO tokens) — live clock, markets strip, AI rail, partner lanes.
 - Buy: Mega / IPO / Meme / **Pairs** · TokenSelect + flip · Netro-depth details.
-- Markets: multi-venue board · Pre-IPO + Tessera lanes · live universe count (~1k+ Solana xStocks) · curated 50+ priced desk.
-- Credit: AssetLogo rates · Kamino ktx in-desk · NestUSD metrics-only (no Nest execute theater).
-- PreStocks / Tessera: in-desk BuyExecute · Tessera Buy-style search + flip (stables ↔ T-token; no cross-issuer).
-- Holdings: shared query keys + refetch cadence so balances match across Home / Holdings / detail after email or wallet auth.
+- Markets: multi-venue curated board + **Universe tab** (~1k+ Solana xStocks, Jupiter batch marks, search) · Pre-IPO + Tessera lanes.
+- Credit: AssetLogo rates · Kamino ktx in-desk · NestUSD metrics-only · collateral from **full wallet xStock scan** when bound.
+- PreStocks / Tessera: in-desk BuyExecute · **both** Buy-style TokenSelect + flip (stables ↔ partner; no cross-issuer).
+- Holdings: **full ATA wallet-scan** → mint index (paper 3-symbol only when unbound) · shared query keys + invalidate after Privy/session mint.
 - Agent: `agent_daily` = 5 / account / 24h.
 - Logo chain: API → Backed CDN → favicon → initials (SpaceX / Tessera paths fixed).
 - Fills arm when `BROADCAST_PAUSED=false` (user-signed Jupiter + Kamino + partner buys).

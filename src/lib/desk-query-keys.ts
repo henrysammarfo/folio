@@ -38,5 +38,5 @@ export const DESK_SYNC = {
   washTtlMs: 60_000,
   washStaleMs: 240_000,
   universeTtlMs: 600_000,
-  boardTtlMs: 30_000,
+  boardTtlMs: 60_000,
 } as const;

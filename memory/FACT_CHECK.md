@@ -3,6 +3,13 @@
 | Claim | Status |
 |---|---|
 | Live Solana xStocks universe ≈ 1124 via paginated `api.xstocks.fi/api/v2/public/assets` | Verified live (12 pages) |
+| Markets board prices universe via Jupiter Price v3 batch (50/chunk, parallel workers, stock-ref fallback) | Implemented — never invents marks |
+| PreStocks Buy ticket = Tessera parity (TokenSelect + flip, USDC/USDT ↔ partner) | Implemented |
+| Wallet holdings = full ATA scan → mint index (not 3-symbol WATCHLIST filter) when bound | Implemented — paper watchlist only when unbound |
+| Credit collateral = full wallet xStock scan when bound | Implemented |
+| Multi-tenant qty still needs Privy + Supabase session keys | Honest — fail-closed without keys; inspect/watch-wallet still mainnet-read |
+
+## 2026-09-25 — Netro home + markets universe + Tessera Buy (prior)
 | Desk curated catalog > 40 buyable names | Implemented |
 | Markets lanes include Pre-IPO (8) + Tessera (3) | Implemented — partner marks, not fake Jupiter venues |
 | Tessera Buy-style TokenSelect + flip USDC/USDT ↔ T-token | Implemented — no PreStock↔Tessera cross |

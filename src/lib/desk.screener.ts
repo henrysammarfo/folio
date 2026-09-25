@@ -1,8 +1,6 @@
 /**
- * Live markets board — multi-venue (Jupiter · free tape · Raydium · Solami when keyed).
- * Primary mark prefers Jupiter → Solami → free tape. Never invents prices.
- * Bounded concurrency + board TTL cache so 1k concurrent users share one build.
- * Partner lanes (PreStocks · Tessera) listed honestly — separate from xStock truth.
+ * Live markets board — multi-venue for curated desk + Jupiter batch for full universe.
+ * Never invents prices. Board TTL + singleflight so 1k concurrent users share one build.
  */
 
 import { createServerFn } from "@tanstack/react-start";
@@ -12,10 +10,15 @@ import { fetchXStockUniverse } from "./adapters/xstocks-universe";
 import { fetchPreStocksCatalog } from "./adapters/prestocks";
 import { fetchTesseraCatalog } from "./adapters/tessera";
 import {
+  fetchJupiterTokenPricesBatch,
+  type JupiterTokenPrice,
+} from "./adapters/jupiter";
+import {
   resolveMultiVenuePrice,
   type VenueQuote,
 } from "./adapters/multi-venue";
 import { cacheGet, cacheSet, cacheSingleflight } from "./adapters/ttl-cache";
+import type { AdapterResult } from "./adapters/types";
 import { DESK_SYNC } from "./desk-query-keys";
 import {
   XSTOCK_CATALOG,
@@ -23,7 +26,7 @@ import {
   type XStockLane,
 } from "./xstock-catalog";
 
-export type MarketsLane = XStockLane | "preipo" | "tessera";
+export type MarketsLane = XStockLane | "preipo" | "tessera" | "universe";
 
 export type MarketsBoardRow = {
   symbol: string;
@@ -41,16 +44,17 @@ export type MarketsBoardRow = {
   venues: VenueQuote[];
   openNow: boolean | null;
   tradingPeriod: string | null;
-  /** Partner desks — buy path is /desk/preipo or /desk/tessera */
   deskPath?: "/desk/preipo" | "/desk/tessera";
+  /** venue = Jupiter usdPrice · stock-ref = stockData only */
+  priceKind?: "venue" | "stock-ref" | "multi";
 };
 
 export type MarketsBoardBundle = {
   rows: MarketsBoardRow[];
   asOf: string;
   note: string;
-  /** Live Solana xStocks universe size (not just curated desk). */
   universeCount: number | null;
+  pricedCount: number;
   partnerCounts: { preipo: number; tessera: number };
 };
 
@@ -59,8 +63,10 @@ export type ScreenerBundle = MarketsBoardBundle;
 
 const BoardInput = z.object({
   lane: z
-    .enum(["all", "mega", "ipo", "meme", "preipo", "tessera"])
+    .enum(["all", "mega", "ipo", "meme", "preipo", "tessera", "universe"])
     .default("all"),
+  /** Case-insensitive filter against symbol/name/underlying (universe + all). */
+  q: z.string().max(48).optional(),
 });
 
 function catalogSlice(lane: "all" | XStockLane): readonly XStockCatalogItem[] {
@@ -68,7 +74,6 @@ function catalogSlice(lane: "all" | XStockLane): readonly XStockCatalogItem[] {
   return XSTOCK_CATALOG.filter((s) => s.lane === lane);
 }
 
-/** Cap parallel mint probes — avoids Jupiter 429 storms and Vercel timeouts. */
 const MINT_CONCURRENCY = 4;
 
 async function mapPool<T, R>(
@@ -90,7 +95,7 @@ async function mapPool<T, R>(
   return out;
 }
 
-async function buildXStockRow(
+async function buildCuratedRow(
   item: XStockCatalogItem,
 ): Promise<MarketsBoardRow> {
   const asset = await fetchXStockAsset(item.symbol);
@@ -99,41 +104,34 @@ async function buildXStockRow(
   const openNow = asset.ok ? asset.data.openNow : null;
   const tradingPeriod = asset.ok ? asset.data.tradingPeriod : null;
 
-  const base = {
+  const base: MarketsBoardRow = {
     symbol: item.symbol,
     name: item.name,
     underlying: item.underlying,
-    lane: item.lane as MarketsLane,
+    lane: item.lane,
     buyable: item.buyable,
     logo,
     mint,
     openNow,
     tradingPeriod,
+    usdPrice: null,
+    stockRefPrice: null,
+    liquidity: null,
+    priceNote: !item.buyable
+      ? "Watchlist"
+      : asset.ok
+        ? "Mint missing"
+        : asset.reason,
+    venues: [],
     ...(item.blurb ? { blurb: item.blurb } : {}),
   };
 
-  if (!mint || !item.buyable) {
-    return {
-      ...base,
-      usdPrice: null,
-      stockRefPrice: null,
-      liquidity: null,
-      priceNote: !item.buyable
-        ? "Watchlist"
-        : asset.ok
-          ? "Mint missing"
-          : asset.reason,
-      venues: [],
-    };
-  }
+  if (!mint || !item.buyable) return base;
 
   const multi = await resolveMultiVenuePrice(mint);
   if (!multi.primary) {
     return {
       ...base,
-      usdPrice: null,
-      stockRefPrice: null,
-      liquidity: null,
       priceNote: "Venues cooling — refresh soon",
       venues: multi.venues,
     };
@@ -146,6 +144,45 @@ async function buildXStockRow(
     liquidity: multi.primary.liquidity,
     priceNote: multi.primary.priceNote,
     venues: multi.venues,
+    priceKind: "multi",
+  };
+}
+
+function priceFromJup(
+  hit: AdapterResult<JupiterTokenPrice> | undefined,
+): Pick<
+  MarketsBoardRow,
+  "usdPrice" | "stockRefPrice" | "liquidity" | "priceNote" | "priceKind" | "venues"
+> {
+  if (!hit?.ok) {
+    return {
+      usdPrice: null,
+      stockRefPrice: null,
+      liquidity: null,
+      priceNote: hit && !hit.ok ? hit.reason : "Mark pending",
+      venues: [],
+    };
+  }
+  const kind = hit.data.priceKind ?? "venue";
+  return {
+    usdPrice: hit.data.usdPrice,
+    stockRefPrice: hit.data.stockRefPrice,
+    liquidity: hit.data.liquidity,
+    priceKind: kind,
+    priceNote:
+      kind === "venue"
+        ? "Jupiter venue mark"
+        : "xStocks stockData mark · no venue usdPrice",
+    venues: [
+      {
+        id: "jupiter",
+        label: "Jupiter",
+        status: hit.source.includes("cached") ? "cached" : "live",
+        usdPrice: hit.data.usdPrice,
+        liquidity: hit.data.liquidity,
+        note: kind === "venue" ? "Batch venue" : "Batch stock-ref",
+      },
+    ],
   };
 }
 
@@ -215,10 +252,67 @@ async function buildPartnerRows(
   return { rows, counts };
 }
 
+function matchesQuery(
+  row: { symbol: string; name: string; underlying: string },
+  q: string | undefined,
+): boolean {
+  if (!q?.trim()) return true;
+  const needle = q.trim().toLowerCase();
+  return (
+    row.symbol.toLowerCase().includes(needle) ||
+    row.name.toLowerCase().includes(needle) ||
+    row.underlying.toLowerCase().includes(needle)
+  );
+}
+
+async function buildUniverseRows(opts: {
+  q?: string;
+  /** When true, skip symbols already in curated catalog. */
+  excludeCurated: boolean;
+}): Promise<{ rows: MarketsBoardRow[]; universeCount: number | null }> {
+  const universe = await fetchXStockUniverse();
+  if (!universe.ok) {
+    return { rows: [], universeCount: null };
+  }
+  const curated = new Set(XSTOCK_CATALOG.map((c) => c.symbol.toUpperCase()));
+  let slice = universe.data.rows.filter((r) => {
+    if (opts.excludeCurated && curated.has(r.symbol.toUpperCase())) return false;
+    return matchesQuery(r, opts.q);
+  });
+
+  // Full universe when no search; search can still be large — hard cap display paid rows.
+  const CAP = opts.q?.trim() ? 400 : 1124;
+  slice = slice.slice(0, CAP);
+
+  const mints = slice.map((r) => r.mint).filter((m): m is string => Boolean(m));
+  // Chunk work via batch helper (internal 50) — call once for all mints.
+  const prices = await fetchJupiterTokenPricesBatch(mints);
+
+  const rows: MarketsBoardRow[] = slice.map((r) => {
+    const priced = r.mint ? prices.get(r.mint) : undefined;
+    const mark = priceFromJup(priced);
+    return {
+      symbol: r.symbol,
+      name: r.name,
+      underlying: r.underlying,
+      lane: "universe" as const,
+      buyable: Boolean(r.mint),
+      logo: r.logo,
+      mint: r.mint,
+      openNow: null,
+      tradingPeriod: null,
+      ...mark,
+    };
+  });
+
+  return { rows, universeCount: universe.data.count };
+}
+
 async function buildBoard(
   lane: z.infer<typeof BoardInput>["lane"],
+  q?: string,
 ): Promise<MarketsBoardBundle> {
-  const cacheKey = `markets-board:${lane}`;
+  const cacheKey = `markets-board:v2:${lane}:${(q ?? "").trim().toLowerCase()}`;
   const hit = cacheGet<MarketsBoardBundle>(cacheKey);
   if (hit) return hit.value;
 
@@ -226,31 +320,65 @@ async function buildBoard(
     const again = cacheGet<MarketsBoardBundle>(cacheKey);
     if (again) return again.value;
 
-    const universeP = fetchXStockUniverse();
     const partnersP = buildPartnerRows(
       lane === "preipo" || lane === "tessera" || lane === "all"
         ? lane
         : "all",
     );
 
-    let xRows: MarketsBoardRow[] = [];
-    if (lane === "all" || lane === "mega" || lane === "ipo" || lane === "meme") {
-      const slice = catalogSlice(lane === "all" ? "all" : lane);
-      xRows = await mapPool(slice, MINT_CONCURRENCY, (item) =>
-        buildXStockRow(item),
+    let rows: MarketsBoardRow[] = [];
+    let universeCount: number | null = null;
+
+    if (lane === "universe") {
+      const u = await buildUniverseRows({
+        ...(q ? { q } : {}),
+        excludeCurated: false,
+      });
+      rows = u.rows;
+      universeCount = u.universeCount;
+    } else if (
+      lane === "all" ||
+      lane === "mega" ||
+      lane === "ipo" ||
+      lane === "meme"
+    ) {
+      const slice = catalogSlice(lane === "all" ? "all" : lane).filter((r) =>
+        matchesQuery(r, q),
       );
+      const curated = await mapPool(slice, MINT_CONCURRENCY, (item) =>
+        buildCuratedRow(item),
+      );
+      rows = [...curated];
+
+      if (lane === "all") {
+        // Full Solana universe marks (batch) excluding curated duplicates.
+        const u = await buildUniverseRows({
+          ...(q ? { q } : {}),
+          excludeCurated: true,
+        });
+        universeCount = u.universeCount;
+        rows = [...rows, ...u.rows];
+      } else {
+        const uni = await fetchXStockUniverse();
+        universeCount = uni.ok ? uni.data.count : null;
+      }
     }
 
-    const [universe, partners] = await Promise.all([universeP, partnersP]);
+    const partners = await partnersP;
     const partnerRows =
-      lane === "mega" || lane === "ipo" || lane === "meme"
+      lane === "mega" ||
+      lane === "ipo" ||
+      lane === "meme" ||
+      lane === "universe"
         ? []
-        : partners.rows.filter((r) =>
-            lane === "all" ? true : r.lane === lane,
+        : partners.rows.filter(
+            (r) =>
+              (lane === "all" ? true : r.lane === lane) &&
+              matchesQuery(r, q),
           );
 
-    const rows = [...xRows, ...partnerRows];
-    const priced = rows.filter((r) => r.usdPrice != null).length;
+    rows = [...rows, ...partnerRows];
+    const pricedCount = rows.filter((r) => r.usdPrice != null).length;
     const liveVenues = rows.reduce(
       (n, r) =>
         n +
@@ -258,27 +386,19 @@ async function buildBoard(
           .length,
       0,
     );
-    const freeTape = rows.filter((r) =>
-      r.venues.some((v) => v.id === "free-tape" && v.usdPrice != null),
-    ).length;
-    const solami = rows.filter((r) =>
-      r.venues.some((v) => v.id === "solami" && v.usdPrice != null),
-    ).length;
     const anyOpen = rows.some((r) => r.openNow === true);
-    const universeCount = universe.ok ? universe.data.count : null;
     const paceNote = [
-      universeCount != null ? `${universeCount} Solana xStocks live` : null,
+      universeCount != null
+        ? `${universeCount.toLocaleString()} Solana xStocks live`
+        : null,
+      `${pricedCount} priced`,
       partners.counts.preipo
         ? `${partners.counts.preipo} PreStocks`
         : null,
       partners.counts.tessera
         ? `${partners.counts.tessera} Tessera`
         : null,
-      freeTape > 0 ? `${freeTape} free-tape` : null,
-      solami > 0 ? `${solami} Solami` : null,
-      priced < rows.filter((r) => r.buyable && r.lane !== "preipo" && r.lane !== "tessera").length
-        ? "some marks still loading"
-        : null,
+      liveVenues > 0 ? `${liveVenues} venue reads` : null,
     ]
       .filter(Boolean)
       .join(" · ");
@@ -287,10 +407,11 @@ async function buildBoard(
       rows,
       asOf: new Date().toISOString(),
       universeCount,
+      pricedCount,
       partnerCounts: partners.counts,
       note: anyOpen
-        ? `Session open · multi-venue marks (${liveVenues} live reads)${paceNote ? ` · ${paceNote}` : ""}`
-        : `Session closed · Solana venues still quote 24/7 (${liveVenues} live reads)${paceNote ? ` · ${paceNote}` : ""}`,
+        ? `Session open · ${paceNote}`
+        : `Session closed · Solana marks still quote 24/7 · ${paceNote}`,
     };
     cacheSet(cacheKey, bundle, DESK_SYNC.boardTtlMs);
     return bundle;
@@ -300,7 +421,7 @@ async function buildBoard(
 export const getMarketsBoard = createServerFn({ method: "GET" })
   .validator(BoardInput)
   .handler(async ({ data }): Promise<MarketsBoardBundle> => {
-    return buildBoard(data.lane);
+    return buildBoard(data.lane, data.q);
   });
 
 export const getScreenerBundle = getMarketsBoard;

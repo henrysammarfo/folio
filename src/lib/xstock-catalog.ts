@@ -13,7 +13,7 @@ export type XStockCatalogItem = {
 };
 
 export type LaneMeta = {
-  id: XStockLane | "all" | "pairs" | "preipo" | "tessera";
+  id: XStockLane | "all" | "pairs" | "preipo" | "tessera" | "universe";
   label: string;
   title: string;
   body: string;
@@ -56,6 +56,12 @@ export const LANE_META: readonly LaneMeta[] = [
     label: "Tessera",
     title: "Tessera T-tokens",
     body: "Loan-participation T-tokens (OpenAI, SpaceX, Kalshi). Separate from PreStocks and from public xStocks.",
+  },
+  {
+    id: "universe",
+    label: "Universe",
+    title: "Full Solana xStocks",
+    body: "Every Backed xStock on Solana with a Jupiter mark (venue or stockData). Search to filter — priced in batches, cached for concurrent desks.",
   },
   {
     id: "pairs",

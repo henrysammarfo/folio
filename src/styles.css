@@ -1433,6 +1433,21 @@
 .fx-markets-stats{display:flex;gap:1rem;font-size:.82rem;color:var(--fx-muted)}
 .fx-markets-stats b{color:var(--fx-ink);font-weight:700}
 .fx-markets-tabs{margin-bottom:.5rem;padding:0}
+.fx-sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+.fx-markets-search{
+  display:block;margin:0 0 .85rem;max-width:28rem;
+}
+.fx-markets-search input{
+  width:100%;padding:.7rem .95rem;border:1px solid var(--fx-line);border-radius:12px;
+  background:#fff;font-size:.9rem;color:var(--fx-ink);font-family:inherit;
+}
+.fx-markets-search input::placeholder{color:var(--fx-muted)}
+.fx-markets-search input:focus{
+  outline:2px solid var(--fx-azure,#0EA5C9);outline-offset:1px;border-color:var(--fx-azure,#0EA5C9);
+}
 .fx-markets-explain{
   margin:0 0 1rem;font-size:.82rem;line-height:1.45;color:var(--fx-muted);
 }
@@ -1463,6 +1478,9 @@
 }
 .fx-board-lane.lane-ipo{color:#0D9488}
 .fx-board-lane.lane-meme{color:#B45309}
+.fx-board-lane.lane-universe{color:#066A84}
+.fx-board-lane.lane-preipo{color:#7C3AED}
+.fx-board-lane.lane-tessera{color:#0F766E}
 .fx-board-session{font-size:.82rem;font-weight:650}
 .fx-board-session small{display:block;font-size:.68rem;font-weight:500;color:var(--fx-muted)}
 .fx-board-liq{font-variant-numeric:tabular-nums;font-size:.82rem}

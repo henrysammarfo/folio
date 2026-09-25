@@ -65,6 +65,11 @@ export type JupiterTokenPrice = {
   stockRefPrice: number | null;
   scaledUiMultiplier: number | null;
   blockId: number | null;
+  /**
+   * venue = Jupiter usdPrice · stock-ref = stockData.price only (no venue mark).
+   * Never invents — both come from Jupiter Price v3.
+   */
+  priceKind: "venue" | "stock-ref";
 };
 
 function quoteCacheKey(params: {
@@ -373,16 +378,26 @@ export async function fetchJupiterTokenPrice(
       }
     >;
     const row = json[mint];
-    if (!row || typeof row.usdPrice !== "number" || !Number.isFinite(row.usdPrice)) {
+    if (!row) {
+      return errResult(source, "jupiter_price_missing", mint);
+    }
+    const stockRef =
+      typeof row.stockData?.price === "number" && Number.isFinite(row.stockData.price)
+        ? row.stockData.price
+        : null;
+    const venue =
+      typeof row.usdPrice === "number" && Number.isFinite(row.usdPrice)
+        ? row.usdPrice
+        : null;
+    if (venue == null && stockRef == null) {
       return errResult(source, "jupiter_price_missing", mint);
     }
     const ok = okResult("mainnet-read", source, {
       mint,
-      usdPrice: row.usdPrice,
+      usdPrice: venue ?? (stockRef as number),
       liquidity: typeof row.liquidity === "number" ? row.liquidity : null,
       decimals: typeof row.decimals === "number" ? row.decimals : null,
-      stockRefPrice:
-        typeof row.stockData?.price === "number" ? row.stockData.price : null,
+      stockRefPrice: stockRef,
       scaledUiMultiplier:
         typeof row.scaledUiConfig?.multiplier === "number"
           ? row.scaledUiConfig.multiplier
@@ -390,10 +405,177 @@ export async function fetchJupiterTokenPrice(
             ? row.scaledUiConfig.newMultiplier
             : null,
       blockId: typeof row.blockId === "number" ? row.blockId : null,
+      priceKind: venue != null ? ("venue" as const) : ("stock-ref" as const),
     });
     cacheSet(cacheKey, ok, PRICE_TTL_MS);
     return ok;
   } catch (e) {
     return errResult(source, "jupiter_price_fetch_failed", String(e));
   }
+}
+
+const BATCH_CHUNK = 50;
+/** Parallel Price v3 chunk workers — stay under Vercel + Jupiter RPM. */
+const BATCH_CHUNK_WORKERS = 3;
+/**
+ * Cache tiers (shared `jup.price:${mint}` key):
+ * - single fetch: PRICE_TTL_MS (30s) — desk tickets
+ * - batch board: BATCH_PRICE_TTL_MS (120s) — 1k+ universe marks
+ * - 429 path: STALE_MAX_MS (120s) labeled stale — never invent
+ */
+const BATCH_PRICE_TTL_MS = 120_000;
+
+type RawPriceRow = {
+  usdPrice?: number;
+  liquidity?: number;
+  decimals?: number;
+  blockId?: number;
+  stockData?: { price?: number };
+  scaledUiConfig?: { multiplier?: number; newMultiplier?: number };
+};
+
+function parsePriceRow(
+  mint: string,
+  row: RawPriceRow,
+  source: string,
+): AdapterResult<JupiterTokenPrice> {
+  const stockRef =
+    typeof row.stockData?.price === "number" && Number.isFinite(row.stockData.price)
+      ? row.stockData.price
+      : null;
+  const venue =
+    typeof row.usdPrice === "number" && Number.isFinite(row.usdPrice)
+      ? row.usdPrice
+      : null;
+  if (venue == null && stockRef == null) {
+    return errResult(source, "jupiter_price_missing", mint);
+  }
+  return okResult("mainnet-read", source, {
+    mint,
+    usdPrice: venue ?? (stockRef as number),
+    liquidity: typeof row.liquidity === "number" ? row.liquidity : null,
+    decimals: typeof row.decimals === "number" ? row.decimals : null,
+    stockRefPrice: stockRef,
+    scaledUiMultiplier:
+      typeof row.scaledUiConfig?.multiplier === "number"
+        ? row.scaledUiConfig.multiplier
+        : typeof row.scaledUiConfig?.newMultiplier === "number"
+          ? row.scaledUiConfig.newMultiplier
+          : null,
+    blockId: typeof row.blockId === "number" ? row.blockId : null,
+    priceKind: venue != null ? ("venue" as const) : ("stock-ref" as const),
+  });
+}
+
+/**
+ * Batch Jupiter Price v3 — chunks of 50, parallel workers, per-mint cache.
+ * Prefer venue usdPrice; fall back to stockData.price labeled stock-ref (never invent).
+ */
+export async function fetchJupiterTokenPricesBatch(
+  mints: readonly string[],
+): Promise<Map<string, AdapterResult<JupiterTokenPrice>>> {
+  const source = "api.jup.ag/price/v3 · batch";
+  const out = new Map<string, AdapterResult<JupiterTokenPrice>>();
+  const unique = [...new Set(mints.map((m) => m.trim()).filter(Boolean))];
+  const need: string[] = [];
+
+  for (const mint of unique) {
+    const hit = cacheGet<AdapterResult<JupiterTokenPrice>>(`jup.price:${mint}`);
+    if (hit?.value.ok) {
+      out.set(mint, {
+        ...hit.value,
+        source: `${source} · cached ${Math.round(hit.ageMs / 1000)}s`,
+        data: {
+          ...hit.value.data,
+          priceKind: hit.value.data.priceKind ?? "venue",
+        },
+      });
+    } else {
+      need.push(mint);
+    }
+  }
+
+  const chunks: string[][] = [];
+  for (let i = 0; i < need.length; i += BATCH_CHUNK) {
+    chunks.push(need.slice(i, i + BATCH_CHUNK));
+  }
+
+  async function fetchChunk(chunk: string[]) {
+    try {
+      const res = await fetch(
+        `https://api.jup.ag/price/v3?ids=${encodeURIComponent(chunk.join(","))}`,
+        {
+          headers: jupiterHeaders(),
+          signal: AbortSignal.timeout(20_000),
+        },
+      );
+      if (!res.ok) {
+        for (const mint of chunk) {
+          if (res.status === 429) {
+            const stale = cacheGetStale<AdapterResult<JupiterTokenPrice>>(
+              `jup.price:${mint}`,
+              STALE_MAX_MS,
+            );
+            if (stale?.value.ok) {
+              out.set(mint, {
+                ...stale.value,
+                source: `${source} · stale after 429`,
+                data: {
+                  ...stale.value.data,
+                  priceKind: stale.value.data.priceKind ?? "venue",
+                },
+              });
+              continue;
+            }
+          }
+          out.set(
+            mint,
+            errResult(
+              source,
+              res.status === 429
+                ? "jupiter_rate_limited"
+                : "jupiter_price_http_error",
+              `HTTP ${res.status}`,
+            ),
+          );
+        }
+        return;
+      }
+      const json = (await res.json()) as Record<string, RawPriceRow>;
+      for (const mint of chunk) {
+        const row = json[mint];
+        if (!row) {
+          out.set(mint, errResult(source, "jupiter_price_missing", mint));
+          continue;
+        }
+        const parsed = parsePriceRow(mint, row, source);
+        if (parsed.ok) {
+          cacheSet(`jup.price:${mint}`, parsed, BATCH_PRICE_TTL_MS);
+        }
+        out.set(mint, parsed);
+      }
+    } catch (e) {
+      for (const mint of chunk) {
+        out.set(
+          mint,
+          errResult(source, "jupiter_price_fetch_failed", String(e)),
+        );
+      }
+    }
+  }
+
+  let next = 0;
+  async function worker() {
+    while (true) {
+      const i = next++;
+      if (i >= chunks.length) return;
+      await fetchChunk(chunks[i]!);
+    }
+  }
+  const workers = Math.min(BATCH_CHUNK_WORKERS, Math.max(1, chunks.length));
+  if (chunks.length > 0) {
+    await Promise.all(Array.from({ length: workers }, () => worker()));
+  }
+
+  return out;
 }
