@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-26 — Deeper domains + Grok Bot brief + Colosseum hit-list
+
+- Henry already has Cursor Grok Bot for distribution — wrote paste brief `docs/GROK_BOT_BRIEF.md`.
+- Deep domain pass (2× Vercel search + empty DNS): top pick **tryfolio.trade** ($27) / **getfolio.trade** · **folioequity.app** · **honestfolio.com** · **buyonfolio.com**.
+- Full Colosseum hit-list `docs/COLOSSEUM_HITLIST.md` — portal, workshops (Tokenization Sep 30 · SF OH Oct 5), people map, scoreboard · deadline 2026-10-12.
+- Soft pitch / no fake hype unchanged.
+
 ## 2026-09-26 — GTM playbook + Grok distribution bot + domain shortlist
 
 - Mapped Chase Barker Solana GTM (solanagtm.netlify.app) → `docs/GTM_PLAYBOOK.md`.

@@ -8,8 +8,8 @@
 2. **Document** (whitepaper, operating plan, Stocklana pack, GTM) ✅  
 3. **Submit Stocklana** (re-check live form counts before claims)  
 4. **Buy domain + claim X** · wire Vercel alias · update `socials.ts`  
-5. **Grok/GTM bot drafts** · Henry posts · mentor feedback loop  
-6. **Reach Colosseum / World’s Fair** (submit by **2026-10-12**)  
+5. **Grok Bot owns distribution** (paste `docs/GROK_BOT_BRIEF.md`) · Henry posts from his X · Cursor ships  
+6. **Hit every Colosseum spot** (`docs/COLOSSEUM_HITLIST.md`) · submit by **2026-10-12**  
 7. **Open closed beta** (`/beta`) — mainnet-read + quote; fills when funded  
 8. **Traction** (funded actives, demos, written mentor notes)  
 9. **Submit Colosseum** with Stocklana credibility + beta numbers  
@@ -18,24 +18,31 @@ Winning Stocklana is a **credibility booster**. Colosseum World’s Fair is the 
 
 ---
 
-## A0. Domain shortlist (Vercel registrar · 2026-09-26)
+## A0. Domain shortlist (deep pass · verified 2026-09-26)
 
-Do **not** buy until Henry picks one. Then quote → confirm → `buy_domain` → add to project.
+Re-checked via Vercel `search_domains` **twice** + empty DNS (no A/NS). Do **not** buy until Henry picks. Then quote → confirm → buy → alias to Vercel `folio`.
 
-| Domain | ~1y USD | Note |
-|---|---:|---|
-| **honestfolio.com** | 11.25 | Soft-pitch brand · recommended cheap primary |
-| **honestfolio.app** | 14.99 | App TLD twin |
-| **foliohq.dev** | 13.00 | Builder-native · good for Colosseum |
-| **wearefolio.app** | 14.99 | Community / “we” tone |
-| **solfolio.app** | 14.99 | Solana-native |
-| **folioaccra.com** | 11.25 | Origin story · secondary |
-| **solstocks.app** | 14.99 | Category, weaker brand |
-| **folio.trade** | 385 | Premium · only if budget allows |
+### Ranked for Colosseum boost (say-aloud + brand)
 
-Taken (skip): folio.xyz · folio.so · tryfolio.com · getfolio.com · folio.fi · folio.finance · folio.markets …
+| Rank | Domain | ~1y USD | Why it helps |
+|---:|---|---:|---|
+| **1** | **tryfolio.trade** | 27 | FOLIO + verb + trade desk · easy for judges to remember |
+| **2** | **getfolio.trade** | 27 | Same family · CTA in the name |
+| **3** | **folioequity.app** | 14.99 | Product-clear (equities) · app TLD for mobile judges |
+| **4** | **honestfolio.com** | 11.25 | Soft-pitch brand match · cheapest strong `.com` |
+| **5** | **buyonfolio.com** | 11.25 | Acquisition CTA domain · good redirect → desk/buy |
+| **6** | **livefolio.app** | 14.99 | “Live desk” signal for hackathon demos |
+| **7** | **foliohq.dev** | 13 | Builder / Colosseum-native |
+| — | folio.trade | 385 | Premium apex · only if budget |
+| — | folio.ventures | 9.99 (renew ~46) | Cheap but reads VC fund — **skip for product** |
 
-After purchase: point DNS to Vercel project `folio` · keep `folio-tawny-one.vercel.app` as fallback · update bio + `SOCIALS.demo`.
+Also available (weaker brand / category): wearefolio.app · solfolio.app · folioequity.io · honestshares.com · xstocksdesk.com · equityonsol.com · folioaccra.com · honestfolio.org (~$8)
+
+**Taken (verified unavailable):** folio.xyz · folio.so · folio.fi · folio.finance · tryfolio.com · getfolio.com · folio.markets · folio.money · folio.capital · truefolio.* …
+
+**Recommendation:** Buy **tryfolio.trade** as primary (or **honestfolio.com** if you want `.com` soft-pitch). Optionally also **buyonfolio.com** as cheap redirect to `/desk/acquire`.
+
+After purchase: DNS → Vercel · keep `folio-tawny-one.vercel.app` · update `SOCIALS.demo` + X bio.
 
 ---
 

@@ -13,7 +13,7 @@ FOLIO buys the US stocks you want on Solana — keeps share counts honest, won�
 - Playbook: `docs/GTM_PLAYBOOK.md` (Chase Barker Solana GTM mapped to FOLIO)
 - Distribution bot: `docs/GROK_DISTRIBUTION_BOT.md` · `npm run gtm:draft` → `memory/gtm-queue.json` (approve gate; no auto-post)
 - World’s Fair submit: **2026-10-12** · https://colosseum.com/worldsfair
-- Domain shortlist (do not buy until Henry picks): honestfolio.com · foliohq.dev · wearefolio.app · solfolio.app (~$11–15) · folio.trade ($385 premium)
+- Domain ranked: **tryfolio.trade** ($27) · folioequity.app · honestfolio.com · buyonfolio.com (verified available) · paste brief for Grok Bot `docs/GROK_BOT_BRIEF.md` · hit-list `docs/COLOSSEUM_HITLIST.md`
 - Socials checklist: `docs/LAUNCH_AND_SOCIALS.md`
 
 ## Creative desk doctrine (binding)

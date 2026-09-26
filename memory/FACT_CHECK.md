@@ -10,6 +10,16 @@
 | Fix merged to `main` (`9b1d5fc`) · PR #46 | Verified git push |
 | Production deploy `dpl_8sX5nCKr…` READY · no Anchor crash on that deploy | Verified runtime logs + SSR probe |
 
+## 2026-09-26 — Domain deep pass + Colosseum channels
+
+| Claim | Status |
+|---|---|
+| tryfolio.trade / getfolio.trade available ~$27 | Verified Vercel search×2 + empty DNS |
+| folioequity.app · honestfolio.com · buyonfolio.com available | Verified |
+| folio.xyz / folio.so / folio.fi taken | Verified unavailable |
+| World's Fair workshops Tokenization Sep 30 · SF OH Oct 5 (UTC 17:00) | Verified Colosseum Codex / Luma |
+| Submit due 2026-10-12 | Verified colosseum.com/worldsfair |
+
 ## 2026-09-26 — GTM / domain / Colosseum
 
 | Claim | Status |
