@@ -8,6 +8,14 @@
 
 FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
 
+## GTM / Colosseum (2026-09-26)
+
+- Playbook: `docs/GTM_PLAYBOOK.md` (Chase Barker Solana GTM mapped to FOLIO)
+- Distribution bot: `docs/GROK_DISTRIBUTION_BOT.md` · `npm run gtm:draft` → `memory/gtm-queue.json` (approve gate; no auto-post)
+- World’s Fair submit: **2026-10-12** · https://colosseum.com/worldsfair
+- Domain shortlist (do not buy until Henry picks): honestfolio.com · foliohq.dev · wearefolio.app · solfolio.app (~$11–15) · folio.trade ($385 premium)
+- Socials checklist: `docs/LAUNCH_AND_SOCIALS.md`
+
 ## Creative desk doctrine (binding)
 
 See `memory/HENRY_DESK_CREATIVE.md` — factorize every feature against Bible + Henry screenshots + NetroBNB depth. No bare `Loading…`. Logos on every partner row. Take 4K time. Research via Tavily/Firecrawl/TinyFish (keys in `.env` only).

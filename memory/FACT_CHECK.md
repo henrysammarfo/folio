@@ -10,6 +10,16 @@
 | Fix merged to `main` (`9b1d5fc`) · PR #46 | Verified git push |
 | Production deploy `dpl_8sX5nCKr…` READY · no Anchor crash on that deploy | Verified runtime logs + SSR probe |
 
+## 2026-09-26 — GTM / domain / Colosseum
+
+| Claim | Status |
+|---|---|
+| Solana GTM playbook source solanagtm.netlify.app (Chase Barker) | Verified fetch · 17 slides |
+| GTM draft bot fail-closed without keys; auto-post default false | Implemented `scripts/gtm-draft.mts` |
+| honestfolio.com · foliohq.dev · wearefolio.app available ~$11–15 | Verified Vercel search_domains |
+| folio.trade available premium ~$385 | Verified |
+| Colosseum World's Fair submissions due 2026-10-12 | Verified colosseum.com/worldsfair |
+
 ## 2026-09-25 — Prod feature smoke (post SSR fix)
 
 | Claim | Status |

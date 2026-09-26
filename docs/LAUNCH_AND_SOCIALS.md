@@ -1,32 +1,55 @@
 # FOLIO — Launch, socials, beta & judge outreach
 
-> 2026-09-19 · Do this in order. Companion: whitepaper + operating plan.
+> 2026-09-26 · Do this in order. Companion: whitepaper · operating plan · `docs/GTM_PLAYBOOK.md` · `docs/GROK_DISTRIBUTION_BOT.md`.
 
 ## Sequence (locked)
 
-1. **Finish desk** (truth / wash / quote / markets / pairs / PreStocks / Tessera) ✅ in progress  
-2. **Document** (whitepaper, operating plan, updated Stocklana pack) ← this folder  
-3. **Submit Stocklana** (deadline hero **SEP 25, 2026** — re-check live form)  
-4. **Create X + socials** · publish whitepaper + demo  
-5. **Reach Colosseum / World’s Fair judges** for feedback (not spam)  
-6. **Open closed beta** (`/beta`) — mainnet-read + quote; fills when funded  
-7. **Gather traction** (funded actives, demos, testimonials)  
-8. **Submit Colosseum** with Stocklana credibility + beta numbers  
+1. **Finish desk** (truth / wash / quote / markets / pairs / PreStocks / Tessera) ✅  
+2. **Document** (whitepaper, operating plan, Stocklana pack, GTM) ✅  
+3. **Submit Stocklana** (re-check live form counts before claims)  
+4. **Buy domain + claim X** · wire Vercel alias · update `socials.ts`  
+5. **Grok/GTM bot drafts** · Henry posts · mentor feedback loop  
+6. **Reach Colosseum / World’s Fair** (submit by **2026-10-12**)  
+7. **Open closed beta** (`/beta`) — mainnet-read + quote; fills when funded  
+8. **Traction** (funded actives, demos, written mentor notes)  
+9. **Submit Colosseum** with Stocklana credibility + beta numbers  
 
-Winning Stocklana is a **credibility booster**, not the finish line.
+Winning Stocklana is a **credibility booster**. Colosseum World’s Fair is the next gate.
+
+---
+
+## A0. Domain shortlist (Vercel registrar · 2026-09-26)
+
+Do **not** buy until Henry picks one. Then quote → confirm → `buy_domain` → add to project.
+
+| Domain | ~1y USD | Note |
+|---|---:|---|
+| **honestfolio.com** | 11.25 | Soft-pitch brand · recommended cheap primary |
+| **honestfolio.app** | 14.99 | App TLD twin |
+| **foliohq.dev** | 13.00 | Builder-native · good for Colosseum |
+| **wearefolio.app** | 14.99 | Community / “we” tone |
+| **solfolio.app** | 14.99 | Solana-native |
+| **folioaccra.com** | 11.25 | Origin story · secondary |
+| **solstocks.app** | 14.99 | Category, weaker brand |
+| **folio.trade** | 385 | Premium · only if budget allows |
+
+Taken (skip): folio.xyz · folio.so · tryfolio.com · getfolio.com · folio.fi · folio.finance · folio.markets …
+
+After purchase: point DNS to Vercel project `folio` · keep `folio-tawny-one.vercel.app` as fallback · update bio + `SOCIALS.demo`.
 
 ---
 
 ## A. Create socials (Henry — manual, ~30 min)
 
 ### X / Twitter (primary)
-1. Create **@folio** if available; else `@tryfolio` / `@folio_desk` / `@folioxyz` (pick one; update `src/lib/socials.ts`).
+1. Create **@folio** if available; else `@tryfolio` / `@folio_desk` / `@folioxyz` / `@honestfolio` (pick one; update `src/lib/socials.ts`).
 2. Display name: **FOLIO**
 3. Bio (paste):
    > Honest stock desk on Solana. Share counts you can trust. Won’t buy wash. Borrow without selling. Built in Accra. → folio-tawny-one.vercel.app
-4. Header: desk / markets screenshot · Avatar: FOLIO mark
-5. Pin: whitepaper + 60s demo thread
-6. Link in bio: production URL + `/beta`
+4. Header: home hero `/opt/cursor/artifacts/folio-x-post.png` · Avatar: FOLIO mark
+5. Pin: soft-pitch launch + demo thread
+6. Link in bio: production URL (or new domain) + `/beta`
+7. Distribution drafts: `npx tsx scripts/gtm-draft.mts` → `memory/gtm-queue.json` (see `docs/GROK_DISTRIBUTION_BOT.md`)
 
 ### Secondary (week 1 optional)
 - GitHub org/repo already: `henrysammarfo/folio`
@@ -107,20 +130,32 @@ Tracks to name: Investing · credit & yield · infrastructure · PreStocks / Tes
 
 ## E. Colosseum / World’s Fair
 
-After Stocklana submit + first beta signals:
-1. Collect 3 written judge/mentor notes
-2. Update vision pack: `docs/COLOSSEUM_VISION.md`
-3. Submit with: demo + traction screenshot (beta count, honest) + whitepaper
-4. Interview beats already in vision pack — practice aloud
+**Deadline:** product submission **2026-10-12** · https://colosseum.com/worldsfair  
+**Prizes:** overall + Solana ecosystem track · Accelerator interview path for winners.
+
+### Feedback that actually works
+Colosseum does **not** guarantee written feedback to every team. Earn it:
+1. Join Colosseum Discord · RSVP livestream workshops  
+2. Superteam / office hours when available  
+3. Advice-first public replies + ≤10 thoughtful DMs (templates above)  
+4. Mentors already listed in Bible: `@kashdhanda` · `@y2kappa` · `@colosseum` · `@crabbylions` · `@mattytay` · `@adamdelphantom`  
+5. Collect ≥3 written notes → paste into `docs/COLOSSEUM_VISION.md`  
+6. Submit: demo + 2–3 min video + GitHub + honest traction (beta count) + soft story  
+
+### Hype = system (not spam)
+From Solana GTM: brand first · replies as free marketing · don’t launch alone · amplify milestones only · team is first distribution. FOLIO maps this in `docs/GTM_PLAYBOOK.md`. Grok bot drafts; Henry posts.
 
 ---
 
 ## F. Owner checklist (this week)
 
+- [ ] Pick + buy domain from A0 · alias on Vercel
 - [ ] Claim Folio X handle · update `src/lib/socials.ts`
+- [ ] Add `XAI_API_KEY` (or use AgentRouter) · run `npx tsx scripts/gtm-draft.mts`
 - [ ] Record ≤90s demo · upload unlisted YouTube/X
-- [ ] Submit Stocklana form (edit until close)
-- [ ] Post launch thread · pin whitepaper
-- [ ] DM/reply 10 judges/builders with demo link
+- [ ] Post launch + reply thread · pin soft pitch
+- [ ] Join Colosseum Discord · RSVP 1 workshop
+- [ ] DM/reply 10 judges/builders with demo link (advice first)
 - [ ] Invite first 25 beta users from `/beta`
+- [ ] Draft Colosseum portal answers · deadline **2026-10-12**
 - [ ] Weekly metrics note in `memory/SESSION_LOG.md`

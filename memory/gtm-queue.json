@@ -1,0 +1,32 @@
+{
+  "updatedAt": "2026-09-26T11:18:43.538Z",
+  "items": [
+    {
+      "id": "gtm_1790421523538_1",
+      "createdAt": "2026-09-26T11:18:43.538Z",
+      "theme": "launch",
+      "status": "draft",
+      "text": "Built for #Stocklana. Shipping for Colosseum.\n\nHonest shares. Refuse dirty pools. Borrow without selling.\n\nhttps://folio-tawny-one.vercel.app",
+      "chars": 141,
+      "notes": "source=local-templates"
+    },
+    {
+      "id": "gtm_1790421523538_0",
+      "createdAt": "2026-09-26T11:18:43.538Z",
+      "theme": "launch",
+      "status": "draft",
+      "text": "Token balances can lie after dividends.\n\nFOLIO \u2014 honest stock desk on Solana.\nTruth \u2192 wash \u2192 buy \u2192 borrow without selling.\n\nhttps://folio-tawny-one.vercel.app",
+      "chars": 158,
+      "notes": "source=local-templates"
+    },
+    {
+      "id": "gtm_1790421522948_2",
+      "createdAt": "2026-09-26T11:18:42.948Z",
+      "theme": "colosseum",
+      "status": "draft",
+      "text": "Colosseum builders \u2014 brutal take welcome.\nIs FOLIO desk-worthy or still demo theater?\n\nDemo https://folio-tawny-one.vercel.app\nPitch https://folio-tawny-one.vercel.app/pitch",
+      "chars": 173,
+      "notes": "source=local-templates"
+    }
+  ]
+}
