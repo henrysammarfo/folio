@@ -1,6 +1,21 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-09-26 — Deeper domains + Grok Bot brief + Colosseum hit-list
+
+- Henry already has Cursor Grok Bot for distribution — wrote paste brief `docs/GROK_BOT_BRIEF.md`.
+- Deep domain pass (2× Vercel search + empty DNS): top pick **tryfolio.trade** ($27) / **getfolio.trade** · **folioequity.app** · **honestfolio.com** · **buyonfolio.com**.
+- Full Colosseum hit-list `docs/COLOSSEUM_HITLIST.md` — portal, workshops (Tokenization Sep 30 · SF OH Oct 5), people map, scoreboard · deadline 2026-10-12.
+- Soft pitch / no fake hype unchanged.
+
+## 2026-09-26 — GTM playbook + Grok distribution bot + domain shortlist
+
+- Mapped Chase Barker Solana GTM (solanagtm.netlify.app) → `docs/GTM_PLAYBOOK.md`.
+- Grok/AgentRouter draft bot: `scripts/gtm-draft.mts` · `npm run gtm:draft` · queue `memory/gtm-queue.json` · auto-post off.
+- Domain research via Vercel registrar: cheap picks honestfolio.com / foliohq.dev / wearefolio.app / solfolio.app; premium folio.trade $385. No purchase until Henry confirms.
+- Colosseum World's Fair deadline **2026-10-12** wired into LAUNCH_AND_SOCIALS + CURRENT_STATE.
+- Split: Cursor ships product; GTM bot drafts distribution; Henry approves posts + mentor DMs.
+
 ## 2026-09-25 — Prod feature smoke after SSR Privy fix
 
 - All desk routes HTTP 200 · SSR success · no Anchor `exports is not defined` on current prod.

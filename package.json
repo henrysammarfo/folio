@@ -19,7 +19,8 @@
     "smoke:keys": "npx tsx scripts/smoke-keys.mts",
     "smoke:goal": "npx tsx --env-file=.env scripts/smoke-goal.mts",
     "keys": "npx tsx scripts/keys-readiness.mts",
-    "check:secrets": "npx tsx scripts/check-frontend-secrets.mts"
+    "check:secrets": "npx tsx scripts/check-frontend-secrets.mts",
+    "gtm:draft": "npx tsx scripts/gtm-draft.mts"
   },
   "overrides": {
     "rolldown": "1.2.1"
