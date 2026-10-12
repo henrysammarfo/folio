@@ -31,6 +31,16 @@ What you need for **write** paths (you sign, not FOLIO):
 
 Buy SOL on an exchange → send to your Phantom, or use Phantom’s buy flow.
 
+### Email / Open App users (customer loophole — fixed in desk)
+
+Email sign-up creates an **embedded Solana wallet with 0 SOL**.  
+Meteora Trade · Reflect earn/mint · Kamino/NestUSD borrow are **their apps + your wallet** — they fail without fees.
+
+Desk now shows a **gas ready** strip on Buy / Borrow / Launches / Account with **Add SOL** (Privy fund) + copy-paste address.  
+CTAs label “needs SOL” when balance &lt; ~0.01. FOLIO still does **not** sponsor gas.
+
+**Henry (Privy dashboard):** enable funding methods (external wallet transfer and/or Moonpay) so Add SOL opens a real modal — otherwise users still send SOL manually to the shown address.
+
 ---
 
 ## 1 — Phantom App ID → **SKIP**

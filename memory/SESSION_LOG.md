@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-10-12 — Email-wallet gas loophole (customer path)
+
+- Loophole: Open App email → embedded Solana wallet at **0 SOL** → Meteora / Reflect / Kamino deep-links look live but fail without fees.
+- Fix: `fetchWalletSolBalance` + `getWalletGasStatus` · `WalletGasReady` on Buy / Borrow / Launches / Account with **Add SOL** (Privy `useFundWallet`) + manual address hint.
+- Soft CTAs when gas low (“needs SOL”); session mint binds Solana wallet from `useWallets` + Privy verify prefers `chain_type=solana`.
+- Residual: FOLIO still does not sponsor gas; Privy dashboard must enable funding methods for modal on-ramp; Jupiter gasless still only covers FOLIO Buy ≥~$10.
+
 ## 2026-10-12 — Hub keys runbook + consumer desk polish
 
 - `docs/HUB_KEYS_HENRY.md` — Phantom App ID (Portal paused for new apps), Reflect optional key, Squads vault why-unavailable, SOL for gas (agent cannot mint SOL).

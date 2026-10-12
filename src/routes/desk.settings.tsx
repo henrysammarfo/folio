@@ -8,6 +8,7 @@ import { AccountCustodyPanel } from "@/components/account-custody-panel";
 import { DeskShell } from "@/components/desk-shell";
 import { PhantomConnectPanel } from "@/components/phantom-connect-panel";
 import { usePrivyShellReady } from "@/components/privy-app-provider";
+import { WalletGasReady } from "@/components/wallet-gas-ready";
 import { Switch } from "@/components/ui/switch";
 import {
   bindWatchWallet,
@@ -215,6 +216,9 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                 Disconnect wallet
               </button>
             ) : null}
+            <div style={{ marginTop: "1rem" }}>
+              <WalletGasReady context="account" />
+            </div>
           </article>
 
           <article className="fx-card fx-account-card">

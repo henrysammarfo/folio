@@ -20,6 +20,7 @@ FOLIO is **not** unhackable. Residual risk remains against skilled attackers, in
 | LLM agent overspend | Paper default; caps; meter AgentRouter | Prompt injection |
 | RPC lie / eclipse | Prefer reputable RPC; cross-check Pyth vs venue | Single-RPC trust |
 | Supply-chain npm | Lockfile; minimize new deps | Always present |
+| Email wallet at 0 SOL → failed external txs | Desk gas gate + Add SOL CTA; soft “needs SOL” CTAs | Users still fund themselves; Privy on-ramp depends on dashboard methods; FOLIO never sponsors gas |
 
 ## Explicit non-claims
 

@@ -53,20 +53,38 @@ export async function verifyPrivyAccessToken(
     const json = (await res.json()) as {
       id?: string;
       email?: { address?: string } | null;
-      wallet?: { address?: string } | null;
-      linked_accounts?: Array<{ type?: string; address?: string }>;
+      wallet?: { address?: string; chain_type?: string } | null;
+      linked_accounts?: Array<{
+        type?: string;
+        address?: string;
+        chain_type?: string;
+        chainType?: string;
+      }>;
     };
 
     if (!json.id) {
       return errResult(source, "privy_user_missing", "Privy response missing user id.");
     }
 
-    const walletFromLinked =
-      json.linked_accounts?.find((a) => a.type === "wallet" && a.address)?.address ?? null;
+    const linked = json.linked_accounts ?? [];
+    const isSolana = (a: { chain_type?: string; chainType?: string }) =>
+      a.chain_type === "solana" || a.chainType === "solana";
+    const solanaFromLinked =
+      linked.find((a) => a.type === "wallet" && a.address && isSolana(a))
+        ?.address ?? null;
+    const anyFromLinked =
+      linked.find((a) => a.type === "wallet" && a.address)?.address ?? null;
+    const primaryIsSolana =
+      !json.wallet?.chain_type || json.wallet.chain_type === "solana";
 
     return okResult("mainnet-read", source, {
       userId: json.id,
-      walletAddress: json.wallet?.address ?? walletFromLinked,
+      // Prefer Solana — email signup creates an embedded Solana wallet; never
+      // bind an EVM primary when a Solana linked account exists.
+      walletAddress:
+        solanaFromLinked ??
+        (primaryIsSolana ? (json.wallet?.address ?? null) : null) ??
+        anyFromLinked,
       email: json.email?.address ?? null,
     });
   } catch (e) {

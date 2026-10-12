@@ -1,3 +1,13 @@
+## 2026-10-12 — Email-wallet gas honesty
+
+| Claim | Status |
+|---|---|
+| Email embedded wallets start at 0 SOL | True — customer loophole for external deep-links |
+| Desk surfaces SOL &lt; 0.01 before Meteora/Reflect/Kamino | Implemented — `WalletGasReady` + `getWalletGasStatus` |
+| Add SOL via Privy fundWallet | Wired — needs Privy dashboard funding methods enabled |
+| FOLIO sponsors user gas | False — residual; Jupiter gasless only on FOLIO Buy ≥~$10 |
+| Session binds Solana wallet on email login | Implemented — client `useWallets` + verify prefers solana linked |
+
 ## 2026-10-12 — World's Fair hub sponsors
 
 | Claim | Status |

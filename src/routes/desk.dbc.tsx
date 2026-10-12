@@ -3,6 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
+import {
+  useWalletGasStatus,
+  WalletGasReady,
+} from "@/components/wallet-gas-ready";
 import { trackFolioEvent } from "@/lib/analytics";
 import { getMeteoraDbcBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
@@ -34,6 +38,8 @@ function Page() {
   const sample = ok ? data.dbc.data.sample : [];
   const total = ok ? data.dbc.data.totalPools : null;
   const appUrl = ok ? data.dbc.data.appUrl : "https://app.meteora.ag/";
+  const { data: gas } = useWalletGasStatus();
+  const gasReady = Boolean(gas?.readyForExternalWrite);
 
   return (
     <DeskShell title="Launches">
@@ -49,17 +55,39 @@ function Page() {
           </p>
         </header>
 
+        <WalletGasReady context="launches" />
+
         <div className="fx-actions">
-          <a
-            href={appUrl}
-            className="fx-btn fx-btn-primary"
-            target="_blank"
-            rel="noreferrer"
-            data-testid="dbc-open-app"
-            onClick={() => trackFolioEvent("cta_click", { cta: "meteora_app" })}
-          >
-            Open Meteora
-          </a>
+          {gasReady ? (
+            <a
+              href={appUrl}
+              className="fx-btn fx-btn-primary"
+              target="_blank"
+              rel="noreferrer"
+              data-testid="dbc-open-app"
+              onClick={() =>
+                trackFolioEvent("cta_click", { cta: "meteora_app" })
+              }
+            >
+              Open Meteora
+            </a>
+          ) : (
+            <a
+              href={appUrl}
+              className="fx-btn fx-btn-ghost"
+              target="_blank"
+              rel="noreferrer"
+              data-testid="dbc-open-app"
+              onClick={() =>
+                trackFolioEvent("cta_click", {
+                  cta: "meteora_app",
+                  gas: "low",
+                })
+              }
+            >
+              Open Meteora anyway
+            </a>
+          )}
           <Link to="/desk/acquire" className="fx-btn fx-btn-ghost">
             Buy stocks
           </Link>
@@ -89,18 +117,24 @@ function Page() {
                     <span className="fx-asset-right">
                       <a
                         href={p.tradeUrl}
-                        className="fx-btn fx-btn-primary fx-btn-sm"
+                        className={`fx-btn fx-btn-sm ${gasReady ? "fx-btn-primary" : "fx-btn-ghost"}`}
                         target="_blank"
                         rel="noreferrer"
                         data-testid={`dbc-trade-${p.baseSymbol}`}
+                        title={
+                          gasReady
+                            ? "Trade on Meteora with your wallet"
+                            : "Needs SOL for fees — add funds above first"
+                        }
                         onClick={() =>
                           trackFolioEvent("cta_click", {
                             cta: "meteora_trade",
                             pool: p.address.slice(0, 8),
+                            gas: gasReady ? "ok" : "low",
                           })
                         }
                       >
-                        Trade
+                        {gasReady ? "Trade" : "Trade (needs SOL)"}
                       </a>
                     </span>
                   </li>
@@ -118,7 +152,8 @@ function Page() {
 
         <p className="fx-sub" style={{ marginTop: "1.25rem" }}>
           Tap Trade to open the pool in Meteora and buy or sell with your wallet.
-          Stock buys on FOLIO stay on the Buy tab.
+          Email sign-up wallets start empty — add a little SOL first. Stock buys
+          on FOLIO stay on the Buy tab.
         </p>
       </section>
     </DeskShell>

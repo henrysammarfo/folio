@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { BuyExecuteButton } from "@/components/buy-execute-button";
 import { DeskShell } from "@/components/desk-shell";
+import { WalletGasReady } from "@/components/wallet-gas-ready";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { trackFolioEvent } from "@/lib/analytics";
 import { getAcquireBundle } from "@/lib/desk.functions";
@@ -185,6 +186,7 @@ function Page() {
   return (
     <DeskShell title="Buy">
       <section className="fx-buy fx-page">
+        <WalletGasReady context="buy" />
         <div className="fx-buy-stack">
           <div className="fx-card fx-buy-chart">
             <div className="fx-buy-chart-stage">

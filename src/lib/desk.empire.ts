@@ -51,8 +51,10 @@ import {
   verifyWatchWalletCookieValue,
 } from "./auth/watch-wallet";
 import {
+  fetchWalletSolBalance,
   fetchWalletTokenBalances,
   isLikelySolanaPubkey,
+  type WalletSolBalance,
 } from "./adapters/wallet-balances";
 import {
   resolveWalletBinding,
@@ -859,6 +861,65 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
     };
   },
 );
+
+export type WalletGasStatus = {
+  wallet: string | null;
+  walletSource: WalletBindingSource;
+  sol: AdapterResult<WalletSolBalance> | null;
+  /** Soft consumer copy — never jargon. */
+  note: string;
+  /** True when wallet exists and SOL ≥ min for typical external-app gas. */
+  readyForExternalWrite: boolean;
+};
+
+/**
+ * Email / embedded wallets often start at 0 SOL. Surface gas honesty before
+ * Meteora / Reflect / Kamino deep-links (FOLIO does not sponsor CPI).
+ */
+export const getWalletGasStatus = createServerFn({ method: "GET" })
+  .validator(InspectWalletInput)
+  .handler(async ({ data }): Promise<WalletGasStatus> => {
+    const session = readVerifiedSession();
+    const { wallet, source } = resolveDisplayWallet(
+      session,
+      data.inspectWallet,
+    );
+    if (!wallet) {
+      return {
+        wallet: null,
+        walletSource: source,
+        sol: null,
+        readyForExternalWrite: false,
+        note: "Open App with email to create a wallet, or paste one on Account. Trades and borrows need a little SOL for network fees — FOLIO never pays gas for you.",
+      };
+    }
+    const sol = await fetchWalletSolBalance(wallet);
+    if (!sol.ok) {
+      return {
+        wallet,
+        walletSource: source,
+        sol,
+        readyForExternalWrite: false,
+        note: "Couldn’t read your SOL balance right now. Try again, or add a little SOL before opening Meteora, Reflect, or Kamino.",
+      };
+    }
+    if (!sol.data.canPayGas) {
+      return {
+        wallet,
+        walletSource: source,
+        sol,
+        readyForExternalWrite: false,
+        note: `Your wallet has ${sol.data.sol.toFixed(4)} SOL. Add about ${sol.data.minSolForGas} SOL (or more) so Meteora trades, Reflect earn/mint, and Kamino borrows can go through. Buy stocks on FOLIO may still work via Jupiter gasless on larger sizes.`,
+      };
+    }
+    return {
+      wallet,
+      walletSource: source,
+      sol,
+      readyForExternalWrite: true,
+      note: `${sol.data.sol.toFixed(3)} SOL ready for fees. You sign — FOLIO never moves funds for you.`,
+    };
+  });
 
 export const getSessionBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<SessionBundle> => {

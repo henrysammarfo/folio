@@ -4,6 +4,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { DeskShell } from "@/components/desk-shell";
+import {
+  useWalletGasStatus,
+  WalletGasReady,
+} from "@/components/wallet-gas-ready";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { trackFolioEvent } from "@/lib/analytics";
 import { getCreditBundle } from "@/lib/desk.functions";
@@ -73,6 +77,8 @@ function Page() {
   const reflectTypes = data?.reflect?.ok
     ? data.reflect.data.types.map((t) => t.name).join(" · ")
     : null;
+  const { data: gas } = useWalletGasStatus(inspect);
+  const gasReady = Boolean(gas?.readyForExternalWrite);
 
   return (
     <DeskShell title="Borrow">
@@ -87,6 +93,11 @@ function Page() {
               "Keep your stocks. Borrow against them without selling."}
           </p>
         </header>
+
+        <WalletGasReady
+          context="borrow"
+          {...(inspect ? { inspectWallet: inspect } : {})}
+        />
 
         {ltv != null ? (
           <div className="fx-card fx-card-pad" style={{ marginBottom: "1rem" }}>
@@ -114,15 +125,23 @@ function Page() {
           {kaminoUrl ? (
             <a
               href={kaminoUrl}
-              className="fx-btn fx-btn-primary"
+              className={`fx-btn ${gasReady ? "fx-btn-primary" : "fx-btn-ghost"}`}
               target="_blank"
               rel="noreferrer"
               data-testid="credit-borrow-kamino"
+              title={
+                gasReady
+                  ? "Borrow on Kamino with your wallet"
+                  : "Needs SOL for fees — add funds above first"
+              }
               onClick={() =>
-                trackFolioEvent("cta_click", { cta: "borrow_kamino" })
+                trackFolioEvent("cta_click", {
+                  cta: "borrow_kamino",
+                  gas: gasReady ? "ok" : "low",
+                })
               }
             >
-              Borrow on Kamino
+              {gasReady ? "Borrow on Kamino" : "Borrow (needs SOL)"}
             </a>
           ) : (
             <button type="button" className="fx-btn fx-btn-primary" disabled>
@@ -137,7 +156,10 @@ function Page() {
               rel="noreferrer"
               data-testid="credit-borrow-nestusd"
               onClick={() =>
-                trackFolioEvent("cta_click", { cta: "borrow_nestusd" })
+                trackFolioEvent("cta_click", {
+                  cta: "borrow_nestusd",
+                  gas: gasReady ? "ok" : "low",
+                })
               }
             >
               NestUSD app
@@ -150,11 +172,19 @@ function Page() {
               target="_blank"
               rel="noreferrer"
               data-testid="credit-reflect"
+              title={
+                gasReady
+                  ? "Earn or mint on Reflect with your wallet"
+                  : "Needs SOL for fees + USDC to mint"
+              }
               onClick={() =>
-                trackFolioEvent("cta_click", { cta: "reflect_stable" })
+                trackFolioEvent("cta_click", {
+                  cta: "reflect_stable",
+                  gas: gasReady ? "ok" : "low",
+                })
               }
             >
-              Earn with Reflect
+              {gasReady ? "Earn with Reflect" : "Reflect (needs SOL)"}
             </a>
           ) : null}
           <Link to="/desk/positions" className="fx-btn fx-btn-ghost">
@@ -239,8 +269,9 @@ function Page() {
         ) : null}
 
         <p className="fx-sub" style={{ marginTop: "1.25rem" }}>
-          Borrow and earn open in Kamino, NestUSD, or Reflect. You sign. FOLIO
-          never moves funds for you.{" "}
+          Borrow and earn open in Kamino, NestUSD, or Reflect — their apps, your
+          wallet. Email wallets start empty; add SOL (and USDC for Reflect mint)
+          first. FOLIO never moves funds for you.{" "}
           {nestEarn ? `${nestEarn}.` : null}
         </p>
 

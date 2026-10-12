@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   isLikelySolanaPubkey,
   mergeTokenAccountRows,
+  MIN_SOL_FOR_GAS,
+  solCanPayGas,
 } from "../adapters/wallet-balances";
 import { TOKEN_PROGRAM_ID } from "../adapters/solana-program-ids";
 
@@ -10,6 +12,14 @@ describe("wallet balance helpers", () => {
     expect(isLikelySolanaPubkey(TOKEN_PROGRAM_ID)).toBe(true);
     expect(isLikelySolanaPubkey("not-a-key")).toBe(false);
     expect(isLikelySolanaPubkey("")).toBe(false);
+  });
+
+  it("gates email-wallet gas at ~0.01 SOL", () => {
+    expect(solCanPayGas(0)).toBe(false);
+    expect(solCanPayGas(0.009)).toBe(false);
+    expect(solCanPayGas(MIN_SOL_FOR_GAS)).toBe(true);
+    expect(solCanPayGas(0.05)).toBe(true);
+    expect(solCanPayGas(Number.NaN)).toBe(false);
   });
 
   it("merges multiple ATAs for the same mint", () => {

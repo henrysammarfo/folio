@@ -140,6 +140,74 @@ async function rpcGetTokenAccountsByOwner(
   }
 }
 
+export type WalletSolBalance = {
+  wallet: string;
+  lamports: number;
+  sol: number;
+  /** Enough SOL for a typical user-signed trade / deep-link (~0.01 SOL). */
+  canPayGas: boolean;
+  minSolForGas: number;
+};
+
+/** Typical user-signed trade / deep-link needs ~0.01 SOL for fees + ATA rent. */
+export const MIN_SOL_FOR_GAS = 0.01;
+
+/** Pure gate — email / embedded wallets often start at 0 SOL. */
+export function solCanPayGas(sol: number, minSol = MIN_SOL_FOR_GAS): boolean {
+  return Number.isFinite(sol) && sol >= minSol;
+}
+
+/**
+ * Native SOL balance for gas / funding gates (email wallets often start at 0).
+ */
+export async function fetchWalletSolBalance(
+  walletRaw: string,
+): Promise<AdapterResult<WalletSolBalance>> {
+  const source = "solana-rpc.getBalance";
+  const wallet = walletRaw.trim();
+  if (!isLikelySolanaPubkey(wallet)) {
+    return errResult(source, "wallet_pubkey_invalid", "Expected a base58 Solana pubkey.");
+  }
+  const { url: rpc } = resolveSolanaRpcUrl();
+  try {
+    const res = await fetch(rpc, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(12_000),
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "getBalance",
+        params: [wallet, { commitment: "confirmed" }],
+      }),
+    });
+    if (!res.ok) {
+      return errResult(source, "solana_rpc_http_error", `HTTP ${res.status}`);
+    }
+    const json = (await res.json()) as {
+      result?: { value?: number };
+      error?: { message?: string };
+    };
+    if (json.error?.message) {
+      return errResult(source, "solana_rpc_error", json.error.message);
+    }
+    const lamports = Number(json.result?.value);
+    if (!Number.isFinite(lamports) || lamports < 0) {
+      return errResult(source, "sol_balance_parse", "Missing lamports");
+    }
+    const sol = lamports / 1_000_000_000;
+    return okResult("mainnet-read", source, {
+      wallet,
+      lamports,
+      sol,
+      canPayGas: solCanPayGas(sol),
+      minSolForGas: MIN_SOL_FOR_GAS,
+    });
+  } catch (e) {
+    return errResult(source, "solana_rpc_failed", String(e));
+  }
+}
+
 /**
  * Read SPL + Token-2022 balances for a wallet on mainnet.
  * Optional `mints` filters to watchlist assets. Fail-closed without RPC / bad pubkey.

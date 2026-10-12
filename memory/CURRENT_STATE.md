@@ -10,6 +10,7 @@
 - **Meteora DBC** separate desk `/desk/dbc` via `dbc.datapi.meteora.ag` — not xStock truth · no Anchor SDK on SSR.
 - **Squads / Altitude** treasury row · `FOLIO_SQUADS_VAULT` + explicit `FOLIO_TREASURY_FUNDED` · ≤~$1 stays unfunded unless both arm.
 - Matrix rows + Netro gate labels + keys-readiness optional envs wired.
+- **Email-wallet gas gate:** Open App users get embedded Solana at 0 SOL — desk shows Add SOL / needs-SOL CTAs on Buy · Borrow · Launches · Account. FOLIO does not sponsor gas.
 
 ## Marketing / landing (product)
 

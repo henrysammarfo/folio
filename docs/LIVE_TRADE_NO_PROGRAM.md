@@ -81,6 +81,11 @@ Ship diverge remains **Yahoo/Finnhub + CoinGecko xStock**. Pyth stays off ship p
 3. Connect on Account · quote on Buy · review gates · fills stay paused until armed.
 4. Self-test loop: buy AAPLx → hold → optional pair swap → sell back to USDC. Expect SOL dust as only lasting cost if user-pays-gas.
 
+### Email / Open App customers (not Phantom-first)
+
+- Embedded wallet starts at **0 SOL**. FOLIO Buy may still work via Jupiter gasless on ≥~$10.
+- **Meteora Trade · Reflect earn/mint · Kamino / NestUSD borrow** always need the user to pay gas (and Reflect needs USDC). Desk `WalletGasReady` blocks the silent failure: Add SOL CTA + “needs SOL” labels. FOLIO never sponsors those external apps.
+
 ## Open-source / lab refs worth stealing patterns from
 
 | Project | Steal |

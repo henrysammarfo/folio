@@ -1,4 +1,5 @@
 import { usePrivy } from "@privy-io/react-auth";
+import { useWallets } from "@privy-io/react-auth/solana";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { usePrivyShellReady } from "@/components/privy-app-provider";
@@ -50,9 +51,11 @@ function PrivyMintInner({
   variant: "consumer" | "ops";
 }) {
   const { ready, authenticated, login, logout, getAccessToken, user } = usePrivy();
+  const { wallets } = useWallets();
   const createSession = useServerFn(createSessionFromPrivyToken);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+  /** Track last mint key so we remint once when Solana wallet appears after email login. */
   const autoMintedFor = useRef<string | null>(null);
 
   async function mintFromPrivy() {
@@ -68,11 +71,20 @@ function PrivyMintInner({
         );
         return;
       }
-      const res = await createSession({ data: { accessToken: token } });
+      // Bind Solana embedded / linked wallet so Account + gas gates resolve.
+      const walletAddress = wallets[0]?.address;
+      const res = await createSession({
+        data: {
+          accessToken: token,
+          ...(walletAddress ? { walletAddress } : {}),
+        },
+      });
       if (res.ok) {
         setMsg(
           variant === "consumer"
-            ? "Signed in."
+            ? walletAddress
+              ? "Signed in · wallet linked."
+              : "Signed in."
             : `Session bound for ${res.data.session.userId.slice(0, 16)}… — httpOnly cookie set. If tenants empty → Join folio-demo.`,
         );
         await onMinted();
@@ -91,11 +103,20 @@ function PrivyMintInner({
   useEffect(() => {
     if (!ready || !authenticated || !mintReady || busy) return;
     const uid = user?.id ?? "authed";
-    if (autoMintedFor.current === uid) return;
-    autoMintedFor.current = uid;
+    const walletAddress = wallets[0]?.address ?? "";
+    const key = `${uid}:${walletAddress}`;
+    if (autoMintedFor.current === key) return;
+    // Allow one remint when wallet address arrives after email create-on-login.
+    if (
+      autoMintedFor.current?.startsWith(`${uid}:`) &&
+      !walletAddress
+    ) {
+      return;
+    }
+    autoMintedFor.current = key;
     void mintFromPrivy();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional one-shot on auth
-  }, [ready, authenticated, mintReady, user?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- remint when Solana wallet binds
+  }, [ready, authenticated, mintReady, user?.id, wallets[0]?.address]);
 
   if (variant === "consumer") {
     return (
