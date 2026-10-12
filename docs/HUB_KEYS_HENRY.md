@@ -39,7 +39,19 @@ Meteora Trade · Reflect earn/mint · Kamino/NestUSD borrow are **their apps + y
 Desk now shows a **gas ready** strip on Buy / Borrow / Launches / Account with **Add SOL** (Privy fund) + copy-paste address.  
 CTAs label “needs SOL” when balance &lt; ~0.01. FOLIO still does **not** sponsor gas.
 
-**Henry (Privy dashboard):** enable funding methods (external wallet transfer and/or Moonpay) so Add SOL opens a real modal — otherwise users still send SOL manually to the shown address.
+**Henry (Privy dashboard) — how to enable Add SOL:**
+
+1. Open https://dashboard.privy.io/ → select the **FOLIO** app (same App ID as `PRIVY_APP_ID`).
+2. Left nav → **Funding** (sometimes labeled Account Funding / Onramps).
+3. Turn **on** at least one method that can land **SOL on Solana**:
+   - **Card onramps** (easiest for email users) — MoonPay / Stripe toggles. Leave on; save.
+   - Optional later: Exchange (Coinbase Onramp keys) or Bank (Bridge keys) — not required for Stocklana week.
+4. Confirm **Allowed Origins** still include prod + preview (`https://folio-tawny-one.vercel.app` and your Vercel preview URL).
+5. Redeploy / hard-refresh desk → Account or Launches → **Add SOL** should open Privy’s fund modal.
+
+If the modal is empty or errors: card onramps aren’t enabled for that app, or origin isn’t allowlisted. Users can still send ~0.05 SOL manually to the address shown under the button (desk always shows that fallback).
+
+Docs: https://docs.privy.io/wallets/funding/configuration · Solana fund hook: https://docs.privy.io/wallets/funding/legacy/solana
 
 ---
 
