@@ -33,49 +33,44 @@ Buy SOL on an exchange → send to your Phantom, or use Phantom’s buy flow.
 
 ---
 
-## 1 — Phantom App ID (embedded Google / Apple)
+## 1 — Phantom App ID → **SKIP**
 
-**Portal status:** new Portal apps are **paused**. Injected Phantom extension already works in FOLIO without an App ID.
+You cannot sign up (Portal new apps paused). That is fine.
 
-Only if you already have a Portal app:
-
-1. Open https://phantom.app/portal  
-2. Sign in with the **same Google/Apple** used when the app was created.  
-3. Open the app → **Set Up** → copy **App ID**.  
-4. Vercel → `PHANTOM_APP_ID` = that value (Preview + Production).  
-5. Add allowed origins: your prod URL + preview URL.  
-6. Redeploy.
-
-If you have **no** Portal account yet: skip App ID. Extension “Connect Phantom” still works. Embedded social waits until Portal reopens.
+- Leave `PHANTOM_APP_ID` unset.
+- Desk **Connect Phantom** uses the browser extension (wallet `4HMZ…fWqm` style) — no App ID.
+- Google/Apple embedded Phantom waits until Portal reopens. Privy still covers email login.
 
 ---
 
-## 2 — Reflect API key (optional)
+## 2 — Reflect API key → **SKIP for now** (optional later)
 
-Public reads already work (no key). Key raises rate limits and unlocks integrator write helpers.
+Your pasted docs match what we wired:
 
-1. Open https://docs.reflect.money/developers and https://reflect.money  
-2. Reflect is **closed beta** for integrators — you initialize an integration on-chain, then reveal the key with a signed message (`POST /integration/api-key/reveal`).  
-3. If they approve you: copy key → Vercel `REFLECT_API_KEY`.  
-4. Desk “Earn with Reflect” already opens Reflect for user-signed mint/earn without FOLIO holding funds.
+- **Reads:** open, no key (`curl https://prod.api.reflect.money/stablecoin/apy` / health / types / stats). FOLIO credit rail already uses this.
+- **Key:** only after closed-beta integrator setup (`POST /integration/initialize/flow` → sign tx → `POST /integration/api-key/reveal`). That creates a **branded mint** and needs SOL for rent + you as fee payer. Skip until after World’s Fair submit unless you want whitelabel now.
+- **Write for users today:** desk **Earn with Reflect** → they open Reflect and sign with their wallet. No FOLIO `REFLECT_API_KEY` required.
 
-If beta blocks you: leave key unset. Public credit rail stays live; write stays on Reflect’s site with your wallet.
+Leave `REFLECT_API_KEY` unset.
 
 ---
 
-## 3 — Squads vault (+ Altitude later)
+## 3 — Squads vault (you are here — screenshot)
 
-1. Open https://app.squads.so/ (mainnet) or https://v4.squads.so/  
-2. Connect Phantom → **Create Squad** (name, members, threshold).  
-3. Sign the create tx (needs a little SOL for rent/gas).  
-4. Open **Info / Vault** → copy the **vault address** (not just the Squad name).  
-5. Vercel → `FOLIO_SQUADS_VAULT` = that pubkey.  
-6. Deposit SOL/USDC you want as treasury.  
-7. Only when you are ready for FOLIO to treat treasury as funded: `FOLIO_TREASURY_FUNDED=true`  
-   Optional: `FOLIO_TREASURY_SOL_THRESHOLD=0.05`  
-8. Redeploy. Matrix row flips when vault reads and the funded flag is true.
+Wallet connected (`4HMZ…fWqm`). Form = **Squad Details** (step 1 of 3).
 
-**Altitude:** https://altitude.xyz — business account on Squads rails. Create/login there when you want ops banking; paste that account’s Solana vault the same way if it exposes a vault pubkey. No separate Altitude API key is required for FOLIO’s vault balance read.
+1. **Squad name:** e.g. `FOLIO` (public onchain — short is fine).  
+2. Optional description under 64 chars, or leave blank.  
+3. Click **Next**.  
+4. **Members & Threshold:** keep yourself as member; threshold `1 of 1` for solo founder (or 2-of-N if you add someone).  
+5. **Review** → confirm → **sign** in Phantom (needs a little SOL for rent/gas).  
+6. After create: open the Squad → **Vault** or **Info** → copy the **vault address** (long base58 pubkey).  
+7. Vercel → Environment Variables → `FOLIO_SQUADS_VAULT` = that address (Preview + Production).  
+8. Deposit a little SOL into the vault (Deposit button).  
+9. Only when you want FOLIO to treat treasury as funded: also set `FOLIO_TREASURY_FUNDED=true`.  
+10. Redeploy. Reply in chat: `Squads vault: set` (no address in chat if you prefer — or paste the vault pubkey only, not seed phrases).
+
+**Altitude:** later at https://altitude.xyz — same family as Squads; not required to green the matrix today.
 
 ---
 
