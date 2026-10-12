@@ -165,7 +165,7 @@ export function buildNetworkMatrix(input: {
       capability: "Meteora DBC awareness (separate lane)",
       mode: modeOf(meteoraDbc),
       detail: meteoraDbc.ok
-        ? `${meteoraDbc.source} · separate DBC lane · not xStock economic truth`
+        ? `${meteoraDbc.source} · live launches · trade on Meteora with your wallet`
         : detailOf(meteoraDbc),
     },
     {
@@ -215,21 +215,21 @@ export function buildNetworkMatrix(input: {
       capability: "Reflect stable credit (read)",
       mode: modeOf(reflect),
       detail: reflect.ok
-        ? `${reflect.source} · USDC+/USDT+ · not NestUSD · not Nest.credit · mint via Reflect app/SDK`
+        ? `${reflect.source} · USDC+/USDT+ earn/mint on Reflect · not NestUSD · not Nest.credit`
         : detailOf(reflect),
     },
     {
       capability: "Phantom Connect (wallet dual-path)",
       mode: modeOf(phantom),
       detail: phantom.ok
-        ? `${phantom.source} · alongside Privy · session mint stays httpOnly Privy`
+        ? `${phantom.source} · connect + sign · FOLIO session still Privy httpOnly`
         : detailOf(phantom),
     },
     {
       capability: "FOLIO treasury (Squads / Altitude)",
       mode: modeOf(squads),
       detail: squads.ok
-        ? `${squads.source} · ${squads.data.note ?? "vault read"}`
+        ? `${squads.source} · ${squads.data.note ?? "vault live"}`
         : detailOf(squads),
     },
     {

@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-10-12 — Hub keys runbook + consumer desk polish
+
+- `docs/HUB_KEYS_HENRY.md` — Phantom App ID (Portal paused for new apps), Reflect optional key, Squads vault why-unavailable, SOL for gas (agent cannot mint SOL).
+- Desk Launches `/desk/dbc`: consumer copy, Trade CTAs, Jupiter/token logos on pools.
+- Phantom + Reflect credit copy softened; Launches in desk nav.
+- Write path = user-signed deep-links (Meteora / Reflect / Kamino / Phantom) — FOLIO still does not sponsor CPI on ≤~$1.
+
 ## 2026-10-12 — World's Fair hub sponsors spine (Phantom · Reflect · DBC · Squads)
 
 - Added fail-closed adapters: `phantom-connect`, `reflect`, `meteora-dbc`, `squads-treasury` + `reflect-sdk` handoff.

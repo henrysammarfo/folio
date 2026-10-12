@@ -80,11 +80,11 @@ function Page() {
         ))}
       </div>
       <p className="mkt-links" style={{ marginTop: "1rem" }}>
-        <Link to="/desk/dbc">Meteora DBC separate lane →</Link>
+        <Link to="/desk/dbc">New launches →</Link>
         {" · "}
-        <Link to="/desk/credit">Credit (Kamino / NestUSD / Reflect) →</Link>
+        <Link to="/desk/credit">Borrow and earn →</Link>
         {" · "}
-        <Link to="/desk/settings">Phantom Connect dual-path →</Link>
+        <Link to="/desk/settings">Connect Phantom →</Link>
       </p>
       <section className="mkt-aside-band" aria-label="How to read this matrix">
         <h2>Read the mode, not the marketing</h2>

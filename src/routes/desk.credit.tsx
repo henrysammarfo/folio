@@ -84,7 +84,7 @@ function Page() {
           </h1>
           <p className="fx-hero-sub">
             {data?.paper.note ??
-              "Keep your stocks. Borrow against xStocks on live Kamino / NestUSD rails."}
+              "Keep your stocks. Borrow against them without selling."}
           </p>
         </header>
 
@@ -154,7 +154,7 @@ function Page() {
                 trackFolioEvent("cta_click", { cta: "reflect_stable" })
               }
             >
-              Reflect stables
+              Earn with Reflect
             </a>
           ) : null}
           <Link to="/desk/positions" className="fx-btn fx-btn-ghost">
@@ -225,13 +225,13 @@ function Page() {
 
         {reflectLive ? (
           <>
-            <h2 className="fx-section-title">Reflect stable rail (live)</h2>
+            <h2 className="fx-section-title">Earn on stables</h2>
             <div className="fx-card fx-card-pad" data-testid="credit-reflect-card">
               <p className="fx-sub" style={{ marginBottom: 0 }}>
-                {reflectTypes ?? "USDC+ / USDT+"} · not NestUSD borrow · mint/earn
-                via Reflect app or @reflectmoney/stable.ts
+                {reflectTypes ?? "USDC+ and USDT+"} on Reflect. Open Reflect to
+                earn or mint with your wallet.
                 {data?.reflect?.ok && data.reflect.data.users != null
-                  ? ` · ${data.reflect.data.users.toLocaleString("en-US")} users`
+                  ? ` ${data.reflect.data.users.toLocaleString("en-US")} people already use it.`
                   : ""}
               </p>
             </div>
@@ -239,8 +239,8 @@ function Page() {
         ) : null}
 
         <p className="fx-sub" style={{ marginTop: "1.25rem" }}>
-          FOLIO reads live rails and opens Kamino / NestUSD / Reflect for
-          execute — we do not run a custom borrow CPI.{" "}
+          Borrow and earn open in Kamino, NestUSD, or Reflect. You sign. FOLIO
+          never moves funds for you.{" "}
           {nestEarn ? `${nestEarn}.` : null}
         </p>
 

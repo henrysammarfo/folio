@@ -1,16 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
+import { trackFolioEvent } from "@/lib/analytics";
 import { getMeteoraDbcBundle } from "@/lib/desk.functions";
 import { siteMeta } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/desk/dbc")({
   head: () => ({
     meta: siteMeta({
-      title: "Meteora DBC — FOLIO",
-      description:
-        "Separate Meteora DBC pool awareness lane — not xStock economic truth.",
+      title: "New launches — FOLIO",
+      description: "Fresh Solana launches. Open a pool and trade with your wallet.",
       path: "/desk/dbc",
     }),
   }),
@@ -32,64 +33,75 @@ function Page() {
   const ok = data?.dbc.ok;
   const sample = ok ? data.dbc.data.sample : [];
   const total = ok ? data.dbc.data.totalPools : null;
+  const appUrl = ok ? data.dbc.data.appUrl : "https://app.meteora.ag/";
 
   return (
-    <DeskShell title="DBC">
+    <DeskShell title="Launches">
       <section className="fx-page">
         <header className="fx-hero">
-          <p className="fx-hero-kicker">Separate lane</p>
+          <p className="fx-hero-kicker">New on Solana</p>
           <h1 className="fx-hero-value">
             {total != null ? total.toLocaleString("en-US") : "—"}
           </h1>
           <p className="fx-hero-sub">
-            {data?.note ??
-              "Meteora DBC awareness — not FOLIO xStock truth or wash spine."}
+            Fresh pools you can open and trade. Your wallet signs. FOLIO never
+            holds the keys.
           </p>
         </header>
 
         <div className="fx-actions">
           <a
-            href={data?.docsUrl}
+            href={appUrl}
             className="fx-btn fx-btn-primary"
             target="_blank"
             rel="noreferrer"
-            data-testid="dbc-docs"
+            data-testid="dbc-open-app"
+            onClick={() => trackFolioEvent("cta_click", { cta: "meteora_app" })}
           >
-            Meteora DBC docs
+            Open Meteora
           </a>
           <Link to="/desk/acquire" className="fx-btn fx-btn-ghost">
-            Back to xStock buy
-          </Link>
-          <Link to="/network" className="fx-btn fx-btn-ghost">
-            Network matrix
+            Buy stocks
           </Link>
         </div>
 
         {sample.length > 0 ? (
           <>
-            <h2 className="fx-section-title">Sample pools (mainnet-read)</h2>
+            <h2 className="fx-section-title">Live pools</h2>
             <div className="fx-card">
               <ul className="fx-list" data-testid="dbc-pool-rows">
-                {sample.map((p, i) => (
-                  <li key={p.address} className="fx-asset" style={{ cursor: "default" }}>
-                    <span
-                      className="fx-asset-mark"
-                      style={{ background: i % 2 ? "#0B1220" : "#0EA5C9" }}
-                      aria-hidden
-                    >
-                      {p.baseSymbol[0]}
-                    </span>
+                {sample.map((p) => (
+                  <li key={p.address} className="fx-asset">
+                    <AssetLogo
+                      symbol={p.baseSymbol}
+                      mint={p.baseMint}
+                      logo={p.baseLogo}
+                      size={40}
+                    />
                     <span className="fx-asset-main">
                       <strong>
-                        {p.baseSymbol}/{p.quoteSymbol}
+                        {p.baseName?.trim() || p.baseSymbol}
                       </strong>
                       <small>
-                        {p.address.slice(0, 4)}…{p.address.slice(-4)}
+                        {p.baseSymbol}/{p.quoteSymbol}
                       </small>
                     </span>
                     <span className="fx-asset-right">
-                      <strong>DBC</strong>
-                      <small>awareness</small>
+                      <a
+                        href={p.tradeUrl}
+                        className="fx-btn fx-btn-primary fx-btn-sm"
+                        target="_blank"
+                        rel="noreferrer"
+                        data-testid={`dbc-trade-${p.baseSymbol}`}
+                        onClick={() =>
+                          trackFolioEvent("cta_click", {
+                            cta: "meteora_trade",
+                            pool: p.address.slice(0, 8),
+                          })
+                        }
+                      >
+                        Trade
+                      </a>
                     </span>
                   </li>
                 ))}
@@ -99,15 +111,14 @@ function Page() {
         ) : (
           <p className="fx-sub" data-testid="dbc-unavailable">
             {ok === false && data?.dbc && !data.dbc.ok
-              ? `${data.dbc.reason}${data.dbc.detail ? ` — ${data.dbc.detail}` : ""}`
-              : "No DBC sample rows."}
+              ? "Launches are offline right now. Try again in a minute."
+              : "No pools to show yet."}
           </p>
         )}
 
         <p className="fx-sub" style={{ marginTop: "1.25rem" }}>
-          FOLIO does not assemble DBC launch or swap CPI on this desk. Use the
-          Meteora docs / Invent CLI for launches. xStock buy still runs wash +
-          Jupiter quote-only.
+          Tap Trade to open the pool in Meteora and buy or sell with your wallet.
+          Stock buys on FOLIO stay on the Buy tab.
         </p>
       </section>
     </DeskShell>

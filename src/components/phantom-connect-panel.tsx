@@ -5,8 +5,8 @@ import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { bindWatchWallet } from "@/lib/desk.functions";
 
 /**
- * Phantom Connect dual-path controls on Settings.
- * FOLIO session mint stays Privy — this only connects + optional watch-wallet bind.
+ * Phantom wallet connect on Account — consumer copy.
+ * FOLIO session still uses Privy when you Open App / sign in.
  */
 export function PhantomConnectPanel({
   appIdConfigured,
@@ -18,17 +18,16 @@ export function PhantomConnectPanel({
   return (
     <div className="fx-card fx-card-pad" data-testid="phantom-connect-panel">
       <p className="fx-section-title" style={{ marginBottom: ".35rem" }}>
-        Phantom Connect
+        Phantom wallet
       </p>
       <p className="fx-sub" style={{ marginBottom: ".75rem" }}>
-        Dual-path beside Privy. Injected extension works now
+        Connect Phantom to trade and save a watch wallet.
         {appIdConfigured
-          ? "; embedded Google/Apple armed via PHANTOM_APP_ID."
-          : "; embedded social needs PHANTOM_APP_ID (Portal new apps paused)."}{" "}
-        Session mint stays Privy httpOnly.
+          ? " Google and Apple sign-in are ready too."
+          : " Extension works now. Email style sign-in needs a Phantom App ID when Portal lets you create one."}
       </p>
       {!shellReady ? (
-        <p className="fx-sub">Phantom shell loading…</p>
+        <p className="fx-sub">Getting Phantom ready…</p>
       ) : (
         <PhantomConnectActions preferInjected={!appIdConfigured} />
       )}
@@ -49,7 +48,7 @@ function PhantomConnectActions({ preferInjected }: { preferInjected: boolean }) 
   }, []);
 
   if (loadErr) {
-    return <p className="fx-sub">{loadErr}</p>;
+    return <p className="fx-sub">Phantom could not load. Refresh and try again.</p>;
   }
   if (!mod) {
     return (
@@ -136,7 +135,7 @@ function PhantomConnectActionsInner({
               setPubkey(null);
             }}
           >
-            Disconnect Phantom
+            Disconnect
           </button>
         )}
         {!preferInjected ? (
@@ -160,7 +159,7 @@ function PhantomConnectActionsInner({
       {pubkey ? (
         <p className="fx-sub" style={{ marginTop: ".5rem" }} data-testid="phantom-pubkey">
           Connected {pubkey.slice(0, 4)}…{pubkey.slice(-4)}
-          {busy ? " · binding watch-wallet…" : " · watch-wallet bind attempted"}
+          {busy ? " · saving…" : " · ready to trade"}
         </p>
       ) : null}
       {err ? (

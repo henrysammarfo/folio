@@ -641,8 +641,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       note = "Estimate until you connect a wallet.";
     }
     if (reflectLive) {
-      note +=
-        " Reflect USDC+/USDT+ is live for stable yield — not NestUSD xStock borrow.";
+      note += " Earn on Reflect stables with your wallet when you are ready.";
     }
 
     return {

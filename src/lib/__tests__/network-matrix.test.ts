@@ -133,7 +133,7 @@ describe("buildNetworkMatrix honesty", () => {
       "mainnet-read",
     );
     expect(byCap["Meteora DBC awareness (separate lane)"]?.detail).toMatch(
-      /not xStock/i,
+      /Meteora|launch/i,
     );
     expect(byCap["FOLIO treasury (Squads / Altitude)"]?.mode).toBe(
       "mainnet-read",

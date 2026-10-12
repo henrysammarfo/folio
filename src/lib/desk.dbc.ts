@@ -1,10 +1,11 @@
 /**
- * Meteora DBC desk bundle — separate lane from xStock truth spine.
+ * Meteora launches desk bundle — consumer list + trade deep-links.
  */
 
 import { createServerFn } from "@tanstack/react-start";
 import {
   fetchMeteoraDbcAwareness,
+  METEORA_APP_URL,
   METEORA_DBC_DOCS_URL,
   type MeteoraDbcSnapshot,
 } from "./adapters/meteora-dbc";
@@ -13,6 +14,7 @@ import type { AdapterResult } from "./adapters/types";
 export type MeteoraDbcBundle = {
   dbc: AdapterResult<MeteoraDbcSnapshot>;
   docsUrl: string;
+  appUrl: string;
   note: string;
 };
 
@@ -22,9 +24,10 @@ export const getMeteoraDbcBundle = createServerFn({ method: "GET" }).handler(
     return {
       dbc,
       docsUrl: METEORA_DBC_DOCS_URL,
+      appUrl: dbc.ok ? dbc.data.appUrl : METEORA_APP_URL,
       note: dbc.ok
-        ? "Separate Meteora DBC lane · not xStock economic truth · FOLIO does not launch or swap DBC CPI here"
-        : "Meteora DBC awareness unavailable · fail-closed",
+        ? "Fresh pools · trade with your wallet on Meteora"
+        : "Launches offline · try again shortly",
     };
   },
 );

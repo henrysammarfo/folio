@@ -1,5 +1,7 @@
 # FOLIO — Keys landing runbook (multi-tenant + wash + Pyth)
 
+**World’s Fair hub IDs (Phantom · Reflect · Squads):** see [`docs/HUB_KEYS_HENRY.md`](./HUB_KEYS_HENRY.md) — step-by-step dashboards, why Squads is unavailable, SOL needed for gas.
+
 Use this **after** Henry replies with a lab candidate id (or in parallel if he asks).  
 Do **one key family at a time**. Paste into Vercel (Preview + Production) and local `.env`. Never commit values. Rotate anything pasted in chat.
 

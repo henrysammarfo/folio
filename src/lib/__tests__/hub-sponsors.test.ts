@@ -48,7 +48,9 @@ describe("hub sponsor adapters", () => {
       if (dbc.ok) {
         expect(dbc.mode).toBe("mainnet-read");
         expect(dbc.data.totalPools).toBeGreaterThan(0);
-        expect(dbc.data.note).toMatch(/not xStock/i);
+        expect(dbc.data.note).toMatch(/trade|Meteora|launch/i);
+        expect(dbc.data.sample[0]?.tradeUrl).toMatch(/meteora\.ag\/pools\//);
+        expect(dbc.data.sample[0]?.baseMint).toBeTruthy();
       } else {
         expect(dbc.mode).toBe("unavailable");
         expect(dbc.reason).toMatch(/meteora_dbc_/);
