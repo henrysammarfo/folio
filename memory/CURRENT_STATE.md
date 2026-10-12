@@ -1,5 +1,6 @@
 # FOLIO — CURRENT STATE
 
+
 > Updated: 2026-10-12 · Crypto World's Fair deadline **2026-10-12 23:59 PT**
 > Doctrine: honest security only — **never claim unhackable / NK-proof**.
 
@@ -15,13 +16,67 @@
 
 ## Marketing / landing (product)
 
-- Landing: **Nexeus cinematic** — looping CloudFront video + left hero + glass foot slot. FOLIO simple footer preserved (Whitepaper/Beta/About/Privacy/Desk).
-- Standalone pixel template: `/nexeus/index.html` (exact Nexeus spec).
-- Marketing PublicShell: same video/scrim language, dark type on cinema, **same FolioSimpleFooter** (not the old 3-col mkt foot).
-- Nav: Markets/Truth/Credit/Pre-IPO/About.
-- Branch: `cursor/folio-nexeus-landing-f1ec`.
+> Updated: 2026-09-25 · Stocklana deadline **re-check live**
+> Doctrine: honest security only — **never claim unhackable**. Soft pitch only in user-facing copy.
+> Bible: `docs/FOLIO_BIBLE.md` · Demo: `docs/DEMO_SCRIPT.md` · Submit: `docs/STOCKLANA_SUBMIT.md`
+
+## Soft pitch (lock)
+
+
+FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
+
+## Creative desk doctrine (binding)
+
+See `memory/HENRY_DESK_CREATIVE.md` — factorize every feature against Bible + Henry screenshots + NetroBNB depth. No bare `Loading…`. Logos on every partner row. Take 4K time. Research via Tavily/Firecrawl/TinyFish (keys in `.env` only).
+
+## Bible spine (World’s Fair · 2026-09-25)
+
+| Piece | Status |
+|---|---|
+| Soft pitch + pitch order | Live in copy |
+| **Cash session weekend refuse** | **Wired** — `session-gate.ts` → acquire gates + `/network` + overview week strip |
+| **Meteora DBC stock-curve** | **Live config + RPC** — program executable · pool create needs **~0.05–0.08 SOL (~$6–10)** funded wallet (see `FLAWS_AND_WORKAROUNDS.md`) · paste `FOLIO_DBC_POOL` after create |
+| **Solami Blur tape** | **Key landed** · live via **Solami RPC** (Free/Pro) · Blur marks optional (prepaid GB — skip $25) |
+| **Multi-venue markets** | **Live** — Jupiter + free tape + Raydium awareness + Solami · letter-mark venue pills |
+| Panta | Out (correct) |
+
+## Flaws ledger
+
+See `memory/FLAWS_AND_WORKAROUNDS.md` — Jupiter 429s, Raydium no mid, Solami DataApi key, NestUSD metrics-only, **DBC create cost table**, DBC demo pool pending.
+
+## Live product (production)
+
+**URL:** https://folio-tawny-one.vercel.app
+
+**Keys (2026-09-25):** Vercel Privy+Supabase+session+Jupiter+Bitquery+Finnhub+Pyth+RPC present · `privyConfigured` true on SSR · `broadcastPaused:false`. Connect/sign break was Anchor ESM crash from Meteora DBC SDK in desk SSR — fixed and live on prod (`9b1d5fc` / PR #46).
+
+**Feature smoke (2026-09-25):** Buy/Markets/Borrow/PreStocks/Tessera/Network/Account all live on prod after SSR fix · overnight cash-session refuse expected · Pyth optional unavailable by design.
+
+| Surface | Status |
+|---|---|
+| Buy | USDC→stock / stock↔stock · searchable pickers + popular chips · flip · user-signed fills when armed |
+| Markets | Multi-venue board · Jupiter + free-tape + Raydium awareness + Solami (when keyed) |
+| Borrow | Kamino deposit/borrow in-desk (you sign) · NestUSD metrics + rate bars |
+| Pre-IPO | PreStocks + Tessera desks · buys stay inside FOLIO · API logos on PreStocks |
+| Overview | Netro density · signal gauge · FOLIO azure AI rail · partner faces |
+| Activity | Lucide + AssetLogo (no letter tiles) |
+| Agent | 5 messages / account / day |
+| Truth / Network | Live share multiplier · labeled capability matrix |
+
+## Copy refresh (branch `cursor/folio-copy-refresh-f1ec`)
+
+README, marketing routes, whitepaper, demo/submit docs, and public intros rewritten in soft plain English — no ops jargon in user-facing copy.
+
+## Marketing / landing
+
+- Landing: **Nexeus cinematic** — brand-first hero · Open desk CTA.
+- Nav: Markets / Truth / Credit / PreStocks / Pitch / About.
+- Pitch deck: `/pitch` · 13 slides · soft pitch · three tracks · ten year vision.
+- Video scripts: Pitch + Technical in `docs/VIDEO_SCRIPTS.md` for Stocklana Links form.
+- Public pages soft copy: `/`, `/about`, `/markets`, `/credit`, `/preipo`, `/beta`, `/truth`, `/pairs`, `/network`, `/execution`, `/whitepaper`, `/pitch`.
 
 ## Desk UI (product)
+
 
 - Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
 - Buy **Netro-depth**: short Details (route/impact/gas/fill) + settings (slippage + gas chips). Fills still paused.
@@ -39,23 +94,40 @@
 - Soft access banner → **Open App**; Account tenant switcher; agent session-gated.
 - **/whitepaper** · **/beta** waitlist · docs: `FOLIO_WHITEPAPER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
 - Human wash copy (no raw `bitquery_*` in PreStocks/Tessera consumer UI).
+- Home: **Netro density always-on** (FOLIO azure `#0EA5C9` · grey canvas) — live clock, markets strip, AI rail, partner lanes. Soft titles: Your market desk / Today's flow / Easy market view.
+- Buy: Mega / IPO / Meme / **Pairs** · TokenSelect + flip · Netro-depth details.
+- Markets: multi-venue curated board + **Universe search** (~1k+ Solana xStocks, Jupiter batch marks) · PreStocks + Tessera on own desks.
+- Credit: AssetLogo rates · Kamino ktx in-desk · NestUSD metrics-only · collateral from **full wallet xStock scan** when bound.
+- PreStocks / Tessera: catalog list kept · Buy-style TokenSelect + flip (USDC/USDT ↔ partner; no cross-issuer).
+- Holdings: **full ATA wallet-scan** → mint index (paper 3-symbol only when unbound) · shared query keys + invalidate after Privy/session mint.
+- Agent: `agent_daily` = 5 / account / 24h.
+- Logo chain: API → Backed CDN → favicon → initials (SpaceX / Tessera paths fixed).
+- Fills arm when `BROADCAST_PAUSED=false` (user-signed Jupiter + Kamino + partner buys).
+
 
 ## Launch path (Stocklana → Colosseum → beta)
 
-1. Submit Stocklana (SEP 25 hero — re-check form) with PR #15 preview if markets routes not on main yet.
+1. Submit Stocklana with production demo URL (re-check hero deadline + counts).
 2. Claim Folio X · judge feedback · closed beta invites.
 3. Traction → Colosseum / World’s Fair submit.
 
 ## Stocklana (live)
 
-- Deadline extended to **25 Sep 2026 16:00 ET**; prize pool ~$126k; tracks include PreStocks, Tessera, Clawpump, Meteora DBC, Pyth.
-- FOLIO wedge: honest share counts + safe routes + credit + stock pairs + PreStocks/Tessera desks.
+- Re-check deadline + registered/submission counts before any README claim.
+- FOLIO wedge: honest share counts + safe routes + buy/borrow + PreStocks/Tessera desks.
 
 ## Product lock
 
-- **One job:** Honest stock desk on Solana (truth · safe route · credit).
+- **One job:** Honest stock desk on Solana.
 - **Pitch order:** (1) honest share counts (2) won’t buy wash (3) buy on Solana (4) borrow without selling (5) guarded agent.
 - Soft: FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
+
+## World’s Fair side tracks (Bible)
+
+- **Meteora DBC** primary (stock curve config · USDC · gentle · fixed/short linear fee).
+- **Solami** = mainnet tape proof.
+- **Panta** not taken.
+- Aqua0 = multi-strategy LP competitor field note — FOLIO stays the honesty desk, not an LP router.
 
 ## Network verdict (Stocklana + Colosseum World’s Fair)
 
@@ -67,9 +139,9 @@
 | Jupiter price + swap quote | **Mainnet READ / quote-only** |
 | Wash / Bitquery | **Mainnet READ**, fail-closed until keyed+wired |
 | Kamino xStocks / Jupiter Lend earn / Raydium pools | **Mainnet READ** (labeled) |
-| NestUSD capacity | **Unavailable** until verified endpoint |
-| Swap / borrow broadcast | **Disabled** (≤~$1 budget) |
-| Borrow CPI proofs | **Unavailable until funded** (no fork harness shipped) |
+| NestUSD capacity | **Mainnet READ** metrics (risk API) · execute still NestUSD app |
+| Swap / borrow broadcast | **User-signed** when `BROADCAST_PAUSED=false` (Jupiter + Kamino ktx) |
+| Borrow CPI proofs | **Kamino ktx** assembles (no FOLIO program) · NestUSD unfunded |
 | Custom program mainnet deploy | **Out** (rent ≫ $1) |
 | Optional policy harness | Devnet OK if labeled |
 

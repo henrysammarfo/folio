@@ -14,7 +14,8 @@ const discover = [
   { label: "Desk", to: "/desk" as const },
   { label: "Buy", to: "/desk/acquire" as const },
   { label: "Markets", to: "/markets" as const },
-  { label: "Pre-IPO", to: "/preipo" as const },
+  { label: "PreStocks", to: "/preipo" as const },
+  { label: "Pitch", to: "/pitch" as const },
   { label: "Pairs", to: "/pairs" as const },
   { label: "Borrow", to: "/desk/credit" as const },
 ];

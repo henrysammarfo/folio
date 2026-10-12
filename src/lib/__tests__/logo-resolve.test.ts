@@ -16,9 +16,23 @@ describe("logo-resolve", () => {
 
   it("maps Tessera T-symbols to company domains", () => {
     expect(underlyingKey("T-OpenAI")).toBe("OPENAI");
+    expect(underlyingKey("T-SpaceX")).toBe("SPACEX");
     const c = logoCandidates({ symbol: "T-OpenAI" });
     expect(c.some((u) => u.includes("openai.com"))).toBe(true);
+    const sx = logoCandidates({ symbol: "T-SpaceX" });
+    expect(sx.some((u) => /spacex/i.test(u))).toBe(true);
     expect(initialsForSymbol("T-SpaceX")).toBe("SP");
+  });
+
+  it("resolves credit-board faces for SPY / QQQ / GOOGL / cbBTC", () => {
+    expect(underlyingKey("cbBTC")).toBe("CBBTC");
+    expect(underlyingKey("SPYx")).toBe("SPY");
+    const spy = logoCandidates({ symbol: "SPYx", underlying: "SPY" });
+    expect(spy.some((u) => /ssga|clearbit/i.test(u))).toBe(true);
+    const btc = logoCandidates({ symbol: "cbBTC" });
+    expect(btc.some((u) => /cbbtc|coinbase|coingecko/i.test(u))).toBe(true);
+    const goog = logoCandidates({ symbol: "GOOGLx", underlying: "GOOGL" });
+    expect(goog.some((u) => u.includes("google.com"))).toBe(true);
   });
 
   it("prefers provided logo then CDN then favicon", () => {

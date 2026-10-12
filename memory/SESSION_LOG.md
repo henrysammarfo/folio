@@ -1,6 +1,7 @@
 
 # FOLIO — SESSION LOG
 
+
 ## 2026-10-12 — Arm fills + unblock Vercel preview
 
 - Confirmed Vercel `BROADCAST_PAUSED=false` already on production/preview/development (user-signed Jupiter only).
@@ -37,6 +38,164 @@
 - Desk: Phantom Connect shell + Settings panel · Reflect CTA on credit · `/desk/dbc` separate lane.
 - Deps: `@phantom/react-sdk`, `@reflectmoney/stable.ts` (SDK not imported on SSR read path).
 - Branch: `cursor/folio-hub-sponsors-spine-f1ec`.
+
+## 2026-09-25 — Prod feature smoke after SSR Privy fix
+
+- All desk routes HTTP 200 · SSR success · no Anchor `exports is not defined` on current prod.
+- Buy: live Jupiter quote + wash pass + truth/diverge/scaled-ui OK · Review blocked only by overnight cash session (expected).
+- Markets: ~55 xStock symbols · Jupiter/Free tape/Raydium/Solami venue pills.
+- Borrow: Kamino rates + NestUSD live · fills armed label.
+- PreStocks catalog 8 names (ANDURIL…SPACEX) · Tessera 3 T-tokens · both mainnet-read.
+- Network matrix 22 caps · only Pyth optional + custom deploy unavailable (doctrine).
+- Account: Open App / Connect CTAs render · privyConfigured.
+- Playwright shots under `/opt/cursor/artifacts/screenshots/prod-*.png`.
+
+## 2026-09-25 — Keys check + DBC SSR crash blocking Privy sign
+
+- Prod SSR readiness: Privy+Supabase+session configured · `broadcastPaused:false` (fills armed).
+- Vercel env (names only): PRIVY_APP_ID/SECRET, SUPABASE_*, FOLIO_SESSION_SECRET, JUPITER, BITQUERY, FINNHUB, PYTH, SOLANA_RPC, AGENTROUTER, TAVILY, SOLAMI all present on production+preview.
+- Local `.env`: Privy/Supabase/Jupiter empty → local Open App fail-closed (expected).
+- Root cause of connect/sign dying on prod: `@coral-xyz/anchor` ESM crash (`exports is not defined`) pulled via Meteora DBC SDK into desk SSR — not missing Privy keys.
+- Fix: move SDK to `stock-curve-sdk.ts` (tests only); production `stock-curve.ts` is RPC-only.
+- PR #46 merged · production READY on `9b1d5fc` (`dpl_8sX5nCKr…`) · zero Anchor crash logs on that deploy · Privy keys still green.
+
+## 2026-09-25 — Pitch + Technical video pack + live pitch deck
+
+- `docs/VIDEO_SCRIPTS.md`: full human Pitch Video (~2m15) + Technical Video (~3m30) with shot lists, end cards, Loom blurbs.
+- Live deck `/pitch`: 13 startup grade slides · FOLIO mark · partner logos · ten year vision · keyboard nav.
+- README: three Stocklana tracks table + Mermaid · partner integration steps · flaws table · video form fields.
+- `docs/STOCKLANA_SUBMISSION.md`: Pitch + Technical URL slots + deck link.
+- Branch: `cursor/folio-pitch-tech-pack-f1ec`
+
+## 2026-09-25 — README real logo + Mermaid diagrams
+
+- Replaced flat black/azure `og.png` with FOLIO mark + wordmark banner (`public/folio-readme-banner.png`, also writes `og.png`).
+- README uses logo lockup + three Mermaid diagrams (stack, desk flow + sequence, partner rooms).
+- Branch: `cursor/folio-readme-logo-mermaid-f1ec`
+
+## 2026-09-25 — Azure accents + soft copy + partner Buy flip (catalog kept)
+
+- Home Netro: yellow `#F4D014` → FOLIO azure `#0EA5C9` (soft/wash + agent rail). Soft titles: Your market desk / Today's flow / Easy market view / Trading days. No em-dash footer.
+- PreStocks + Tessera: **catalog list kept** + Buy-style TokenSelect + flip (USDC/USDT ↔ partner). Docs keep PreStocks ≠ Tessera.
+- Desk/public wordings softened (PreStocks label, no hyphen heavy prose).
+- Branch: `cursor/folio-netro-home-depth-f1ec`
+
+## 2026-09-25 — Stocklana paste pack + NetroBNB style README + video scripts
+
+- Root README rewritten NetroBNB style (badges, stack table, flow, honest limits). Soft pitch. No hyphen heavy prose.
+- `docs/VIDEO_SCRIPTS.md` added: master 90s tour plus nine surface clips with shot lists.
+- `docs/STOCKLANA_SUBMISSION.md` Full Description Markdown paste ready (~2k chars).
+- Demo and submit checklists pointed at video scripts.
+
+## 2026-09-25 — NetroBNB home fidelity + markets/partner UX repair
+
+- Home Netro canvas: **exact NetroBNB tokens** (#F4D014 yellow · #E5E7EB canvas) · `i1.png` gear · "Asset Intelligence Dashboard" / "Today's Market Flow" / "Make Analysis Easy" · always-on (no approve-gate).
+- Markets: restored clean All/Mega/IPO/Meme tabs (removed jammed Pre-IPO/Tessera/Universe tabs) · search expands universe · partners stay on their desks.
+- PreStocks / Tessera: restored catalog list + ticket UX (prior layout).
+- Branch: `cursor/folio-netro-home-depth-f1ec`
+
+## 2026-09-25 — Honest leftovers: PreStocks Buy · universe prices · wallet-scan qty
+
+- PreStocks desk: Tessera-parity Buy ticket (TokenSelect + flip, USDC/USDT ↔ PreStock).
+- Markets: Universe tab + search; Jupiter Price v3 batch (50/chunk · 3 workers · 30s/120s cache tiers · stock-ref when no venue usdPrice); board TTL 60s + singleflight.
+- Holdings/Credit: full wallet ATA scan → mint→symbol via live universe index; paper 3-symbol watchlist only when unbound. Session mint invalidates positions/credit/markets.
+- Branch: `cursor/folio-netro-home-depth-f1ec`
+
+## 2026-09-25 — Netro home + markets depth + Tessera Buy + sync
+
+- Desk home: NetroBNB density canvas always mounts on `/desk` (no approve-gate required).
+- Markets: curated board expanded 23→50+; lanes Pre-IPO + Tessera; live universe count (~1124 Solana xStocks) via cached paginated API; board TTL + singleflight.
+- Tessera: Buy-style searchable TokenSelect + flip (USDC/USDT ↔ T-token). PreStocks≠Tessera still enforced.
+- Wash: singleflight + longer TTL/stale for concurrent users.
+- Holdings: shared `positionsQueryKey` / `creditQueryKey` + sync cadences across Home / Holdings / Netro / detail.
+- Branch: `cursor/folio-netro-home-depth-f1ec`
+
+## 2026-09-25 — Shot-fix pass (Henry screens)
+
+- Credit: Available/Max LTV hero + meta strip · NestUSD panel head cleaned
+- Markets: real venue SVG logos (Jupiter/Raydium/Solami/Gecko) not letter marks
+- Buy: token dropdown z-index fix (AAPLx bleed) · USDC+USDT stables-first · Pay stable mode
+- PreStocks/Tessera: soft heroes · wash banner (honest thin-tape, no invent clear) · softer CTA
+- Wash gate: 45s TTL + 3m stale cache to cut Gecko/Bitquery RPM
+- Holdings: Netro summary strip · Account: create-account vs connect-wallet dual paths
+- Meteora: full-pay config+pool (no public-config reuse) documented
+- Branch: `cursor/folio-shot-fix-pass-f1ec`
+
+## 2026-09-25 — DBC create cost + shot-page depth
+
+- **DBC mainnet create cost (honest):** comfortable **0.05–0.08 SOL (~$6–10)**; bare reuse-config **~0.025–0.035 SOL (~$3–4)**; typical pool rent **~0.022 SOL**. Graduation **750 USDC** ≠ create cost. ≤~$1 cannot sponsor. Documented in `FLAWS_AND_WORKAROUNDS.md`.
+- Overview: AI rail yellow sheen + live gate chips; larger signal gauge; partner rows 40px + PreStocks `image` logos.
+- Credit: LTV hero ring · NestUSD dual rate bars (borrow/liq).
+- Buy: token picker popular chips + deeper sheet.
+- Markets: letter-mark venue pills (J/G/R/S).
+- Holdings: paper-estimate banner + Connect CTA.
+- Branch: `cursor/folio-dbc-cost-shot-depth-f1ec`.
+
+## 2026-09-25 — Solami docs correction (no $25 Blur tax)
+
+- Re-read Solami docs: Blur meters prepaid streaming bandwidth; Free/Pro include **RPC**.
+- Live probe: `remaining_bytes: 0` · Blur 402 · **same key** `rpc.solami.dev` getSlot + getSignaturesForAddress OK.
+- Adapter: prefer Solami RPC tape; Blur last-trade optional only when bandwidth > 0. Never require $25 top-up for demo.
+- Multi-venue: Solami stays `live` on RPC path when Blur empty.
+- Stocklana Pro trial (`st-earn-sep-26`) = RPC/gRPC perk, not free Blur GB.
+
+## 2026-09-24 — Multi-venue + SDK depth (Henry follow-up)
+
+- Markets: `resolveMultiVenuePrice` — Jupiter · Gecko free-tape · Raydium liq awareness · Solami Blur REST (`api.solami.dev`) when keyed; venue pills on board (not faint dots).
+- Solami: real Blur `/data/token/price` · fractional strings parsed · fail-closed without DataApi key · RPC tape labeled otherwise.
+- Meteora: official `@meteora-ag/dynamic-bonding-curve-sdk` buildCurveWithMarketCap (fixed 100bps stock fee) + mainnet program executable probe.
+- Overview: holdings logos + connect CTA · quote AssetLogos · cash-session week strip · stronger AI rail · soft Tape/Borrow labels.
+- Credit/Holdings soft CTAs · `memory/FLAWS_AND_WORKAROUNDS.md` documents bugs/workarounds.
+- Tests: 199+ multi-venue · build green · preview routes 200.
+- Branch: `cursor/folio-netro-depth-bible-f1ec`.
+
+## 2026-09-24 — Netro depth + Bible spine (Henry screenshots)
+
+- Doctrine: `memory/HENRY_DESK_CREATIVE.md` — factorize every feature · no rush · screenshot-verify · research keys in `.env` only (rotated after chat paste).
+- Honest Bible gap: DBC/Solami/cash-close were docs-only → now adapters + `/network` rows + acquire weekend refuse.
+- Desk polish from Henry shots: partner Pre-IPO/Tessera **AssetLogo rows** · skeleton loaders (no bare Loading…) · shorter Tessera hero · Netro signal gauge · stronger venue labels.
+- Branch: `cursor/folio-netro-depth-bible-f1ec`.
+
+## 2026-09-24 — Copy refresh (README · marketing · docs)
+
+
+- Soft plain-English pass across README, home/about/markets/credit/preipo/beta, truth/pairs/network/execution/whitepaper.
+- Whitepaper v1.1 + DEMO_SCRIPT + STOCKLANA_SUBMIT/SUBMISSION pointed at production `https://folio-tawny-one.vercel.app`.
+- Stripped ops jargon from user-facing intros (no CPI / fail-closed / BROADCAST / ≤$1 theater language in marketing).
+- Memory sync: CURRENT_STATE · FACT_CHECK · this log.
+- Branch: `cursor/folio-copy-refresh-f1ec`.
+
+## 2026-09-24 — Desk UX pass (token select + markets venues)
+
+- Buy: searchable TokenSelect on pay/receive · flip arrow always works.
+- Markets: GeckoTerminal free-tape price fallback when Jupiter cools; catalog +CRCLx/MSTRx/COSTx.
+- Logo: T-SpaceX → SPACEX (stop stripping X from SpaceX).
+- Branch: `cursor/folio-desk-ux-pass-f1ec`.
+
+## 2026-09-24 — Demo lock (desk polish + agent daily cap)
+
+- Credit in-house + launch polish merged onto `cursor/folio-demo-lock-f1ec`.
+- Activity: Lucide + AssetLogo glyphs; events stamped with `icon`/`symbol`.
+- Markets: staggered Jupiter price fetches; venue column humanized (`Cooling — refresh soon`).
+- PreStocks / Tessera: in-desk BuyExecute via partner `outputMint`; removed Tessera/PreStocks app CTAs.
+- Agent: `agent_daily` = 5 msgs / account / 24h (plus burst `agent` window).
+- Soft copy + logo domains for cbBTC / PreStocks names.
+
+## 2026-09-24 — Bible sync + launch polish 20 + agent chat
+
+- Synced `docs/FOLIO_BIBLE.md` (Meteora DBC primary · Solami tape · Panta out · soft pitch lock).
+- Field note: Aqua0 multi-strategy LP on tokenized equities ≠ FOLIO honesty-desk wedge.
+- Launch checklist `docs/LAUNCH_POLISH_20.md` — privacy/terms/HSTS/cookies/meta/og/favicon/sitemap/404/analytics/honeypot/CTA audited + gaps closed.
+- Soft pitch: truth meta + landing slide; beta honeypot; expanded sitemap; FolioAgentChat (thinking/stream/composer) on settings agent.
+- Branch: `cursor/folio-launch-polish-agent-f1ec`.
+
+## 2026-09-21 — Credit in-house (Kamino ktx) + logos + layout
+
+- `/desk/credit`: Buy-style board + ticket — AssetLogo on rates; deposit collateral + borrow USDC in-desk.
+- `prepareKaminoDeposit` / `prepareKaminoBorrow` via `api.kamino.finance/ktx/klend/*`; Privy `signAndSendTransaction` (no outbound Kamino/Nest CTA).
+- Honesty: Kamino builds txs · user signs · no FOLIO borrow CPI. NestUSD stays metrics-only.
+- Branch: `cursor/folio-credit-inhouse-logos-f1ec`.
+
 
 ## 2026-09-20 — Credit live: NestUSD metrics + Kamino borrow CTA
 
@@ -198,6 +357,12 @@
 - Build + 147 unit tests green.
 
 # FOLIO — SESSION LOG
+
+## 2026-09-25 — README real logo + Mermaid diagrams
+
+- Replaced flat black/azure `og.png` with FOLIO mark + wordmark banner (`public/folio-readme-banner.png`, also writes `og.png`).
+- README uses logo lockup + three Mermaid diagrams (stack, desk flow + sequence, partner rooms).
+- Branch: `cursor/folio-readme-logo-mermaid-f1ec`
 
 ## 2026-09-20 — Light TradingView (Netro match)
 

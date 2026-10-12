@@ -6,9 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { BuyExecuteButton } from "@/components/buy-execute-button";
 import { DeskShell } from "@/components/desk-shell";
+import { TokenSelectButton } from "@/components/token-select-button";
 import { WalletGasReady } from "@/components/wallet-gas-ready";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { trackFolioEvent } from "@/lib/analytics";
+import { isStablePaySymbol } from "@/lib/adapters/jupiter";
 import { getAcquireBundle } from "@/lib/desk.functions";
 import {
   humanizeGateReason,
@@ -38,9 +40,9 @@ type GasPref = "best" | "usdc" | "sol";
 export const Route = createFileRoute("/desk/acquire")({
   head: () => ({
     meta: siteMeta({
-      title: "Buy — FOLIO",
+      title: "Buy · FOLIO",
       description:
-        "Buy xStocks with USDC or swap stock↔stock on Solana — mega, IPO, meme lanes.",
+        "Buy xStocks with USDC or swap stock to stock on Solana. Mega, IPO, meme lanes.",
       path: "/desk/acquire",
     }),
   }),
@@ -74,7 +76,8 @@ function Page() {
     return () => window.removeEventListener("keydown", onKey);
   }, [settingsOpen]);
 
-  const isPair = pay !== "USDC";
+  const isPair = !isStablePaySymbol(pay);
+  const payStable = isStablePaySymbol(pay) ? pay.toUpperCase() : "USDC";
   const payAmount = Number(amount);
   const ready =
     Number.isFinite(payAmount) && payAmount > 0 && payAmount <= 25;
@@ -119,7 +122,7 @@ function Page() {
       }),
     enabled: ready && Boolean(selected?.buyable !== false || isPair),
     initialData:
-      receive === "AAPLx" && pay === "USDC" && payAmount === 1
+      receive === "AAPLx" && isStablePaySymbol(pay) && payAmount === 1
         ? initial
         : undefined,
     initialDataUpdatedAt: Date.now(),
@@ -175,12 +178,52 @@ function Page() {
   }
 
   function flipPair() {
-    if (!isPair) return;
-    const nextPay = receive;
-    const nextRecv = pay;
-    setPay(nextPay);
-    setReceive(nextRecv);
+    if (isPair) {
+      const nextPay = receive;
+      const nextRecv = pay;
+      setPay(nextPay);
+      setReceive(nextRecv);
+      setReviewed(false);
+      setErr(null);
+      return;
+    }
+    // USDC → stock: flip into stock↔stock with this stock as pay
+    const stock = receive;
+    const other =
+      XSTOCK_CATALOG.find((i) => i.buyable && i.symbol !== stock)?.symbol ??
+      "MSFTx";
+    setTab("pairs");
+    setPay(stock);
+    setReceive(other);
+    setAmount("0.01");
     setReviewed(false);
+    setErr(null);
+  }
+
+  function onPayToken(sym: string) {
+    if (isStablePaySymbol(sym)) {
+      setPay(sym.toUpperCase());
+      setAmount((a) => (Number(a) <= 0.25 ? "1" : a));
+      if (tab === "pairs") setTab("all");
+    } else {
+      setPay(sym);
+      setTab("pairs");
+      if (receive === sym) {
+        const other =
+          XSTOCK_CATALOG.find((i) => i.buyable && i.symbol !== sym)?.symbol ??
+          "AAPLx";
+        setReceive(other);
+      }
+      setAmount((a) => (Number(a) >= 1 ? "0.01" : a));
+    }
+    setReviewed(false);
+    setErr(null);
+  }
+
+  function onReceiveToken(sym: string) {
+    if (isStablePaySymbol(sym)) return;
+    pickReceive(sym);
+    if (pay === sym) setPay("USDC");
   }
 
   return (
@@ -235,12 +278,12 @@ function Page() {
                   className={`fx-lane${tab === id ? " is-on" : ""}`}
                   onClick={() => {
                     setTab(id);
-                    if (id === "pairs" && pay === "USDC") {
+                    if (id === "pairs" && isStablePaySymbol(pay)) {
                       setPay("AAPLx");
                       setReceive("MSFTx");
                       setAmount("0.01");
                     }
-                    if (id !== "pairs" && pay !== "USDC") {
+                    if (id !== "pairs" && !isStablePaySymbol(pay)) {
                       setPay("USDC");
                       setAmount("1");
                     }
@@ -252,9 +295,9 @@ function Page() {
               <Link
                 to="/desk/preipo"
                 className="fx-lane fx-lane-link"
-                title="PreStocks Pre-IPO desk"
+                title="PreStocks desk"
               >
-                Pre-IPO
+                PreStocks
               </Link>
               <Link
                 to="/desk/tessera"
@@ -269,7 +312,7 @@ function Page() {
               <strong>{meta.title}</strong>
               <p>{meta.body}</p>
               <p className="fx-lane-links">
-                Private pre-IPO?{" "}
+                Private names?{" "}
                 <Link to="/desk/preipo">PreStocks</Link>
                 {" · "}
                 <Link to="/desk/tessera">Tessera</Link>
@@ -369,9 +412,13 @@ function Page() {
               </h1>
               <p className="fx-ticket-sub">
                 {isPair
-                  ? "True Jupiter pair route · fills paused"
+                  ? data && "broadcastPaused" in data && data.broadcastPaused === false
+                    ? "True Jupiter pair route · user-signed fills"
+                    : "True Jupiter pair route · fills arm when enabled"
                   : selected.blurb ??
-                    "Live Jupiter quote · fills pause until enabled"}
+                    (data && "broadcastPaused" in data && data.broadcastPaused === false
+                      ? "Live Jupiter quote · confirm to fill"
+                      : "Live Jupiter quote · fills arm when enabled")}
               </p>
             </div>
             <button
@@ -388,7 +435,7 @@ function Page() {
           <div className="fx-mode-row" role="group" aria-label="Pay with">
             <button
               type="button"
-              className={`fx-mode${pay === "USDC" ? " is-on" : ""}`}
+              className={`fx-mode${!isPair ? " is-on" : ""}`}
               onClick={() => {
                 setPay("USDC");
                 setAmount("1");
@@ -396,7 +443,7 @@ function Page() {
                 setReviewed(false);
               }}
             >
-              Pay USDC
+              Pay stable
             </button>
             <button
               type="button"
@@ -417,30 +464,13 @@ function Page() {
             <div className="fx-swap-leg">
               <span>You pay</span>
               <div className="fx-swap-row">
-                <strong className="fx-swap-token">
-                  {isPair ? (
-                    <>
-                      <AssetLogo
-                        symbol={pay}
-                        {...(payItem?.underlying
-                          ? { underlying: payItem.underlying }
-                          : {})}
-                        size={28}
-                      />
-                      {pay}
-                    </>
-                  ) : (
-                    <>
-                      <span
-                        className="fx-logo fx-logo-fallback fx-logo-usdc"
-                        aria-hidden
-                      >
-                        $
-                      </span>
-                      USDC
-                    </>
-                  )}
-                </strong>
+                <TokenSelectButton
+                  value={isPair ? pay : payStable}
+                  allowUsdc
+                  exclude={[receive]}
+                  aria-label="Pay token"
+                  onChange={onPayToken}
+                />
                 <input
                   className="fx-swap-amt"
                   value={amount}
@@ -458,8 +488,7 @@ function Page() {
             <button
               type="button"
               className="fx-swap-mid"
-              aria-label="Flip pair"
-              disabled={!isPair}
+              aria-label="Flip pay and receive"
               onClick={flipPair}
             >
               <ArrowDownUp size={16} strokeWidth={2.2} />
@@ -468,14 +497,13 @@ function Page() {
             <div className="fx-swap-leg">
               <span>You receive</span>
               <div className="fx-swap-row">
-                <strong className="fx-swap-token">
-                  <AssetLogo
-                    symbol={selected.symbol}
-                    underlying={selected.underlying}
-                    size={28}
-                  />
-                  {selected.symbol}
-                </strong>
+                <TokenSelectButton
+                  value={selected.symbol}
+                  allowUsdc={false}
+                  exclude={isPair ? [pay] : []}
+                  aria-label="Receive token"
+                  onChange={onReceiveToken}
+                />
                 <b className="fx-swap-out">
                   {isFetching ? "…" : out ? out : "—"}
                 </b>
@@ -632,7 +660,7 @@ function Page() {
                   <b>
                     {data?.gates.washOk
                       ? "Clear"
-                      : "Paused — tape check"}
+                      : "Paused. Flow check."}
                   </b>
                 </li>
                 <li>
@@ -659,7 +687,7 @@ function Page() {
                   )
                 }
                 symbol={receive}
-                paySymbol={isPair ? pay : "USDC"}
+                paySymbol={isPair ? pay : payStable}
                 amount={payAmount}
                 slippageBps={slippageBps}
                 onError={(msg) => setErr(msg || null)}
@@ -684,7 +712,7 @@ function Page() {
           <p className="fx-ticket-sub">
             Prefer credit? <Link to="/desk/credit">Borrow</Link>
             {" · "}
-            <Link to="/desk/preipo">Pre-IPO</Link>
+            <Link to="/desk/preipo">PreStocks</Link>
           </p>
         </aside>
       </section>

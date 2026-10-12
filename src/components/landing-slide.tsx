@@ -7,7 +7,7 @@ const SLIDES = [
     id: "truth",
     kicker: "01",
     title: "Share counts that hold.",
-    body: "Live corporate-action multipliers checked against Solana Token-2022 Scaled UI — before you trade.",
+    body: "Live share multipliers checked against Solana Token-2022 Scaled UI — before you trade.",
     cue: "Truth",
     to: "/truth" as const,
     tone: "ink" as const,

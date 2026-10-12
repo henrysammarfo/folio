@@ -8,6 +8,7 @@ export type RateLimitBucket =
   | "quote"
   | "execute"
   | "agent"
+  | "agent_daily"
   | "waitlist";
 
 type WindowCfg = { limit: number; windowMs: number };
@@ -15,7 +16,10 @@ type WindowCfg = { limit: number; windowMs: number };
 const BUCKETS: Record<RateLimitBucket, WindowCfg> = {
   quote: { limit: 40, windowMs: 60_000 },
   execute: { limit: 12, windowMs: 60_000 },
-  agent: { limit: 12, windowMs: 60_000 },
+  /** Burst guard — still short-window. */
+  agent: { limit: 8, windowMs: 60_000 },
+  /** Per-account daily AI budget — 5 messages / 24h when keyed by userId. */
+  agent_daily: { limit: 5, windowMs: 24 * 60 * 60_000 },
   waitlist: { limit: 5, windowMs: 60 * 60_000 },
 };
 

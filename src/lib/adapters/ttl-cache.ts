@@ -7,6 +7,8 @@ type CacheEntry<T> = {
 };
 
 const store = new Map<string, CacheEntry<unknown>>();
+/** In-flight dedupe — 1k concurrent users share one upstream fetch per key. */
+const inflight = new Map<string, Promise<unknown>>();
 
 export function cacheGet<T>(key: string): { value: T; ageMs: number } | null {
   const hit = store.get(key) as CacheEntry<T> | undefined;
@@ -38,7 +40,25 @@ export function cacheSet<T>(key: string, value: T, ttlMs: number): void {
   store.set(key, { value, storedAt: now, expiresAt: now + ttlMs });
 }
 
+/**
+ * Single-flight: concurrent callers with the same key await one producer.
+ * Producer is responsible for cacheSet on success.
+ */
+export async function cacheSingleflight<T>(
+  key: string,
+  produce: () => Promise<T>,
+): Promise<T> {
+  const existing = inflight.get(key) as Promise<T> | undefined;
+  if (existing) return existing;
+  const pending = produce().finally(() => {
+    inflight.delete(key);
+  });
+  inflight.set(key, pending);
+  return pending;
+}
+
 /** Test helper — do not use in production paths. */
 export function cacheClearForTests(): void {
   store.clear();
+  inflight.clear();
 }

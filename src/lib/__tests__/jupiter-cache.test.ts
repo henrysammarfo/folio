@@ -160,6 +160,42 @@ describe("Jupiter Swap V2 /order TTL cache + rate-limit honesty", () => {
   });
 });
 
+describe("Jupiter Price v3 batch", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    cacheClearForTests();
+  });
+
+  it("batches ids, labels stock-ref when venue usdPrice missing", async () => {
+    const { fetchJupiterTokenPricesBatch } = await import("../adapters/jupiter");
+    const mintVenue = "VenueMint1111111111111111111111111111111111";
+    const mintRef = "RefMint1111111111111111111111111111111111111";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo) => {
+        expect(String(input)).toMatch(/api\.jup\.ag\/price\/v3\?ids=/);
+        return new Response(
+          JSON.stringify({
+            [mintVenue]: { usdPrice: 190.5, liquidity: 1e6, decimals: 8 },
+            [mintRef]: { stockData: { price: 42.1 }, decimals: 8 },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }),
+    );
+    const map = await fetchJupiterTokenPricesBatch([mintVenue, mintRef]);
+    const venue = map.get(mintVenue);
+    const ref = map.get(mintRef);
+    expect(venue?.ok).toBe(true);
+    expect(ref?.ok).toBe(true);
+    if (!venue?.ok || !ref?.ok) return;
+    expect(venue.data.usdPrice).toBe(190.5);
+    expect(venue.data.priceKind).toBe("venue");
+    expect(ref.data.usdPrice).toBe(42.1);
+    expect(ref.data.priceKind).toBe("stock-ref");
+  });
+});
+
 describe("Jupiter Swap V2 /execute", () => {
   afterEach(() => {
     vi.unstubAllGlobals();

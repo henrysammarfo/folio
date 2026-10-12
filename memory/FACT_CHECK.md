@@ -1,3 +1,4 @@
+
 ## 2026-10-12 — Customer perspective audit
 
 | Claim | Status |
@@ -33,6 +34,168 @@
 | NestUSD not conflated with Reflect | Matrix + credit copy labeled |
 | `@reflectmoney/stable.ts` / `@phantom/react-sdk` installed | Packaged · Reflect SDK not on SSR read path |
 | No Meteora Anchor DBC SDK on SSR | Intentional — HTTP awareness only |
+
+## 2026-09-25 — API keys + Privy sign diagnosis
+
+| Claim | Status |
+|---|---|
+| Production Vercel has PRIVY_APP_ID/SECRET + Supabase + FOLIO_SESSION_SECRET + Jupiter + Bitquery + Finnhub + Pyth + SOLANA_RPC | Verified via `filter_project_envs` (names) + SSR readiness |
+| Production `broadcastPaused:false` (fills armed) | Verified SSR `broadcastPaused:!1` |
+| Local `.env` Privy/Supabase empty | Verified smoke:keys FAIL-CLOSED |
+| Desk SSR Anchor `exports is not defined` blocked Privy mint/sign (not missing keys) | Verified runtime logs on prod main pre-fix |
+| Fix preview (`cursor/folio-dbc-ssr-sign-fix-f1ec`) has zero Anchor crash logs | Verified |
+| Fix merged to `main` (`9b1d5fc`) · PR #46 | Verified git push |
+| Production deploy `dpl_8sX5nCKr…` READY · no Anchor crash on that deploy | Verified runtime logs + SSR probe |
+
+## 2026-09-25 — Prod feature smoke (post SSR fix)
+
+| Claim | Status |
+|---|---|
+| Desk routes /desk* + /network + /pitch HTTP 200 SSR success | Verified curl |
+| Buy Jupiter quote + wash + diverge live; cash session overnight refuse | Verified SSR + UI shot |
+| Markets multi-venue board populated (~55 symbols) | Verified SSR + UI |
+| Borrow Kamino + NestUSD live · armed | Verified SSR + UI |
+| PreStocks catalog live (8) · Tessera T-tokens live (3) | Verified SSR catalog |
+| Network matrix 22 capabilities labeled honestly | Verified SSR |
+| No Anchor ESM crash on current production deploy | Verified runtime logs |
+
+## 2026-09-25 — Pitch deck + dual video scripts
+
+| Claim | Status |
+|---|---|
+| Pitch Video + Technical Video scripts with shot lists | Implemented in `docs/VIDEO_SCRIPTS.md` |
+| Live `/pitch` deck · 13 slides · soft pitch · three tracks | Implemented |
+| README documents Investing+credit · PreStocks · Tessera + flaws | Implemented |
+| Stocklana form Links paste pack updated for both video fields | Implemented |
+
+## 2026-09-25 — Azure home + partner flip (catalog kept)
+
+| Claim | Status |
+|---|---|
+| Netro accents FOLIO azure `#0EA5C9` (not NetroBNB yellow `#F4D014`) | Implemented |
+| Soft home titles: Your market desk / Today's flow / Easy market view | Implemented |
+| PreStocks + Tessera keep catalog list + TokenSelect flip USDC/USDT ↔ partner | Implemented — no cross-issuer |
+| Prepare swap supports partner sell (mint → stable) | Implemented |
+
+## 2026-09-25 — Netro home + markets universe + Tessera Buy
+
+| Claim | Status |
+|---|---|
+| Live Solana xStocks universe ≈ 1124 via paginated `api.xstocks.fi/api/v2/public/assets` | Verified live (12 pages) |
+| Markets board prices universe via Jupiter Price v3 batch (50/chunk, parallel workers, stock-ref fallback) | Implemented — never invents marks |
+| PreStocks Buy ticket = Tessera parity (TokenSelect + flip, USDC/USDT ↔ partner) | Implemented |
+| Wallet holdings = full ATA scan → mint index (not 3-symbol WATCHLIST filter) when bound | Implemented — paper watchlist only when unbound |
+| Credit collateral = full wallet xStock scan when bound | Implemented |
+| Multi-tenant qty still needs Privy + Supabase session keys | Honest — fail-closed without keys; inspect/watch-wallet still mainnet-read |
+
+## 2026-09-25 — Netro home + markets universe + Tessera Buy (prior)
+| Desk curated catalog > 40 buyable names | Implemented |
+| Markets lanes include Pre-IPO (8) + Tessera (3) | Implemented — partner marks, not fake Jupiter venues |
+| Tessera Buy-style TokenSelect + flip USDC/USDT ↔ T-token | Implemented — no PreStock↔Tessera cross |
+| Wash singleflight + TTL 60s / stale 240s | Implemented |
+| Holdings query keys identical across Home / Holdings / Netro | Implemented — `positionsQueryKey` |
+| Netro density always-on for `/desk` home | Implemented |
+| No invented fills / prices | Holds |
+
+## 2026-09-25 — DBC create cost + shot depth
+
+| Claim | Status |
+|---|---|
+| Mainnet DBC pool create ≈ 0.022 SOL rent; comfortable wallet 0.05–0.08 SOL (~$6–10 @ ~$121) | Verified — Solana rent RPC + Meteora SDK fee bounds + docs |
+| Graduation 750 USDC is migration cap, not create SOL | Correct — Bible / Meteora USDC quote config |
+| ≤~$1 cannot FOLIO-sponsor mainnet pool | Holds |
+| Overview AI rail yellow energy + gate chips | Implemented |
+| NestUSD dual rate bars · Credit LTV ring | Implemented |
+| Token picker popular chips | Implemented |
+| Markets letter-mark venue pills | Implemented |
+| Holdings paper banner | Implemented |
+| PreStocks partner rows use API `image` | Implemented |
+| No invented pool / fake volume | Holds |
+
+## 2026-09-24 — Multi-venue + SDK depth
+
+| Claim | Status |
+|---|---|
+| Markets multi-venue (Jupiter + free tape + Raydium + Solami) | Implemented — `multi-venue.ts` + board pills |
+| Solami Blur REST live when SOLAMI_API_KEY | Implemented — `api.solami.dev/data/token/price` |
+| Meteora DBC SDK builds FOLIO stock curve | Implemented — `buildCurveWithMarketCap` · program executable verified |
+| Overview Netro depth beyond thin gauge | Holdings logos · week strip · quote logos · stronger AI rail |
+| Flaws/workarounds documented | `memory/FLAWS_AND_WORKAROUNDS.md` |
+| No invented prices / fake DBC volume / Nest fills | Holds — fail-closed + labeled |
+| Unit tests + production build | Green |
+
+## 2026-09-24 — Netro depth + Bible spine
+
+| Claim | Status |
+|---|---|
+| Henry creative doctrine in memory | `memory/HENRY_DESK_CREATIVE.md` |
+| Bible DBC/Solami was docs-only before this pass | Corrected — adapters + network rows |
+| Cash session weekend refuse on Buy | Implemented — `session-gate.ts` + acquire gates |
+| FOLIO stock-curve config (USDC · gentle · cash-close start) | Implemented — `stock-curve.ts` · demo pool pending |
+| Solami Blur live stream | Fail-closed until client shipped · RPC recent-sig probe labeled |
+| Partner Pre-IPO/Tessera rows show AssetLogo | Implemented — `partner-lane-panel.tsx` |
+| Skeleton loaders replace bare “Loading…” | Implemented — Tessera/PreStocks + partner lanes |
+| Netro signal gauge on overview | Implemented — live wash/×/LTV |
+| Research keys only in gitignored `.env` | Verified — never committed |
+| Never claim unhackable | Still holds |
+
+## 2026-09-24 — Copy refresh
+
+| Claim | Status |
+|---|---|
+| README soft pitch + live product table + prod URL | Updated — `README.md` |
+| Marketing routes soft intros (home/about/markets/credit/preipo/beta) | Updated |
+| Truth / pairs / network / execution / whitepaper soft copy | Updated |
+| Whitepaper MD v1.1 matches live desk (Buy/Borrow/Agent 5/day) | Updated — `docs/FOLIO_WHITEPAPER.md` |
+| DEMO_SCRIPT + STOCKLANA_SUBMIT use production URL | Updated — no stale preview URL |
+| No “unhackable” / fake fill claims in marketing | Verified in this pass |
+| NestUSD still metrics-only in copy | Honest residual |
+
+## 2026-09-24 — Desk UX pass
+
+| Claim | Status |
+|---|---|
+| Buy pay/receive searchable token dropdown | Implemented — `token-select-button.tsx` |
+| Swap flip works from USDC buys | Implemented — flips into stock↔stock |
+| Markets free-tape fallback when Jupiter 429 | Implemented — `gecko-price.ts` labeled |
+| T-SpaceX logo key SPACEX (not SPACE) | Fixed — `underlyingKey` Tessera path |
+| Catalog +CRCLx MSTRx COSTx | Added |
+
+## 2026-09-24 — Demo lock (desk UX + agent cap)
+
+| Claim | Status |
+|---|---|
+| Credit in-house Kamino ktx + AssetLogo | Merged onto demo-lock |
+| Activity icons/logos (not letter tiles) | Verified — `ActivityEvent.icon` + Lucide/AssetLogo on `/desk/activity` |
+| Markets staggered fetch + soft 429 copy | Verified — `mapStaggered` in `desk.screener.ts` · `humanizeVenueNote` |
+| PreStocks / Tessera in-FOLIO buy (no external CTA) | Verified — `outputMint` prepare path · BuyExecuteButton · Tessera app link removed |
+| Agent ≤5 messages / account / day | Verified — `agent_daily` bucket wired in `runDeskAgent` |
+| Credit faces SPY/QQQ/GOOGL/cbBTC | Verified — direct logo + favicon fallbacks in `logo-resolve` |
+| Soft wash / venue copy (no Gecko/jupiter_rate_limited dump) | Verified — `humanizeWashNote` + `humanizeVenueNote` |
+
+## 2026-09-21 — Credit in-house Kamino ktx
+
+| Claim | Status |
+|---|---|
+| Credit desk deposits/borrows in-FOLIO via Kamino ktx | Implemented — `credit-borrow-button.tsx` + `kamino-ktx.ts` |
+| No primary CTA redirect to Kamino / NestUSD app | Implemented — desk ticket only |
+| AssetLogo on Kamino + NestUSD rate rows | Implemented |
+| Still no FOLIO custom borrow CPI | Honest residual |
+| Gated by BROADCAST_PAUSED + folio_session | Same as Jupiter fills |
+| NestUSD execute still metrics/app (not in-desk) | Honest residual |
+
+## 2026-09-24 — Bible · Aqua0 · launch polish
+
+| Claim | Status |
+|---|---|
+| FOLIO_BIBLE synced (DBC primary · Solami tape · soft pitch) | Verified — `docs/FOLIO_BIBLE.md` |
+| Aqua0 $1.1k multi-strategy LP on tokenized equities | Observed — competitor field note; not FOLIO claim |
+| FOLIO wedge ≠ shared-capital LP routing | Decision — honesty desk (truth · wash · buy/borrow) |
+| Launch polish 20 checklist | Done — `docs/LAUNCH_POLISH_20.md` |
+| FolioAgentChat thinking/stream/composer | Implemented — settings agent |
+| Beta honeypot spam trap | Implemented |
+| Sitemap includes markets/beta/whitepaper/preipo/tessera | Implemented |
+
 
 ## 2026-09-20 — Ship rough edges (fills · F · G · honesty)
 

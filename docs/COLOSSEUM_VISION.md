@@ -37,16 +37,16 @@ FOLIO buys the US stocks you want on Solana — keeps share counts honest after 
 
 ## Interview beats (practice aloud)
 1. **Why you?** Ghana, less privileged, still building at full intensity — the product is the proof.
-2. **Why this?** Tokenized stocks lie when corporate actions and wash flow are ignored; FOLIO makes the desk honest first.
-3. **Why now?** xStocks + Solana rails exist; the missing piece is a fail-closed prime desk, not another fake fill UI.
-4. **Why you win?** Live mainnet reads already; wash refuse; quote-only; credit labels; broadcast paused on purpose.
-5. **How do you last 3 years?** Trust → keyed sessions → funded broadcast with caps → fee on credit/routing. Never fake readiness.
-6. **What’s hard?** NestUSD endpoint unverified (we hide capacity); Pyth may 401 on some egress (we say so); keys not in yet (fail-closed).
+2. **Why this?** Tokenized stocks lie when dividends, splits, and dirty pools are ignored; FOLIO makes the desk honest first.
+3. **Why now?** xStocks + Solana rails exist; the missing piece is an honest desk, not another fake fill UI.
+4. **Why you win?** Live mainnet reads · wash refuse · live quotes · credit in-desk · NestUSD metrics honest.
+5. **How do you last 3 years?** Trust → sessions → funded fills with caps → fee on credit/routing. Never fake readiness.
+6. **What’s hard?** NestUSD execute still external; Pyth entitlement gaps (we say so); residual risk always remains.
 
 ## Demo URL (judges)
-https://folio-git-cursor-folio-prefs-agent-honesty-f1ec-teamtitanlink.vercel.app  
+https://folio-tawny-one.vercel.app  
 
-Beats: `/truth` live multiplier · `/network` fail-closed wash/NestUSD/broadcast · `/desk/credit` NestUSD never Ready · home **Approve desk UI / Approve shaders**.
+Beats: `/truth` live multiplier · `/network` labeled status · `/desk/credit` Kamino in-desk · Buy token search + flip · PreStocks/Tessera rooms.
 
 ## Lab approve (blocker for “wow” chrome)
 - `/lab/ui` → `desk-density-a` · `desk-density-b` · `gate-chip`

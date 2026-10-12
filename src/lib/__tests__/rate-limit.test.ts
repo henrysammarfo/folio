@@ -26,6 +26,19 @@ describe("rateLimitCheck", () => {
     expect(rateLimitCheck("agent", "u:a").ok).toBe(true);
     expect(rateLimitCheck("quote", "u:b").ok).toBe(true);
   });
+
+  it("enforces agent_daily at 5 per 24h window", () => {
+    const key = "u:did:privy:demo";
+    for (let i = 0; i < 5; i++) {
+      expect(rateLimitCheck("agent_daily", key).ok).toBe(true);
+    }
+    const blocked = rateLimitCheck("agent_daily", key);
+    expect(blocked.ok).toBe(false);
+    if (!blocked.ok) {
+      expect(blocked.detail).toMatch(/agent_daily/i);
+      expect(blocked.retryAfterSec).toBeGreaterThan(0);
+    }
+  });
 });
 
 describe("rateLimitClientKey", () => {

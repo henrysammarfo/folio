@@ -9,7 +9,11 @@ import {
   type EquityRefPrice,
   type XStockRefPrice,
 } from "./adapters/equity-ref";
-import { fetchJupiterQuote, fetchJupiterTokenPrice, fetchJupiterExecute } from "./adapters/jupiter";
+import { fetchJupiterQuote, fetchJupiterTokenPrice, fetchJupiterExecute, isStablePaySymbol, stableMintForSymbol } from "./adapters/jupiter";
+import {
+  fetchKaminoBorrowTx,
+  fetchKaminoDepositTx,
+} from "./adapters/kamino-ktx";
 import { evaluateWashGate, washAllowsSize } from "./adapters/wash";
 import { buildAcquireGateMessages } from "./acquire-gates";
 import { buildNetworkMatrix, type MatrixRow } from "./adapters/network-matrix";
@@ -29,6 +33,9 @@ import { fetchReflectStatus } from "./adapters/reflect";
 import { fetchMeteoraDbcAwareness } from "./adapters/meteora-dbc";
 import { fetchSquadsTreasuryStatus } from "./adapters/squads-treasury";
 import { resolveSolanaRpcUrl } from "./adapters/solana-rpc";
+import { evaluateCashSession } from "./adapters/session-gate";
+import { folioStockCurveStatus } from "./adapters/stock-curve";
+import { fetchSolamiTape } from "./adapters/solami-tape";
 import { errResult, type AdapterResult } from "./adapters/types";
 import type { XStockAsset, XStockMultiplier } from "./adapters/xstocks";
 import type { JupiterQuote, JupiterTokenPrice } from "./adapters/jupiter";
@@ -104,13 +111,21 @@ const QuoteInput = z.object({
 });
 
 const PrepareSwapInput = z.object({
-  symbol: z.string().min(2).max(16),
+  symbol: z.string().min(2).max(32),
   spendUsdc: z.number().positive().max(25).optional(),
   paySymbol: z.string().min(2).max(16).optional(),
   amount: z.number().positive().max(25).optional(),
   /** Solana pubkey that will sign — required for Swap V2 assembled tx. */
   taker: z.string().min(32).max(64),
   slippageBps: z.number().int().min(1).max(500).optional(),
+  /**
+   * Partner mint path (PreStocks / Tessera) — skip xStocks catalog lookup.
+   * When set, FOLIO quotes stable ↔ this mint in-desk (no external redirect).
+   */
+  outputMint: z.string().min(32).max(64).optional(),
+  outputDecimals: z.number().int().min(0).max(18).optional(),
+  /** buy = stable → partner · sell = partner → stable. Never cross issuers. */
+  side: z.enum(["buy", "sell"]).optional().default("buy"),
 });
 
 export type TruthBundle = {
@@ -368,8 +383,13 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
 
     const symbol = data.symbol;
     const payRaw = data.paySymbol?.trim();
-    const isPair = Boolean(payRaw && payRaw.toUpperCase() !== "USDC");
-    const paySymbol = isPair ? payRaw! : "USDC";
+    const payStable = payRaw ? isStablePaySymbol(payRaw) : true;
+    const isPair = Boolean(payRaw && !payStable);
+    const paySymbol = isPair
+      ? payRaw!
+      : payRaw && isStablePaySymbol(payRaw)
+        ? payRaw.toUpperCase()
+        : "USDC";
     const payAmount = data.amount ?? data.spendUsdc ?? (isPair ? 0.01 : 1);
     const spendUsdc = payAmount;
 
@@ -449,7 +469,10 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       };
     } else {
       jupiter = await fetchJupiterQuote({
-        inputMint: isPair && payMint ? payMint : undefined,
+        inputMint:
+          isPair && payMint
+            ? payMint
+            : (stableMintForSymbol(paySymbol) ?? undefined),
         outputMint: mint,
         amountRaw: Math.round(payAmount * 10 ** (isPair ? payDecimals : 6)),
         slippageBps: 50,
@@ -492,6 +515,7 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
         : ({ kind: "ok", poolCount: pools.data.raydium.length } as const);
 
     const prefs = await loadStrictFailClosedPref();
+    const cashSession = evaluateCashSession();
     const gateMsgs = buildAcquireGateMessages({
       truthOk,
       tradingHalted: Boolean(asset.ok && asset.data.isTradingHalted),
@@ -505,6 +529,11 @@ export const getAcquireBundle = createServerFn({ method: "GET" })
       strictFailClosed: prefs.strictFailClosed,
       pools: poolsGate,
       scaledUi: scaledUiGate,
+      cashSession: cashSession.ok
+        ? cashSession.data.open
+          ? { kind: "open", label: cashSession.data.label }
+          : { kind: "closed", label: cashSession.data.label }
+        : undefined,
     });
 
     const honestyNotes = [
@@ -598,10 +627,84 @@ export const prepareJupiterSwap = createServerFn({ method: "POST" })
     }
 
     const payRaw = data.paySymbol?.trim();
-    const isPair = Boolean(payRaw && payRaw.toUpperCase() !== "USDC");
-    const paySymbol = isPair ? payRaw! : "USDC";
+    const payStable = payRaw ? isStablePaySymbol(payRaw) : true;
+    const isPair = Boolean(payRaw && !payStable);
+    const paySymbol = isPair
+      ? payRaw!
+      : payRaw && isStablePaySymbol(payRaw)
+        ? payRaw.toUpperCase()
+        : "USDC";
     const payAmount = data.amount ?? data.spendUsdc ?? (isPair ? 0.01 : 1);
     const slippageBps = data.slippageBps ?? 50;
+    const partnerMint = data.outputMint?.trim() || null;
+    const partnerDecimals =
+      data.outputDecimals != null && Number.isFinite(data.outputDecimals)
+        ? data.outputDecimals
+        : 9;
+
+    if (partnerMint) {
+      if (isPair) {
+        return {
+          ok: false as const,
+          reason: "partner_pair_unsupported",
+          detail: "Partner tokens stay on stable rails only. No stock pairs.",
+        };
+      }
+      const side = data.side ?? "buy";
+      const stable = stableMintForSymbol(paySymbol);
+      if (!stable) {
+        return {
+          ok: false as const,
+          reason: "stable_pay_unknown",
+          detail: "Pay rail must be USDC or USDT.",
+        };
+      }
+      const amountRaw =
+        side === "sell"
+          ? Math.round(payAmount * 10 ** partnerDecimals)
+          : Math.round(payAmount * 1_000_000);
+      const order = await fetchJupiterQuote({
+        inputMint: side === "sell" ? partnerMint : stable,
+        outputMint: side === "sell" ? stable : partnerMint,
+        amountRaw,
+        slippageBps,
+        outputDecimals: side === "sell" ? 6 : partnerDecimals,
+        inputDecimals: side === "sell" ? partnerDecimals : 6,
+        taker: data.taker.trim(),
+      });
+      if (!order.ok) {
+        return {
+          ok: false as const,
+          reason: order.reason,
+          detail: order.detail ?? null,
+          source: order.source,
+        };
+      }
+      if (!order.data.transaction || !order.data.requestId) {
+        return {
+          ok: false as const,
+          reason: "order_missing_transaction",
+          detail:
+            "Jupiter returned quote without a signable tx — check wallet SOL/USDC or try ≥~$10 for gasless.",
+          source: order.source,
+        };
+      }
+      return {
+        ok: true as const,
+        source: order.source,
+        mode: order.mode,
+        data: {
+          requestId: order.data.requestId,
+          transaction: order.data.transaction,
+          outUiAmount: order.data.outUiAmount,
+          inUiAmount: order.data.inUiAmount,
+          gasless: order.data.gasless,
+          signatureFeePayer: order.data.signatureFeePayer,
+          router: order.data.router,
+          feeBps: order.data.feeBps,
+        },
+      };
+    }
 
     const [asset, payAssetRes] = await Promise.all([
       fetchXStockAsset(data.symbol),
@@ -642,7 +745,10 @@ export const prepareJupiterSwap = createServerFn({ method: "POST" })
     const amountRaw = Math.round(payAmount * 10 ** (isPair ? payDecimals : 6));
 
     const order = await fetchJupiterQuote({
-      inputMint: isPair && payAsset?.ok ? payAsset.data.solanaMint! : undefined,
+      inputMint:
+        isPair && payAsset?.ok
+          ? payAsset.data.solanaMint!
+          : (stableMintForSymbol(paySymbol) ?? undefined),
       outputMint: asset.data.solanaMint,
       amountRaw,
       slippageBps,
@@ -743,6 +849,126 @@ export const executeJupiterSwap = createServerFn({ method: "POST" })
     };
   });
 
+const KaminoKtxInput = z.object({
+  wallet: z.string().min(32).max(64),
+  reserve: z.string().min(32).max(64),
+  amount: z.string().min(1).max(32),
+});
+
+/**
+ * Assemble a Kamino Klend deposit (collateral) tx via ktx — signed in-desk.
+ * Requires folio_session · rate-limited · fail-closed while broadcast paused.
+ */
+export const prepareKaminoDeposit = createServerFn({ method: "POST" })
+  .inputValidator(KaminoKtxInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSessionLocal();
+    const sessionBlock = executeBlockedReason(session);
+    if (sessionBlock) {
+      return {
+        ok: false as const,
+        reason: "execute_requires_session",
+        detail: sessionBlock,
+      };
+    }
+    const rl = rateLimitCheck(
+      "execute",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
+    if (isBroadcastPaused()) {
+      return {
+        ok: false as const,
+        reason: "broadcast_paused",
+        detail: "Borrow/deposit paused until FOLIO arms fills.",
+      };
+    }
+    const res = await fetchKaminoDepositTx({
+      wallet: data.wallet,
+      reserve: data.reserve,
+      amount: data.amount,
+    });
+    if (!res.ok) {
+      return {
+        ok: false as const,
+        reason: res.reason,
+        detail: res.detail ?? null,
+        source: res.source,
+      };
+    }
+    return {
+      ok: true as const,
+      source: res.source,
+      data: res.data,
+    };
+  });
+
+/**
+ * Assemble a Kamino Klend borrow (USDC) tx via ktx — signed in-desk.
+ * Obligation must exist (deposit first).
+ */
+export const prepareKaminoBorrow = createServerFn({ method: "POST" })
+  .inputValidator(KaminoKtxInput)
+  .handler(async ({ data }) => {
+    const session = readVerifiedSessionLocal();
+    const sessionBlock = executeBlockedReason(session);
+    if (sessionBlock) {
+      return {
+        ok: false as const,
+        reason: "execute_requires_session",
+        detail: sessionBlock,
+      };
+    }
+    const rl = rateLimitCheck(
+      "execute",
+      rateLimitClientKey({
+        userId: session.ok ? session.data.userId : null,
+        ip: readClientIp(),
+      }),
+    );
+    if (!rl.ok) {
+      return {
+        ok: false as const,
+        reason: "rate_limited",
+        detail: rl.detail,
+      };
+    }
+    if (isBroadcastPaused()) {
+      return {
+        ok: false as const,
+        reason: "broadcast_paused",
+        detail: "Borrow paused until FOLIO arms fills.",
+      };
+    }
+    const res = await fetchKaminoBorrowTx({
+      wallet: data.wallet,
+      reserve: data.reserve,
+      amount: data.amount,
+    });
+    if (!res.ok) {
+      return {
+        ok: false as const,
+        reason: res.reason,
+        detail: res.detail ?? null,
+        source: res.source,
+      };
+    }
+    return {
+      ok: true as const,
+      source: res.source,
+      data: res.data,
+    };
+  });
+
 export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<NetworkBundle> => {
     const symbol = "AAPLx";
@@ -825,6 +1051,12 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     const broadcastFunded =
       squadsTreasury.ok && Boolean(squadsTreasury.data.broadcastTreasuryReady);
 
+    const cashSession = evaluateCashSession();
+    const [stockCurve, solamiTape] = await Promise.all([
+      folioStockCurveStatus(),
+      fetchSolamiTape({ mint }),
+    ]);
+
     return {
       rows: buildNetworkMatrix({
         multiplier,
@@ -843,6 +1075,9 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         reflect,
         meteoraDbc,
         squadsTreasury,
+        cashSession,
+        stockCurve,
+        solamiTape,
         bitqueryKeyPresent: Boolean(process.env["BITQUERY_API_KEY"]?.trim()),
         multiTenantKeysPresent,
         sessionSecretPresent,

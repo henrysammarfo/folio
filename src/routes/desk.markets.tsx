@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
+import { VenueLogo } from "@/components/venue-logo";
 import { getMarketsBoard } from "@/lib/desk.functions";
+import { DESK_SYNC, marketsQueryKey } from "@/lib/desk-query-keys";
+import { humanizeVenueNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 import { LANE_META, type XStockLane } from "@/lib/xstock-catalog";
 
@@ -40,20 +43,31 @@ function shortLiq(n: number) {
 function Page() {
   const initial = Route.useLoaderData();
   const [lane, setLane] = useState<LaneFilter>("all");
+  const [q, setQ] = useState("");
+  const [qDebounced, setQDebounced] = useState("");
   const fetchBoard = useServerFn(getMarketsBoard);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setQDebounced(q.trim()), 280);
+    return () => window.clearTimeout(t);
+  }, [q]);
+
   const { data, isFetching } = useQuery({
-    queryKey: ["markets-board", lane],
-    queryFn: () => fetchBoard({ data: { lane } }),
-    initialData: lane === "all" ? initial : undefined,
+    queryKey: [...marketsQueryKey(lane), qDebounced],
+    queryFn: () =>
+      fetchBoard({
+        data: { lane, ...(qDebounced ? { q: qDebounced } : {}) },
+      }),
+    initialData: lane === "all" && !qDebounced ? initial : undefined,
     initialDataUpdatedAt: Date.now(),
-    staleTime: 20_000,
-    refetchInterval: 45_000,
+    staleTime: DESK_SYNC.marketsStaleMs,
+    refetchInterval: DESK_SYNC.marketsRefetchMs,
   });
 
   const rows = data?.rows ?? [];
   const priced = useMemo(
-    () => rows.filter((r) => r.usdPrice != null).length,
-    [rows],
+    () => data?.pricedCount ?? rows.filter((r) => r.usdPrice != null).length,
+    [data?.pricedCount, rows],
   );
 
   return (
@@ -64,7 +78,8 @@ function Page() {
             <p className="fx-hero-kicker">Live board</p>
             <h1>Markets</h1>
             <p className="fx-sub">
-              {data?.note ?? "Jupiter venue prices for the desk catalog."}
+              {data?.note ??
+                "Jupiter + free-tape venue prices for the desk catalog."}
               {isFetching ? " · refreshing…" : ""}
             </p>
           </div>
@@ -75,6 +90,11 @@ function Page() {
             <span>
               <b>{rows.length}</b> listed
             </span>
+            {data?.universeCount != null ? (
+              <span>
+                <b>{data.universeCount.toLocaleString()}</b> on Solana
+              </span>
+            ) : null}
           </div>
         </header>
 
@@ -85,7 +105,7 @@ function Page() {
         >
           {rows.slice(0, 10).map((row) => (
             <Link
-              key={row.symbol}
+              key={`${row.lane}-${row.symbol}`}
               to="/desk/acquire"
               className="fx-markets-flow-chip"
               aria-label={`Buy ${row.symbol}`}
@@ -127,10 +147,23 @@ function Page() {
           })}
         </div>
 
+        <label className="fx-markets-search">
+          <span className="fx-sr-only">Search markets</span>
+          <input
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search symbol. Expands full Solana universe…"
+            autoComplete="off"
+          />
+        </label>
+
         <p className="fx-markets-explain">
           {LANE_META.find((l) => l.id === lane)?.body}
-          {" "}
-          Private pre-IPO stays on{" "}
+          {data?.universeCount != null
+            ? ` · ${data.universeCount.toLocaleString()} Solana xStocks live.`
+            : ""}{" "}
+          Private names stay on{" "}
           <Link to="/desk/preipo">PreStocks</Link> /{" "}
           <Link to="/desk/tessera">Tessera</Link>.
         </p>
@@ -141,7 +174,7 @@ function Page() {
             <span>Lane</span>
             <span>Session</span>
             <span>Liq</span>
-            <span>Venue</span>
+            <span>Mark · venues</span>
           </div>
           <ul className="fx-board-list">
             {rows.map((row) => {
@@ -152,10 +185,16 @@ function Page() {
                   ? ((row.usdPrice - row.stockRefPrice) / row.stockRefPrice) *
                     100
                   : null;
+              const deskTo =
+                row.deskPath === "/desk/preipo"
+                  ? "/desk/preipo"
+                  : row.deskPath === "/desk/tessera"
+                    ? "/desk/tessera"
+                    : "/desk/acquire";
               return (
-                <li key={row.symbol}>
+                <li key={`${row.lane}-${row.symbol}`}>
                   <Link
-                    to="/desk/acquire"
+                    to={deskTo}
                     className="fx-board-row"
                     aria-label={`Trade ${row.symbol}`}
                   >
@@ -198,16 +237,39 @@ function Page() {
                       {row.usdPrice != null ? (
                         <>
                           <strong>{money(row.usdPrice)}</strong>
-                          <small>
-                            {row.priceNote}
-                            {vsRef != null
-                              ? ` · ${vsRef >= 0 ? "+" : ""}${vsRef.toFixed(1)}% vs ref`
-                              : ""}
-                          </small>
+                          {vsRef != null ? (
+                            <small>
+                              {vsRef >= 0 ? "+" : ""}
+                              {vsRef.toFixed(1)}% vs cash ref
+                            </small>
+                          ) : null}
                         </>
                       ) : (
-                        <small>{row.priceNote}</small>
+                        <small>{humanizeVenueNote(row.priceNote)}</small>
                       )}
+                      {row.venues.length > 0 ? (
+                        <span className="fx-venue-strip" aria-label="Venues">
+                          {row.venues.map((v) => (
+                            <em
+                              key={v.id}
+                              className={`fx-venue-pill is-${v.status}`}
+                              title={v.note}
+                            >
+                              <VenueLogo id={v.id} size={14} />
+                              {v.label}
+                              {v.usdPrice != null
+                                ? ` ${money(v.usdPrice)}`
+                                : v.liquidity != null
+                                  ? ` ${shortLiq(v.liquidity)}`
+                                  : v.status === "cooling"
+                                    ? " · cool"
+                                    : v.status === "off"
+                                      ? " · off"
+                                      : ""}
+                            </em>
+                          ))}
+                        </span>
+                      ) : null}
                     </span>
                   </Link>
                 </li>
@@ -218,14 +280,14 @@ function Page() {
 
         <div className="fx-markets-extra">
           <article className="fx-markets-aside">
-            <h2>Stock ↔ stock</h2>
-            <p>Rotate without cashing to USDC first — pairs on Buy.</p>
-            <Link to="/desk/acquire">Open pairs →</Link>
+            <h2>Stock to stock</h2>
+            <p>Rotate without cashing to USDC first. Pairs live on Buy.</p>
+            <Link to="/desk/acquire">Open pairs</Link>
           </article>
           <article className="fx-markets-aside">
-            <h2>Pre-IPO</h2>
-            <p>PreStocks private names · Tessera T-tokens on their own desks.</p>
-            <Link to="/desk/preipo">PreStocks →</Link>
+            <h2>PreStocks</h2>
+            <p>Private names and Tessera T-tokens on their own desks.</p>
+            <Link to="/desk/preipo">Open PreStocks</Link>
           </article>
         </div>
       </section>

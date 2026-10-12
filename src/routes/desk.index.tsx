@@ -10,6 +10,11 @@ import {
   getCreditBundle,
   getPositionsBundle,
 } from "@/lib/desk.functions";
+import {
+  creditQueryKey,
+  DESK_SYNC,
+  positionsQueryKey,
+} from "@/lib/desk-query-keys";
 import { siteMeta } from "@/lib/site-meta";
 
 const deskSearchSchema = z.object({
@@ -50,18 +55,22 @@ function Page() {
   const fetchPositions = useServerFn(getPositionsBundle);
   const fetchCredit = useServerFn(getCreditBundle);
   const positions = useQuery({
-    queryKey: ["positions-bundle", inspect ?? ""],
+    queryKey: positionsQueryKey(inspect),
     queryFn: () => fetchPositions({ data: { inspectWallet: inspect } }),
     initialData: initial.positions,
     initialDataUpdatedAt: Date.now(),
-    staleTime: 15_000,
+    staleTime: DESK_SYNC.positionsStaleMs,
+    refetchInterval: DESK_SYNC.positionsRefetchMs,
+    refetchOnMount: "always",
   });
   const credit = useQuery({
-    queryKey: ["credit-bundle", inspect ?? ""],
+    queryKey: creditQueryKey(inspect),
     queryFn: () => fetchCredit({ data: { inspectWallet: inspect } }),
     initialData: initial.credit,
     initialDataUpdatedAt: Date.now(),
-    staleTime: 20_000,
+    staleTime: DESK_SYNC.creditStaleMs,
+    refetchInterval: DESK_SYNC.positionsRefetchMs,
+    refetchOnMount: "always",
   });
 
   const rows = positions.data?.rows ?? [];

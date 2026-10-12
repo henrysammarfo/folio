@@ -8,6 +8,7 @@ import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { getPositionsBundle } from "@/lib/desk.functions";
+import { DESK_SYNC, positionsQueryKey } from "@/lib/desk-query-keys";
 import { scaledUiHealthLabel, positionStatusLabel } from "@/lib/position-health";
 import { siteMeta } from "@/lib/site-meta";
 
@@ -47,11 +48,13 @@ function Page() {
   const [inspectInput, setInspectInput] = useState(inspect ?? "");
   const [err, setErr] = useState<string | null>(null);
   const { data } = useQuery({
-    queryKey: ["positions-bundle", inspect ?? ""],
+    queryKey: positionsQueryKey(inspect),
     queryFn: () => fetchPositions({ data: { inspectWallet: inspect } }),
     initialData: initial,
     initialDataUpdatedAt: Date.now(),
-    staleTime: 15_000,
+    staleTime: DESK_SYNC.positionsStaleMs,
+    refetchInterval: DESK_SYNC.positionsRefetchMs,
+    refetchOnMount: "always",
   });
 
   const rows = data?.rows ?? [];
@@ -96,12 +99,57 @@ function Page() {
         </header>
 
         <div className="fx-actions">
-          <Link to="/desk/acquire" className="fx-btn fx-btn-primary">
+          {!walletRead ? (
+            <Link to="/desk/settings" className="fx-btn fx-btn-primary">
+              Connect wallet
+            </Link>
+          ) : null}
+          <Link
+            to="/desk/acquire"
+            className={`fx-btn ${walletRead ? "fx-btn-primary" : "fx-btn-ghost"}`}
+          >
             Buy stocks
           </Link>
           <Link to="/desk/credit" className="fx-btn fx-btn-ghost">
             Borrow
           </Link>
+        </div>
+
+        {!walletRead ? (
+          <div className="fx-holdings-banner" data-testid="holdings-paper-banner">
+            <div>
+              <strong>Estimates until you connect</strong>
+              <p>
+                Paper rows are sizing guides, not owned shares. Connect a wallet
+                to verify live balances and share counts.
+              </p>
+            </div>
+            <Link to="/desk/settings" className="fx-btn fx-btn-dark">
+              Connect →
+            </Link>
+          </div>
+        ) : null}
+
+        <div className="fx-holdings-netro" data-testid="holdings-netro-strip">
+          <div className="fx-holdings-netro-card">
+            <span>Portfolio</span>
+            <b>{total > 0 ? money(total) : "—"}</b>
+            <small>{walletRead ? "Wallet verified" : "Paper estimate"}</small>
+          </div>
+          <div className="fx-holdings-netro-card">
+            <span>Positions</span>
+            <b>{rows.length}</b>
+            <small>{rows.filter((r) => r.qtySource === "wallet-read").length} live</small>
+          </div>
+          <div className="fx-holdings-netro-card is-dark">
+            <span>Next</span>
+            <b>{walletRead ? "Borrow" : "Connect"}</b>
+            <small>
+              <Link to={walletRead ? "/desk/credit" : "/desk/settings"}>
+                {walletRead ? "Open credit →" : "Open account →"}
+              </Link>
+            </small>
+          </div>
         </div>
 
         {parts.length > 0 ? <AllocationChart parts={parts} /> : null}

@@ -183,4 +183,19 @@ describe("buildAcquireGateMessages", () => {
     expect(g.canReview).toBe(false);
     expect(g.blockedReasons.join(" ")).toMatch(/Share-count mismatch/i);
   });
+
+  it("blocks review when cash session is closed (Bible weekend refuse)", () => {
+    const g = buildAcquireGateMessages({
+      truthOk: true,
+      tradingHalted: false,
+      washOk: true,
+      wash: { kind: "pressure" },
+      quoteOk: true,
+      quoteReason: null,
+      diverge: { kind: "ok" },
+      cashSession: { kind: "closed", label: "Weekend — cash session closed" },
+    });
+    expect(g.canReview).toBe(false);
+    expect(g.blockedReasons.join(" ")).toMatch(/Cash session closed/i);
+  });
 });

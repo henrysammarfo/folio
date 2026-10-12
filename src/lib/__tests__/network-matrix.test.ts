@@ -61,7 +61,7 @@ describe("buildNetworkMatrix honesty", () => {
 
     expect(byCap["Kamino xStocks market (read)"]?.mode).toBe("mainnet-read");
     expect(byCap["Kamino xStocks market (read)"]?.detail).toMatch(
-      /Kamino UI|deep-link|no FOLIO CPI/i,
+      /in-desk|ktx|no FOLIO CPI/i,
     );
     expect(byCap["Watch-wallet mainnet-read qty"]?.mode).toBe("mainnet-read");
     expect(byCap["Ephemeral wallet inspect"]?.mode).toBe("mainnet-read");
@@ -89,6 +89,10 @@ describe("buildNetworkMatrix honesty", () => {
     expect(byCap["FOLIO treasury (Squads / Altitude)"]?.mode).toBe(
       "unavailable",
     );
+    // Bible spine — labeled when unwired (no silent omission)
+    expect(byCap["Cash session (weekend refuse)"]?.mode).toBe("unavailable");
+    expect(byCap["Meteora DBC stock curve"]?.mode).toBe("unavailable");
+    expect(byCap["Solami / mainnet tape"]?.mode).toBe("unavailable");
   });
 
   it("labels hub lanes when adapters report mainnet-read without flipping NestUSD", () => {

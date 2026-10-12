@@ -1,8 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import {
+  Activity,
+  AlertTriangle,
+  BadgeDollarSign,
+  Landmark,
+  Link2,
+  Scale,
+  ShieldCheck,
+  Sparkles,
+  Vault,
+  type LucideIcon,
+} from "lucide-react";
+import { AssetLogo } from "@/components/asset-logo";
 import { DeskShell } from "@/components/desk-shell";
-import { getActivityBundle } from "@/lib/desk.functions";
+import { getActivityBundle, type ActivityEvent } from "@/lib/desk.functions";
 import { humanizeHonestyNote, humanizeWashNote } from "@/lib/humanize-copy";
 import { siteMeta } from "@/lib/site-meta";
 
@@ -18,9 +31,38 @@ export const Route = createFileRoute("/desk/activity")({
   component: Page,
 });
 
+const ICON_MAP: Record<ActivityEvent["icon"], LucideIcon> = {
+  share: Scale,
+  chain: Link2,
+  ca: Sparkles,
+  alert: AlertTriangle,
+  quote: BadgeDollarSign,
+  wash: ShieldCheck,
+  credit: Landmark,
+  earn: Vault,
+  borrow: Landmark,
+  pool: Activity,
+};
+
 function humanizeActivityDetail(title: string, detail: string): string {
-  if (/wash/i.test(title)) return humanizeWashNote(detail);
+  if (/wash|route/i.test(title)) return humanizeWashNote(detail);
   return humanizeHonestyNote(detail) || detail;
+}
+
+function ActivityGlyph({ event }: { event: ActivityEvent }) {
+  if (event.symbol) {
+    return (
+      <span className="fx-feed-glyph" aria-hidden>
+        <AssetLogo symbol={event.symbol} size={28} />
+      </span>
+    );
+  }
+  const Icon = ICON_MAP[event.icon] ?? Activity;
+  return (
+    <span className={`fx-feed-dot tone-${event.tone}`} aria-hidden>
+      <Icon size={16} strokeWidth={2.1} />
+    </span>
+  );
 }
 
 function Page() {
@@ -45,10 +87,8 @@ function Page() {
         <div className="fx-card">
           <ul className="fx-feed" aria-label="Activity">
             {(data?.events ?? []).map((e) => (
-              <li key={`${e.title}-${e.at}`}>
-                <span className="fx-feed-dot" aria-hidden>
-                  {e.title.slice(0, 1)}
-                </span>
+              <li key={`${e.title}-${e.at}-${e.icon}`}>
+                <ActivityGlyph event={e} />
                 <div>
                   <strong>{e.title}</strong>
                   <p>{humanizeActivityDetail(e.title, e.detail)}</p>

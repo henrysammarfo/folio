@@ -233,8 +233,8 @@ export function NetroDensityCanvas({
     <div className="netro-density" data-testid="netro-density-surface">
       <header className="netro-density-title netro-density-item" style={delay(0)}>
         <div>
-          <h3>Your desk</h3>
-          <span>Buy · hold · borrow — live markets</span>
+          <h3>Your market desk</h3>
+          <span>Buy, hold, and borrow on Solana</span>
         </div>
         <div className="netro-density-chrome-actions">
           <Link to="/desk/acquire" className="netro-density-connect">
@@ -339,13 +339,21 @@ export function NetroDensityCanvas({
                 <b>{ownership.economicValueLabel}</b>
               </div>
               {ownership.rows.map((row) => (
-                <div key={row.symbol}>
-                  <span>{row.symbol}</span>
-                  <b>{row.qtyLabel.replace(/\bpaper\b/gi, "est.")}</b>
-                  <small>{row.valueLabel}</small>
+                <div key={row.symbol} className="netro-density-own-row">
+                  <AssetLogo symbol={row.symbol} size={28} />
+                  <div>
+                    <span>{row.symbol}</span>
+                    <b>{row.qtyLabel.replace(/\bpaper\b/gi, "est.")}</b>
+                    <small>{row.valueLabel}</small>
+                  </div>
                 </div>
               ))}
             </div>
+            {/no wallet/i.test(ownership.walletSourceLabel) ? (
+              <Link to="/desk/settings" className="netro-density-own-cta">
+                Connect wallet to verify →
+              </Link>
+            ) : null}
           </section>
         </details>
       ) : null}
@@ -357,15 +365,14 @@ export function NetroDensityCanvas({
               className="netro-density-profile netro-density-item"
               style={delay(3)}
             >
-              <p className="netro-density-hi">Welcome</p>
+              <p className="netro-density-hi">Hi from FOLIO</p>
               <div className="netro-density-profile-art" aria-hidden>
-                <span className="netro-density-gear" />
-                <span className="netro-density-gear netro-density-gear-inner" />
+                <img src="/netro/i1.png" alt="" width={260} height={260} />
               </div>
               <h4>
-                Trade
+                Easy
                 <br />
-                {flowSymbol}
+                market view
               </h4>
               <div className="netro-density-clock">
                 <span>{clock.h}</span>
@@ -374,12 +381,8 @@ export function NetroDensityCanvas({
                 <em>:</em>
                 <span>{clock.s}</span>
               </div>
-              <Link
-                to="/desk/positions/$symbol"
-                params={{ symbol: flowSymbol }}
-                className="netro-density-cta"
-              >
-                Open {flowSymbol}
+              <Link to="/desk/acquire" className="netro-density-cta">
+                Open Buy
               </Link>
             </div>
 
@@ -391,10 +394,12 @@ export function NetroDensityCanvas({
               >
                 <div className="netro-density-flow-head">
                   <div>
-                    <strong>{flowUnderlying}</strong>
-                    <p>{flowSymbol}</p>
+                    <strong>Today&apos;s flow</strong>
+                    <p>Live share counts, wash check, Jupiter quote</p>
                   </div>
-                  <span className="netro-density-flow-pill">Live</span>
+                  <span className="netro-density-flow-pill">
+                    {flowUnderlying} | USDC
+                  </span>
                 </div>
                 <div
                   className="netro-density-metrics"
@@ -420,6 +425,89 @@ export function NetroDensityCanvas({
                     <span>LTV</span>
                     <b>{gates.kaminoLtv ? `${gates.kaminoLtv}` : "—"}</b>
                   </div>
+                </div>
+                <div
+                  className="netro-density-signal"
+                  data-testid="netro-signal-rail"
+                  aria-label="Desk signal"
+                >
+                  <div className="netro-density-signal-gauge" aria-hidden>
+                    <svg viewBox="0 0 120 64" role="presentation">
+                      <path
+                        d="M10 54 A50 50 0 0 1 110 54"
+                        fill="none"
+                        stroke="#e5e7eb"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M10 54 A50 50 0 0 1 110 54"
+                        fill="none"
+                        stroke="var(--netro-yellow,#0EA5C9)"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                        strokeDasharray={`${/live|clear|pass/i.test(gates.wash) ? 120 : 48} 160`}
+                      />
+                    </svg>
+                    <strong>
+                      {/live|clear|pass/i.test(gates.wash) ? "Clear" : "Watch"}
+                    </strong>
+                  </div>
+                  <ul>
+                    <li>
+                      <span>Flow</span>
+                      <b>
+                        {/live|clear|pass/i.test(gates.wash)
+                          ? "Clean"
+                          : /fail|closed|block|pause|unavail/i.test(gates.wash)
+                            ? "Paused"
+                            : gates.wash || "…"}
+                      </b>
+                    </li>
+                    <li>
+                      <span>Shares</span>
+                      <b>{multiplierLabel.replace(/\s*live$/i, "")}</b>
+                    </li>
+                    <li>
+                      <span>Borrow</span>
+                      <b>
+                        {gates.kaminoLtv
+                          ? `${(Number(gates.kaminoLtv) * 100).toFixed(0)}% max`
+                          : "—"}
+                      </b>
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  className="netro-density-week"
+                  data-testid="netro-session-week"
+                  aria-label="Trading week"
+                >
+                  <strong>Trading days</strong>
+                  <div className="netro-density-week-grid">
+                    {(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const).map(
+                      (d, i) => {
+                        const weekend = i >= 5;
+                        return (
+                          <span
+                            key={d}
+                            className={`netro-density-week-cell${weekend ? " is-closed" : " is-open"}`}
+                            title={
+                              weekend
+                                ? "Weekend: FOLIO blocks size"
+                                : "Weekday: open when NYSE is open"
+                            }
+                          >
+                            {d}
+                          </span>
+                        );
+                      },
+                    )}
+                  </div>
+                  <small>
+                    Weekend buys stay blocked in FOLIO. The curve cannot see the
+                    bell.
+                  </small>
                 </div>
               </div>
 
@@ -600,7 +688,10 @@ export function NetroDensityCanvas({
             >
               <div>
                 <span>You pay</span>
-                <b>USDC</b>
+                <b className="netro-density-quote-asset">
+                  <AssetLogo symbol="USDC" size={22} />
+                  USDC
+                </b>
                 <em>${spendChip}</em>
               </div>
               <div className="netro-density-quote-swap" aria-hidden>
@@ -608,7 +699,16 @@ export function NetroDensityCanvas({
               </div>
               <div>
                 <span>You receive</span>
-                <b>{flowSymbol}</b>
+                <b className="netro-density-quote-asset">
+                  <AssetLogo
+                    symbol={flowSymbol}
+                    {...(flowItem?.underlying
+                      ? { underlying: flowItem.underlying }
+                      : {})}
+                    size={22}
+                  />
+                  {flowSymbol}
+                </b>
                 <em>{quoteReceiveLabel}</em>
               </div>
             </div>
@@ -672,9 +772,24 @@ export function NetroDensityCanvas({
           >
             <div className="netro-density-rail-head">
               <span className="netro-density-rail-avatar">F</span>
-              <div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <p className="netro-density-rail-title">FOLIO agent</p>
-                <p className="netro-density-rail-sub">Asset intelligence</p>
+                <p className="netro-density-rail-sub">Live desk help</p>
+                <div className="netro-density-rail-live" aria-label="Live gates">
+                  <span
+                    className={`netro-density-rail-chip${/live|match/i.test(multiplierLabel) ? " is-on" : ""}`}
+                  >
+                    × {multiplierLabel.replace(/\s*live$/i, "") || "…"}
+                  </span>
+                  <span
+                    className={`netro-density-rail-chip${/live|clear|pass/i.test(gates.wash) ? " is-on" : ""}`}
+                  >
+                    {/live|clear|pass/i.test(gates.wash) ? "Wash clear" : "Wash…"}
+                  </span>
+                  <span className="netro-density-rail-chip is-on">
+                    {flowSymbol}
+                  </span>
+                </div>
               </div>
               {enablePaperAgent ? (
                 <button

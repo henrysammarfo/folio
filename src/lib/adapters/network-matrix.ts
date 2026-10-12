@@ -1,4 +1,4 @@
-import type { AdapterResult, IntegrationMode } from "./types";
+import { errResult, type AdapterResult, type IntegrationMode } from "./types";
 
 export type MatrixRow = {
   capability: string;
@@ -11,8 +11,20 @@ function modeOf(r: AdapterResult<unknown>): IntegrationMode {
 }
 
 function detailOf(r: AdapterResult<unknown>, okDetail?: string): string {
-  if (r.ok) return okDetail ?? r.source;
+  if (r.ok) {
+    if (okDetail) return okDetail;
+    const data = r.data as { label?: string; note?: string } | null;
+    if (data && typeof data === "object") {
+      if (typeof data.label === "string" && data.label) return `${r.source} · ${data.label}`;
+      if (typeof data.note === "string" && data.note) return data.note;
+    }
+    return r.source;
+  }
   return r.detail ? `${r.reason} — ${r.detail}` : r.reason;
+}
+
+function errUnavailable(source: string): AdapterResult<unknown> {
+  return errResult(source, "unwired");
 }
 
 /**
@@ -62,6 +74,12 @@ export function buildNetworkMatrix(input: {
   broadcastFunded: boolean;
   /** Env arm: BROADCAST_PAUSED=false enables user-signed Jupiter /execute. */
   broadcastPaused?: boolean;
+  /** Cash session (NYSE hours) — weekend refuse lives in FOLIO. */
+  cashSession?: AdapterResult<unknown>;
+  /** FOLIO Meteora DBC stock-curve config (+ optional devnet pool). */
+  stockCurve?: AdapterResult<unknown>;
+  /** Solami / RPC mainnet tape probe. */
+  solamiTape?: AdapterResult<unknown>;
 }): MatrixRow[] {
   const phantom =
     input.phantomConnect ??
@@ -108,6 +126,30 @@ export function buildNetworkMatrix(input: {
       capability: "xStocks multiplier + asset metadata",
       mode: modeOf(input.multiplier),
       detail: detailOf(input.multiplier),
+    },
+    {
+      capability: "Cash session (weekend refuse)",
+      mode: modeOf(input.cashSession ?? errUnavailable("folio.cash-session")),
+      detail: input.cashSession
+        ? detailOf(input.cashSession)
+        : "Unwired · Bible spine requires FOLIO session gate",
+    },
+    {
+      capability: "Meteora DBC stock curve",
+      mode: modeOf(input.stockCurve ?? errUnavailable("folio.stock-curve")),
+      detail: input.stockCurve
+        ? detailOf(
+            input.stockCurve,
+            "USDC · gentle · fixed/short linear · start=cash close · mainnet pool when FOLIO_DBC_POOL set",
+          )
+        : "Config unwired · World’s Fair primary track",
+    },
+    {
+      capability: "Solami / mainnet tape",
+      mode: modeOf(input.solamiTape ?? errUnavailable("folio.solami-tape")),
+      detail: input.solamiTape
+        ? detailOf(input.solamiTape)
+        : "Unwired · Blur/Yellowstone or labeled RPC probe",
     },
     {
       capability: "On-chain Scaled UI (Token-2022)",
@@ -185,7 +227,7 @@ export function buildNetworkMatrix(input: {
       capability: "Kamino xStocks market (read)",
       mode: modeOf(input.kamino),
       detail: input.kamino.ok
-        ? `${input.kamino.source} · borrow via Kamino UI deep-link (no FOLIO CPI)`
+        ? `${input.kamino.source} · in-desk ktx deposit/borrow · user-signed (no FOLIO CPI)`
         : detailOf(input.kamino),
     },
     {
@@ -275,7 +317,7 @@ export function buildNetworkMatrix(input: {
       detail: treasuryReady
         ? "Squads/Altitude treasury armed (still requires explicit user confirm)"
         : input.broadcastPaused === false
-          ? "User-signed Jupiter fills armed · no FOLIO payer · borrow CPI still unfunded"
+          ? "User-signed Jupiter fills + Kamino ktx borrow armed · no FOLIO payer/CPI"
           : "Not funded · ≤~$1 budget · quote-only · BROADCAST_PAUSED",
     },
     {

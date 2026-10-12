@@ -12,13 +12,13 @@ export const Route = createFileRoute("/credit")({
       {
         name: "description",
         content:
-          "Live Kamino / NestUSD credit reads — borrow via partner apps (no FOLIO CPI).",
+          "Borrow USDC against xStocks in FOLIO — keep your shares, unlock cash.",
       },
       { property: "og:title", content: "Credit Desk — FOLIO" },
       {
         property: "og:description",
         content:
-          "Live Kamino / NestUSD credit reads — borrow via partner apps (no FOLIO CPI).",
+          "Borrow USDC against xStocks in FOLIO — keep your shares, unlock cash.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -72,8 +72,8 @@ function Page() {
     <PublicShell
       tone="credit"
       eyebrow="Credit without selling"
-      title="Keep the shares. Test the liquidity."
-      intro="Credit uses live Kamino + NestUSD metrics. Borrow opens on Kamino / NestUSD apps — FOLIO does not run a custom borrow CPI. Nest.credit vault TVL is a different product."
+      title="Keep the shares. Unlock the cash."
+      intro="Deposit stock collateral and borrow USDC inside FOLIO. Your wallet signs every step. NestUSD risk metrics stay visible — Nest execute still lives on their app."
       aside={
         <div className="metrics-grid metrics-grid-aside">
           <Metric
@@ -90,27 +90,31 @@ function Page() {
             value={borrow}
             detail={
               aaplLtv != null
-                ? `AAPLx maxLtv ${(aaplLtv * 100).toFixed(0)}% · Kamino live`
+                ? `AAPLx max LTV ${(aaplLtv * 100).toFixed(0)}% · live`
                 : data?.paper.maxLtvUsed != null
-                  ? `AAPLx maxLtv ${(data.paper.maxLtvUsed * 100).toFixed(0)}% · Kamino live`
-                  : "Kamino maxLtv when reachable"
+                  ? `AAPLx max LTV ${(data.paper.maxLtvUsed * 100).toFixed(0)}% · live`
+                  : "Live LTV when markets respond"
             }
           />
           <Metric
-            label="Borrow execution"
+            label="Borrow in FOLIO"
             value={
-              data?.borrowExecution === "kamino-external"
-                ? "Kamino live"
-                : data?.borrowExecution === "nestusd-external"
-                  ? "NestUSD app"
+              data?.borrowExecution === "kamino-inhouse"
+                ? data.broadcastPaused
+                  ? "Ready · fills paused"
+                  : "Live in-desk"
+                : data?.borrowExecution === "nestusd-metrics"
+                  ? "Metrics only"
                   : data?.borrowExecution === "unavailable"
                     ? "Unavailable"
                     : "…"
             }
             detail={
-              data?.kaminoBorrowUrl
-                ? "Deep-link to Kamino · FOLIO does not sign borrow CPI"
-                : "No live borrow rail"
+              data?.borrowExecution === "kamino-inhouse"
+                ? data.broadcastPaused
+                  ? "Deposit & borrow arm when fills are on"
+                  : "You sign · FOLIO never invents a loan"
+                : "No live borrow rail yet"
             }
           />
         </div>
@@ -130,12 +134,12 @@ function Page() {
           </header>
           <p>
             {data?.kamino.ok
-              ? `${data.kamino.data.reserves.length} xStocks reserves · AAPLx LTV ${
+              ? `${data.kamino.data.reserves.length} reserves · AAPLx LTV ${
                   aaplLtv != null ? `${(aaplLtv * 100).toFixed(0)}%` : "—"
-                } · borrow on Kamino`
+                } · borrow inside FOLIO`
               : data && !data.kamino.ok
                 ? data.kamino.reason
-                : "xStocks market reserves (live LTV/APY when reachable)"}
+                : "Live LTV and APY when markets respond"}
           </p>
         </div>
         <div>
@@ -170,7 +174,7 @@ function Page() {
           </header>
           <p>
             {data?.nestCredit.ok
-              ? `Indexed TVL ~$${Math.round(data.nestCredit.data.totalTvlUsd).toLocaleString()} · ${data.nestCredit.data.solanaOftCount} Solana OFT · not NestUSD borrow`
+              ? `Indexed TVL ~$${Math.round(data.nestCredit.data.totalTvlUsd).toLocaleString()} · vault awareness · not NestUSD borrow`
               : data && !data.nestCredit.ok
                 ? data.nestCredit.reason
                 : "Vault awareness when reachable — not NestUSD capacity"}
@@ -195,10 +199,10 @@ function Page() {
           </header>
           <p>
             {data?.nestusd.ok
-              ? `${data.nestusd.data.collaterals.length} collaterals · mint nUSD on NestUSD app · not Nest.credit`
+              ? `${data.nestusd.data.collaterals.length} collaterals · risk LTV labeled in Borrow`
               : data && !data.nestusd.ok
                 ? (data.nestusd.detail ?? data.nestusd.reason)
-                : "Live risk API when reachable"}
+                : "Live risk metrics when reachable"}
           </p>
         </div>
         <div>
@@ -223,8 +227,8 @@ function Page() {
       </div>
       <p className="mkt-note">
         {data?.walletSource === "inspect"
-          ? "Capacity uses ephemeral inspect wallet-read qty (not auth / not multi-tenant)."
-          : "Optional: append ?inspect=<pubkey> for ephemeral mainnet-read capacity without a session secret."}
+          ? "Capacity uses a temporary wallet inspect (public read · not a signed session)."
+          : "Tip: append ?inspect=<wallet> to preview capacity without signing in."}
       </p>
       <p className="mkt-links">
         <Link to="/desk/credit" search={inspect ? { inspect } : {}}>

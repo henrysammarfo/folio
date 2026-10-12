@@ -9,6 +9,8 @@ export const KAMINO_XSTOCKS_BORROW_URL = `https://kamino.com/borrow/${KAMINO_XST
 export type KaminoReserve = {
   symbol: string;
   mint: string;
+  /** Klend reserve pubkey — required for ktx deposit/borrow. */
+  reserve: string;
   maxLtv: number;
   borrowApy: number;
   supplyApy: number;
@@ -27,7 +29,7 @@ export type KaminoMarketSnapshot = {
 
 /**
  * Mainnet-read Kamino xStocks market reserves (LTV / APY / TVL).
- * Execute path = deep-link to Kamino borrow UI (no FOLIO program / CPI).
+ * Execute path = ktx deposit/borrow assembled in FOLIO, user-signed (no FOLIO CPI).
  */
 export async function fetchKaminoXStocksMarket(): Promise<
   AdapterResult<KaminoMarketSnapshot>
@@ -41,6 +43,7 @@ export async function fetchKaminoXStocksMarket(): Promise<
     });
     if (!res.ok) return errResult(source, "kamino_http_error", `HTTP ${res.status}`);
     const json = (await res.json()) as Array<{
+      reserve?: string;
       liquidityToken?: string;
       liquidityTokenMint?: string;
       maxLtv?: string | number;
@@ -58,15 +61,17 @@ export async function fetchKaminoXStocksMarket(): Promise<
       .map((r) => {
         const symbol = r.liquidityToken ?? "";
         const mint = r.liquidityTokenMint ?? "";
+        const reserve = r.reserve ?? "";
         const maxLtv = Number(r.maxLtv);
         const borrowApy = Number(r.borrowApy);
         const supplyApy = Number(r.supplyApy);
         const totalSupply = Number(r.totalSupply);
         const totalBorrow = Number(r.totalBorrow);
-        if (!symbol || !mint || !Number.isFinite(maxLtv)) return null;
+        if (!symbol || !mint || !reserve || !Number.isFinite(maxLtv)) return null;
         return {
           symbol,
           mint,
+          reserve,
           maxLtv,
           borrowApy: Number.isFinite(borrowApy) ? borrowApy : 0,
           supplyApy: Number.isFinite(supplyApy) ? supplyApy : 0,

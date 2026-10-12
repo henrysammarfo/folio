@@ -57,6 +57,10 @@ import {
   type WalletSolBalance,
 } from "./adapters/wallet-balances";
 import {
+  heldXStockSymbolsFromBalances,
+  loadXStockMintIndex,
+} from "./adapters/xstock-mint-index";
+import {
   resolveWalletBinding,
   type WalletBindingSource,
 } from "./wallet-binding";
@@ -84,7 +88,8 @@ import { isFolioOpsEnabled } from "./auth/ops-access";
 import { upsertBetaWaitlist } from "./auth/beta-waitlist";
 import { readApprovedLabShader, readApprovedLabUi } from "./lab-pick";
 
-const WATCHLIST = ["AAPLx", "NVDAx", "TSLAx"] as const;
+/** Paper fallback when no wallet is bound — never invents qty for other mints. */
+const PAPER_WATCHLIST = ["AAPLx", "NVDAx", "TSLAx"] as const;
 
 function unavailablePrice(reason: string): AdapterResult<JupiterTokenPrice> {
   return errResult("api.jup.ag/price/v3", reason);
@@ -184,19 +189,24 @@ export type CreditBundle = {
   walletSource: WalletBindingSource;
   /**
    * Borrow rails status.
-   * - kamino-external: live Kamino xStocks market + deep-link execute
-   * - nestusd-external: live NestUSD metrics + app deep-link (no FOLIO CPI)
+   * - kamino-inhouse: live Kamino xStocks + ktx deposit/borrow signed in-desk
+   * - nestusd-metrics: NestUSD LTV metrics only (no NestUSD in-desk execute yet)
+   * - nestusd-external: NestUSD app deep-link (legacy label)
    * - reflect-external: Reflect stable rail live (earn/mint — not xStock CDP)
    * - unavailable: neither rail live
    */
   borrowExecution:
-    | "kamino-external"
+    | "kamino-inhouse"
+    | "nestusd-metrics"
     | "nestusd-external"
     | "reflect-external"
     | "unavailable";
+  /** Reference deep-link only — desk borrow is in-house via ktx. */
   kaminoBorrowUrl: string | null;
   nestusdAppUrl: string | null;
   reflectAppUrl: string | null;
+  /** Same arm as Jupiter fills — ktx sign/send fail-closed while true. */
+  broadcastPaused: boolean;
 };
 
 export type ActivityEvent = {
@@ -205,6 +215,19 @@ export type ActivityEvent = {
   detail: string;
   tone: "green" | "blue" | "amber" | "neutral";
   mode: string;
+  /** Feed glyph — logos when symbol set, else Lucide kind. */
+  icon:
+    | "share"
+    | "chain"
+    | "ca"
+    | "alert"
+    | "quote"
+    | "wash"
+    | "credit"
+    | "earn"
+    | "borrow"
+    | "pool";
+  symbol?: string;
 };
 
 export type ActivityBundle = {
@@ -422,27 +445,67 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
       data.inspectWallet,
     );
 
-    const assets = await Promise.all(
-      WATCHLIST.map(async (symbol) => {
-        const [asset, multiplier] = await Promise.all([
-          fetchXStockAsset(symbol),
-          fetchXStockMultiplier(symbol),
-        ]);
-        return { symbol, asset, multiplier };
-      }),
-    );
-    const mints = assets
-      .map((a) => (a.asset.ok ? a.asset.data.solanaMint : null))
-      .filter((m): m is string => Boolean(m));
-
+    // Full ATA scan when bound — never filter to the 3-symbol paper watchlist.
     const walletBalances = displayWallet
-      ? await fetchWalletTokenBalances({ wallet: displayWallet, mints })
+      ? await fetchWalletTokenBalances({ wallet: displayWallet })
       : null;
 
+    const mintIndex = await loadXStockMintIndex();
+
+    type PlanRow = {
+      symbol: string;
+      name: string;
+      mint: string | null;
+      logo: string | null;
+    };
+
+    const plan: PlanRow[] = [];
+    const seen = new Set<string>();
+
+    if (displayWallet && walletBalances?.ok) {
+      const held = heldXStockSymbolsFromBalances(
+        walletBalances.data.byMint,
+        mintIndex,
+      );
+      for (const h of held) {
+        seen.add(h.symbol.toUpperCase());
+        plan.push({
+          symbol: h.symbol,
+          name: h.meta.name,
+          mint: h.mint,
+          logo: h.meta.logo,
+        });
+      }
+      // Keep paper watchlist visible at qty 0 so empty wallets aren't a blank desk.
+      for (const symbol of PAPER_WATCHLIST) {
+        if (seen.has(symbol.toUpperCase())) continue;
+        seen.add(symbol.toUpperCase());
+        plan.push({ symbol, name: symbol, mint: null, logo: null });
+      }
+    } else {
+      for (const symbol of PAPER_WATCHLIST) {
+        plan.push({ symbol, name: symbol, mint: null, logo: null });
+      }
+    }
+
+    const assets = await Promise.all(
+      plan.map(async (row) => {
+        const [asset, multiplier] = await Promise.all([
+          fetchXStockAsset(row.symbol),
+          fetchXStockMultiplier(row.symbol),
+        ]);
+        const mint =
+          row.mint ?? (asset.ok ? asset.data.solanaMint : null);
+        const logo =
+          row.logo ?? (asset.ok ? asset.data.logo : null);
+        const name = asset.ok ? asset.data.name : row.name;
+        return { symbol: row.symbol, name, mint, logo, asset, multiplier };
+      }),
+    );
+
     const rows: PositionRow[] = [];
-    for (const { symbol, asset, multiplier } of assets) {
+    for (const { symbol, name, mint, logo, asset, multiplier } of assets) {
       const paperRaw = paperRawFor(symbol);
-      const mint = asset.ok ? asset.data.solanaMint : null;
       const [price, onchain] = await Promise.all([
         mint
           ? fetchJupiterTokenPrice(mint)
@@ -459,17 +522,18 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
       // Bound wallet + successful balance read → never fall back to paper qty
       // (empty email wallets must show 0, not demo shares).
       const qtySource: PositionRow["qtySource"] =
-        displayWallet && walletBalances?.ok
-          ? "wallet-read"
-          : walletUi != null && Number.isFinite(walletUi)
-            ? "wallet-read"
-            : "paper";
+        walletUi != null && Number.isFinite(walletUi) ? "wallet-read" : "paper";
+      // Bound wallet with readable balances: zero is honest wallet-read, not paper.
       const qty =
-        qtySource === "wallet-read"
+        displayWallet && walletBalances?.ok
           ? walletUi != null && Number.isFinite(walletUi)
-            ? (walletUi as number)
+            ? walletUi
             : 0
-          : paperRaw;
+          : qtySource === "wallet-read"
+            ? (walletUi as number)
+            : paperRaw;
+      const finalQtySource: PositionRow["qtySource"] =
+        displayWallet && walletBalances?.ok ? "wallet-read" : qtySource;
 
       const mult = multiplier.ok ? multiplier.data.currentMultiplier : null;
       const onchainEff = onchain.ok ? onchain.data.effectiveMultiplier : null;
@@ -482,7 +546,7 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
           : null;
 
       const labels = [
-        qtySource === "wallet-read" ? "wallet-read-qty" : "paper-qty",
+        finalQtySource === "wallet-read" ? "wallet-read-qty" : "paper-qty",
         "mainnet-read-multiplier",
       ];
       if (scaledUiCompare.status === "match") labels.push("onchain-scaled-ui-match");
@@ -495,10 +559,10 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
       if (displayWallet && walletBalances && !walletBalances.ok) {
         labels.push("wallet-read-unavailable");
       }
+      if (displayWallet && walletBalances?.ok) labels.push("wallet-full-scan");
 
-      // Verified = wallet-read + live feeds + API↔on-chain Scaled UI match.
       const health = positionHealth({
-        qtySource,
+        qtySource: finalQtySource,
         multiplierOk: multiplier.ok,
         assetOk: asset.ok,
         priceOk: price.ok,
@@ -507,12 +571,12 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
 
       rows.push({
         symbol,
-        name: asset.ok ? asset.data.name : symbol,
+        name,
         mint,
-        logo: asset.ok ? asset.data.logo : null,
+        logo,
         qty,
         paperRaw,
-        qtySource,
+        qtySource: finalQtySource,
         multiplier: mult,
         pendingMultiplier: multiplier.ok
           ? multiplier.data.pendingMultiplier
@@ -527,6 +591,14 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
       });
     }
 
+    // Non-zero wallet holdings first, then watchlist zeros, then by symbol.
+    rows.sort((a, b) => {
+      const az = a.qty > 0 ? 0 : 1;
+      const bz = b.qty > 0 ? 0 : 1;
+      if (az !== bz) return az - bz;
+      return a.symbol.localeCompare(b.symbol);
+    });
+
     const watch = readWatchWallet();
     const inspectActive = walletSource === "inspect" ? displayWallet : null;
     const anyWalletQty = rows.some(
@@ -539,7 +611,8 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
     } else if (walletBalances?.ok && !anyWalletQty) {
       note = `Wallet ${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)} holds no xStocks yet. Buy to get real holdings.`;
     } else if (walletBalances?.ok) {
-      note = `Live balances for ${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}. Share counts verified on-chain when they match.`;
+      const heldN = rows.filter((r) => r.qty > 0).length;
+      note = `Live balances for ${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)} · ${heldN} xStock holding${heldN === 1 ? "" : "s"} (full wallet scan). Share counts verified on-chain when they match.`;
     } else {
       note = `Wallet connected but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — demo estimates only. Share counts still live.`;
     }
@@ -574,30 +647,50 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       fetchReflectStatus(),
     ]);
 
-    const creditSymbols = ["AAPLx", "NVDAx"] as const;
+    // Full wallet scan when bound — collateral from every held xStock, not just AAPLx/NVDAx.
+    const walletBalances = displayWallet
+      ? await fetchWalletTokenBalances({ wallet: displayWallet })
+      : null;
+    const mintIndex = await loadXStockMintIndex();
+
+    type CreditPlan = { symbol: string; mint: string | null };
+    const creditPlan: CreditPlan[] = [];
+    const seen = new Set<string>();
+
+    if (displayWallet && walletBalances?.ok) {
+      const held = heldXStockSymbolsFromBalances(
+        walletBalances.data.byMint,
+        mintIndex,
+      );
+      for (const h of held) {
+        seen.add(h.symbol.toUpperCase());
+        creditPlan.push({ symbol: h.symbol, mint: h.mint });
+      }
+    }
+    // Paper fallback symbols when unbound / empty / balances fail.
+    if (creditPlan.length === 0) {
+      for (const symbol of ["AAPLx", "NVDAx"] as const) {
+        if (seen.has(symbol.toUpperCase())) continue;
+        creditPlan.push({ symbol, mint: null });
+      }
+    }
+
     const assets = await Promise.all(
-      creditSymbols.map(async (symbol) => {
+      creditPlan.map(async ({ symbol, mint: knownMint }) => {
         const [asset, multiplier] = await Promise.all([
           fetchXStockAsset(symbol),
           fetchXStockMultiplier(symbol),
         ]);
-        return { symbol, asset, multiplier };
+        const mint = knownMint ?? (asset.ok ? asset.data.solanaMint : null);
+        return { symbol, asset, multiplier, mint };
       }),
     );
-    const mints = assets
-      .map((a) => (a.asset.ok ? a.asset.data.solanaMint : null))
-      .filter((m): m is string => Boolean(m));
-
-    const walletBalances = displayWallet
-      ? await fetchWalletTokenBalances({ wallet: displayWallet, mints })
-      : null;
 
     const walletReadOk = Boolean(displayWallet && walletBalances?.ok);
     let collateral: number | null = null;
     let priced = 0;
     let usedWalletQty = false;
-    for (const { symbol, asset, multiplier } of assets) {
-      const mint = asset.ok ? asset.data.solanaMint : null;
+    for (const { symbol, asset, multiplier, mint } of assets) {
       const price = mint
         ? await fetchJupiterTokenPrice(mint)
         : unavailablePrice("xstock_mint_missing");
@@ -609,16 +702,20 @@ export const getCreditBundle = createServerFn({ method: "GET" })
             : undefined;
         // Bound + balances OK → wallet only (0 if empty). Never inflate borrow
         // with paper qty for email wallets that hold nothing.
-        let raw: number;
-        if (walletReadOk) {
-          raw =
-            walletUi != null && Number.isFinite(walletUi) ? (walletUi as number) : 0;
-          if (raw > 0) usedWalletQty = true;
-        } else {
-          const useWallet =
-            walletUi != null && Number.isFinite(walletUi) && walletUi > 0;
-          raw = useWallet ? (walletUi as number) : paperRaw;
-          if (useWallet) usedWalletQty = true;
+        const useWallet =
+          displayWallet &&
+          walletBalances?.ok &&
+          walletUi != null &&
+          Number.isFinite(walletUi);
+        const raw = useWallet
+          ? (walletUi as number)
+          : displayWallet && walletBalances?.ok
+            ? 0
+            : paperRaw;
+        if (useWallet && (walletUi as number) > 0) usedWalletQty = true;
+        if (raw <= 0 && displayWallet && walletBalances?.ok) {
+          // Skip zero wallet holdings from collateral sum.
+          continue;
         }
         collateral =
           (collateral ?? 0) +
@@ -654,9 +751,9 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       !nestusd.data.protocolPaused;
     const reflectLive = reflect.ok;
     const borrowExecution = kaminoLive
-      ? ("kamino-external" as const)
+      ? ("kamino-inhouse" as const)
       : nestLive
-        ? ("nestusd-external" as const)
+        ? ("nestusd-metrics" as const)
         : reflectLive
           ? ("reflect-external" as const)
           : ("unavailable" as const);
@@ -667,8 +764,8 @@ export const getCreditBundle = createServerFn({ method: "GET" })
         "Your wallet has no xStocks yet — borrow capacity is $0. Buy stocks first, then open Kamino.";
     } else if (kaminoLive) {
       note = usedWalletQty
-        ? "Live Kamino xStocks LTV × your wallet collateral. Open Kamino to deposit & borrow — you sign."
-        : "Live Kamino rates. Demo borrow figure until you Open App — not your money.";
+        ? "Live Kamino xStocks LTV × your wallet collateral (full scan). Deposit & borrow USDC in FOLIO — your wallet signs on Kamino rails."
+        : "Live Kamino xStocks LTV. Connect a wallet for your collateral estimate, then deposit & borrow in-desk.";
     } else if (usedWalletQty) {
       note =
         "Estimate from your wallet balances × live max LTV. Borrow rails unavailable.";
@@ -699,6 +796,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       kaminoBorrowUrl: kamino.ok ? kamino.data.borrowUrl : null,
       nestusdAppUrl: nestusd.ok ? nestusd.data.appUrl : null,
       reflectAppUrl: reflect.ok ? reflect.data.appUrl : REFLECT_APP_URL,
+      broadcastPaused: isBroadcastPaused(),
       watchWallet: watch.ok ? watch.data.wallet : null,
       inspectWallet: inspectActive,
       walletSource,
@@ -767,6 +865,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         detail: multiplier.ok ? "Live market feed" : multiplier.reason,
         tone: multiplier.ok ? "green" : "amber",
         mode: multiplier.ok ? multiplier.mode : "unavailable",
+        icon: "share",
+        symbol,
       },
       (() => {
         const compare = compareApiOnchainMultiplier(
@@ -789,6 +889,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
                 ? ("amber" as const)
                 : ("neutral" as const),
           mode: scaledUi.ok ? scaledUi.mode : ("unavailable" as const),
+          icon: "chain" as const,
+          symbol,
         };
       })(),
       {
@@ -811,6 +913,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
         tone:
           multiplier.ok && multiplier.data.pendingMultiplier != null ? "amber" : "neutral",
         mode: multiplier.ok ? multiplier.mode : "unavailable",
+        icon: "ca",
+        symbol,
       },
       {
         at: now,
@@ -824,6 +928,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           : "Connect in Settings to save alert preferences.",
         tone: prefsFromSession && corporateActionAlerts ? "blue" : "neutral",
         mode: prefsFromSession ? "paper" : "unavailable",
+        icon: "alert",
       },
       {
         at: now,
@@ -835,6 +940,8 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           : jupiterQuote.reason,
         tone: jupiterQuote.ok ? "blue" : "amber",
         mode: jupiterQuote.ok ? jupiterQuote.mode : "unavailable",
+        icon: "quote",
+        symbol,
       },
       {
         at: now,
@@ -844,6 +951,7 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           : "Route check unavailable",
         tone: wash.ok && wash.data.pass ? "green" : "amber",
         mode: wash.ok ? wash.mode : "unavailable",
+        icon: "wash",
       },
       {
         at: now,
@@ -851,10 +959,11 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           ? "Credit markets live"
           : "Credit markets unavailable",
         detail: kamino.ok
-          ? `${kamino.data.reserves.length} reserves · borrow not enabled yet`
+          ? `${kamino.data.reserves.length} reserves · deposit & borrow in-desk when fills arm`
           : kamino.reason,
         tone: kamino.ok ? "blue" : "amber",
         mode: kamino.ok ? kamino.mode : "unavailable",
+        icon: "credit",
       },
       {
         at: now,
@@ -862,19 +971,21 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           ? "Earn vaults available"
           : "Earn vaults unavailable",
         detail: nestCredit.ok
-          ? `Nest.credit vault awareness · ${nestCredit.data.vaultCount} vaults · not NestUSD`
+          ? `Nest.credit vault awareness · ${nestCredit.data.vaultCount} vaults · read-only`
           : `Nest.credit vault awareness · ${nestCredit.reason}`,
         tone: nestCredit.ok ? "blue" : "amber",
         mode: nestCredit.ok ? nestCredit.mode : "unavailable",
+        icon: "earn",
       },
       {
         at: now,
         title: "Borrow capacity",
         detail: nestusd.ok
-          ? "NestUSD risk-labeled · not verified ready"
+          ? "NestUSD risk metrics · collateral LTV labeled in Borrow"
           : "NestUSD capacity not verified · unavailable",
         tone: "amber",
         mode: "unavailable",
+        icon: "borrow",
       },
       {
         at: now,
@@ -886,12 +997,14 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
           : pools.reason,
         tone: pools.ok ? "neutral" : "amber",
         mode: pools.ok ? pools.mode : "unavailable",
+        icon: "pool",
+        symbol,
       },
     ];
 
     return {
       events,
-      note: "Live desk events from market feeds. Buying and borrowing stay paused until enabled for your account.",
+      note: "Live desk events from market feeds. Buys and borrows arm when fills are on for your account.",
       corporateActionAlerts,
       prefsFromSession,
     };
@@ -1007,13 +1120,20 @@ export const runDeskAgent = createServerFn({ method: "POST" })
     if (blocked) {
       return errResult("folio.agent.paper", "agent_requires_session", blocked);
     }
-    const rl = rateLimitCheck(
-      "agent",
-      rateLimitClientKey({
-        userId: session.ok ? session.data.userId : null,
-        ip: readClientIp(),
-      }),
-    );
+    const clientKey = rateLimitClientKey({
+      userId: session.ok ? session.data.userId : null,
+      ip: readClientIp(),
+    });
+    /** Per-account daily AI budget — 5 messages / 24h (keyed by userId when present). */
+    const daily = rateLimitCheck("agent_daily", clientKey);
+    if (!daily.ok) {
+      return errResult(
+        "folio.agent.paper",
+        "agent_daily_limit",
+        `Daily agent limit reached (5 messages). Resets in ~${Math.ceil(daily.retryAfterSec / 3600)}h.`,
+      );
+    }
+    const rl = rateLimitCheck("agent", clientKey);
     if (!rl.ok) {
       return errResult("folio.agent.paper", "rate_limited", rl.detail);
     }
