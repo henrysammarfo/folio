@@ -18,6 +18,9 @@ describe("readEmpireReadiness", () => {
     expect(r.broadcastPaused).toBe(true);
     expect(r.approvedLabUi).toBe("netro-density");
     expect(r.opsWallEnabled).toBe(false);
+    expect(r.phantomAppId).toBe(null);
+    expect(r.reflectApiKeyPresent).toBe(false);
+    expect(r.squadsVaultConfigured).toBe(false);
   });
 
   it("arms multi-tenant flags only when Privy + Supabase both set", () => {

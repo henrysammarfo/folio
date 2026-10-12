@@ -8,11 +8,15 @@
 | Jupiter Price v3 | mainnet-read | Venue + optional stockData · TTL 30s · stale≤120s on 429 |
 | Jupiter swap quote | quote-only | No broadcast · TTL 20s · stale≤120s on 429 |
 | Raydium pool awareness | mainnet-read | Awareness only · not a route guarantee · wash still required |
+| Meteora DBC awareness | mainnet-read / unavailable | Separate DBC lane (`/desk/dbc`) · **not** xStock economic truth |
 | Wash / Bitquery | unavailable | Key missing or query fail — **fail-closed** (mode forced unavailable without key) |
 | Kamino xStocks reserves | mainnet-read | Market 5wJe…Lsua · borrow CPI unavailable until funded (no fork harness) |
 | Jupiter Lend earn | mainnet-read | Earn vaults only — labeled (not xStock borrow) |
 | Nest.credit vault awareness | mainnet-read | Indexed vault TVL/OFT — **not** NestUSD borrow |
 | NestUSD | unavailable | Unverified endpoint · fail-closed |
+| Reflect stable credit | mainnet-read / unavailable | USDC+/USDT+ REST · **not** NestUSD · SDK `@reflectmoney/stable.ts` for mint later |
+| Phantom Connect dual-path | mainnet-read | Injected always · embedded needs `PHANTOM_APP_ID` · session mint stays Privy |
+| FOLIO treasury (Squads/Altitude) | unavailable / mainnet-read | `FOLIO_SQUADS_VAULT` + explicit `FOLIO_TREASURY_FUNDED` |
 | Multi-tenant sessions | unavailable | PRIVY_* / SUPABASE_* missing · fail-closed |
 | Membership wallet qty binding | mainnet-read | membership → session → watch → inspect |
 | Role-gated desk prefs | mainnet-read | owner/trader write · viewer fail-closed |

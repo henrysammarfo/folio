@@ -46,8 +46,9 @@ export function BuyExecuteButton(props: Props) {
         className="fx-btn fx-btn-primary fx-btn-block"
         disabled
         data-testid="acquire-execute"
+        title="Finish review checks above — wash, share count, or quote may be blocking"
       >
-        {props.pausedLabel ?? "Paused. Check wash or quote."}
+        {props.pausedLabel ?? "Fix checks above"}
       </button>
     );
   }

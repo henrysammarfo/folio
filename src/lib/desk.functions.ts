@@ -28,6 +28,10 @@ import {
   type ScaledUiOnchain,
 } from "./adapters/scaled-ui";
 import { fetchRaydiumPoolsForMint } from "./adapters/pools";
+import { fetchPhantomConnectStatus } from "./adapters/phantom-connect";
+import { fetchReflectStatus } from "./adapters/reflect";
+import { fetchMeteoraDbcAwareness } from "./adapters/meteora-dbc";
+import { fetchSquadsTreasuryStatus } from "./adapters/squads-treasury";
 import { resolveSolanaRpcUrl } from "./adapters/solana-rpc";
 import { evaluateCashSession } from "./adapters/session-gate";
 import { folioStockCurveStatus } from "./adapters/stock-curve";
@@ -977,30 +981,47 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     const decimals = asset.ok && asset.data.decimals != null ? asset.data.decimals : 8;
     const rpc = resolveSolanaRpcUrl();
 
-    const [equityRef, jupiterPrice, wash, kamino, jupiterLend, nestusd, nestCredit, scaledUi, pools] =
-      await Promise.all([
-        fetchEquityReferencePrice(underlying),
-        mint
-          ? fetchJupiterTokenPrice(mint)
-          : Promise.resolve(unavailablePrice("xstock_mint_missing")),
-        evaluateWashGate({ symbol, mint, notionalUsd: 100 }),
-        fetchKaminoXStocksMarket(),
-        fetchJupiterLendEarn(),
-        fetchNestUsdStatus(),
-        fetchNestCreditVaults(),
-        mint
-          ? fetchScaledUiOnchain(mint)
-          : Promise.resolve({
-              ok: false as const,
-              mode: "unavailable" as const,
-              asOf: new Date().toISOString(),
-              source: "solana-rpc.scaled-ui",
-              reason: "xstock_mint_missing",
-            }),
-        mint
-          ? fetchRaydiumPoolsForMint(mint)
-          : Promise.resolve(errResult("api-v3.raydium.io", "xstock_mint_missing")),
-      ]);
+    const [
+      equityRef,
+      jupiterPrice,
+      wash,
+      kamino,
+      jupiterLend,
+      nestusd,
+      nestCredit,
+      scaledUi,
+      pools,
+      phantomConnect,
+      reflect,
+      meteoraDbc,
+      squadsTreasury,
+    ] = await Promise.all([
+      fetchEquityReferencePrice(underlying),
+      mint
+        ? fetchJupiterTokenPrice(mint)
+        : Promise.resolve(unavailablePrice("xstock_mint_missing")),
+      evaluateWashGate({ symbol, mint, notionalUsd: 100 }),
+      fetchKaminoXStocksMarket(),
+      fetchJupiterLendEarn(),
+      fetchNestUsdStatus(),
+      fetchNestCreditVaults(),
+      mint
+        ? fetchScaledUiOnchain(mint)
+        : Promise.resolve({
+            ok: false as const,
+            mode: "unavailable" as const,
+            asOf: new Date().toISOString(),
+            source: "solana-rpc.scaled-ui",
+            reason: "xstock_mint_missing",
+          }),
+      mint
+        ? fetchRaydiumPoolsForMint(mint)
+        : Promise.resolve(errResult("api-v3.raydium.io", "xstock_mint_missing")),
+      Promise.resolve(fetchPhantomConnectStatus()),
+      fetchReflectStatus(),
+      fetchMeteoraDbcAwareness({ pageSize: 5 }),
+      fetchSquadsTreasuryStatus(),
+    ]);
     const pyth = pythOffShipPath();
 
     const jupiter = mint
@@ -1027,6 +1048,8 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
     );
     const sessionSecretPresent =
       (process.env["FOLIO_SESSION_SECRET"]?.trim().length ?? 0) >= 16;
+    const broadcastFunded =
+      squadsTreasury.ok && Boolean(squadsTreasury.data.broadcastTreasuryReady);
 
     const cashSession = evaluateCashSession();
     const [stockCurve, solamiTape] = await Promise.all([
@@ -1048,6 +1071,10 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         nestCredit,
         scaledUi,
         pools,
+        phantomConnect,
+        reflect,
+        meteoraDbc,
+        squadsTreasury,
         cashSession,
         stockCurve,
         solamiTape,
@@ -1055,8 +1082,7 @@ export const getNetworkBundle = createServerFn({ method: "GET" }).handler(
         multiTenantKeysPresent,
         sessionSecretPresent,
         solanaRpcPublicFallback: rpc.publicFallback,
-        /** FOLIO does not sponsor gas/treasury at ≤~$1 — user-signed only when unpaused. */
-        broadcastFunded: false,
+        broadcastFunded,
         broadcastPaused: isBroadcastPaused(),
       }),
       broadcastPaused: isBroadcastPaused(),
@@ -1080,6 +1106,7 @@ export {
   getCreditBundle,
   getActivityBundle,
   getSessionBundle,
+  getWalletGasStatus,
   getEmpireReadiness,
   getDeskAccess,
   runDeskAgent,
@@ -1094,18 +1121,21 @@ export {
   joinBetaWaitlist,
 } from "./desk.empire";
 export { getPreipoBundle, getTesseraBundle } from "./desk.markets";
+export { getMeteoraDbcBundle } from "./desk.dbc";
 export { getMarketsBoard, getScreenerBundle } from "./desk.screener";
 export type {
   PositionsBundle,
   CreditBundle,
   ActivityBundle,
   SessionBundle,
+  WalletGasStatus,
   EmpireReadiness,
   PositionRow,
   ActivityEvent,
 } from "./desk.empire";
 export type { DeskAccess } from "./auth/desk-access";
 export type { PreipoBundle, TesseraBundle } from "./desk.markets";
+export type { MeteoraDbcBundle } from "./desk.dbc";
 export type {
   MarketsBoardBundle,
   MarketsBoardRow,

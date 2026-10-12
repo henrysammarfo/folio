@@ -6,6 +6,10 @@ import { z } from "zod";
 import { AssetLogo } from "@/components/asset-logo";
 import { CreditBorrowButton } from "@/components/credit-borrow-button";
 import { DeskShell } from "@/components/desk-shell";
+import {
+  useWalletGasStatus,
+  WalletGasReady,
+} from "@/components/wallet-gas-ready";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
 import { trackFolioEvent } from "@/lib/analytics";
 import { getCreditBundle } from "@/lib/desk.functions";
@@ -87,13 +91,25 @@ function Page() {
   const borrow = data?.paper.illustrativeBorrowUsd;
   const ltv = data?.paper.maxLtvUsed;
   const collateral = data?.paper.collateralUsd;
+  const qtyLabel = data?.paper.label;
+  const isDemoBorrow = qtyLabel !== "wallet-read";
+  const emptyWalletBorrow =
+    qtyLabel === "wallet-read" && (borrow == null || borrow <= 0);
+  const nestUrl = data?.nestusdAppUrl;
   const nestLive =
     data?.nestusd.ok && data.nestusd.data.status === "live";
   const nestEarn = data?.nestCredit?.ok
     ? `Nest.credit shows ${data.nestCredit.data.vaultCount} vaults (read-only · not NestUSD)`
     : null;
+  const reflectLive = Boolean(data?.reflect?.ok);
+  const reflectUrl = data?.reflectAppUrl;
+  const reflectTypes = data?.reflect?.ok
+    ? data.reflect.data.types.map((t) => t.name).join(" · ")
+    : null;
   const broadcastPaused = data?.broadcastPaused !== false;
   const kaminoReady = Boolean(data?.kamino.ok && selected?.reserve);
+  const { data: gas } = useWalletGasStatus(inspect);
+  const gasReady = Boolean(gas?.readyForExternalWrite);
 
   return (
     <DeskShell title="Borrow">
@@ -101,7 +117,13 @@ function Page() {
         <div className="fx-buy-stack">
           <header className="fx-credit-hero">
             <div className="fx-credit-hero-copy">
-              <p className="fx-credit-hero-kicker">Available to borrow</p>
+              <p className="fx-credit-hero-kicker">
+                {isDemoBorrow
+                  ? "Demo borrow figure"
+                  : emptyWalletBorrow
+                    ? "Available to borrow"
+                    : "Available to borrow"}
+              </p>
               <p className="fx-credit-hero-value">
                 {borrow != null ? money(borrow) : "—"}
               </p>
@@ -141,6 +163,58 @@ function Page() {
               </div>
             </div>
           </header>
+
+          <WalletGasReady
+            context="borrow"
+            {...(inspect ? { inspectWallet: inspect } : {})}
+          />
+
+          <div className="fx-actions" style={{ marginBottom: "1rem" }}>
+            {nestLive && nestUrl ? (
+              <a
+                href={nestUrl}
+                className="fx-btn fx-btn-ghost"
+                target="_blank"
+                rel="noreferrer"
+                data-testid="credit-borrow-nestusd"
+                title={
+                  gasReady
+                    ? "Open NestUSD with your wallet"
+                    : "Needs SOL for fees — add funds above first"
+                }
+                onClick={() =>
+                  trackFolioEvent("cta_click", {
+                    cta: "borrow_nestusd",
+                    gas: gasReady ? "ok" : "low",
+                  })
+                }
+              >
+                {gasReady ? "NestUSD app" : "NestUSD (needs SOL)"}
+              </a>
+            ) : null}
+            {reflectLive && reflectUrl ? (
+              <a
+                href={reflectUrl}
+                className="fx-btn fx-btn-ghost"
+                target="_blank"
+                rel="noreferrer"
+                data-testid="credit-reflect"
+                title={
+                  gasReady
+                    ? "Earn or mint on Reflect with your wallet"
+                    : "Needs SOL for fees + USDC to mint"
+                }
+                onClick={() =>
+                  trackFolioEvent("cta_click", {
+                    cta: "reflect_stable",
+                    gas: gasReady ? "ok" : "low",
+                  })
+                }
+              >
+                {gasReady ? "Earn with Reflect" : "Reflect (needs SOL)"}
+              </a>
+            ) : null}
+          </div>
 
           {ltv != null ? (
             <div className="fx-card fx-card-pad">
@@ -293,6 +367,24 @@ function Page() {
                 })}
               </div>
             </div>
+          ) : null}
+
+          {reflectLive ? (
+            <>
+              <h2 className="fx-section-title">Earn on stables</h2>
+              <div
+                className="fx-card fx-card-pad"
+                data-testid="credit-reflect-card"
+              >
+                <p className="fx-sub" style={{ marginBottom: 0 }}>
+                  {reflectTypes ?? "USDC+ and USDT+"} on Reflect. Open Reflect to
+                  earn or mint with your wallet.
+                  {data?.reflect?.ok && data.reflect.data.users != null
+                    ? ` ${data.reflect.data.users.toLocaleString("en-US")} people already use it.`
+                    : ""}
+                </p>
+              </div>
+            </>
           ) : null}
         </div>
 
@@ -472,6 +564,13 @@ function Page() {
             }}
           />
 
+          {!gasReady ? (
+            <p className="fx-checks" data-testid="credit-needs-sol">
+              Needs SOL for fees — add funds above before signing borrows or
+              opening NestUSD / Reflect.
+            </p>
+          ) : null}
+
           {!kaminoReady ? (
             <p className="fx-checks">
               Kamino market offline — borrow ticket stays disabled until rates
@@ -487,7 +586,8 @@ function Page() {
 
           <p className="fx-sub" style={{ margin: 0, fontSize: ".78rem" }}>
             FOLIO assembles Kamino deposit/borrow txs in-desk; your wallet
-            signs. We do not run a custom borrow CPI.{" "}
+            signs. Email wallets start empty — add SOL (and USDC for Reflect
+            mint) first. We do not run a custom borrow CPI.{" "}
             {nestEarn ? `${nestEarn}.` : null}
           </p>
         </aside>

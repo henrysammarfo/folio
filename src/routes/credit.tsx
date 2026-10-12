@@ -205,6 +205,25 @@ function Page() {
                 : "Live risk metrics when reachable"}
           </p>
         </div>
+        <div>
+          <header>
+            <span>Reflect</span>
+            <em data-ok={String(Boolean(data?.reflect?.ok))}>
+              {data?.reflect?.ok
+                ? data.reflect.data.types.map((t) => t.name).join(" · ")
+                : data && data.reflect && !data.reflect.ok
+                  ? "Unavailable"
+                  : "…"}
+            </em>
+          </header>
+          <p>
+            {data?.reflect?.ok
+              ? `Stable yield rail · not NestUSD borrow · ${data.reflect.data.sdkPackage}`
+              : data && data.reflect && !data.reflect.ok
+                ? data.reflect.reason
+                : "USDC+/USDT+ when Reflect API reachable"}
+          </p>
+        </div>
       </div>
       <p className="mkt-note">
         {data?.walletSource === "inspect"

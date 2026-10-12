@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   PanelLeftClose,
   PanelLeft,
+  Rocket,
   Settings,
   ArrowUpRight,
 } from "lucide-react";
@@ -56,6 +57,7 @@ const links = [
   ["Holdings", "/desk/positions", BriefcaseBusiness],
   ["Buy", "/desk/acquire", ArrowUpRight],
   ["Markets", "/desk/markets", LayoutGrid],
+  ["Launches", "/desk/dbc", Rocket],
   ["Borrow", "/desk/credit", CircleDollarSign],
   ["Activity", "/desk/activity", Activity],
   ["Account", "/desk/settings", Settings],

@@ -1,10 +1,27 @@
 # FOLIO — CURRENT STATE
 
+
+> Updated: 2026-10-12 · Crypto World's Fair deadline **2026-10-12 23:59 PT**
+> Doctrine: honest security only — **never claim unhackable / NK-proof**.
+
+## World's Fair hub sponsors (branch `cursor/folio-hub-sponsors-spine-f1ec`)
+
+- **Phantom Connect** dual-path beside Privy (`PhantomConnectShell` + Settings panel). Injected always; embedded social needs `PHANTOM_APP_ID` (Portal new apps paused). Session mint stays Privy httpOnly.
+- **Reflect** REST mainnet-read (`prod.api.reflect.money`) on credit + matrix · `@reflectmoney/stable.ts` packaged for mint/redeem handoff · never conflated with NestUSD.
+- **Meteora DBC** separate desk `/desk/dbc` via `dbc.datapi.meteora.ag` — not xStock truth · no Anchor SDK on SSR.
+- **Squads / Altitude** treasury row · `FOLIO_SQUADS_VAULT` + explicit `FOLIO_TREASURY_FUNDED` · ≤~$1 stays unfunded unless both arm.
+- Matrix rows + Netro gate labels + keys-readiness optional envs wired.
+- **Email-wallet gas gate:** Open App users get embedded Solana at 0 SOL — desk shows Add SOL / Add USDC / copy address on Buy · Borrow · Launches · Account. FOLIO does not sponsor gas.
+- **Customer honesty:** Bound empty wallets show $0 portfolio/borrow (no paper inflation). Home labels Demo preview when unbound. Account shows session wallet.
+
+## Marketing / landing (product)
+
 > Updated: 2026-09-25 · Stocklana deadline **re-check live**
 > Doctrine: honest security only — **never claim unhackable**. Soft pitch only in user-facing copy.
 > Bible: `docs/FOLIO_BIBLE.md` · Demo: `docs/DEMO_SCRIPT.md` · Submit: `docs/STOCKLANA_SUBMIT.md`
 
 ## Soft pitch (lock)
+
 
 FOLIO buys the US stocks you want on Solana — keeps share counts honest, won’t buy in shady pools, and lets you borrow cash without selling.
 
@@ -60,6 +77,23 @@ README, marketing routes, whitepaper, demo/submit docs, and public intros rewrit
 
 ## Desk UI (product)
 
+
+- Buy: Mega / IPO / Meme / **Pairs** with lane explainers; **true stock↔stock** Jupiter quotes (pay mint → receive mint).
+- Buy **Netro-depth**: short Details (route/impact/gas/fill) + settings (slippage + gas chips). Fills still paused.
+- **/desk/markets** live Jupiter board + **flow strip** (quick Buy chips) — square lane filters, list-style pairs.
+- Netro overview: **FOLIO watermark** over TradingView (NetroBNB CryptoMarketCard pattern) · tight Buy sheet · AI modal.
+- Live-trade research: `docs/LIVE_TRADE_NO_PROGRAM.md` · field map `docs/ECOSYSTEM_FIELD.md`
+- **Phases A–E on main (`4a35b13`):** Swap V2 `/order` + gated `/execute` · Privy Open App (email/embedded Solana + link/export) · consumer settings scrub (`FOLIO_OPS=1`) · session/rate-limit gates · overview Stocks/Pre-IPO/Tessera partner lanes · beta waitlist **server-only** (Supabase `beta_waitlist`, no localStorage).
+- **Ship rough edges (branch `cursor/folio-ship-rough-edges-f1ec`):** Buy prepare→Privy sign→execute CTA · positions Verified/paper labels · partner $1 quote strip · beta cine contrast · Phase G analytics events + `/desk/admin` · Truth reconcile/PoR-analogue copy · credit unavailable-until-funded honesty.
+- Prod: https://folio-tawny-one.vercel.app
+- **Fills armed:** `BROADCAST_PAUSED=false` on Vercel prod/preview/dev (user-signed Jupiter; no FOLIO payer). Hub preview needs TanStack ≥1.168.60 (XSS gate). NestUSD/borrow CPI still unfunded.
+- Henry still: apply `beta_waitlist` migration · Privy allowed origins if missing.
+- **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
+- **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
+- Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).
+- Soft access banner → **Open App**; Account tenant switcher; agent session-gated.
+- **/whitepaper** · **/beta** waitlist · docs: `FOLIO_WHITEPAPER.md` · `FOUNDER_OPERATING_PLAN.md` · `LAUNCH_AND_SOCIALS.md`.
+- Human wash copy (no raw `bitquery_*` in PreStocks/Tessera consumer UI).
 - Home: **Netro density always-on** (FOLIO azure `#0EA5C9` · grey canvas) — live clock, markets strip, AI rail, partner lanes. Soft titles: Your market desk / Today's flow / Easy market view.
 - Buy: Mega / IPO / Meme / **Pairs** · TokenSelect + flip · Netro-depth details.
 - Markets: multi-venue curated board + **Universe search** (~1k+ Solana xStocks, Jupiter batch marks) · PreStocks + Tessera on own desks.
@@ -69,6 +103,7 @@ README, marketing routes, whitepaper, demo/submit docs, and public intros rewrit
 - Agent: `agent_daily` = 5 / account / 24h.
 - Logo chain: API → Backed CDN → favicon → initials (SpaceX / Tessera paths fixed).
 - Fills arm when `BROADCAST_PAUSED=false` (user-signed Jupiter + Kamino + partner buys).
+
 
 ## Launch path (Stocklana → Colosseum → beta)
 

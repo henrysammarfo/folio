@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { PhantomConnectShell } from "@/components/phantom-connect-shell";
 import { PrivyAppProvider } from "@/components/privy-app-provider";
 import {
   getAcquireBundle,
@@ -51,7 +52,9 @@ function DeskLayout() {
   const { readiness } = Route.useLoaderData();
   return (
     <PrivyAppProvider appId={readiness.privyAppId}>
-      <Outlet />
+      <PhantomConnectShell appId={readiness.phantomAppId}>
+        <Outlet />
+      </PhantomConnectShell>
     </PrivyAppProvider>
   );
 }

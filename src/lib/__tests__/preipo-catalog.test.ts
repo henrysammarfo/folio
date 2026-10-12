@@ -8,7 +8,7 @@ describe("PreStocks catalog", () => {
     expect(res.ok).toBe(true);
     if (!res.ok) return;
     expect(res.data.rows.length).toBeGreaterThan(3);
-    expect(res.data.note).toMatch(/PreStocks-only/i);
+    expect(res.data.note).toMatch(/PreStocks[- ]only/i);
     for (const row of res.data.rows) {
       expect(row.mint.length).toBeGreaterThan(30);
       expect(row.symbol.length).toBeGreaterThan(2);

@@ -17,6 +17,14 @@ export type NetroLiveGateLabels = {
   raydium: string;
   /** Nest.credit vault awareness — not NestUSD borrow. */
   nestCredit: string;
+  /** Reflect stable rail — not NestUSD. */
+  reflect: string;
+  /** Phantom Connect dual-path. */
+  phantom: string;
+  /** Squads / Altitude treasury. */
+  squads: string;
+  /** Meteora DBC separate lane. */
+  meteoraDbc: string;
   /** Live AAPLx maxLtv from Kamino when mainnet-read — e.g. "0.40". */
   kaminoLtv: string | null;
   /** Paper/wallet illustrative borrow capacity label. */
@@ -87,6 +95,10 @@ export function buildNetroLiveGateLabels(input: {
   const multiTenant = findMode(input.rows, "Multi-tenant");
   const raydium = findMode(input.rows, "Raydium");
   const nestCredit = findMode(input.rows, "Nest.credit");
+  const reflect = findMode(input.rows, "Reflect stable");
+  const phantom = findMode(input.rows, "Phantom Connect");
+  const squads = findMode(input.rows, "FOLIO treasury");
+  const meteoraDbc = findMode(input.rows, "Meteora DBC");
 
   /** Prefer live free diverge label over Pyth-unavailable theater. */
   let pythLabel = modeLabel(pyth, "Off ship path");
@@ -149,6 +161,10 @@ export function buildNetroLiveGateLabels(input: {
     multiTenant: modeLabel(multiTenant, "Unavailable"),
     raydium: modeLabel(raydium, "Unavailable"),
     nestCredit: modeLabel(nestCredit, "Unavailable"),
+    reflect: modeLabel(reflect, "Unavailable"),
+    phantom: modeLabel(phantom, "Unavailable"),
+    squads: modeLabel(squads, "Unavailable"),
+    meteoraDbc: modeLabel(meteoraDbc, "Unavailable"),
     kaminoLtv: ltv,
     creditCapacity,
     quoteOut,
@@ -167,6 +183,10 @@ export const NETRO_LIVE_GATE_DEFAULTS: NetroLiveGateLabels = {
   multiTenant: "Unavailable",
   raydium: "Unavailable",
   nestCredit: "Unavailable",
+  reflect: "Unavailable",
+  phantom: "Unavailable",
+  squads: "Unavailable",
+  meteoraDbc: "Unavailable",
   kaminoLtv: null,
   creditCapacity: "Illustrative · borrow off",
   quoteOut: "Quote pending",

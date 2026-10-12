@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PublicShell } from "@/components/public-page";
@@ -81,12 +81,20 @@ function Page() {
           </div>
         ))}
       </div>
+      <p className="mkt-links" style={{ marginTop: "1rem" }}>
+        <Link to="/desk/dbc">New launches →</Link>
+        {" · "}
+        <Link to="/desk/credit">Borrow and earn →</Link>
+        {" · "}
+        <Link to="/desk/settings">Connect Phantom →</Link>
+      </p>
       <section className="mkt-aside-band" aria-label="How to read this matrix">
         <h2>Read the label, not the hype</h2>
         <p>
           Live read means a real probe returned. Quote means you can review a
           route. Unavailable is intentional — not a broken badge waiting for a
-          screenshot.
+          screenshot. Hub rows: Phantom, Reflect, Meteora DBC, Squads/Altitude —
+          labeled separately from NestUSD and xStock truth.
         </p>
       </section>
     </PublicShell>

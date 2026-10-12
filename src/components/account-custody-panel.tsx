@@ -79,9 +79,10 @@ function AccountCustodyLive({
   return (
     <div className="fx-custody">
       <p className="fx-sub">
-        Email sign-in creates an embedded Solana wallet. Already have Phantom or
-        Solflare? Link it. Leaving FOLIO? Export only after you understand the
-        risks.
+        Email sign-in creates an embedded Solana wallet — it starts empty. Add a
+        little SOL before Meteora, Reflect, or Kamino can go through. Already
+        have Phantom or Solflare? Link it. Leaving FOLIO? Export only after you
+        understand the risks.
       </p>
 
       <div className="fx-chip-row" style={{ marginTop: "0.85rem" }}>

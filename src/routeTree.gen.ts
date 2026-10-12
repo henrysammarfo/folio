@@ -29,6 +29,7 @@ import { Route as DeskAcquireRouteImport } from './routes/desk.acquire'
 import { Route as DeskActivityRouteImport } from './routes/desk.activity'
 import { Route as DeskAdminRouteImport } from './routes/desk.admin'
 import { Route as DeskCreditRouteImport } from './routes/desk.credit'
+import { Route as DeskDbcRouteImport } from './routes/desk.dbc'
 import { Route as DeskMarketsRouteImport } from './routes/desk.markets'
 import { Route as DeskPositionsRouteImport } from './routes/desk.positions'
 import { Route as DeskPreipoRouteImport } from './routes/desk.preipo'
@@ -138,6 +139,11 @@ const DeskCreditRoute = DeskCreditRouteImport.update({
   path: '/credit',
   getParentRoute: () => DeskRoute,
 } as any)
+const DeskDbcRoute = DeskDbcRouteImport.update({
+  id: '/dbc',
+  path: '/dbc',
+  getParentRoute: () => DeskRoute,
+} as any)
 const DeskMarketsRoute = DeskMarketsRouteImport.update({
   id: '/markets',
   path: '/markets',
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/desk/activity': typeof DeskActivityRoute
   '/desk/admin': typeof DeskAdminRoute
   '/desk/credit': typeof DeskCreditRoute
+  '/desk/dbc': typeof DeskDbcRoute
   '/desk/markets': typeof DeskMarketsRoute
   '/desk/positions': typeof DeskPositionsRoute
   '/desk/preipo': typeof DeskPreipoRoute
@@ -228,6 +235,7 @@ export interface FileRoutesByTo {
   '/desk/activity': typeof DeskActivityRoute
   '/desk/admin': typeof DeskAdminRoute
   '/desk/credit': typeof DeskCreditRoute
+  '/desk/dbc': typeof DeskDbcRoute
   '/desk/markets': typeof DeskMarketsRoute
   '/desk/positions': typeof DeskPositionsRoute
   '/desk/preipo': typeof DeskPreipoRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/desk/activity': typeof DeskActivityRoute
   '/desk/admin': typeof DeskAdminRoute
   '/desk/credit': typeof DeskCreditRoute
+  '/desk/dbc': typeof DeskDbcRoute
   '/desk/markets': typeof DeskMarketsRoute
   '/desk/positions': typeof DeskPositionsRoute
   '/desk/preipo': typeof DeskPreipoRoute
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/desk/activity'
     | '/desk/admin'
     | '/desk/credit'
+    | '/desk/dbc'
     | '/desk/markets'
     | '/desk/positions'
     | '/desk/preipo'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/desk/activity'
     | '/desk/admin'
     | '/desk/credit'
+    | '/desk/dbc'
     | '/desk/markets'
     | '/desk/positions'
     | '/desk/preipo'
@@ -350,6 +361,7 @@ export interface FileRouteTypes {
     | '/desk/activity'
     | '/desk/admin'
     | '/desk/credit'
+    | '/desk/dbc'
     | '/desk/markets'
     | '/desk/positions'
     | '/desk/preipo'
@@ -523,6 +535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeskCreditRouteImport
       parentRoute: typeof DeskRoute
     }
+    '/desk/dbc': {
+      id: '/desk/dbc'
+      path: '/dbc'
+      fullPath: '/desk/dbc'
+      preLoaderRoute: typeof DeskDbcRouteImport
+      parentRoute: typeof DeskRoute
+    }
     '/desk/markets': {
       id: '/desk/markets'
       path: '/markets'
@@ -587,6 +606,7 @@ interface DeskRouteChildren {
   DeskActivityRoute: typeof DeskActivityRoute
   DeskAdminRoute: typeof DeskAdminRoute
   DeskCreditRoute: typeof DeskCreditRoute
+  DeskDbcRoute: typeof DeskDbcRoute
   DeskMarketsRoute: typeof DeskMarketsRoute
   DeskPositionsRoute: typeof DeskPositionsRoute
   DeskPreipoRoute: typeof DeskPreipoRoute
@@ -601,6 +621,7 @@ const DeskRouteChildren: DeskRouteChildren = {
   DeskActivityRoute: DeskActivityRoute,
   DeskAdminRoute: DeskAdminRoute,
   DeskCreditRoute: DeskCreditRoute,
+  DeskDbcRoute: DeskDbcRoute,
   DeskMarketsRoute: DeskMarketsRoute,
   DeskPositionsRoute: DeskPositionsRoute,
   DeskPreipoRoute: DeskPreipoRoute,

@@ -1,6 +1,44 @@
 
 # FOLIO — SESSION LOG
 
+
+## 2026-10-12 — Arm fills + unblock Vercel preview
+
+- Confirmed Vercel `BROADCAST_PAUSED=false` already on production/preview/development (user-signed Jupiter only).
+- Hub previews were ERROR: TanStack Start XSS block (`@tanstack/react-start@1.168.32` → **1.168.61** + router 1.170.42 + plugin 1.168.43).
+- Session `networkPolicy.broadcast` now tracks `!isBroadcastPaused()`; Account desk-mode copy reflects armed fills.
+- Residual: FOLIO still never sponsors gas; borrow CPI unfunded; merge hub → main for prod Buy path if acquire 404 on old main.
+
+## 2026-10-12 — Customer perspective audit (paper illusion + Account wallet)
+
+- P0: Home/Borrow no longer treat paper qty as real money when wallet bound+empty → $0 borrow / empty holdings.
+- Account shows Open App / session wallet + **Copy address** (was “No wallet connected”).
+- Header Open App remints when Solana wallet arrives; gas strip adds **Add USDC** + full address copy.
+- Launches primary = Add SOL first when gas low; NestUSD labeled needs SOL.
+- Residual: Buy gasPref still cosmetic; Activity is market telemetry not user trades; fills paused until Henry arms.
+
+## 2026-10-12 — Email-wallet gas loophole (customer path)
+
+- Loophole: Open App email → embedded Solana wallet at **0 SOL** → Meteora / Reflect / Kamino deep-links look live but fail without fees.
+- Fix: `fetchWalletSolBalance` + `getWalletGasStatus` · `WalletGasReady` on Buy / Borrow / Launches / Account with **Add SOL** (Privy `useFundWallet`) + manual address hint.
+- Soft CTAs when gas low (“needs SOL”); session mint binds Solana wallet from `useWallets` + Privy verify prefers `chain_type=solana`.
+- Residual: FOLIO still does not sponsor gas; Privy dashboard must enable funding methods for modal on-ramp; Jupiter gasless still only covers FOLIO Buy ≥~$10.
+
+## 2026-10-12 — Hub keys runbook + consumer desk polish
+
+- `docs/HUB_KEYS_HENRY.md` — Phantom App ID (Portal paused for new apps), Reflect optional key, Squads vault why-unavailable, SOL for gas (agent cannot mint SOL).
+- Desk Launches `/desk/dbc`: consumer copy, Trade CTAs, Jupiter/token logos on pools.
+- Phantom + Reflect credit copy softened; Launches in desk nav.
+- Write path = user-signed deep-links (Meteora / Reflect / Kamino / Phantom) — FOLIO still does not sponsor CPI on ≤~$1.
+
+## 2026-10-12 — World's Fair hub sponsors spine (Phantom · Reflect · DBC · Squads)
+
+- Added fail-closed adapters: `phantom-connect`, `reflect`, `meteora-dbc`, `squads-treasury` + `reflect-sdk` handoff.
+- Wired into `buildNetworkMatrix` / `getNetworkBundle` / `getCreditBundle` / Empire readiness.
+- Desk: Phantom Connect shell + Settings panel · Reflect CTA on credit · `/desk/dbc` separate lane.
+- Deps: `@phantom/react-sdk`, `@reflectmoney/stable.ts` (SDK not imported on SSR read path).
+- Branch: `cursor/folio-hub-sponsors-spine-f1ec`.
+
 ## 2026-09-25 — Prod feature smoke after SSR Privy fix
 
 - All desk routes HTTP 200 · SSR success · no Anchor `exports is not defined` on current prod.
@@ -157,6 +195,7 @@
 - `prepareKaminoDeposit` / `prepareKaminoBorrow` via `api.kamino.finance/ktx/klend/*`; Privy `signAndSendTransaction` (no outbound Kamino/Nest CTA).
 - Honesty: Kamino builds txs · user signs · no FOLIO borrow CPI. NestUSD stays metrics-only.
 - Branch: `cursor/folio-credit-inhouse-logos-f1ec`.
+
 
 ## 2026-09-20 — Credit live: NestUSD metrics + Kamino borrow CTA
 

@@ -22,6 +22,13 @@ import { fetchNestUsdStatus } from "./adapters/nestusd";
 import { fetchNestCreditVaults } from "./adapters/nest-credit";
 import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import {
+  fetchReflectStatus,
+  REFLECT_APP_URL,
+  type ReflectSnapshot,
+} from "./adapters/reflect";
+import { readPhantomAppId } from "./adapters/phantom-connect";
+import { readSquadsVault } from "./adapters/squads-treasury";
+import {
   FOLIO_SESSION_COOKIE,
   getAuthProviderStatus,
   loadDeskPreferences,
@@ -44,8 +51,10 @@ import {
   verifyWatchWalletCookieValue,
 } from "./auth/watch-wallet";
 import {
+  fetchWalletSolBalance,
   fetchWalletTokenBalances,
   isLikelySolanaPubkey,
+  type WalletSolBalance,
 } from "./adapters/wallet-balances";
 import {
   heldXStockSymbolsFromBalances,
@@ -164,6 +173,8 @@ export type CreditBundle = {
   nestusd: Awaited<ReturnType<typeof fetchNestUsdStatus>>;
   /** Nest.credit vault awareness — not NestUSD borrow capacity. */
   nestCredit: Awaited<ReturnType<typeof fetchNestCreditVaults>>;
+  /** Reflect USDC+/USDT+ — not NestUSD borrow. */
+  reflect: AdapterResult<ReflectSnapshot>;
   paper: {
     /** Qty basis for collateral math — wallet-read when bound, else paper. */
     label: "paper" | "wallet-read";
@@ -180,15 +191,20 @@ export type CreditBundle = {
    * Borrow rails status.
    * - kamino-inhouse: live Kamino xStocks + ktx deposit/borrow signed in-desk
    * - nestusd-metrics: NestUSD LTV metrics only (no NestUSD in-desk execute yet)
+   * - nestusd-external: NestUSD app deep-link (legacy label)
+   * - reflect-external: Reflect stable rail live (earn/mint — not xStock CDP)
    * - unavailable: neither rail live
    */
   borrowExecution:
     | "kamino-inhouse"
     | "nestusd-metrics"
+    | "nestusd-external"
+    | "reflect-external"
     | "unavailable";
   /** Reference deep-link only — desk borrow is in-house via ktx. */
   kaminoBorrowUrl: string | null;
   nestusdAppUrl: string | null;
+  reflectAppUrl: string | null;
   /** Same arm as Jupiter fills — ktx sign/send fail-closed while true. */
   broadcastPaused: boolean;
 };
@@ -274,6 +290,12 @@ export type EmpireReadiness = {
   approvedLabShader: string | null;
   /** Optional Jupiter auth header — public path works without it. */
   jupiterKeyPresent: boolean;
+  /** Phantom Connect App ID — embedded social; injected path works without it. */
+  phantomAppId: string | null;
+  /** Optional Reflect integrator key (rate limits). */
+  reflectApiKeyPresent: boolean;
+  /** Squads vault pubkey configured for treasury read. */
+  squadsVaultConfigured: boolean;
   /** Dedicated SOLANA_RPC_URL (false = labeled public RPC fallback · B004). */
   solanaRpcDedicated: boolean;
   /**
@@ -311,6 +333,9 @@ export function readEmpireReadiness(
     approvedLabUi: readApprovedLabUi(env),
     approvedLabShader: readApprovedLabShader(env),
     jupiterKeyPresent: Boolean(env["JUPITER_API_KEY"]?.trim()),
+    phantomAppId: readPhantomAppId(env),
+    reflectApiKeyPresent: Boolean(env["REFLECT_API_KEY"]?.trim()),
+    squadsVaultConfigured: Boolean(readSquadsVault(env)),
     solanaRpcDedicated: Boolean(env["SOLANA_RPC_URL"]?.trim()),
     /** Sync path defaults false — enrich via loadEmpireReadiness. */
     supabaseSchemaReady: false,
@@ -494,6 +519,8 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
         mint && walletBalances?.ok
           ? walletBalances.data.byMint[mint]?.uiAmount
           : undefined;
+      // Bound wallet + successful balance read → never fall back to paper qty
+      // (empty email wallets must show 0, not demo shares).
       const qtySource: PositionRow["qtySource"] =
         walletUi != null && Number.isFinite(walletUi) ? "wallet-read" : "paper";
       // Bound wallet with readable balances: zero is honest wallet-read, not paper.
@@ -574,15 +601,20 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
 
     const watch = readWatchWallet();
     const inspectActive = walletSource === "inspect" ? displayWallet : null;
+    const anyWalletQty = rows.some(
+      (r) => r.qtySource === "wallet-read" && r.qty > 0,
+    );
     let note: string;
     if (!displayWallet) {
       note =
-        "Estimated quantities until you connect a wallet. Share counts are live and checked against the Solana ledger.";
+        "Demo quantities — not owned shares. Open App, add USDC + a little SOL, then Buy.";
+    } else if (walletBalances?.ok && !anyWalletQty) {
+      note = `Wallet ${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)} holds no xStocks yet. Buy to get real holdings.`;
     } else if (walletBalances?.ok) {
       const heldN = rows.filter((r) => r.qty > 0).length;
       note = `Live balances for ${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)} · ${heldN} xStock holding${heldN === 1 ? "" : "s"} (full wallet scan). Share counts verified on-chain when they match.`;
     } else {
-      note = `Wallet connected but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing estimates. Share counts still live.`;
+      note = `Wallet connected but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — demo estimates only. Share counts still live.`;
     }
 
     return {
@@ -607,11 +639,12 @@ export const getCreditBundle = createServerFn({ method: "GET" })
     );
     const watch = readWatchWallet();
 
-    const [kamino, jupiterLend, nestusd, nestCredit] = await Promise.all([
+    const [kamino, jupiterLend, nestusd, nestCredit, reflect] = await Promise.all([
       fetchKaminoXStocksMarket(),
       fetchJupiterLendEarn(),
       fetchNestUsdStatus(),
       fetchNestCreditVaults(),
+      fetchReflectStatus(),
     ]);
 
     // Full wallet scan when bound — collateral from every held xStock, not just AAPLx/NVDAx.
@@ -653,6 +686,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       }),
     );
 
+    const walletReadOk = Boolean(displayWallet && walletBalances?.ok);
     let collateral: number | null = null;
     let priced = 0;
     let usedWalletQty = false;
@@ -666,6 +700,8 @@ export const getCreditBundle = createServerFn({ method: "GET" })
           mint && walletBalances?.ok
             ? walletBalances.data.byMint[mint]?.uiAmount
             : undefined;
+        // Bound + balances OK → wallet only (0 if empty). Never inflate borrow
+        // with paper qty for email wallets that hold nothing.
         const useWallet =
           displayWallet &&
           walletBalances?.ok &&
@@ -688,6 +724,9 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       }
     }
     if (priced === 0) collateral = null;
+    if (walletReadOk && !usedWalletQty) {
+      collateral = 0;
+    }
 
     const aaplReserve = kamino.ok
       ? kamino.data.reserves.find((r) => r.symbol === "AAPLx")
@@ -698,7 +737,11 @@ export const getCreditBundle = createServerFn({ method: "GET" })
         ? collateral * maxLtvUsed
         : null;
 
-    const label = usedWalletQty ? ("wallet-read" as const) : ("paper" as const);
+    const label = walletReadOk
+      ? ("wallet-read" as const)
+      : usedWalletQty
+        ? ("wallet-read" as const)
+        : ("paper" as const);
     const inspectActive = walletSource === "inspect" ? displayWallet : null;
 
     const kaminoLive = kamino.ok;
@@ -706,14 +749,20 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       nestusd.ok &&
       nestusd.data.status === "live" &&
       !nestusd.data.protocolPaused;
+    const reflectLive = reflect.ok;
     const borrowExecution = kaminoLive
       ? ("kamino-inhouse" as const)
       : nestLive
         ? ("nestusd-metrics" as const)
-        : ("unavailable" as const);
+        : reflectLive
+          ? ("reflect-external" as const)
+          : ("unavailable" as const);
 
     let note: string;
-    if (kaminoLive) {
+    if (walletReadOk && !usedWalletQty) {
+      note =
+        "Your wallet has no xStocks yet — borrow capacity is $0. Buy stocks first, then open Kamino.";
+    } else if (kaminoLive) {
       note = usedWalletQty
         ? "Live Kamino xStocks LTV × your wallet collateral (full scan). Deposit & borrow USDC in FOLIO — your wallet signs on Kamino rails."
         : "Live Kamino xStocks LTV. Connect a wallet for your collateral estimate, then deposit & borrow in-desk.";
@@ -722,9 +771,12 @@ export const getCreditBundle = createServerFn({ method: "GET" })
         "Estimate from your wallet balances × live max LTV. Borrow rails unavailable.";
     } else if (displayWallet && walletBalances && !walletBalances.ok) {
       note =
-        "Wallet connected but balances unavailable — showing estimates × live max LTV.";
+        "Wallet connected but balances unavailable — demo estimate only, not your collateral.";
     } else {
-      note = "Estimate until you connect a wallet.";
+      note = "Demo estimate until you Open App. Not borrowable cash.";
+    }
+    if (reflectLive) {
+      note += " Earn on Reflect stables with your wallet when you are ready.";
     }
 
     return {
@@ -732,6 +784,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       jupiterLend,
       nestusd,
       nestCredit,
+      reflect,
       paper: {
         label,
         collateralUsd: collateral,
@@ -742,6 +795,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       borrowExecution,
       kaminoBorrowUrl: kamino.ok ? kamino.data.borrowUrl : null,
       nestusdAppUrl: nestusd.ok ? nestusd.data.appUrl : null,
+      reflectAppUrl: reflect.ok ? reflect.data.appUrl : REFLECT_APP_URL,
       broadcastPaused: isBroadcastPaused(),
       watchWallet: watch.ok ? watch.data.wallet : null,
       inspectWallet: inspectActive,
@@ -957,6 +1011,65 @@ export const getActivityBundle = createServerFn({ method: "GET" }).handler(
   },
 );
 
+export type WalletGasStatus = {
+  wallet: string | null;
+  walletSource: WalletBindingSource;
+  sol: AdapterResult<WalletSolBalance> | null;
+  /** Soft consumer copy — never jargon. */
+  note: string;
+  /** True when wallet exists and SOL ≥ min for typical external-app gas. */
+  readyForExternalWrite: boolean;
+};
+
+/**
+ * Email / embedded wallets often start at 0 SOL. Surface gas honesty before
+ * Meteora / Reflect / Kamino deep-links (FOLIO does not sponsor CPI).
+ */
+export const getWalletGasStatus = createServerFn({ method: "GET" })
+  .validator(InspectWalletInput)
+  .handler(async ({ data }): Promise<WalletGasStatus> => {
+    const session = readVerifiedSession();
+    const { wallet, source } = resolveDisplayWallet(
+      session,
+      data.inspectWallet,
+    );
+    if (!wallet) {
+      return {
+        wallet: null,
+        walletSource: source,
+        sol: null,
+        readyForExternalWrite: false,
+        note: "Open App with email to create a wallet, or paste one on Account. Trades and borrows need a little SOL for network fees — FOLIO never pays gas for you.",
+      };
+    }
+    const sol = await fetchWalletSolBalance(wallet);
+    if (!sol.ok) {
+      return {
+        wallet,
+        walletSource: source,
+        sol,
+        readyForExternalWrite: false,
+        note: "Couldn’t read your SOL balance right now. Try again, or add a little SOL before opening Meteora, Reflect, or Kamino.",
+      };
+    }
+    if (!sol.data.canPayGas) {
+      return {
+        wallet,
+        walletSource: source,
+        sol,
+        readyForExternalWrite: false,
+        note: `Your wallet has ${sol.data.sol.toFixed(4)} SOL. Add about ${sol.data.minSolForGas} SOL (or more) so Meteora trades, Reflect earn/mint, and Kamino borrows can go through. Buy stocks on FOLIO may still work via Jupiter gasless on larger sizes.`,
+      };
+    }
+    return {
+      wallet,
+      walletSource: source,
+      sol,
+      readyForExternalWrite: true,
+      note: `${sol.data.sol.toFixed(3)} SOL ready for fees. You sign — FOLIO never moves funds for you.`,
+    };
+  });
+
 export const getSessionBundle = createServerFn({ method: "GET" }).handler(
   async (): Promise<SessionBundle> => {
     const session = readVerifiedSession();
@@ -975,9 +1088,10 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
       preferences,
       networkPolicy: {
         mainnetRead: true,
-        quoteOnly: true,
-        // Unfunded · ≤~$1 — never report Enabled just because BROADCAST_PAUSED=false.
-        broadcast: false,
+        // Quote-only until fills armed; when BROADCAST_PAUSED=false, user-signed
+        // Jupiter execute is live (still no FOLIO payer / custom program).
+        quoteOnly: isBroadcastPaused(),
+        broadcast: !isBroadcastPaused(),
         customProgramDeploy: false,
       },
       watchWallet: watch.ok ? watch.data.wallet : null,

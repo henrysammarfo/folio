@@ -119,3 +119,37 @@ export function initialsForSymbol(symbol: string): string {
   const base = raw.replace(/x$/i, "");
   return (base.slice(0, 2) || "?").toUpperCase();
 }
+
+/** SOL wrapped mint — stable CDN logo. */
+export const WSOL_MINT = "So11111111111111111111111111111111111111112";
+
+export function solLogoUrl(): string {
+  return `https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/${WSOL_MINT}/logo.png`;
+}
+
+/**
+ * Logo candidates for arbitrary Solana mints (DBC / meme launches).
+ * Prefer API-provided icon, then token-list path, then initials fallback in AssetLogo.
+ */
+export function mintLogoCandidates(opts: {
+  mint: string;
+  symbol?: string;
+  logo?: string | null;
+}): string[] {
+  const mint = opts.mint.trim();
+  const out: string[] = [];
+  const push = (u: string | null | undefined) => {
+    const t = u?.trim();
+    if (t && !out.includes(t)) out.push(t);
+  };
+  push(opts.logo);
+  if (mint === WSOL_MINT || opts.symbol?.toUpperCase() === "SOL") {
+    push(solLogoUrl());
+  }
+  if (mint) {
+    push(
+      `https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/${mint}/logo.png`,
+    );
+  }
+  return out;
+}

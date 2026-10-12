@@ -1,3 +1,40 @@
+
+## 2026-10-12 — Customer perspective audit
+
+| Claim | Status |
+|---|---|
+| Bound empty wallet still showed paper borrow USD | Fixed — wallet-read path uses 0 collateral |
+| Home “Your portfolio” from paper without label | Fixed — Demo preview / empty copy |
+| Account “No wallet connected” after Open App | Fixed — resolveWalletBinding + Copy |
+| No copy-address / Add USDC | Fixed on gas strip + Account |
+| Header Open App missed Solana remint | Fixed — matches Account mint |
+| Buy gasPref wires to prepare | Residual — cosmetic only |
+| Activity = user trade history | Residual — market checks |
+
+## 2026-10-12 — Email-wallet gas honesty
+
+| Claim | Status |
+|---|---|
+| Email embedded wallets start at 0 SOL | True — customer loophole for external deep-links |
+| Desk surfaces SOL &lt; 0.01 before Meteora/Reflect/Kamino | Implemented — `WalletGasReady` + `getWalletGasStatus` |
+| Add SOL via Privy fundWallet | Wired — needs Privy dashboard funding methods enabled |
+| FOLIO sponsors user gas | False — residual; Jupiter gasless only on FOLIO Buy ≥~$10 |
+| Session binds Solana wallet on email login | Implemented — client `useWallets` + verify prefers solana linked |
+
+## 2026-10-12 — World's Fair hub sponsors
+
+| Claim | Status |
+|---|---|
+| Reflect `prod.api.reflect.money` health+types+stats mainnet-read | Live probe 200 (APY endpoint 404 — not required for desk honesty) |
+| Meteora DBC `dbc.datapi.meteora.ag/pools` indexed sample | Live probe 200 · separate `/desk/dbc` lane |
+| Phantom Connect dual-path beside Privy | Implemented — injected without App ID; embedded needs `PHANTOM_APP_ID` |
+| Phantom Portal new app sign-ups paused | Hub/docs residual — disclose in Settings copy |
+| Squads treasury fail-closed without `FOLIO_SQUADS_VAULT` | Implemented |
+| Broadcast funded only with vault + `FOLIO_TREASURY_FUNDED=true` | Implemented — never invent on ≤~$1 |
+| NestUSD not conflated with Reflect | Matrix + credit copy labeled |
+| `@reflectmoney/stable.ts` / `@phantom/react-sdk` installed | Packaged · Reflect SDK not on SSR read path |
+| No Meteora Anchor DBC SDK on SSR | Intentional — HTTP awareness only |
+
 ## 2026-09-25 — API keys + Privy sign diagnosis
 
 | Claim | Status |
@@ -159,13 +196,15 @@
 | Beta honeypot spam trap | Implemented |
 | Sitemap includes markets/beta/whitepaper/preipo/tessera | Implemented |
 
+
 ## 2026-09-20 — Ship rough edges (fills · F · G · honesty)
 
 | Claim | Status |
 |---|---|
 | Buy CTA calls prepare → Privy sign → execute when fills armed | Implemented — `buy-execute-button.tsx` |
 | prepareJupiterSwap requires session + !BROADCAST_PAUSED + taker | Implemented — `desk.functions.ts` |
-| Fills still env-gated until BROADCAST_PAUSED=false | Residual — Henry preview-then-prod |
+| Fills env-gated by BROADCAST_PAUSED | Armed — Vercel value `false` on prod/preview/dev |
+| Hub preview blocked by TanStack XSS CVE | Fixed — react-start ≥1.168.61 |
 | Positions show positionStatusLabel (Verified / Live · est.) | Implemented |
 | Partner lanes show Jupiter $1 out amount | Implemented |
 | Beta cine inputs/Join high contrast | Implemented — `styles.css` |
