@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@phantom/react-sdk": "^2.0.4",
     "@privy-io/react-auth": "^3.43.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -53,6 +54,7 @@
     "@radix-ui/react-toggle": "^1.1.10",
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@reflectmoney/stable.ts": "^5.3.2",
     "@solana-program/memo": "^0.8.0",
     "@solana-program/system": "^0.8.0",
     "@solana-program/token": "^0.6.0",

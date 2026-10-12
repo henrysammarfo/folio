@@ -39,6 +39,18 @@ export function buildNetworkMatrix(input: {
   scaledUi: AdapterResult<unknown>;
   /** Raydium pool awareness — mainnet-read, not a route guarantee. */
   pools: AdapterResult<unknown>;
+  /** Phantom Connect dual-path (alongside Privy) — sign / bind, not session mint. */
+  phantomConnect?: AdapterResult<unknown>;
+  /** Reflect USDC+/USDT+ stable rail — not NestUSD / Nest.credit. */
+  reflect?: AdapterResult<unknown>;
+  /** Meteora DBC awareness — separate bounty lane, not xStock truth. */
+  meteoraDbc?: AdapterResult<unknown>;
+  /** Squads / Altitude treasury vault read. */
+  squadsTreasury?: AdapterResult<{
+    broadcastTreasuryReady?: boolean;
+    sol?: number;
+    note?: string;
+  }>;
   bitqueryKeyPresent: boolean;
   /** Privy + Supabase + session secret all configured. */
   multiTenantKeysPresent: boolean;
@@ -51,6 +63,46 @@ export function buildNetworkMatrix(input: {
   /** Env arm: BROADCAST_PAUSED=false enables user-signed Jupiter /execute. */
   broadcastPaused?: boolean;
 }): MatrixRow[] {
+  const phantom =
+    input.phantomConnect ??
+    ({
+      ok: false,
+      mode: "unavailable" as const,
+      asOf: new Date().toISOString(),
+      source: "phantom-connect",
+      reason: "phantom_connect_not_probed",
+    } as const);
+  const reflect =
+    input.reflect ??
+    ({
+      ok: false,
+      mode: "unavailable" as const,
+      asOf: new Date().toISOString(),
+      source: "reflect",
+      reason: "reflect_not_probed",
+    } as const);
+  const meteoraDbc =
+    input.meteoraDbc ??
+    ({
+      ok: false,
+      mode: "unavailable" as const,
+      asOf: new Date().toISOString(),
+      source: "meteora-dbc",
+      reason: "meteora_dbc_not_probed",
+    } as const);
+  const squads =
+    input.squadsTreasury ??
+    ({
+      ok: false,
+      mode: "unavailable" as const,
+      asOf: new Date().toISOString(),
+      source: "squads-treasury",
+      reason: "squads_vault_unconfigured",
+      detail: "Set FOLIO_SQUADS_VAULT",
+    } as const);
+  const treasuryReady =
+    input.broadcastFunded ||
+    (squads.ok && Boolean(squads.data.broadcastTreasuryReady));
   return [
     {
       capability: "xStocks multiplier + asset metadata",
@@ -110,6 +162,13 @@ export function buildNetworkMatrix(input: {
         : detailOf(input.pools),
     },
     {
+      capability: "Meteora DBC awareness (separate lane)",
+      mode: modeOf(meteoraDbc),
+      detail: meteoraDbc.ok
+        ? `${meteoraDbc.source} · separate DBC lane · not xStock economic truth`
+        : detailOf(meteoraDbc),
+    },
+    {
       capability: "Wash / linked-flow gate",
       mode: modeOf(input.wash),
       detail: input.wash.ok
@@ -153,6 +212,27 @@ export function buildNetworkMatrix(input: {
           : "NestUSD metrics unavailable · fail-closed",
     },
     {
+      capability: "Reflect stable credit (read)",
+      mode: modeOf(reflect),
+      detail: reflect.ok
+        ? `${reflect.source} · USDC+/USDT+ · not NestUSD · not Nest.credit · mint via Reflect app/SDK`
+        : detailOf(reflect),
+    },
+    {
+      capability: "Phantom Connect (wallet dual-path)",
+      mode: modeOf(phantom),
+      detail: phantom.ok
+        ? `${phantom.source} · alongside Privy · session mint stays httpOnly Privy`
+        : detailOf(phantom),
+    },
+    {
+      capability: "FOLIO treasury (Squads / Altitude)",
+      mode: modeOf(squads),
+      detail: squads.ok
+        ? `${squads.source} · ${squads.data.note ?? "vault read"}`
+        : detailOf(squads),
+    },
+    {
       capability: "Multi-tenant sessions (Privy + Supabase)",
       mode: input.multiTenantKeysPresent ? "mainnet-read" : "unavailable",
       detail: input.multiTenantKeysPresent
@@ -189,11 +269,11 @@ export function buildNetworkMatrix(input: {
     {
       capability: "Broadcast swap / borrow",
       mode:
-        input.broadcastFunded || input.broadcastPaused === false
+        treasuryReady || input.broadcastPaused === false
           ? "mainnet-read"
           : "unavailable",
-      detail: input.broadcastFunded
-        ? "Funded wallet path (still requires explicit user confirm)"
+      detail: treasuryReady
+        ? "Squads/Altitude treasury armed (still requires explicit user confirm)"
         : input.broadcastPaused === false
           ? "User-signed Jupiter fills armed · no FOLIO payer · borrow CPI still unfunded"
           : "Not funded · ≤~$1 budget · quote-only · BROADCAST_PAUSED",

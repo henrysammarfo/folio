@@ -1,3 +1,17 @@
+## 2026-10-12 — World's Fair hub sponsors
+
+| Claim | Status |
+|---|---|
+| Reflect `prod.api.reflect.money` health+types+stats mainnet-read | Live probe 200 (APY endpoint 404 — not required for desk honesty) |
+| Meteora DBC `dbc.datapi.meteora.ag/pools` indexed sample | Live probe 200 · separate `/desk/dbc` lane |
+| Phantom Connect dual-path beside Privy | Implemented — injected without App ID; embedded needs `PHANTOM_APP_ID` |
+| Phantom Portal new app sign-ups paused | Hub/docs residual — disclose in Settings copy |
+| Squads treasury fail-closed without `FOLIO_SQUADS_VAULT` | Implemented |
+| Broadcast funded only with vault + `FOLIO_TREASURY_FUNDED=true` | Implemented — never invent on ≤~$1 |
+| NestUSD not conflated with Reflect | Matrix + credit copy labeled |
+| `@reflectmoney/stable.ts` / `@phantom/react-sdk` installed | Packaged · Reflect SDK not on SSR read path |
+| No Meteora Anchor DBC SDK on SSR | Intentional — HTTP awareness only |
+
 ## 2026-09-20 — Ship rough edges (fills · F · G · honesty)
 
 | Claim | Status |

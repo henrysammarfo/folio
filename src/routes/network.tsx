@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PublicShell } from "@/components/public-page";
@@ -79,12 +79,20 @@ function Page() {
           </div>
         ))}
       </div>
+      <p className="mkt-links" style={{ marginTop: "1rem" }}>
+        <Link to="/desk/dbc">Meteora DBC separate lane →</Link>
+        {" · "}
+        <Link to="/desk/credit">Credit (Kamino / NestUSD / Reflect) →</Link>
+        {" · "}
+        <Link to="/desk/settings">Phantom Connect dual-path →</Link>
+      </p>
       <section className="mkt-aside-band" aria-label="How to read this matrix">
         <h2>Read the mode, not the marketing</h2>
         <p>
           Mainnet-read means a live probe returned. Quote-only means Jupiter
           routes without broadcast. Unavailable is intentional — not a broken
-          badge waiting for a screenshot.
+          badge waiting for a screenshot. Hub rows: Phantom, Reflect, Meteora
+          DBC, Squads/Altitude — labeled separately from NestUSD and xStock truth.
         </p>
       </section>
     </PublicShell>

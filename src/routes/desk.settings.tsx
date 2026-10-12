@@ -6,6 +6,7 @@ import { lazy, Suspense, useState } from "react";
 import { z } from "zod";
 import { AccountCustodyPanel } from "@/components/account-custody-panel";
 import { DeskShell } from "@/components/desk-shell";
+import { PhantomConnectPanel } from "@/components/phantom-connect-panel";
 import { usePrivyShellReady } from "@/components/privy-app-provider";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -104,6 +105,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
     : false;
   const signedIn = Boolean(data?.auth.ok && data.auth.data.sessionReady);
   const appId = data?.readiness.privyAppId ?? "";
+  const phantomAppConfigured = Boolean(data?.readiness.phantomAppId);
   const watchBindReady = Boolean(data?.sessionSecretPresent);
   const fillsPaused = data?.readiness.broadcastPaused !== false;
   const shortWallet = data?.watchWallet
@@ -257,6 +259,8 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               </button>
             ) : null}
           </article>
+
+          <PhantomConnectPanel appIdConfigured={phantomAppConfigured} />
 
           <article className="fx-card fx-account-card">
             <header className="fx-account-card-head">

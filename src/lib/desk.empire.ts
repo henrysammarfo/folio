@@ -22,6 +22,13 @@ import { fetchNestUsdStatus } from "./adapters/nestusd";
 import { fetchNestCreditVaults } from "./adapters/nest-credit";
 import { fetchRaydiumPoolsForMint } from "./adapters/pools";
 import {
+  fetchReflectStatus,
+  REFLECT_APP_URL,
+  type ReflectSnapshot,
+} from "./adapters/reflect";
+import { readPhantomAppId } from "./adapters/phantom-connect";
+import { readSquadsVault } from "./adapters/squads-treasury";
+import {
   FOLIO_SESSION_COOKIE,
   getAuthProviderStatus,
   loadDeskPreferences,
@@ -159,6 +166,8 @@ export type CreditBundle = {
   nestusd: Awaited<ReturnType<typeof fetchNestUsdStatus>>;
   /** Nest.credit vault awareness — not NestUSD borrow capacity. */
   nestCredit: Awaited<ReturnType<typeof fetchNestCreditVaults>>;
+  /** Reflect USDC+/USDT+ — not NestUSD borrow. */
+  reflect: AdapterResult<ReflectSnapshot>;
   paper: {
     /** Qty basis for collateral math — wallet-read when bound, else paper. */
     label: "paper" | "wallet-read";
@@ -175,14 +184,17 @@ export type CreditBundle = {
    * Borrow rails status.
    * - kamino-external: live Kamino xStocks market + deep-link execute
    * - nestusd-external: live NestUSD metrics + app deep-link (no FOLIO CPI)
+   * - reflect-external: Reflect stable rail live (earn/mint — not xStock CDP)
    * - unavailable: neither rail live
    */
   borrowExecution:
     | "kamino-external"
     | "nestusd-external"
+    | "reflect-external"
     | "unavailable";
   kaminoBorrowUrl: string | null;
   nestusdAppUrl: string | null;
+  reflectAppUrl: string | null;
 };
 
 export type ActivityEvent = {
@@ -253,6 +265,12 @@ export type EmpireReadiness = {
   approvedLabShader: string | null;
   /** Optional Jupiter auth header — public path works without it. */
   jupiterKeyPresent: boolean;
+  /** Phantom Connect App ID — embedded social; injected path works without it. */
+  phantomAppId: string | null;
+  /** Optional Reflect integrator key (rate limits). */
+  reflectApiKeyPresent: boolean;
+  /** Squads vault pubkey configured for treasury read. */
+  squadsVaultConfigured: boolean;
   /** Dedicated SOLANA_RPC_URL (false = labeled public RPC fallback · B004). */
   solanaRpcDedicated: boolean;
   /**
@@ -290,6 +308,9 @@ export function readEmpireReadiness(
     approvedLabUi: readApprovedLabUi(env),
     approvedLabShader: readApprovedLabShader(env),
     jupiterKeyPresent: Boolean(env["JUPITER_API_KEY"]?.trim()),
+    phantomAppId: readPhantomAppId(env),
+    reflectApiKeyPresent: Boolean(env["REFLECT_API_KEY"]?.trim()),
+    squadsVaultConfigured: Boolean(readSquadsVault(env)),
     solanaRpcDedicated: Boolean(env["SOLANA_RPC_URL"]?.trim()),
     /** Sync path defaults false — enrich via loadEmpireReadiness. */
     supabaseSchemaReady: false,
@@ -527,11 +548,12 @@ export const getCreditBundle = createServerFn({ method: "GET" })
     );
     const watch = readWatchWallet();
 
-    const [kamino, jupiterLend, nestusd, nestCredit] = await Promise.all([
+    const [kamino, jupiterLend, nestusd, nestCredit, reflect] = await Promise.all([
       fetchKaminoXStocksMarket(),
       fetchJupiterLendEarn(),
       fetchNestUsdStatus(),
       fetchNestCreditVaults(),
+      fetchReflectStatus(),
     ]);
 
     const creditSymbols = ["AAPLx", "NVDAx"] as const;
@@ -595,11 +617,14 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       nestusd.ok &&
       nestusd.data.status === "live" &&
       !nestusd.data.protocolPaused;
+    const reflectLive = reflect.ok;
     const borrowExecution = kaminoLive
       ? ("kamino-external" as const)
       : nestLive
         ? ("nestusd-external" as const)
-        : ("unavailable" as const);
+        : reflectLive
+          ? ("reflect-external" as const)
+          : ("unavailable" as const);
 
     let note: string;
     if (kaminoLive) {
@@ -615,12 +640,17 @@ export const getCreditBundle = createServerFn({ method: "GET" })
     } else {
       note = "Estimate until you connect a wallet.";
     }
+    if (reflectLive) {
+      note +=
+        " Reflect USDC+/USDT+ is live for stable yield — not NestUSD xStock borrow.";
+    }
 
     return {
       kamino,
       jupiterLend,
       nestusd,
       nestCredit,
+      reflect,
       paper: {
         label,
         collateralUsd: collateral,
@@ -631,6 +661,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       borrowExecution,
       kaminoBorrowUrl: kamino.ok ? kamino.data.borrowUrl : null,
       nestusdAppUrl: nestusd.ok ? nestusd.data.appUrl : null,
+      reflectAppUrl: reflect.ok ? reflect.data.appUrl : REFLECT_APP_URL,
       watchWallet: watch.ok ? watch.data.wallet : null,
       inspectWallet: inspectActive,
       walletSource,

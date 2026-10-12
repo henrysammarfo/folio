@@ -68,6 +68,11 @@ function Page() {
   const nestEarn = data?.nestCredit?.ok
     ? `Nest.credit shows ${data.nestCredit.data.vaultCount} vaults (read-only · not NestUSD)`
     : null;
+  const reflectLive = Boolean(data?.reflect?.ok);
+  const reflectUrl = data?.reflectAppUrl;
+  const reflectTypes = data?.reflect?.ok
+    ? data.reflect.data.types.map((t) => t.name).join(" · ")
+    : null;
 
   return (
     <DeskShell title="Borrow">
@@ -138,6 +143,20 @@ function Page() {
               NestUSD app
             </a>
           ) : null}
+          {reflectLive && reflectUrl ? (
+            <a
+              href={reflectUrl}
+              className="fx-btn fx-btn-ghost"
+              target="_blank"
+              rel="noreferrer"
+              data-testid="credit-reflect"
+              onClick={() =>
+                trackFolioEvent("cta_click", { cta: "reflect_stable" })
+              }
+            >
+              Reflect stables
+            </a>
+          ) : null}
           <Link to="/desk/positions" className="fx-btn fx-btn-ghost">
             View holdings
           </Link>
@@ -204,9 +223,24 @@ function Page() {
           </>
         ) : null}
 
+        {reflectLive ? (
+          <>
+            <h2 className="fx-section-title">Reflect stable rail (live)</h2>
+            <div className="fx-card fx-card-pad" data-testid="credit-reflect-card">
+              <p className="fx-sub" style={{ marginBottom: 0 }}>
+                {reflectTypes ?? "USDC+ / USDT+"} · not NestUSD borrow · mint/earn
+                via Reflect app or @reflectmoney/stable.ts
+                {data?.reflect?.ok && data.reflect.data.users != null
+                  ? ` · ${data.reflect.data.users.toLocaleString("en-US")} users`
+                  : ""}
+              </p>
+            </div>
+          </>
+        ) : null}
+
         <p className="fx-sub" style={{ marginTop: "1.25rem" }}>
-          FOLIO reads live rails and opens Kamino / NestUSD for the borrow
-          transaction — we do not run a custom borrow CPI.{" "}
+          FOLIO reads live rails and opens Kamino / NestUSD / Reflect for
+          execute — we do not run a custom borrow CPI.{" "}
           {nestEarn ? `${nestEarn}.` : null}
         </p>
 

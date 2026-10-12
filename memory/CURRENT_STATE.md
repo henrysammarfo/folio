@@ -1,7 +1,15 @@
 # FOLIO — CURRENT STATE
 
-> Updated: 2026-09-20 · Stocklana deadline **2026-09-25 20:00 UTC** (4pm ET)
+> Updated: 2026-10-12 · Crypto World's Fair deadline **2026-10-12 23:59 PT**
 > Doctrine: honest security only — **never claim unhackable / NK-proof**.
+
+## World's Fair hub sponsors (branch `cursor/folio-hub-sponsors-spine-f1ec`)
+
+- **Phantom Connect** dual-path beside Privy (`PhantomConnectShell` + Settings panel). Injected always; embedded social needs `PHANTOM_APP_ID` (Portal new apps paused). Session mint stays Privy httpOnly.
+- **Reflect** REST mainnet-read (`prod.api.reflect.money`) on credit + matrix · `@reflectmoney/stable.ts` packaged for mint/redeem handoff · never conflated with NestUSD.
+- **Meteora DBC** separate desk `/desk/dbc` via `dbc.datapi.meteora.ag` — not xStock truth · no Anchor SDK on SSR.
+- **Squads / Altitude** treasury row · `FOLIO_SQUADS_VAULT` + explicit `FOLIO_TREASURY_FUNDED` · ≤~$1 stays unfunded unless both arm.
+- Matrix rows + Netro gate labels + keys-readiness optional envs wired.
 
 ## Marketing / landing (product)
 

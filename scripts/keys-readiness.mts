@@ -45,6 +45,24 @@ const rows: Array<{ name: string; ok: boolean; note: string; required?: boolean 
     required: false,
   },
   {
+    name: "PHANTOM_APP_ID",
+    ok: Boolean(process.env["PHANTOM_APP_ID"]?.trim()),
+    note: "optional — embedded Phantom Connect social; injected path works without it",
+    required: false,
+  },
+  {
+    name: "REFLECT_API_KEY",
+    ok: Boolean(process.env["REFLECT_API_KEY"]?.trim()),
+    note: "optional — Reflect rate limits; public health/types/stats work without it",
+    required: false,
+  },
+  {
+    name: "FOLIO_SQUADS_VAULT",
+    ok: Boolean(process.env["FOLIO_SQUADS_VAULT"]?.trim()),
+    note: "optional — Squads treasury mainnet-read; fail-closed when unset",
+    required: false,
+  },
+  {
     name: "PRIVY_APP_ID + PRIVY_APP_SECRET",
     ok: Boolean(
       process.env["PRIVY_APP_ID"]?.trim() && process.env["PRIVY_APP_SECRET"]?.trim(),

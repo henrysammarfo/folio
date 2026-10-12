@@ -78,6 +78,67 @@ describe("buildNetworkMatrix honesty", () => {
     expect(byCap["Raydium pool awareness"]?.detail).toMatch(
       /awareness only|not a route guarantee/i,
     );
+
+    expect(byCap["Reflect stable credit (read)"]?.mode).toBe("unavailable");
+    expect(byCap["Phantom Connect (wallet dual-path)"]?.mode).toBe(
+      "unavailable",
+    );
+    expect(byCap["Meteora DBC awareness (separate lane)"]?.mode).toBe(
+      "unavailable",
+    );
+    expect(byCap["FOLIO treasury (Squads / Altitude)"]?.mode).toBe(
+      "unavailable",
+    );
+  });
+
+  it("labels hub lanes when adapters report mainnet-read without flipping NestUSD", () => {
+    const nestusdDown = errResult(
+      "nestusd",
+      "nestusd_endpoint_unverified",
+      "NestUSD xStock borrow capacity unverified — fail-closed.",
+    );
+    const rows = buildNetworkMatrix({
+      multiplier: live,
+      pyth: down,
+      jupiter: live,
+      jupiterPrice: live,
+      wash: down,
+      kamino: live,
+      jupiterLend: live,
+      nestusd: nestusdDown,
+      nestCredit: live,
+      scaledUi: live,
+      pools: live,
+      phantomConnect: live,
+      reflect: live,
+      meteoraDbc: live,
+      squadsTreasury: okResult("mainnet-read", "squads", {
+        broadcastTreasuryReady: false,
+        sol: 0.01,
+        note: "Vault read · FOLIO_TREASURY_FUNDED≠true",
+      }),
+      bitqueryKeyPresent: false,
+      multiTenantKeysPresent: false,
+      sessionSecretPresent: true,
+      solanaRpcPublicFallback: true,
+      broadcastFunded: false,
+    });
+    const byCap = Object.fromEntries(rows.map((r) => [r.capability, r]));
+    expect(byCap["NestUSD capacity"]?.mode).toBe("unavailable");
+    expect(byCap["Reflect stable credit (read)"]?.mode).toBe("mainnet-read");
+    expect(byCap["Reflect stable credit (read)"]?.detail).toMatch(
+      /not NestUSD|not Nest\.credit/i,
+    );
+    expect(byCap["Phantom Connect (wallet dual-path)"]?.mode).toBe(
+      "mainnet-read",
+    );
+    expect(byCap["Meteora DBC awareness (separate lane)"]?.detail).toMatch(
+      /not xStock/i,
+    );
+    expect(byCap["FOLIO treasury (Squads / Altitude)"]?.mode).toBe(
+      "mainnet-read",
+    );
+    expect(byCap["Broadcast swap / borrow"]?.mode).toBe("unavailable");
   });
 
   it("labels user-signed fills armed when broadcastPaused=false without FOLIO treasury", () => {

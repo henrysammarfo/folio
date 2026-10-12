@@ -1,6 +1,14 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-10-12 — World's Fair hub sponsors spine (Phantom · Reflect · DBC · Squads)
+
+- Added fail-closed adapters: `phantom-connect`, `reflect`, `meteora-dbc`, `squads-treasury` + `reflect-sdk` handoff.
+- Wired into `buildNetworkMatrix` / `getNetworkBundle` / `getCreditBundle` / Empire readiness.
+- Desk: Phantom Connect shell + Settings panel · Reflect CTA on credit · `/desk/dbc` separate lane.
+- Deps: `@phantom/react-sdk`, `@reflectmoney/stable.ts` (SDK not imported on SSR read path).
+- Branch: `cursor/folio-hub-sponsors-spine-f1ec`.
+
 ## 2026-09-20 — Credit live: NestUSD metrics + Kamino borrow CTA
 
 - NestUSD: wired `api.nestusd.com/v1/risk` + `/v1/config` (live collateral LTV). Execute = NestUSD app deep-link (no FOLIO CPI).
