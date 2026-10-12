@@ -1,4 +1,5 @@
 import { usePrivy } from "@privy-io/react-auth";
+import { useWallets } from "@privy-io/react-auth/solana";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -77,6 +78,7 @@ function OpenAppPrivyControls({
   onMinted: () => void;
 }) {
   const { ready, authenticated, login, getAccessToken, user } = usePrivy();
+  const { wallets } = useWallets();
   const createSession = useServerFn(createSessionFromPrivyToken);
   const [busy, setBusy] = useState(false);
   const autoMintedFor = useRef<string | null>(null);
@@ -86,7 +88,13 @@ function OpenAppPrivyControls({
     try {
       const token = await getAccessToken();
       if (!token) return;
-      const res = await createSession({ data: { accessToken: token } });
+      const walletAddress = wallets[0]?.address;
+      const res = await createSession({
+        data: {
+          accessToken: token,
+          ...(walletAddress ? { walletAddress } : {}),
+        },
+      });
       if (res.ok) onMinted();
     } finally {
       setBusy(false);
@@ -96,11 +104,16 @@ function OpenAppPrivyControls({
   useEffect(() => {
     if (!ready || !authenticated || !mintReady || busy) return;
     const uid = user?.id ?? "authed";
-    if (autoMintedFor.current === uid) return;
-    autoMintedFor.current = uid;
+    const walletAddress = wallets[0]?.address ?? "";
+    const key = `${uid}:${walletAddress}`;
+    if (autoMintedFor.current === key) return;
+    if (autoMintedFor.current?.startsWith(`${uid}:`) && !walletAddress) {
+      return;
+    }
+    autoMintedFor.current = key;
     void mintFromPrivy();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, authenticated, mintReady, user?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- remint when Solana wallet binds
+  }, [ready, authenticated, mintReady, user?.id, wallets[0]?.address]);
 
   return (
     <button

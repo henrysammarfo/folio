@@ -1,6 +1,14 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-10-12 — Customer perspective audit (paper illusion + Account wallet)
+
+- P0: Home/Borrow no longer treat paper qty as real money when wallet bound+empty → $0 borrow / empty holdings.
+- Account shows Open App / session wallet + **Copy address** (was “No wallet connected”).
+- Header Open App remints when Solana wallet arrives; gas strip adds **Add USDC** + full address copy.
+- Launches primary = Add SOL first when gas low; NestUSD labeled needs SOL.
+- Residual: Buy gasPref still cosmetic; Activity is market telemetry not user trades; fills paused until Henry arms.
+
 ## 2026-10-12 — Email-wallet gas loophole (customer path)
 
 - Loophole: Open App email → embedded Solana wallet at **0 SOL** → Meteora / Reflect / Kamino deep-links look live but fail without fees.

@@ -57,6 +57,9 @@ function Page() {
   const rows = data?.rows ?? [];
   const total = rows.reduce((s, r) => s + (r.paperValueUsd ?? 0), 0);
   const walletRead = rows.some((r) => r.qtySource === "wallet-read");
+  const walletHasStock = rows.some(
+    (r) => r.qtySource === "wallet-read" && r.qty > 0,
+  );
   const parts = rows
     .filter((r) => (r.paperValueUsd ?? 0) > 0)
     .map((r, i) => ({
@@ -70,13 +73,25 @@ function Page() {
       <section className="fx-page">
         <header className="fx-hero">
           <h1 className="fx-hero-kicker">
-            {walletRead ? "Holdings · wallet" : "Holdings · paper estimate"}
-          </h1>
-          <p className="fx-hero-value">{total > 0 ? money(total) : "—"}</p>
-          <p className="fx-hero-sub">
             {walletRead
-              ? "Live balances from your wallet — Verified only when on-chain share count matches"
-              : "Paper quantities for demo — not owned shares until you connect a wallet"}
+              ? walletHasStock
+                ? "Holdings · wallet"
+                : "Holdings · empty"
+              : "Holdings · demo preview"}
+          </h1>
+          <p className="fx-hero-value">
+            {walletRead && !walletHasStock
+              ? money(0)
+              : total > 0
+                ? money(total)
+                : "—"}
+          </p>
+          <p className="fx-hero-sub">
+            {walletRead && !walletHasStock
+              ? "No xStocks in this wallet yet — Buy to get real holdings."
+              : walletRead
+                ? "Live balances from your wallet — Verified only when on-chain share count matches"
+                : "Demo quantities — not owned shares. Open App, then Buy."}
           </p>
         </header>
 
@@ -91,9 +106,22 @@ function Page() {
 
         {parts.length > 0 ? <AllocationChart parts={parts} /> : null}
 
-        <h2 className="fx-section-title">Your stocks</h2>
+        <h2 className="fx-section-title">
+          {walletRead ? "Your stocks" : "Demo stocks"}
+        </h2>
         <div className="fx-card">
-          <ul className="fx-list" aria-label="Holdings">
+          {walletRead && !walletHasStock ? (
+            <p className="fx-sub" style={{ padding: "1rem 1.1rem" }}>
+              Empty — nothing to borrow against yet. Buy stocks first.
+            </p>
+          ) : null}
+          <ul
+            className="fx-list"
+            aria-label="Holdings"
+            style={
+              walletRead && !walletHasStock ? { display: "none" } : undefined
+            }
+          >
             {rows.map((p) => {
               const chain = scaledUiHealthLabel(p.scaledUiCompare.status);
               const status = positionStatusLabel({

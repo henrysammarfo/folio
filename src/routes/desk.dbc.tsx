@@ -72,6 +72,21 @@ function Page() {
               Open Meteora
             </a>
           ) : (
+            <Link
+              to="/desk/settings"
+              className="fx-btn fx-btn-primary"
+              data-testid="dbc-fund-first"
+              onClick={() =>
+                trackFolioEvent("cta_click", { cta: "fund_before_meteora" })
+              }
+            >
+              Add SOL first
+            </Link>
+          )}
+          <Link to="/desk/acquire" className="fx-btn fx-btn-ghost">
+            Buy stocks
+          </Link>
+          {!gasReady ? (
             <a
               href={appUrl}
               className="fx-btn fx-btn-ghost"
@@ -87,10 +102,7 @@ function Page() {
             >
               Open Meteora anyway
             </a>
-          )}
-          <Link to="/desk/acquire" className="fx-btn fx-btn-ghost">
-            Buy stocks
-          </Link>
+          ) : null}
         </div>
 
         {sample.length > 0 ? (

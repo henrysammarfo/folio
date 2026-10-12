@@ -19,9 +19,10 @@ import {
   updateDeskPreferences,
   type SessionBundle,
 } from "@/lib/desk.functions";
-import { canWriteDeskPrefs } from "@/lib/auth/role-gates";
+import { activeMembership, canWriteDeskPrefs } from "@/lib/auth/role-gates";
 import { scrubOpsJargon } from "@/lib/humanize-copy";
 import { isPlausibleSolanaAddress } from "@/components/wallet-lookup-panel";
+import { resolveWalletBinding } from "@/lib/wallet-binding";
 import { siteMeta } from "@/lib/site-meta";
 
 const PrivySessionMint = lazy(() =>
@@ -109,14 +110,23 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
   const phantomAppConfigured = Boolean(data?.readiness.phantomAppId);
   const watchBindReady = Boolean(data?.sessionSecretPresent);
   const fillsPaused = data?.readiness.broadcastPaused !== false;
-  const shortWallet = data?.watchWallet
-    ? `${data.watchWallet.slice(0, 4)}…${data.watchWallet.slice(-4)}`
+  const membership =
+    data?.session.ok ? activeMembership(data.session.data) : null;
+  const { wallet: boundWallet, source: walletSource } = resolveWalletBinding({
+    membershipWallet: membership?.walletAddress ?? null,
+    sessionWallet: data?.session.ok ? data.session.data.walletAddress : null,
+    watchWallet: data?.watchWallet ?? null,
+  });
+  const shortWallet = boundWallet
+    ? `${boundWallet.slice(0, 4)}…${boundWallet.slice(-4)}`
     : null;
+  const [copied, setCopied] = useState(false);
 
   async function refresh() {
     await queryClient.invalidateQueries({ queryKey: ["session-bundle"] });
     await queryClient.invalidateQueries({ queryKey: ["positions-bundle"] });
     await queryClient.invalidateQueries({ queryKey: ["credit-bundle"] });
+    await queryClient.invalidateQueries({ queryKey: ["wallet-gas"] });
     await refetch();
   }
 
@@ -144,9 +154,41 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               <Wallet size={18} strokeWidth={2} aria-hidden />
               <div>
                 <h2>Wallet</h2>
-                <p>{shortWallet ?? "No wallet connected"}</p>
+                <p>
+                  {shortWallet
+                    ? `${shortWallet}${
+                        walletSource === "session" ||
+                        walletSource === "membership"
+                          ? " · from Open App"
+                          : walletSource === "watch-wallet"
+                            ? " · saved"
+                            : ""
+                      }`
+                    : "No wallet yet — Open App with email"}
+                </p>
               </div>
             </header>
+            {boundWallet ? (
+              <div className="fx-wallet-addr" data-testid="account-wallet-addr">
+                <code title={boundWallet}>{boundWallet}</code>
+                <button
+                  type="button"
+                  className="fx-btn fx-btn-dark fx-btn-sm"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(boundWallet);
+                      setCopied(true);
+                      window.setTimeout(() => setCopied(false), 1600);
+                      setMsg("Address copied.");
+                    } catch {
+                      setMsg("Couldn’t copy — select the address manually.");
+                    }
+                  }}
+                >
+                  {copied ? "Copied" : "Copy"}
+                </button>
+              </div>
+            ) : null}
             <form
               className="fx-inline-form"
               onSubmit={async (e) => {
@@ -177,7 +219,7 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               <input
                 value={wallet}
                 onChange={(e) => setWallet(e.target.value)}
-                placeholder="Paste wallet address"
+                placeholder="Or paste another address"
                 autoComplete="off"
                 spellCheck={false}
                 aria-label="Wallet address"
@@ -207,13 +249,13 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
                   try {
                     await clearWatch();
                     await refresh();
-                    setMsg("Wallet disconnected.");
+                    setMsg("Saved wallet cleared.");
                   } finally {
                     setBusy(false);
                   }
                 }}
               >
-                Disconnect wallet
+                Clear saved wallet
               </button>
             ) : null}
             <div style={{ marginTop: "1rem" }}>
@@ -299,8 +341,8 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
             <header className="fx-account-card-head">
               <Bell size={18} strokeWidth={2} aria-hidden />
               <div>
-                <h2>Corporate-action alerts</h2>
-                <p>Notify when a pending multiplier appears.</p>
+                <h2>Stock split alerts</h2>
+                <p>Notify when a pending share-count change appears.</p>
               </div>
             </header>
             <Switch

@@ -456,9 +456,20 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
         mint && walletBalances?.ok
           ? walletBalances.data.byMint[mint]?.uiAmount
           : undefined;
+      // Bound wallet + successful balance read → never fall back to paper qty
+      // (empty email wallets must show 0, not demo shares).
       const qtySource: PositionRow["qtySource"] =
-        walletUi != null && Number.isFinite(walletUi) ? "wallet-read" : "paper";
-      const qty = qtySource === "wallet-read" ? (walletUi as number) : paperRaw;
+        displayWallet && walletBalances?.ok
+          ? "wallet-read"
+          : walletUi != null && Number.isFinite(walletUi)
+            ? "wallet-read"
+            : "paper";
+      const qty =
+        qtySource === "wallet-read"
+          ? walletUi != null && Number.isFinite(walletUi)
+            ? (walletUi as number)
+            : 0
+          : paperRaw;
 
       const mult = multiplier.ok ? multiplier.data.currentMultiplier : null;
       const onchainEff = onchain.ok ? onchain.data.effectiveMultiplier : null;
@@ -518,14 +529,19 @@ export const getPositionsBundle = createServerFn({ method: "GET" })
 
     const watch = readWatchWallet();
     const inspectActive = walletSource === "inspect" ? displayWallet : null;
+    const anyWalletQty = rows.some(
+      (r) => r.qtySource === "wallet-read" && r.qty > 0,
+    );
     let note: string;
     if (!displayWallet) {
       note =
-        "Estimated quantities until you connect a wallet. Share counts are live and checked against the Solana ledger.";
+        "Demo quantities — not owned shares. Open App, add USDC + a little SOL, then Buy.";
+    } else if (walletBalances?.ok && !anyWalletQty) {
+      note = `Wallet ${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)} holds no xStocks yet. Buy to get real holdings.`;
     } else if (walletBalances?.ok) {
       note = `Live balances for ${displayWallet.slice(0, 4)}…${displayWallet.slice(-4)}. Share counts verified on-chain when they match.`;
     } else {
-      note = `Wallet connected but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — showing estimates. Share counts still live.`;
+      note = `Wallet connected but balances unavailable (${walletBalances && !walletBalances.ok ? walletBalances.reason : "unknown"}) — demo estimates only. Share counts still live.`;
     }
 
     return {
@@ -576,6 +592,7 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       ? await fetchWalletTokenBalances({ wallet: displayWallet, mints })
       : null;
 
+    const walletReadOk = Boolean(displayWallet && walletBalances?.ok);
     let collateral: number | null = null;
     let priced = 0;
     let usedWalletQty = false;
@@ -590,10 +607,19 @@ export const getCreditBundle = createServerFn({ method: "GET" })
           mint && walletBalances?.ok
             ? walletBalances.data.byMint[mint]?.uiAmount
             : undefined;
-        const useWallet =
-          walletUi != null && Number.isFinite(walletUi) && walletUi > 0;
-        const raw = useWallet ? (walletUi as number) : paperRaw;
-        if (useWallet) usedWalletQty = true;
+        // Bound + balances OK → wallet only (0 if empty). Never inflate borrow
+        // with paper qty for email wallets that hold nothing.
+        let raw: number;
+        if (walletReadOk) {
+          raw =
+            walletUi != null && Number.isFinite(walletUi) ? (walletUi as number) : 0;
+          if (raw > 0) usedWalletQty = true;
+        } else {
+          const useWallet =
+            walletUi != null && Number.isFinite(walletUi) && walletUi > 0;
+          raw = useWallet ? (walletUi as number) : paperRaw;
+          if (useWallet) usedWalletQty = true;
+        }
         collateral =
           (collateral ?? 0) +
           raw * multiplier.data.currentMultiplier * price.data.usdPrice;
@@ -601,6 +627,9 @@ export const getCreditBundle = createServerFn({ method: "GET" })
       }
     }
     if (priced === 0) collateral = null;
+    if (walletReadOk && !usedWalletQty) {
+      collateral = 0;
+    }
 
     const aaplReserve = kamino.ok
       ? kamino.data.reserves.find((r) => r.symbol === "AAPLx")
@@ -611,7 +640,11 @@ export const getCreditBundle = createServerFn({ method: "GET" })
         ? collateral * maxLtvUsed
         : null;
 
-    const label = usedWalletQty ? ("wallet-read" as const) : ("paper" as const);
+    const label = walletReadOk
+      ? ("wallet-read" as const)
+      : usedWalletQty
+        ? ("wallet-read" as const)
+        : ("paper" as const);
     const inspectActive = walletSource === "inspect" ? displayWallet : null;
 
     const kaminoLive = kamino.ok;
@@ -629,18 +662,21 @@ export const getCreditBundle = createServerFn({ method: "GET" })
           : ("unavailable" as const);
 
     let note: string;
-    if (kaminoLive) {
+    if (walletReadOk && !usedWalletQty) {
+      note =
+        "Your wallet has no xStocks yet — borrow capacity is $0. Buy stocks first, then open Kamino.";
+    } else if (kaminoLive) {
       note = usedWalletQty
-        ? "Live Kamino xStocks LTV × your wallet collateral. Open Kamino to deposit & borrow (FOLIO does not sign the borrow CPI)."
-        : "Live Kamino xStocks LTV. Connect a wallet for your collateral estimate, then borrow on Kamino.";
+        ? "Live Kamino xStocks LTV × your wallet collateral. Open Kamino to deposit & borrow — you sign."
+        : "Live Kamino rates. Demo borrow figure until you Open App — not your money.";
     } else if (usedWalletQty) {
       note =
         "Estimate from your wallet balances × live max LTV. Borrow rails unavailable.";
     } else if (displayWallet && walletBalances && !walletBalances.ok) {
       note =
-        "Wallet connected but balances unavailable — showing estimates × live max LTV.";
+        "Wallet connected but balances unavailable — demo estimate only, not your collateral.";
     } else {
-      note = "Estimate until you connect a wallet.";
+      note = "Demo estimate until you Open App. Not borrowable cash.";
     }
     if (reflectLive) {
       note += " Earn on Reflect stables with your wallet when you are ready.";

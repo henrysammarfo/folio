@@ -65,6 +65,10 @@ function Page() {
   const borrow = data?.paper.illustrativeBorrowUsd;
   const ltv = data?.paper.maxLtvUsed;
   const collateral = data?.paper.collateralUsd;
+  const qtyLabel = data?.paper.label;
+  const isDemoBorrow = qtyLabel !== "wallet-read";
+  const emptyWalletBorrow =
+    qtyLabel === "wallet-read" && (borrow == null || borrow <= 0);
   const kaminoUrl = data?.kaminoBorrowUrl;
   const nestUrl = data?.nestusdAppUrl;
   const nestLive =
@@ -84,7 +88,13 @@ function Page() {
     <DeskShell title="Borrow">
       <section className="fx-page">
         <header className="fx-hero">
-          <p className="fx-hero-kicker">Available to borrow</p>
+          <p className="fx-hero-kicker">
+            {isDemoBorrow
+              ? "Demo borrow figure"
+              : emptyWalletBorrow
+                ? "Available to borrow"
+                : "Available to borrow"}
+          </p>
           <h1 className="fx-hero-value">
             {borrow != null ? money(borrow) : "—"}
           </h1>
@@ -155,6 +165,11 @@ function Page() {
               target="_blank"
               rel="noreferrer"
               data-testid="credit-borrow-nestusd"
+              title={
+                gasReady
+                  ? "Open NestUSD with your wallet"
+                  : "Needs SOL for fees — add funds above first"
+              }
               onClick={() =>
                 trackFolioEvent("cta_click", {
                   cta: "borrow_nestusd",
@@ -162,7 +177,7 @@ function Page() {
                 })
               }
             >
-              NestUSD app
+              {gasReady ? "NestUSD app" : "NestUSD (needs SOL)"}
             </a>
           ) : null}
           {reflectLive && reflectUrl ? (

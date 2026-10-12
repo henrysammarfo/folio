@@ -1,3 +1,15 @@
+## 2026-10-12 — Customer perspective audit
+
+| Claim | Status |
+|---|---|
+| Bound empty wallet still showed paper borrow USD | Fixed — wallet-read path uses 0 collateral |
+| Home “Your portfolio” from paper without label | Fixed — Demo preview / empty copy |
+| Account “No wallet connected” after Open App | Fixed — resolveWalletBinding + Copy |
+| No copy-address / Add USDC | Fixed on gas strip + Account |
+| Header Open App missed Solana remint | Fixed — matches Account mint |
+| Buy gasPref wires to prepare | Residual — cosmetic only |
+| Activity = user trade history | Residual — market checks |
+
 ## 2026-10-12 — Email-wallet gas honesty
 
 | Claim | Status |

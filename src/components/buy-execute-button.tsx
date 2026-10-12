@@ -38,8 +38,9 @@ export function BuyExecuteButton(props: Props) {
         className="fx-btn fx-btn-primary fx-btn-block"
         disabled
         data-testid="acquire-execute"
+        title="Finish review checks above — wash, share count, or quote may be blocking"
       >
-        Blocked for safety
+        Fix checks above
       </button>
     );
   }
