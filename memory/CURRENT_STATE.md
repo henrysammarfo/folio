@@ -31,7 +31,8 @@
 - **Phases A–E on main (`4a35b13`):** Swap V2 `/order` + gated `/execute` · Privy Open App (email/embedded Solana + link/export) · consumer settings scrub (`FOLIO_OPS=1`) · session/rate-limit gates · overview Stocks/Pre-IPO/Tessera partner lanes · beta waitlist **server-only** (Supabase `beta_waitlist`, no localStorage).
 - **Ship rough edges (branch `cursor/folio-ship-rough-edges-f1ec`):** Buy prepare→Privy sign→execute CTA · positions Verified/paper labels · partner $1 quote strip · beta cine contrast · Phase G analytics events + `/desk/admin` · Truth reconcile/PoR-analogue copy · credit unavailable-until-funded honesty.
 - Prod: https://folio-tawny-one.vercel.app
-- Henry still: apply `beta_waitlist` migration · Privy allowed origins · flip `BROADCAST_PAUSED=false` on **preview first**, then prod (user-signed fills; no FOLIO payer). NestUSD/borrow CPI still unfunded.
+- **Fills armed:** `BROADCAST_PAUSED=false` on Vercel prod/preview/dev (user-signed Jupiter; no FOLIO payer). Hub preview needs TanStack ≥1.168.60 (XSS gate). NestUSD/borrow CPI still unfunded.
+- Henry still: apply `beta_waitlist` migration · Privy allowed origins if missing.
 - **/desk/preipo** PreStocks-only (token/mark/premium/implied) · **/desk/tessera** T-tokens (loan-participation, separate bounty).
 - **AssetLogo** chain: API logo → Backed CDN (ARMx not ARMXx) → company favicon → initials.
 - Catalog: ARMx/GMEx/DJTx/NFLXx/AMDx/SPYx/QQQx confirmed live; AMC watchlist dropped (API 500).

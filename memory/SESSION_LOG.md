@@ -1,6 +1,13 @@
 
 # FOLIO — SESSION LOG
 
+## 2026-10-12 — Arm fills + unblock Vercel preview
+
+- Confirmed Vercel `BROADCAST_PAUSED=false` already on production/preview/development (user-signed Jupiter only).
+- Hub previews were ERROR: TanStack Start XSS block (`@tanstack/react-start@1.168.32` → **1.168.61** + router 1.170.42 + plugin 1.168.43).
+- Session `networkPolicy.broadcast` now tracks `!isBroadcastPaused()`; Account desk-mode copy reflects armed fills.
+- Residual: FOLIO still never sponsors gas; borrow CPI unfunded; merge hub → main for prod Buy path if acquire 404 on old main.
+
 ## 2026-10-12 — Customer perspective audit (paper illusion + Account wallet)
 
 - P0: Home/Borrow no longer treat paper qty as real money when wallet bound+empty → $0 borrow / empty holdings.

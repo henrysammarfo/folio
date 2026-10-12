@@ -332,8 +332,9 @@ function ConsumerSettings({ initial }: { initial: SessionBundle }) {
               </div>
             </header>
             <p className="fx-sub">
-              Markets and share counts update live. Broadcast fills stay off
-              until FOLIO turns them on for your session.
+              {fillsPaused
+                ? "Markets and share counts update live. Buys stay quote-only until fills turn on."
+                : "Markets update live. Buys are armed — you sign in your wallet. FOLIO never pays gas for you."}
             </p>
           </article>
 

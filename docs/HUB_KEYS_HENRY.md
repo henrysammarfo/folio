@@ -106,7 +106,7 @@ Wallet connected (`4HMZ…fWqm`). Form = **Squad Details** (step 1 of 3).
 | `JUPITER_API_KEY` | https://portal.jup.ag/ (optional) |
 | `BITQUERY_API_KEY` | https://account.bitquery.io/ |
 | `SOLANA_RPC_URL` | Helius https://www.helius.dev/ (or keep public fallback) |
-| `BROADCAST_PAUSED` | Keep `true` until you want user-signed Jupiter fills armed |
+| `BROADCAST_PAUSED` | Set `false` to arm user-signed Jupiter fills (already false on Vercel prod/preview/dev) |
 
 ---
 

@@ -40,7 +40,8 @@
 |---|---|
 | Buy CTA calls prepare → Privy sign → execute when fills armed | Implemented — `buy-execute-button.tsx` |
 | prepareJupiterSwap requires session + !BROADCAST_PAUSED + taker | Implemented — `desk.functions.ts` |
-| Fills still env-gated until BROADCAST_PAUSED=false | Residual — Henry preview-then-prod |
+| Fills env-gated by BROADCAST_PAUSED | Armed — Vercel value `false` on prod/preview/dev |
+| Hub preview blocked by TanStack XSS CVE | Fixed — react-start ≥1.168.61 |
 | Positions show positionStatusLabel (Verified / Live · est.) | Implemented |
 | Partner lanes show Jupiter $1 out amount | Implemented |
 | Beta cine inputs/Join high contrast | Implemented — `styles.css` |

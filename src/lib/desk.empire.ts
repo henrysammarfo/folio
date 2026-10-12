@@ -975,9 +975,10 @@ export const getSessionBundle = createServerFn({ method: "GET" }).handler(
       preferences,
       networkPolicy: {
         mainnetRead: true,
-        quoteOnly: true,
-        // Unfunded · ≤~$1 — never report Enabled just because BROADCAST_PAUSED=false.
-        broadcast: false,
+        // Quote-only until fills armed; when BROADCAST_PAUSED=false, user-signed
+        // Jupiter execute is live (still no FOLIO payer / custom program).
+        quoteOnly: isBroadcastPaused(),
+        broadcast: !isBroadcastPaused(),
         customProgramDeploy: false,
       },
       watchWallet: watch.ok ? watch.data.wallet : null,
