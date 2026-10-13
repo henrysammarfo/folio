@@ -1,4 +1,13 @@
 
+## 2026-10-13 — World's Fair submit smoke (prod)
+
+- Production READY on `52d4317` · alias `folio-tawny-one.vercel.app`
+- HTTP 200 on home, desk surfaces, network, truth, videos, both MP4s
+- Network: **Fills armed** · `broadcastPaused:false` · Phantom/Reflect/Meteora DBC rows live
+- Videos: `/videos` + FOLIO-pitch.mp4 / FOLIO-demo.mp4 serving
+- Judge pack URLs: demo site · /network · /videos · GitHub henrysammarfo/folio
+
+
 # FOLIO — SESSION LOG
 
 
