@@ -1358,6 +1358,14 @@
 .fx-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .fx-btn-primary{background:var(--fx-brand);color:#fff;box-shadow:0 1px 2px rgba(14,165,201,.2)}
 .fx-btn-primary:hover{background:#0B93B3}
+.fx-video-dl{display:grid;gap:2.5rem;max-width:52rem}
+.fx-video-dl-item{display:grid;gap:1rem}
+.fx-video-dl-head h2{font-family:var(--font-display);font-size:1.75rem;line-height:1.15;margin:0}
+.fx-video-dl-head p{margin:.35rem 0 0;opacity:.78;font-size:.95rem}
+.fx-video-dl-player{width:100%;aspect-ratio:16/9;background:#06211f;border:0;border-radius:0}
+.fx-video-dl-actions{display:flex;flex-wrap:wrap;gap:.75rem}
+.fx-video-dl-foot{margin:0;opacity:.75;font-size:.9rem;line-height:1.5}
+.fx-video-dl-foot a{text-decoration:underline;text-underline-offset:3px}
 .fx-btn-dark{background:#1c1c1c;color:#fff}
 .fx-btn-dark:hover{background:#000}
 .fx-btn-ghost{background:var(--fx-surface);color:var(--fx-ink);border:1px solid var(--fx-line)}

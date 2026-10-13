@@ -19,6 +19,7 @@ import { Route as MarketsRouteImport } from './routes/markets'
 import { Route as NetworkRouteImport } from './routes/network'
 import { Route as PairsRouteImport } from './routes/pairs'
 import { Route as PitchRouteImport } from './routes/pitch'
+import { Route as VideosRouteImport } from './routes/videos'
 import { Route as PreipoRouteImport } from './routes/preipo'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -87,6 +88,11 @@ const PairsRoute = PairsRouteImport.update({
 const PitchRoute = PitchRouteImport.update({
   id: '/pitch',
   path: '/pitch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VideosRoute = VideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PreipoRoute = PreipoRouteImport.update({
@@ -196,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/network': typeof NetworkRoute
   '/pairs': typeof PairsRoute
   '/pitch': typeof PitchRoute
+  '/videos': typeof VideosRoute
   '/preipo': typeof PreipoRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -226,6 +233,7 @@ export interface FileRoutesByTo {
   '/network': typeof NetworkRoute
   '/pairs': typeof PairsRoute
   '/pitch': typeof PitchRoute
+  '/videos': typeof VideosRoute
   '/preipo': typeof PreipoRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -258,6 +266,7 @@ export interface FileRoutesById {
   '/network': typeof NetworkRoute
   '/pairs': typeof PairsRoute
   '/pitch': typeof PitchRoute
+  '/videos': typeof VideosRoute
   '/preipo': typeof PreipoRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/network'
     | '/pairs'
     | '/pitch'
+    | '/videos'
     | '/preipo'
     | '/privacy'
     | '/terms'
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/network'
     | '/pairs'
     | '/pitch'
+    | '/videos'
     | '/preipo'
     | '/privacy'
     | '/terms'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/network'
     | '/pairs'
     | '/pitch'
+    | '/videos'
     | '/preipo'
     | '/privacy'
     | '/terms'
@@ -384,6 +396,7 @@ export interface RootRouteChildren {
   NetworkRoute: typeof NetworkRoute
   PairsRoute: typeof PairsRoute
   PitchRoute: typeof PitchRoute
+  VideosRoute: typeof VideosRoute
   PreipoRoute: typeof PreipoRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -463,6 +476,13 @@ declare module '@tanstack/react-router' {
       path: '/pitch'
       fullPath: '/pitch'
       preLoaderRoute: typeof PitchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/videos': {
+      id: '/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof VideosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/preipo': {
@@ -644,6 +664,7 @@ const rootRouteChildren: RootRouteChildren = {
   NetworkRoute: NetworkRoute,
   PairsRoute: PairsRoute,
   PitchRoute: PitchRoute,
+  VideosRoute: VideosRoute,
   PreipoRoute: PreipoRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
